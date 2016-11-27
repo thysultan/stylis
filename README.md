@@ -113,6 +113,17 @@ stylis('#user', styles, document.querySelector('style'));
 stylis('#user', styles, true);
 ```
 
+## Supports
+
+* Edge
+* IE 9+
+* Chrome
+* Firefox
+* Safari
+* Node.js
+
+---
+
 # Installation
 
 #### direct download
