@@ -1,5 +1,8 @@
 # Stylis
 
+- ~705bytes minified+gzipped
+- ~1kb minified
+
 Stylis is a small css compiler that turns this
 
 ```javascript
@@ -93,4 +96,49 @@ body {
         appearance: none;
     }
 }
+```
+
+and if you wanted to append this to a style element/string
+
+```javascript
+// browser
+stylis('#user', styles, document.querySelector('style'));
+
+// or explicity request a string, this wrap the css in <style></style> tags
+stylis('#user', styles, true);
+```
+
+[![npm](https://img.shields.io/npm/v/stylish.js.svg?style=flat)](https://www.npmjs.com/package/stylish.js) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylish.js/blob/master/LICENSE.md) 
+ ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
+
+## Browser Support
+
+* Edge
+* IE 9+
+* Chrome
+* Firefox
+* Safari
+
+---
+
+
+# Installation
+
+#### direct download
+
+```html
+<script src=stylis.min.js></script>
+```
+
+#### CDN
+
+
+```html
+<script src=https://unpkg.com/stylis@0.1.0/stylis.min.js></script>
+```
+
+#### npm
+
+```
+npm install stylis --save
 ```
