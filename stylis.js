@@ -22,7 +22,7 @@
 }(function (window) {
     'use strict';
 
-
+    var document    = window.document;
     var rkeyf       = /@(keyframes +.*?}$)/g;
     var rtrans      = /(transform:.*?;)/g;
     var rspaces     = /  +/g;
