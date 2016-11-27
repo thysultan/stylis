@@ -144,6 +144,8 @@
                         if (second === 107) {
                             // vendor prefix keyframes
                             line = '@-webkit-'+line+'}@'+line+'}';
+                        } else {
+                            line = line.replace(/@(keyframes +.*?}$)/g, '@-webkit-$1}@$1}');
                         }
                     }
                 } else {
