@@ -1,5 +1,8 @@
 # Stylis
 
+[![npm](https://img.shields.io/npm/v/stylish.svg?style=flat)](https://www.npmjs.com/package/stylish) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylish.js/blob/master/LICENSE.md) 
+ ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
+
 - ~705bytes minified+gzipped
 - ~1kb minified
 
@@ -104,23 +107,11 @@ and if you wanted to append this to a style element/string
 // browser
 stylis('#user', styles, document.querySelector('style'));
 
-// or explicity request a string, this wrap the css in <style></style> tags
+// or explicity request a string, 
+// in node this returns the css wrapped in <style></style> tags
+// and in the browser this returns a style element with the css
 stylis('#user', styles, true);
 ```
-
-[![npm](https://img.shields.io/npm/v/stylish.js.svg?style=flat)](https://www.npmjs.com/package/stylish.js) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylish.js/blob/master/LICENSE.md) 
- ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
-
-## Browser Support
-
-* Edge
-* IE 9+
-* Chrome
-* Firefox
-* Safari
-
----
-
 
 # Installation
 
