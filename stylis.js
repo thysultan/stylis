@@ -23,6 +23,12 @@
     'use strict';
 
 
+    var rkeyf       = /@(keyframes +.*?}$)/g;
+    var rtrans      = /(transform:.*?;)/g;
+    var rspaces     = /  +/g;
+    var ranim       = /(,|:) +/g;
+
+
     /**
      * stylis, css compiler interface
      *
@@ -78,10 +84,6 @@
         var len = chars.length;
         var i = 0;
         var line = '';
-        var regkeyf = /@(keyframes +.*?}$)/g;
-        var regtrans = /(transform:.*?;)/g;
-        var regspaces = /  +/g;
-        var reganim = /(,|:) +/g;
 
         while (i < len) {
             var code = chars.charCodeAt(i);
@@ -143,13 +145,13 @@
                         }
 
                         // vendor prefix transforms properties
-                        line = line.replace(regspaces, '').replace(regtrans, '-webkit-$1$1');
+                        line = line.replace(rspaces, '').replace(rtrans, '-webkit-$1$1');
                         
                         if (second === 107) {
                             // vendor prefix keyframes
                             line = '@-webkit-'+line+'}@'+line+'}';
                         } else {
-                            line = line.replace(regkeyf, '@-webkit-$1}@$1}');
+                            line = line.replace(rkeyf, '@-webkit-$1}@$1}');
                         }
                     }
                 } else {
@@ -159,7 +161,7 @@
                     // animation: a, n, i characters
                     if (first === 97 && second === 110 && third === 105) {
                         // remove space after `,` and `:` then split line
-                        var split = line.replace(reganim, '$1').split(':');
+                        var split = line.replace(ranim, '$1').split(':');
 
                         // build line
                         line = split[0] + ':' + id + (split[1].split(',')).join(','+id);
