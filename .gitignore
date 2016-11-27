@@ -1,3 +1,6 @@
 node_modules
-npm-debug.log
-tests
+.DS_Store
+Thumbs.db
+Desktop.ini
+*~
+*.log
