@@ -204,7 +204,7 @@
                         // vendor prefix
                         line = '-webkit-' + line + '-moz-' + line + line;
                     }
-                    // transform: t, r, a 
+                    // transform & transition: t, r, a 
                     // appearance: a, p, p
                     else if (
                         (first === 116 && second === 114 && third === 97) ||
