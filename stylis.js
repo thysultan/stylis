@@ -22,11 +22,16 @@
 }(function (window) {
     'use strict';
 
-    var document    = window.document;
-    var rkeyf       = /@(keyframes +.*?}$)/g;
-    var rtrans      = /(transform:.*?;)/g;
-    var rspaces     = /  +/g;
-    var ranim       = /(,|:) +/g;
+
+    // enviroment variables
+    var document = window.document || null;
+    var browser  = document !== null;
+
+    // regular expressions
+    var rkeyf    = /@(keyframes +.*?}$)/g;
+    var rtrans   = /(transform:.*?;)/g;
+    var rspaces  = /  +/g;
+    var ranim    = /(,|:) +/g;
 
 
     /**
@@ -34,35 +39,60 @@
      *
      * @example stylis(selector, styles);
      * 
-     * @param  {string}         selector
-     * @param  {string}         styles
-     * @param  {(boolean|Node)} element
+     * @param  {string}                  selector
+     * @param  {string}                  styles
+     * @param  {(boolean|Node|function)} element
      * @return {string}
      */
     function stylis (selector, styles, element) {
-        var output = cssparser(selector[0], selector.substr(1), styles, false);
-
         // request for element
         if (element) {
+            // there are duplicate compiler(...) calls because 
+            // we defer compiling styles until we know more about the requested output
+            // to prevent appending dublicate content to the dom when requested
+            var namespace = 'stylis-';
+
             // browser
-            if (document) {
-                if (element.nodeType) {
+            if (browser) {
+                var nodeType = element.nodeType;
+
+                if (nodeType && element.nodeName === 'STYLE') {
+                    var output = compiler(selector[0], selector.substring(1), styles, false);
+
                     // passed an element, append to preserve elements content
                     return (element.appendChild(document.createTextNode(output)), element);
                 } else {
-                    // new element
-                    var _element = document.createElement('style');
-                        _element.textContent = output;
+                    var id = namespace+selector;
 
-                    return _element;
+                    // avoid adding duplicate style elements
+                    if (document.getElementById(id) != null) {
+                        return null;
+                    }
+
+                    var output = compiler(selector[0], selector.substring(1), styles, false);
+
+                    if (nodeType) {
+                        // new element
+                        var _element = document.createElement('style');
+
+                            _element.textContent = output;
+                            _element.id = id;
+
+                        return element.appendChild(_element);
+                    } else {
+                        // function
+                        return element('style', {id: id}, output);
+                    }
                 }
             } else {
+                var output = compiler(selector[0], selector.substring(1), styles, false);
+
                 // node
-                return '<style>'+output+'</style>';
+                return '<style id="'+namespace+selector+'">'+output+'</style>';
             }
         } else {
             // string
-            return output;
+            return compiler(selector[0], selector.substring(1), styles, false);
         }
     }
 
@@ -70,7 +100,7 @@
     /**
      * css compiler
      *
-     * @example cssparser('.', 'class1', 'css...', false);
+     * @example compiler('.', 'class1', 'css...', false);
      * 
      * @param  {string}  ns
      * @param  {string}  id
@@ -78,7 +108,7 @@
      * @param  {boolean} isattr
      * @return {string}
      */
-    function cssparser (ns, id, chars, isattr) {
+    function compiler (ns, id, chars, isattr) {
         var prefix = isattr ? '['+ns+'='+id+']' : ns + id;
         var output = '';
         var len = chars.length;
@@ -91,9 +121,13 @@
             // {, }, ; characters
             if (code === 123 || code  === 125 || code === 59) {
                 line += chars[i];
-                line  = line.trim();
 
                 var first = line.charCodeAt(0);
+
+                // only trim when the first character is ` `
+                if (first === 32) {
+                    first = (line = line.trim()).charCodeAt(0);
+                }
 
                 // / character, line comment
                 if (first === 47) {
@@ -109,7 +143,7 @@
 
                         if (second == 107) {
                             // @keyframes
-                            line = line.substr(1, 10) + id + line.substr(11);
+                            line = line.substring(1, 11) + id + line.substring(11);
                         } else {
                             // @root
                             line = '';
@@ -207,7 +241,7 @@
                                     _line += affix + selector;
                                 } else if (_first === 38) {
                                     // & character
-                                    _line += affix + selector.substr(1);
+                                    _line += affix + selector.substring(1);
                                 } else {
                                     _line += affix + selector;
                                 }
@@ -233,5 +267,6 @@
         return output;
     }
 
-    return stylis;
+
+    return (stylis.compiler = compiler, stylis);
 }));

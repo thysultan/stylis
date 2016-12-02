@@ -104,13 +104,28 @@ body {
 and if you wanted to append this to a style element/string
 
 ```javascript
-// browser
+// browser, if the element passed is a style element the css will
+// be append to it, if it is another element a style element with the
+// css will be appended to it, thus this adds css to the already
+// present style element
 stylis('#user', styles, document.querySelector('style'));
 
+// and this appends a style element to the head
+stylis('#user', styles, document.head);
+
 // or explicity request a string, 
-// in node this returns the css wrapped in <style></style> tags
+// in node this returns the css wrapped in <style id=stylis-${namespace}></style> tags
 // and in the browser this returns a style element with the css
 stylis('#user', styles, true);
+
+// you can also pass a function
+stylis('#user', styles (type, props, children) => {});
+// where the arguments passed are 
+{
+    type:   {string} 'style';
+    props:  {Object} {id: 'stylis-${namespace}'};
+    output: {string} '...compiled css';
+}
 ```
 
 ## Supports
@@ -124,7 +139,7 @@ stylis('#user', styles, true);
 
 ---
 
-# Installation
+## Installation
 
 #### direct download
 
@@ -136,7 +151,7 @@ stylis('#user', styles, true);
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.1.6/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.2.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -144,3 +159,112 @@ stylis('#user', styles, true);
 ```
 npm install stylis --save
 ```
+
+## API
+
+```javascript
+stylis(namespace: {string}, styles: {string}, element: {(function|boolean|Node)});
+
+// if element is a function the arguments passed are ('style', stylis-${namespace}, output)
+
+// you can also access the low level compiler
+stylis.compiler === (ns, id, chars, isattr) => output;
+
+// that can be used as follows
+stylis.compiler('.', 'class1', 'css string...', false);
+
+// or using the isattr set to true
+stylis.compiler('data-scope', 'user', 'css string...', true);
+// that will compile the namespace to '[data-scope=user]';
+```
+
+## Intergration
+
+Stylis can be used to build an abstraction ontop of it, for example imagine we want to build an abstract that makes the following React Component possible
+
+```javascript
+class Heading extends React.Component {
+    stylesheet(){
+        return `
+            &{
+                color: blue
+            }
+        `;
+    }
+    render() {
+        return (
+            React.createElement('h1', 'Hello World')
+        );
+    }
+}
+```
+
+We could simply extend the Component class as follows
+
+```javascript
+React.Component.prototype.stylis = function () {
+    var ctx = this;
+    var namespace = this.displayName;
+
+    return function () {
+        this.setAttribute(namespace);
+        stylis(namespace, ctx.stylesheet(), document.head);
+    }
+}
+```
+
+Then use it in the following way
+
+```javascript
+class Heading extends React.Component {
+    stylesheet(){
+        return `
+            &{
+                color: blue
+            }
+        `;
+    }
+    render() {
+        return (
+            React.createElement('h1', {ref: this.stylis}, 'Hello World')
+        );
+    }
+}
+```
+
+When the first instance of the component is mounted the function assigned to the ref will get executed adding a style element with the compiled output of `stylesheet()`
+where as only the namespace attribute is added to any subsequent instances.
+
+You can of course do this another way
+
+```javascript
+class Heading extends React.Component {
+    constructor (props) {
+        super(props);
+
+        // or you can even inline this
+        this.style = stylis(this.displayName, this.stylesheet(), React.createElement);
+
+        // this.style will be the return value of 
+        // React.createElement('style', {id: 'stylis-Heading'}, this.stylesheet())
+    }
+    stylesheet(){
+        return `
+            &{
+                color: blue
+            }
+        `;
+    }
+    render() {
+        return (
+            React.createElement('h1', null, 'Hello World', this.style)
+        );
+    }
+}
+```
+
+Both will add the resulting style element generated only once, one will
+add it to the head another will render it in place with the component.
+
+If you want a picture into what can be done, there is an abstraction i created
+for [dio.js](https://github.com/thysultan/dio.js) that does away with the boilerplate entirely [http://jsbin.com/mozefe/1/edit?js,output](http://jsbin.com/mozefe/1/edit?js,output)
