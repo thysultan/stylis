@@ -78,7 +78,8 @@ function run (tests) {
 
 	// failed
 	console.log(
-		format.bold+'Tests Failed '+failed.length+format.reset+format.red + '\n\n'+(failed.join('\n') || 'no failed tests')+end
+		format.bold+'Tests Failed '+failed.length+format.reset+format.red + 
+		'\n\n'+(failed.join('\n') || 'no failed tests')+end
 	);
 
 	// if failed trigger exit
@@ -171,7 +172,7 @@ var tests = {
 			    transform: rotate(30deg);
 			}
 		`,
-		expected: `.user {-webkit-transform: rotate(30deg);transform: rotate(30deg);}`
+		expected: `.user {-webkit-transform: rotate(30deg);-moz-transform: rotate(30deg);transform: rotate(30deg);}`
 	},
 	'keyframes': {
 		name: 'keyframes',
@@ -183,9 +184,14 @@ var tests = {
 				to { transform: translate(20px); }
 			}
 		`,
-		expected: `.user{-webkit-animation:userslidein 3s ease infinite;animation:userslidein 3s ease infinite;}`+
-			`@-webkit-keyframes userslidein {to { -webkit-transform: translate(20px);transform: translate(20px); }}`+
-			`@keyframes userslidein {to { -webkit-transform: translate(20px);transform: translate(20px); }}`
+		expected: `.user{-webkit-animation:userslidein 3s ease infinite;`+
+			`-moz-animation:userslidein 3s ease infinite;animation:userslidein 3s ease infinite;}`+
+			`@-webkit-keyframes userslidein `+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`+
+			`@-moz-keyframes userslidein `+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`+
+			`@keyframes userslidein `+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`
 	}
 };
 

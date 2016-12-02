@@ -59,6 +59,7 @@ body {
 }
 #user .name {
     -webkit-transform: rotate(30deg);
+    -moz-transform: rotate(30deg);
     transform: rotate(30deg);
 }
 #user span,
@@ -67,35 +68,54 @@ body {
 }
 #user {
     -webkit-animation: userslidein 3s ease infinite;
+    -moz-animation: userslidein 3s ease infinite;
     animation: userslidein 3s ease infinite;
 }
 #user:before {
     -webkit-animation: userslidein 3s ease infinite;
+    -moz-animation: userslidein 3s ease infinite;
     animation: userslidein 3s ease infinite;
 }
 @-webkit-keyframes userslidein {
     from {
         -webkit-transform: translate(10px);
+        -moz-transform: translate(10px);
         transform: translate(10px);
     }
     to {
         -webkit-transform: translate(200px);
+        -moz-transform: translate(200px);
+        transform: translate(200px);
+    }
+}
+@-moz-keyframes userslidein {
+    from {
+        -webkit-transform: translate(10px);
+        -moz-transform: translate(10px);
+        transform: translate(10px);
+    }
+    to {
+        -webkit-transform: translate(200px);
+        -moz-transform: translate(200px);
         transform: translate(200px);
     }
 }
 @keyframes userslidein {
     from {
         -webkit-transform: translate(10px);
+        -moz-transform: translate(10px);
         transform: translate(10px);
     }
     to {
         -webkit-transform: translate(200px);
+        -moz-transform: translate(200px);
         transform: translate(200px);
     }
 }
 @media (max-width: 600px) {
     #user {
         -webkit-appearance: none;
+        -moz-appearance: none;
         appearance: none;
     }
 }
@@ -151,7 +171,7 @@ stylis('#user', styles (type, props, children) => {});
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.2.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.3.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -267,4 +287,4 @@ Both will add the resulting style element generated only once, one will
 add it to the head another will render it in place with the component.
 
 If you want a picture into what can be done, there is an abstraction i created
-for [dio.js](https://github.com/thysultan/dio.js) that does away with the boilerplate entirely [http://jsbin.com/mozefe/1/edit?js,output](http://jsbin.com/mozefe/1/edit?js,output)
+for [dio.js](https://github.com/thysultan/dio.js) that does away with the above boilerplate entirely [http://jsbin.com/mozefe/1/edit?js,output](http://jsbin.com/mozefe/1/edit?js,output)

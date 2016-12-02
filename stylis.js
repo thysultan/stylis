@@ -178,14 +178,15 @@
                             }
                         }
 
-                        // vendor prefix transforms properties
-                        line = line.replace(rspaces, '').replace(rtrans, '-webkit-$1$1');
+                        // vendor prefix transform properties within keyframes and @root blocks
+                        line = line.replace(rspaces, '').replace(rtrans, '-webkit-$1-moz-$1$1');
                         
                         if (second === 107) {
-                            // vendor prefix keyframes
-                            line = '@-webkit-'+line+'}@'+line+'}';
+                            // vendor prefix keyframes blocks
+                            line = '@-webkit-'+line+'}'+'@-moz-'+line+'}@'+line+'}';
                         } else {
-                            line = line.replace(rkeyf, '@-webkit-$1}@$1}');
+                            // vendor prefix keyframes in @root block
+                            line = line.replace(rkeyf, '@-webkit-$1}@-moz-$1}@$1}');
                         }
                     }
                 } else {
@@ -201,7 +202,7 @@
                         line = split[0] + ':' + id + (split[1].split(',')).join(','+id);
 
                         // vendor prefix
-                        line = '-webkit-' + line + line;
+                        line = '-webkit-' + line + '-moz-' + line + line;
                     }
                     // transform: t, r, a 
                     // appearance: a, p, p
@@ -210,7 +211,7 @@
                         (first === 97 && second === 112 && third === 112)
                     ) {
                         // vendor prefix
-                        line = '-webkit-' + line + line;
+                        line = '-webkit-' + line + '-moz-' + line + line;
                     } else {
                         // selector declaration
                         if (code === 123) {
@@ -255,7 +256,7 @@
                 output += line;
                 line = '';
             } 
-            // `\t`, `\r`, `\n` characters
+            // not `\t`, `\r`, `\n` characters
             else if (code !== 9 && code !== 13 && code !== 10) {
                 line += chars[i];
             }
