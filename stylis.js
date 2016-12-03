@@ -93,7 +93,7 @@
 
                 // / character, line comment
                 if (first === 47) {
-                    line = code === 125 && first !== 47 ? '}' : '';
+                    line = code === 125 ? '}' : '';
                 }
                 // @ character, special block
                 else if (first === 64) {
