@@ -188,7 +188,19 @@ stylis(namespace: {string}, styles: {string}, element: {(function|boolean|Node)}
 // if element is a function the arguments passed are ('style', stylis-${namespace}, output)
 
 // you can also access the low level compiler
-stylis.compiler === (namespace, id, chars, isAttr, prefixAnimations, prefixKeyframes) => output;
+stylis.compiler === (
+    // i.e if the selector is #user, this value is #
+    selectorType,
+    // i.e if the selector is #user, this value is user
+    selectorValue,
+    cssString, 
+    // i.e if the selector is [data-id=foo] this value is true
+    // and selectorType will equal "data-id", and selectorValue "foo"
+    isAttr, {boolean} 
+
+    prefixAnimations, {boolean} // if you don't want animation properties to get namespaced
+    prefixKeyframes {boolean}   // if you don't want keyframes to get namespaced
+) => output;
 
 // that can be used as follows
 stylis.compiler('.', 'class1', 'css string...', false, true, true);
