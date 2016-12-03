@@ -55,7 +55,7 @@ function run (tests) {
 		var sample = test.sample.trim();
 		var expected = test.expected.trim();
 
-		var result = stylis('.user', sample);
+		var result = stylis('.user', sample, true, true);
 
 		(result === expected ? passed : failed).push(name);
 
@@ -172,7 +172,8 @@ var tests = {
 			    transform: rotate(30deg);
 			}
 		`,
-		expected: `.user {-webkit-transform: rotate(30deg);-moz-transform: rotate(30deg);transform: rotate(30deg);}`
+		expected: `.user {-webkit-transform: rotate(30deg);-moz-transform: rotate(30deg);`+
+				`-ms-transform: rotate(30deg);transform: rotate(30deg);}`
 	},
 	'keyframes': {
 		name: 'keyframes',
@@ -185,13 +186,23 @@ var tests = {
 			}
 		`,
 		expected: `.user{-webkit-animation:userslidein 3s ease infinite;`+
+
 			`-moz-animation:userslidein 3s ease infinite;animation:userslidein 3s ease infinite;}`+
+
 			`@-webkit-keyframes userslidein `+
-			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`+
+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
+			`translate(20px);transform: translate(20px); }}`+
+
 			`@-moz-keyframes userslidein `+
-			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`+
+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
+			`translate(20px);transform: translate(20px); }}`+
+
 			`@keyframes userslidein `+
-			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);transform: translate(20px); }}`
+
+			`{to { -webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
+			`translate(20px);transform: translate(20px); }}`
 	}
 };
 

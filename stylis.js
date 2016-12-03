@@ -23,94 +23,14 @@
     'use strict';
 
 
-    // enviroment variables
-    var document = window.document || null;
-    var browser  = document !== null;
-
-
     // regular expressions
     var regPrefixKey = /@(keyframes +.*?}$)/g;
     var regPrefix    = /((?:transform|appearance):.*?;)/g;
     var regSpaces    = /  +/g;
     var regAnimation = /(,|:) +/g;
 
-
     // css selectors
-    var selectors = {
-        '>': 1,
-        '.': 1,
-        '#': 1,
-        '~': 1,
-        '+': 1,
-        '*': 1,
-        ':': 1,
-        '[': 2
-    };
-
-
-    /**
-     * stylis, css compiler interface
-     *
-     * @example stylis(selector, styles);
-     * 
-     * @param  {string}                  selector
-     * @param  {string}                  styles
-     * @param  {(boolean|Node|function)} element
-     * @param  {boolean}                 namespaceAnimations
-     * @param  {boolean}                 namespaceKeyframes
-     * @return {string}
-     */
-    function stylis (selector, styles, element, namespaceAnimations, namespaceKeyframes) {
-        // request for element
-        if (element) {
-            // there are duplicate compiler(...) calls because 
-            // we defer compiling styles until we know more about the requested output
-            // to prevent appending dublicate content to the dom when requested
-            var namespace = 'stylis-';
-
-            // browser
-            if (browser) {
-                var nodeType = element.nodeType;
-
-                if (nodeType && element.nodeName === 'STYLE') {
-                    var output = compiler(selector, styles, namespaceAnimations, namespaceKeyframes);
-
-                    // passed an element, append to preserve elements content
-                    return (element.appendChild(document.createTextNode(output)), element);
-                } else {
-                    var id = namespace+selector;
-
-                    // avoid adding duplicate style elements
-                    if (document.getElementById(id) != null) {
-                        return null;
-                    }
-
-                    var output = compiler(selector, styles, namespaceAnimations, namespaceKeyframes);
-
-                    if (nodeType || element === true) {
-                        // new element
-                        var _element = document.createElement('style');
-
-                            _element.textContent = output;
-                            _element.id = id;
-
-                        return element === true ? _element : element.appendChild(_element);
-                    } else {
-                        // function
-                        return element('style', {id: id}, output);
-                    }
-                }
-            } else {
-                var output = compiler(selector, styles, namespaceAnimations, namespaceKeyframes);
-
-                // node
-                return '<style id="'+namespace+selector+'">'+output+'</style>';
-            }
-        } else {
-            // string
-            return compiler(selector, styles, namespaceAnimations, namespaceKeyframes);
-        }
-    }
+    var selectors = { '>': 1, '.': 1, '#': 1, '~': 1, '+': 1, '*': 1, ':': 1, '[': 2 };
 
 
     /**
@@ -124,7 +44,7 @@
      * @param  {boolean} namespaceKeyframes
      * @return {string}
      */
-    function compiler (selector, styles, namespaceAnimations, namespaceKeyframes) {
+    function stylis (selector, styles, namespaceAnimations, namespaceKeyframes) {
         var sel = selector[0];
         var type = selectors[sel];
 
@@ -173,7 +93,7 @@
 
                 // / character, line comment
                 if (first === 47) {
-                    line = code === 125 ? '}' : '';
+                    line = code === 125 && first !== 47 ? '}' : '';
                 }
                 // @ character, special block
                 else if (first === 64) {
@@ -221,7 +141,7 @@
                         }
 
                         // vendor prefix transform properties within keyframes and @root blocks
-                        line = line.replace(regSpaces, '').replace(regPrefix, '-webkit-$1-moz-$1$1');
+                        line = line.replace(regSpaces, '').replace(regPrefix, '-webkit-$1-moz-$1-ms-$1$1');
                         
                         if (second === 107) {
                             // vendor prefix keyframes blocks
@@ -246,13 +166,10 @@
                         // vendor prefix
                         line = '-webkit-' + line + '-moz-' + line + line;
                     }
-
-                    // transforms & transitions: t, r, a 
                     // appearance: a, p, p
                     // flex: f, l, e
                     // order: o, r, d
                     else if (
-                        (first === 116 && second === 114 && third === 97) ||
                         (first === 97 && second === 112 && third === 112) ||
                         (first === 102 && second === 108 && third === 101) ||
                         (first === 111 && second === 114 && third === 100)
@@ -260,11 +177,13 @@
                         // vendor prefix
                         line = '-webkit-' + line + '-moz-' + line + line;
                     }
+                    // transforms & transitions: t, r, a 
                     // hyphens: h, y, p
                     // user-select: u, s, r, s
                     else if (
+                        (first === 116 && second === 114 && third === 97) ||
                         (first === 104 && second === 121 && third === 112) ||
-                        (first === 117 && second === 115 && third === 101 && (line.charCodeAt(5) || 0) === 115)
+                        (first === 117 && second === 115 && third === 101 && line.charCodeAt(5) === 115)
                     ) {
                         // vendor prefix
                         line = '-webkit-' + line + '-moz-' + line + '-ms-' + line + line;
@@ -333,5 +252,5 @@
         return output;
     }
 
-    return (stylis.compiler = compiler, stylis);
+    return stylis;
 }));

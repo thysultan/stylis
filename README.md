@@ -3,8 +3,8 @@
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) 
  ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~1kb minified+gzipped
-- ~2kb minified
+- ~900bytes minified+gzipped
+- ~1kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -63,6 +63,7 @@ body {
 #user .name {
     -webkit-transform: rotate(30deg);
     -moz-transform: rotate(30deg);
+    -ms-transform: rotate(30deg);
     transform: rotate(30deg);
 }
 #user span,
@@ -72,7 +73,7 @@ body {
 #user {
     display: -webkit-flex;
     display: flex;
-    
+
     -webkit-flex: 1;
     -moz-flex: 1;
     flex: 1;
@@ -136,33 +137,6 @@ body {
 }
 ```
 
-and if you wanted to append this to a style element/string
-
-```javascript
-// browser, if the element passed is a style element the css will
-// be append to it, if it is another element a style element with the
-// css will be appended to it, thus this adds css to the already
-// present style element
-stylis('#user', styles, document.querySelector('style'));
-
-// and this appends a style element to the head
-stylis('#user', styles, document.head);
-
-// or explicity request a string, 
-// in node this returns the css wrapped in <style id=stylis-${namespace}></style> tags
-// and in the browser this returns a style element with the css
-stylis('#user', styles, true);
-
-// you can also pass a function
-stylis('#user', styles (type, props, children) => {});
-// where the arguments passed are 
-{
-    type:   {string} 'style';
-    props:  {Object} {id: 'stylis-${namespace}'};
-    output: {string} '...compiled css';
-}
-```
-
 ## Supports
 
 * Edge
@@ -186,7 +160,7 @@ stylis('#user', styles (type, props, children) => {});
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.5.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.6.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -201,36 +175,17 @@ npm install stylis --save
 stylis(
     selector: {string}, 
     cssString: {string}, 
-    element: {(function|boolean|Node)},
     namespaceAnimations, {boolean}
     namespaceKeyframes {boolean}
 );
 
-// if element is a function the arguments passed are ('style', stylis-${namespace}, output)
-// if it a style element the output is appended to it
-// if it is any other element a style element is appended to it
-
-// you can also directly access the low level compiler
-stylis.compiler(
-    selector,
-    cssString, 
-    namespaceAnimations, {boolean}
-    namespaceKeyframes {boolean}
-);
-
-// that can be used as follows
-stylis.compiler('.class1', 'css string...', true, true);
-
-// or 
-stylis.compiler('[data-scope=namespace]', 'css string...', true, true);
-
-// explicity setting namespaceAnimations or namespaceKeyframes to false 
-// will prevent namespacing to keyframes/animations
+// namespaceAnimations and namespaceKeyframes allow you to prevent keyframes and animations
+// from being namespaced
 ```
 
 ## Intergration
 
-Stylis can be used to build an abstraction ontop of it, for example imagine we want to build an abstract that makes the following React Component possible
+You can use stylis to build an abstraction ontop of, for example imagine we want to build an abstract that makes the following React Component possible
 
 ```javascript
 class Heading extends React.Component {
@@ -252,13 +207,13 @@ class Heading extends React.Component {
 We could simply extend the Component class as follows
 
 ```javascript
-React.Component.prototype.stylis = function () {
-    var ctx = this;
+React.Component.prototype.stylis = function (self) {
     var namespace = this.displayName;
 
     return function () {
+        stylis(namespace, self.stylesheet(), document.head);
+        mounted = true;
         this.setAttribute(namespace);
-        stylis(namespace, ctx.stylesheet(), document.head);
     }
 }
 ```
@@ -276,7 +231,7 @@ class Heading extends React.Component {
     }
     render() {
         return (
-            React.createElement('h1', {ref: this.stylis}, 'Hello World')
+            React.createElement('h1', {ref: this.stylis(self)}, 'Hello World')
         );
     }
 }
@@ -291,12 +246,8 @@ You can of course do this another way
 class Heading extends React.Component {
     constructor (props) {
         super(props);
-
         // or you can even inline this
-        this.style = stylis(this.displayName, this.stylesheet(), React.createElement);
-
-        // this.style will be the return value of 
-        // React.createElement('style', {id: 'stylis-Heading'}, this.stylesheet())
+        this.style = React.createElement('style', {id: this.displayName}, this.stylesheet());
     }
     stylesheet(){
         return `
@@ -313,8 +264,7 @@ class Heading extends React.Component {
 }
 ```
 
-Both will add the resulting style element generated only once, one will
-add it to the head another will render it in place with the component.
+One will add it to the head another will render it in place with the component.
 
-If you want a picture into what can be done, there is an abstraction i created
+If you want a better picture into what can be done, there is an abstraction i created
 for [dio.js](https://github.com/thysultan/dio.js) that does away with the above boilerplate entirely [http://jsbin.com/mozefe/1/edit?js,output](http://jsbin.com/mozefe/1/edit?js,output)
