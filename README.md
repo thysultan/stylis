@@ -3,8 +3,8 @@
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) 
  ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~705bytes minified+gzipped
-- ~1kb minified
+- ~1kb minified+gzipped
+- ~2kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -35,6 +35,9 @@ span, h1 {
 
 &{
 	animation: slidein 3s ease infinite;
+    display: flex;
+    flex: 1;
+    user-select: none;
 }
 
 &:before {
@@ -67,6 +70,18 @@ body {
     color: red;
 }
 #user {
+    display: -webkit-flex;
+    display: flex;
+    
+    -webkit-flex: 1;
+    -moz-flex: 1;
+    flex: 1;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+
     -webkit-animation: userslidein 3s ease infinite;
     -moz-animation: userslidein 3s ease infinite;
     animation: userslidein 3s ease infinite;
@@ -171,7 +186,7 @@ stylis('#user', styles (type, props, children) => {});
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.4.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.5.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -183,34 +198,34 @@ npm install stylis --save
 ## API
 
 ```javascript
-stylis(namespace: {string}, styles: {string}, element: {(function|boolean|Node)});
+stylis(
+    selector: {string}, 
+    cssString: {string}, 
+    element: {(function|boolean|Node)},
+    namespaceAnimations, {boolean}
+    namespaceKeyframes {boolean}
+);
 
 // if element is a function the arguments passed are ('style', stylis-${namespace}, output)
+// if it a style element the output is appended to it
+// if it is any other element a style element is appended to it
 
-// you can also access the low level compiler
-stylis.compiler === (
-    // i.e if the selector is #user, this value is #
-    selectorType,
-    // i.e if the selector is #user, this value is user
-    selectorValue,
+// you can also directly access the low level compiler
+stylis.compiler(
+    selector,
     cssString, 
-    // i.e if the selector is [data-id=foo] this value is true
-    // and selectorType will equal "data-id", and selectorValue "foo"
-    isAttr, {boolean} 
-
-    prefixAnimations, {boolean} // if you don't want animation properties to get namespaced
-    prefixKeyframes {boolean}   // if you don't want keyframes to get namespaced
-) => output;
+    namespaceAnimations, {boolean}
+    namespaceKeyframes {boolean}
+);
 
 // that can be used as follows
-stylis.compiler('.', 'class1', 'css string...', false, true, true);
+stylis.compiler('.class1', 'css string...', true, true);
 
-// or using the isAttr set to true
-stylis.compiler('data-scope', 'user', 'css string...', true, true, true);
-// that will compile the namespace to '[data-scope=user]';
+// or 
+stylis.compiler('[data-scope=namespace]', 'css string...', true, true);
 
-// setting prefixAnimations or prefixKeyframes to false 
-// will prevent prefixing the namespace of keyframes/animations
+// explicity setting namespaceAnimations or namespaceKeyframes to false 
+// will prevent namespacing to keyframes/animations
 ```
 
 ## Intergration
