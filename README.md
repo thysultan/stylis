@@ -171,7 +171,7 @@ stylis('#user', styles (type, props, children) => {});
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.3.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.4.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -188,14 +188,17 @@ stylis(namespace: {string}, styles: {string}, element: {(function|boolean|Node)}
 // if element is a function the arguments passed are ('style', stylis-${namespace}, output)
 
 // you can also access the low level compiler
-stylis.compiler === (ns, id, chars, isattr) => output;
+stylis.compiler === (namespace, id, chars, isAttr, prefixAnimations, prefixKeyframes) => output;
 
 // that can be used as follows
-stylis.compiler('.', 'class1', 'css string...', false);
+stylis.compiler('.', 'class1', 'css string...', false, true, true);
 
-// or using the isattr set to true
-stylis.compiler('data-scope', 'user', 'css string...', true);
+// or using the isAttr set to true
+stylis.compiler('data-scope', 'user', 'css string...', true, true, true);
 // that will compile the namespace to '[data-scope=user]';
+
+// setting prefixAnimations or prefixKeyframes to false 
+// will prevent prefixing the namespace of keyframes/animations
 ```
 
 ## Intergration

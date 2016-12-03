@@ -44,6 +44,16 @@
      * @param  {(boolean|Node|function)} element
      * @return {string}
      */
+    /**
+     * stylis, css compiler interface
+     *
+     * @example stylis(selector, styles);
+     * 
+     * @param  {string}                  selector
+     * @param  {string}                  styles
+     * @param  {(boolean|Node|function)} element
+     * @return {string}
+     */
     function stylis (selector, styles, element) {
         // request for element
         if (element) {
@@ -57,7 +67,7 @@
                 var nodeType = element.nodeType;
 
                 if (nodeType && element.nodeName === 'STYLE') {
-                    var output = compiler(selector[0], selector.substring(1), styles, false);
+                    var output = compiler(selector[0], selector.substring(1), styles, false, true, true);
 
                     // passed an element, append to preserve elements content
                     return (element.appendChild(document.createTextNode(output)), element);
@@ -69,7 +79,7 @@
                         return null;
                     }
 
-                    var output = compiler(selector[0], selector.substring(1), styles, false);
+                    var output = compiler(selector[0], selector.substring(1), styles, false, true, true);
 
                     if (nodeType) {
                         // new element
@@ -85,35 +95,28 @@
                     }
                 }
             } else {
-                var output = compiler(selector[0], selector.substring(1), styles, false);
+                var output = compiler(selector[0], selector.substring(1), styles, false, true, true);
 
                 // node
                 return '<style id="'+namespace+selector+'">'+output+'</style>';
             }
         } else {
             // string
-            return compiler(selector[0], selector.substring(1), styles, false);
+            return compiler(selector[0], selector.substring(1), styles, false, true, true);
         }
     }
 
 
-    /**
-     * css compiler
-     *
-     * @example compiler('.', 'class1', 'css...', false);
-     * 
-     * @param  {string}  ns
-     * @param  {string}  id
-     * @param  {string}  chars
-     * @param  {boolean} isattr
-     * @return {string}
-     */
-    function compiler (ns, id, chars, isattr) {
-        var prefix = isattr ? '['+ns+'='+id+']' : ns + id;
+    function compiler (ns, id, chars, isAttr, prefixAnim, prefixKeys) {
+        var prefix = isAttr ? '['+ns+'='+id+']' : ns + id;
         var output = '';
-        var len = chars.length;
-        var i = 0;
-        var line = '';
+        var line   = '';
+
+        var keysId = prefixAnim ? id : '';
+        var animId = prefixKeys ? id : '';
+
+        var len    = chars.length;
+        var i      = 0;
 
         while (i < len) {
             var code = chars.charCodeAt(i);
@@ -143,7 +146,7 @@
 
                         if (second == 107) {
                             // @keyframes
-                            line = line.substring(1, 11) + id + line.substring(11);
+                            line = line.substring(1, 11) + keysId + line.substring(11);
                         } else {
                             // @root
                             line = '';
@@ -199,12 +202,12 @@
                         var split = line.replace(ranim, '$1').split(':');
 
                         // build line
-                        line = split[0] + ':' + id + (split[1].split(',')).join(','+id);
+                        line = split[0] + ':' + animId + (split[1].split(',')).join(','+animId);
 
                         // vendor prefix
                         line = '-webkit-' + line + '-moz-' + line + line;
                     }
-                    // transform & transition: t, r, a 
+                    // transform: t, r, a 
                     // appearance: a, p, p
                     else if (
                         (first === 116 && second === 114 && third === 97) ||
