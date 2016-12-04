@@ -192,7 +192,7 @@
                     }
                     // selector declaration
                     else if (code === 123) {
-                        // exit flat css context after with the first block context
+                        // exit flat css context with the first block context
                         if (flat) {
                             flat = false;
 
@@ -216,7 +216,6 @@
                                 _first = (selector = selector.trim()).charCodeAt(0);
                             }
 
-
                             // first selector
                             if (j === 0) {
                                 // :, &, { characters
@@ -226,7 +225,8 @@
                                     affix = prefix + ' ';
                                 }
                             } else {
-                                affix = ',' + prefix + (_first !== 32 && first !== 38 ? ' ' : '');
+                                // ` `, &
+                                affix = ',' + prefix + (_first !== 32 && _first !== 38 ? ' ' : '');
                             }
 
                             if (_first === 123) {

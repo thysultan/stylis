@@ -172,8 +172,11 @@ var tests = {
 			span, h1 {
 				color:red;
 			}
+			h1, &:after, &:before {
+				color:red;
+			}
 		`,
-		expected: `.user span,.user h1 {color:red;}`
+		expected: `.user span,.user h1 {color:red;}.user h1,.user:after,.user:before {color:red;}`
 	},
 	'prefixer': {
 		name: 'prefixer',
