@@ -98,7 +98,17 @@ function run (tests) {
  * @type {Object}
  */
 var tests = {
-	namespace: {
+	'flat': {
+		name: 'flat',
+		sample: `
+			color: 20px;
+			font-size: 20px;
+			transition: all;
+		`,
+		expected: `.user{color: 20px;font-size: 20px;`+
+		`-webkit-transition: all;-moz-transition: all;-ms-transition: all;transition: all;}`
+	},
+	'namespace': {
 		name: 'namespace',
 		sample: `
 			{
@@ -107,7 +117,7 @@ var tests = {
 		`,
 		expected: `.user{color: blue;}`
 	},
-	root: {
+	'root': {
 		name: '@root',
 		sample: `
 			@root {
@@ -118,7 +128,7 @@ var tests = {
 		`,
 		expected: 'body {background: yellow;}'
 	},
-	comment: {
+	'comment': {
 		name: 'comments',
 		sample: `
 			// line comment

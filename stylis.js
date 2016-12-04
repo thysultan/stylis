@@ -29,9 +29,6 @@
     var regSpaces    = /  +/g;
     var regAnimation = /(,|:) +/g;
 
-    // css selectors
-    var selectors = { '>': 1, '.': 1, '#': 1, '~': 1, '+': 1, '*': 1, ':': 1, '[': 2 };
-
 
     /**
      * css compiler
@@ -45,22 +42,18 @@
      * @return {string}
      */
     function stylis (selector, styles, namespaceAnimations, namespaceKeyframes) {
-        var sel = selector[0];
-        var type = selectors[sel];
+        var prefix = '';
+        var id = '';
+        var type = selector.charCodeAt(0);
 
-        var prefix;
-        var id;
-
-        // `>` or `.` or `#` or `:` or `~`
-        if (type === 1) {
-            prefix = selector;
-            id = selector.substring(1);
-        }
-        // `[` 
-        else if (type === 2) {
+        // [
+        if (type === 91) {
             var attr = selector.substring(1, selector.length-1).split('=');
-
             prefix = '['+ attr[0] + '=' + (id = attr[1]) +']';
+        }
+        // `>` or `#` or `.`
+        else if (type === 62 || type === 35 || type === 46) {
+            id = (prefix = selector).substring(1);
         }
         // i.e section 
         else {
@@ -73,8 +66,9 @@
         var keyframeId = (namespaceAnimations === void 0 || namespaceAnimations === true ) ? id : '';
         var animationId = (namespaceKeyframes === void 0 || namespaceKeyframes === true ) ? id : '';
 
-        var len = styles.length;
-        var i = 0;
+        var len  = styles.length;
+        var i    = 0;
+        var flat = true;
 
         // parse + compile
         while (i < len) {
@@ -83,13 +77,11 @@
             // {, }, ; characters
             if (code === 123 || code  === 125 || code === 59) {
                 line += styles[i];
-
+                
                 var first = line.charCodeAt(0);
 
                 // only trim when the first character is ` `
-                if (first === 32) {
-                    first = (line = line.trim()).charCodeAt(0);
-                }
+                if (first === 32) { first = (line = line.trim()).charCodeAt(0); }
 
                 // / character, line comment
                 if (first === 47) {
@@ -97,6 +89,9 @@
                 }
                 // @ character, special block
                 else if (first === 64) {
+                    // exit flat context
+                    if (flat) { flat = false; }
+
                     var second = line.charCodeAt(1) || 0;
 
                     // @keyframe/@root, `k` or @root, `r` character
@@ -195,45 +190,57 @@
                             line = 'display:-webkit-flex; display:flex;'
                         }
                     }
+                    // selector declaration
+                    else if (code === 123) {
+                        // exit flat css context after with the first block context
+                        if (flat) {
+                            flat = false;
 
-                    else {
-                        // selector declaration
-                        if (code === 123) {
-                            var split = line.split(',');
-                            var _line = '';
+                            if (output.length !== 0) {
+                                output = prefix + '{' + output + '}';
+                            }
+                        }
 
-                            // iterate through characters and prefix multiple selectors with namesapces
-                            // i.e h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
-                            for (var j = 0, length = split.length; j < length; j++) {
-                                var selector = split[j];
-                                var _first = selector.charCodeAt(0);
-                                var affix = '';
+                        var split = line.split(',');
+                        var _line = '';
 
-                                // first selector
-                                if (j === 0) {
-                                    // :, &, { characters
-                                    if (_first === 58 || _first === 38 || _first === 123) {
-                                        affix = prefix;
-                                    } else {
-                                        affix = prefix + ' ';
-                                    }
-                                } else {
-                                    affix = ',' + prefix;
-                                }
+                        // iterate through characters and prefix multiple selectors with namesapces
+                        // i.e h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
+                        for (var j = 0, length = split.length; j < length; j++) {
+                            var selector = split[j];
+                            var _first = selector.charCodeAt(0);
+                            var affix = '';
 
-                                if (_first === 123) {
-                                    // { character
-                                    _line += affix + selector;
-                                } else if (_first === 38) {
-                                    // & character
-                                    _line += affix + selector.substring(1);
-                                } else {
-                                    _line += affix + selector;
-                                }
+                            // trim if first character is a space
+                            if (_first === 32) {
+                                _first = (selector = selector.trim()).charCodeAt(0);
                             }
 
-                            line = _line;
+
+                            // first selector
+                            if (j === 0) {
+                                // :, &, { characters
+                                if (_first === 58 || _first === 38 || _first === 123) {
+                                    affix = prefix;
+                                } else {
+                                    affix = prefix + ' ';
+                                }
+                            } else {
+                                affix = ',' + prefix + (_first !== 32 && first !== 38 ? ' ' : '');
+                            }
+
+                            if (_first === 123) {
+                                // { character
+                                _line += affix + selector;
+                            } else if (_first === 38) {
+                                // & character
+                                _line += affix + selector.substring(1);
+                            } else {
+                                _line += affix + selector;
+                            }
                         }
+
+                        line = _line;
                     }
                 }
 
@@ -249,7 +256,7 @@
             i++; 
         }
 
-        return output;
+        return flat && output.length !== 0 ? prefix+'{'+output+'}' : output;
     }
 
     return stylis;

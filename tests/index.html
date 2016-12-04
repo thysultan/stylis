@@ -4,9 +4,47 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>stylis.js example</title>
-	<script src='../stylis.min.js'></script>
+	<script src='../stylis.js'></script>
 </head>
 <body>
 	<script src='./index.js'></script>
+
+	<script>
+		var output = stylis('#user', `
+			color: 20px;
+			font-size: 20px;
+		`);
+		console.log(output);
+
+		var output = stylis('#user', `
+			color: 20px;
+			font-size: 20px;
+
+			> h1 {
+				font-size: 20px;
+				color: red;
+			}
+		
+			h2, div {
+				font-size: 20px;
+				color: red;
+			}
+		`);
+		console.log(output);
+
+		var output = stylis('#user', `
+			&, & > h1 {
+				font-size: 20px;
+				color: red;
+			}
+		
+			h2, div {
+				font-size: 20px;
+				color: red;
+			}
+		`);
+
+		console.log(output);
+	</script>
 </body>
 </html>
