@@ -160,7 +160,7 @@ body {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.6.3/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.6.4/stylis.min.js></script>
 ```
 
 #### npm

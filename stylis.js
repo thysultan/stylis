@@ -23,13 +23,6 @@
     'use strict';
 
 
-    // regular expressions
-    var regPrefixKey = /@(keyframes +.*?}$)/g;
-    var regPrefix    = /((?:transform|appearance):.*?;)/g;
-    var regSpaces    = /  +/g;
-    var regAnimation = /(,|:) +/g;
-
-
     /**
      * css compiler
      *
@@ -60,15 +53,20 @@
             id = prefix = selector;
         }
 
-        var output = '';
-        var line = '';
-
-        var keyframeId = (namespaceAnimations === void 0 || namespaceAnimations === true ) ? id : '';
+        var keyframeId  = (namespaceAnimations === void 0 || namespaceAnimations === true ) ? id : '';
         var animationId = (namespaceKeyframes === void 0 || namespaceKeyframes === true ) ? id : '';
 
-        var len  = styles.length;
-        var i    = 0;
-        var flat = true;
+        var output = '';
+        var line   = '';
+        var blob   = '';
+
+        var len = styles.length;
+        var i   = 0;
+
+        var flat    = 1;
+        var special = 0;
+        var type    = 0;
+        var closing = 0;
 
         // parse + compile
         while (i < len) {
@@ -81,85 +79,59 @@
                 var first = line.charCodeAt(0);
 
                 // only trim when the first character is ` `
-                if (first === 32) { first = (line = line.trim()).charCodeAt(0); }
+                if (first === 32) { 
+                    first = (line = line.trim()).charCodeAt(0); 
+                }
 
-                // / character, line comment
-                if (first === 47) {
+                var second = line.charCodeAt(1) || 0;
+
+                // /, *, block comment
+                if (first === 47 && second === 42) {
+                    first = (line = line.substring(line.indexOf('*/')+2)).charCodeAt(0);
+                    second = line.charCodeAt(1) || 0;
+                }
+
+                // /, / line comment
+                if (first === 47 && second === 47) {
                     line = code === 125 ? '}' : '';
                 }
-                // @ character, special block
+                // @, special block
                 else if (first === 64) {
-                    // exit flat context
-                    if (flat) { flat = false; }
-
-                    var second = line.charCodeAt(1) || 0;
+                    // exit flat css context with the first block context
+                    if (flat === 1) {
+                        flat = 0;
+                        
+                        if (output.length !== 0) {
+                            output = prefix + '{' + output + '}'
+                        }
+                    }
 
                     // @keyframe/@root, `k` or @root, `r` character
                     if (second === 107 || second === 114) {
-                        i++;
+                        special++;
 
-                        if (second == 107) {
-                            // @keyframes
-                            line = line.substring(1, 11) + keyframeId + line.substring(11);
-                        } else {
-                            // @root
-                            line = '';
-                        }
-
-                        var close = 0;
-
-                        while (i < len) {
-                            var char = styles[i++];
-                            var _code = char.charCodeAt(0);
-
-                            // not `\t`, `\r`, `\n` characters
-                            if (_code !== 9 && _code !== 13 && _code !== 10) {
-                                // } character
-                                if (_code === 125) {
-                                    // previous block tag is close
-                                    if (close === 1) {
-                                        break;
-                                    }
-                                    // current block tag is close tag 
-                                    else {
-                                        close = 1;
-                                    }
-                                }
-                                // { character 
-                                else if (_code === 123) {
-                                    // current block tag is open
-                                    close = 0;
-                                }
-
-                                line += char;
-                            }
-                        }
-
-                        // vendor prefix transform properties within keyframes and @root blocks
-                        line = line.replace(regSpaces, '').replace(regPrefix, '-webkit-$1-moz-$1-ms-$1$1');
-                        
                         if (second === 107) {
-                            // vendor prefix keyframes blocks
-                            line = '@-webkit-'+line+'}'+'@-moz-'+line+'}@'+line+'}';
+                            line = line.substring(0, 11) + keyframeId + line.substring(11);
+                            blob = line.substring(1);
+                            type = 1;
                         } else {
-                            // vendor prefix keyframes in @root block
-                            line = line.replace(regPrefixKey, '@-webkit-$1}@-moz-$1}@$1}');
+                            line = '';
                         }
                     }
                 } else {
-                    var second = line.charCodeAt(1) || 0;
                     var third = line.charCodeAt(2) || 0;
 
                     // animation: a, n, i characters
                     if (first === 97 && second === 110 && third === 105) {
-                        // remove space after `,` and `:` then split line
-                        var split = line.replace(regAnimation, '$1').split(':');
+                        var anims = line.substring(10).split(',');
+                        var build = 'animation:';
 
-                        // build line
-                        line = split[0] + ':' + animationId + (split[1].split(',')).join(','+animationId);
+                        for (var j = 0, length = anims.length; j < length; j++) {
+                            build += (j === 0 ? '' : ',') + animationId + anims[j].trim();
+                        }
 
                         // vendor prefix
-                        line = '-webkit-' + line + '-moz-' + line + line;
+                        line = '-webkit-' + build + '-moz-' + build + build;
                     }
                     // appearance: a, p, p
                     // flex: f, l, e
@@ -193,54 +165,90 @@
                     // selector declaration
                     else if (code === 123) {
                         // exit flat css context with the first block context
-                        if (flat) {
-                            flat = false;
-
+                        if (flat === 1) {
+                            flat = 0;
+                            
                             if (output.length !== 0) {
-                                output = prefix + '{' + output + '}';
+                                output = prefix + '{' + output + '}'
                             }
                         }
 
-                        var split = line.split(',');
-                        var _line = '';
+                        if (special === 0) {
+                            var split = line.split(',');
+                            var _line = '';
 
-                        // iterate through characters and prefix multiple selectors with namesapces
-                        // i.e h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
-                        for (var j = 0, length = split.length; j < length; j++) {
-                            var selector = split[j];
-                            var _first = selector.charCodeAt(0);
-                            var affix = '';
+                            // iterate through characters and prefix multiple selectors with namesapces
+                            // i.e h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
+                            for (var j = 0, length = split.length; j < length; j++) {
+                                var selector = split[j];
+                                var _first = selector.charCodeAt(0);
+                                var affix = '';
 
-                            // trim if first character is a space
-                            if (_first === 32) {
-                                _first = (selector = selector.trim()).charCodeAt(0);
-                            }
-
-                            // first selector
-                            if (j === 0) {
-                                // :, &, { characters
-                                if (_first === 58 || _first === 38 || _first === 123) {
-                                    affix = prefix;
-                                } else {
-                                    affix = prefix + ' ';
+                                // trim if first character is a space
+                                if (_first === 32) {
+                                    _first = (selector = selector.trim()).charCodeAt(0);
                                 }
-                            } else {
-                                // ` `, &
-                                affix = ',' + prefix + (_first !== 32 && _first !== 38 ? ' ' : '');
+
+                                // first selector
+                                if (j === 0) {
+                                    // :, &, { characters
+                                    if (_first === 58 || _first === 38 || _first === 123) {
+                                        affix = prefix;
+                                    } else {
+                                        affix = prefix + ' ';
+                                    }
+                                } else {
+                                    // ` `, &
+                                    affix = ',' + prefix + (_first !== 32 && _first !== 38 ? ' ' : '');
+                                }
+
+                                if (_first === 123) {
+                                    // { character
+                                    _line += affix + selector;
+                                } else if (_first === 38) {
+                                    // & character
+                                    _line += affix + selector.substring(1);
+                                } else {
+                                    _line += affix + selector;
+                                }
                             }
 
-                            if (_first === 123) {
-                                // { character
-                                _line += affix + selector;
-                            } else if (_first === 38) {
-                                // & character
-                                _line += affix + selector.substring(1);
-                            } else {
-                                _line += affix + selector;
-                            }
+                            line = _line;
+                        }
+                    }
+
+                    // @root/@keyframes
+                    if (special > 0) {
+                        // find the closing tag
+                        if (code === 125) {
+                            closing++;
+                        } else if (code === 123 && closing !== 0) {
+                            closing--;
                         }
 
-                        line = _line;
+                        // closing tag
+                        if (closing === 2) {
+                            // @root
+                            if (type === 0) {
+                                line = '';
+                            }
+                            // @keyframes 
+                            else {
+                                // vendor prefix
+                                line = '}@-webkit-'+blob+'}@-moz-'+blob+'}';
+                                // reset blob
+                                blob = '';
+                            }
+
+                            // reset flags
+                            type = 0;
+                            closing = special > 1 ? 1 : 0;
+                            special--;
+                        }
+                        // @keyframes 
+                        else if (type === 1) {
+                            blob += line;
+                        }
                     }
                 }
 
