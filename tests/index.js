@@ -115,7 +115,7 @@ var tests = {
 				color: blue;
 			}
 		`,
-		expected: `.user{color: blue;}`
+		expected: `.user {color: blue;}`
 	},
 	'root': {
 		name: '@root',
@@ -202,17 +202,17 @@ var tests = {
 
 			`-moz-animation:userslidein 3s ease infinite;animation:userslidein 3s ease infinite;}`+
 
-			`@keyframes userslidein `+
-
-			`{to {-webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
-			`translate(20px);transform: translate(20px);}}`+
-
 			`@-webkit-keyframes userslidein `+
 
 			`{to {-webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
 			`translate(20px);transform: translate(20px);}}`+
 
 			`@-moz-keyframes userslidein `+
+
+			`{to {-webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
+			`translate(20px);transform: translate(20px);}}` + 
+
+			`@keyframes userslidein `+
 
 			`{to {-webkit-transform: translate(20px);-moz-transform: translate(20px);-ms-transform: `+
 			`translate(20px);transform: translate(20px);}}`

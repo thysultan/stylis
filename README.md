@@ -14,15 +14,21 @@ stylis('#user', styles);
 
 Where `styles` is the following css
 
-```css
-@root {
-	body {
-		background: yellow;
-	}
-}
+```scss
+
+font-size: 2em;
+font-family: sans-serif;
+
+// a line comment
 
 .name {
     transform: rotate(30deg);
+}
+
+@root {
+    body {
+        background: yellow;
+    }
 }
 
 span, h1 {
@@ -57,14 +63,18 @@ span, h1 {
 into this (minus the whitespace)
 
 ```css
-body {
-    background: yellow;
+#user {
+	font-size: 2em;
+	font-family: sans-serif;
 }
 #user .name {
     -webkit-transform: rotate(30deg);
     -moz-transform: rotate(30deg);
     -ms-transform: rotate(30deg);
     transform: rotate(30deg);
+}
+body {
+    background: yellow;
 }
 #user span,
 #user h1 {
@@ -160,7 +170,7 @@ body {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.6.4/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.6.5/stylis.min.js></script>
 ```
 
 #### npm
@@ -179,7 +189,8 @@ stylis(
     namespaceKeyframes {boolean}
 );
 
-// namespaceAnimations and namespaceKeyframes allow you to prevent keyframes and animations
+// namespaceAnimations and namespaceKeyframes allow 
+// you to prevent keyframes and animations
 // from being namespaced
 ```
 

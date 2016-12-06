@@ -1,7 +1,13 @@
+## 0.6.5 (December 06, 2016)
+
+- improvements to handling of line comments
+- improvements to parsing performance
+
 ## 0.6.4 (December 05, 2016)
 
-- improvements to parsing, do away with the little regex that was used.
+- improvements to parsing, do away with the little regex that was used
 - handle edge cases with `@keyframes` nested in `@root` block
+- support complete prefix support in `@keyframes` and `@root` blocks
 
 ## 0.6.3 (December 04, 2016)
 
