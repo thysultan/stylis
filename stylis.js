@@ -126,8 +126,6 @@
                         // vendor prefix
                         line = '-webkit-' + build + build;
                     }
-
-
                     // appearance: a, p, p
                     else if (first === 97 && second === 112 && third === 112) {
                         // vendor prefix -webkit- and -moz-
@@ -154,7 +152,7 @@
                     // transforms & transitions: t, r, a 
                     else if (first === 116 && second === 114 && third === 97) {
                         // vendor prefix -webkit- and -ms- if transform
-                        line = '-webkit-' + line + (line.charCodeAt(5) === 102 ? ('-ms-' + line) : '') + line;
+                        line = '-webkit-' + line + (line.charCodeAt(5) === 102 ? '-ms-' + line : '') + line;
                     }
                     // display: d, i, s
                     else if (first === 100 && second === 105 && third === 115) {
