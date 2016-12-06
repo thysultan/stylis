@@ -124,29 +124,37 @@
                         }
 
                         // vendor prefix
-                        line = '-webkit-' + build + '-moz-' + build + build;
+                        line = '-webkit-' + build + build;
                     }
+
+
                     // appearance: a, p, p
-                    // flex: f, l, e
-                    // order: o, r, d
-                    else if (
-                        (first === 97 && second === 112 && third === 112) ||
-                        (first === 102 && second === 108 && third === 101) ||
-                        (first === 111 && second === 114 && third === 100)
-                    ) {
-                        // vendor prefix
+                    else if (first === 97 && second === 112 && third === 112) {
+                        // vendor prefix -webkit- and -moz-
                         line = '-webkit-' + line + '-moz-' + line + line;
                     }
-                    // transforms & transitions: t, r, a 
                     // hyphens: h, y, p
                     // user-select: u, s, e
                     else if (
-                        (first === 116 && second === 114 && third === 97) ||
                         (first === 104 && second === 121 && third === 112) ||
                         (first === 117 && second === 115 && third === 101)
                     ) {
-                        // vendor prefix
+                        // vendor prefix all
                         line = '-webkit-' + line + '-moz-' + line + '-ms-' + line + line;
+                    }
+                    // flex: f, l, e
+                    // order: o, r, d
+                    else if (
+                        (first === 102 && second === 108 && third === 101) ||
+                        (first === 111 && second === 114 && third === 100)
+                    ) {
+                        // vendor prefix only -webkit-
+                        line = '-webkit-' + line + line;
+                    }
+                    // transforms & transitions: t, r, a 
+                    else if (first === 116 && second === 114 && third === 97) {
+                        // vendor prefix -webkit- and -ms- if transform
+                        line = '-webkit-' + line + (line.charCodeAt(5) === 102 ? ('-ms-' + line) : '') + line;
                     }
                     // display: d, i, s
                     else if (first === 100 && second === 105 && third === 115) {
@@ -207,7 +215,7 @@
                             // @keyframes 
                             else {
                                 // vendor prefix
-                                line = '}@-moz-'+blob+'}@'+blob+'}';
+                                line = '}@'+blob+'}';
                                 // reset blob
                                 blob = '';
                             }

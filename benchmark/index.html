@@ -165,24 +165,17 @@
 				}
 			`, true, true);
 		}
+		var iterations = 1000;
 
-		// warmup
-		for (var i = 0; i < 10; i++) {
-			bench();
-		}
-
-		var blob = '';
 		var start = performance.now();
 
-		for (var i = 0; i < 1000; i++) {
+		for (var i = 0; i < iterations; i++) {
 			bench();
 		}
 
-		var end = performance.now();
-		console.log((end-start)/1000 + ' ms - 150 LOC');
+		console.log((performance.now()-start)/iterations + 'ms - 150 LOC');
 
-		// ~16ms before warmup
-		// ~0.3ms after a warmup
+		// ~0.4ms
 	</script>
 </body>
 </html>
