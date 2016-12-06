@@ -1,3 +1,7 @@
+## 0.6.6 (December 06, 2016)
+
+- reduction to output payload(unused prefixes)
+
 ## 0.6.5 (December 06, 2016)
 
 - improvements to handling of line comments
