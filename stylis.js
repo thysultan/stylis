@@ -37,14 +37,22 @@
     function stylis (selector, styles, nsAnimations, nsKeyframes) {
         var prefix = '';
         var id     = '';
-        var type   = selector.charCodeAt(0);
+        var type   = selector.charCodeAt(0) || 0;
 
         // [
         if (type === 91) {
             // `[data-id=namespace]` -> ['data-id', 'namespace']
-            var attr = selector.substring(1, selector.length-1).split('=');
+            var attr = selector.substring(1, selector.length-1).split('=');            
+            var char = (id = attr[1]).charCodeAt(0);
+
+            // [data-id="namespace"]/[data-id='namespace']
+            // --> "namespace"/'namspace' -> namespace
+            if (char === 34 || char === 39) {
+                id = id.substring(1, id.length-1);
+            }
+
             // re-build and extract namespace/id
-            prefix = '['+ attr[0] + '=' + (id = attr[1]) +']';
+            prefix = '['+ attr[0] + '=\'' + id +'\']';
         }
         // `#` or `.` or `>`
         else if (type === 35 || type === 46 || type === 62) {
@@ -97,7 +105,7 @@
                 // @, special block
                 if (first === 64) {
                     // exit flat css context with the first block context
-                    flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + '{' + output + '}'));
+                    flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + ' {'+output+'}'));
 
                     // @keyframe/@root, `k` or @root, `r` character
                     if (second === 107 || second === 114) {
@@ -164,7 +172,7 @@
                     // { character, selector declaration
                     else if (code === 123) {
                         // exit flat css context with the first block context
-                        flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + '{' + output + '}'));
+                        flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + ' {'+output+'}'));
 
                         if (special === 0) {
                             var split = line.split(',');
@@ -184,7 +192,25 @@
                                 // &
                                 if (firstChar === 38) {
                                     selector = prefix + selector.substring(1);
-                                } else {
+                                }
+                                // :host 
+                                else if (firstChar === 58) {
+                                    var nextChar = (selector = selector.substring(5)).charCodeAt(0);
+                                    
+                                    // :host(selector)                                                    
+                                    if (nextChar === 40) {
+                                        selector = prefix + selector.substring(1).replace(')', '');
+                                    } 
+                                    // :host-context(selector)
+                                    else if (nextChar === 45) {
+                                        selector = selector.substring(9, selector.indexOf(')')) + ' ' + prefix + ' {';
+                                    }
+                                    // :host
+                                    else {
+                                        selector = prefix + selector;
+                                    }
+                                  }
+                                else {
                                     selector = prefix + (firstChar === 58 ? '' : ' ') + selector;
                                 }
 
@@ -251,7 +277,7 @@
             i++; 
         }
 
-        return flat === 1 && output.length !== 0 ? prefix+'{'+output+'}' : output;
+        return flat === 1 && output.length !== 0 ? prefix+' {'+output+'}' : output;
     }
 
     return stylis;

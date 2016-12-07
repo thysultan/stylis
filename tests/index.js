@@ -105,7 +105,7 @@ var tests = {
 			font-size: 20px;
 			transition: all;
 		`,
-		expected: `.user{color: 20px;font-size: 20px;-webkit-transition: all;transition: all;}`
+		expected: `.user {color: 20px;font-size: 20px;-webkit-transition: all;transition: all;}`
 	},
 	'namespace': {
 		name: 'namespace',
@@ -203,7 +203,19 @@ var tests = {
 
 			`@keyframes userslidein `+
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
-	}
+	},
+	'prefixer': {
+		name: ':host',
+		sample: `
+			color: red;
+			& { color: red; }
+			:host { color: red; }
+
+			:host(.fancy) { color: red; }
+			:host-context(body) { color: red; }
+		`,
+		expected: `.user {color: red;}.user {color: red;}.user {color: red;}.user.fancy {color: red;}body .user {color: red;}`
+	},
 };
 
 

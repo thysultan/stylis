@@ -7,6 +7,39 @@
 	<script src='../stylis.js'></script>
 </head>
 <body>
+	<script>
+		// random characters
+		var randomChars  = 'JrIFgLKeEuQUPbhBnWZCTXDtRcxwSzaqijOvfpklYdAoMHmsVNGy';
+
+		/**
+		 * generate random string of a certain length
+		 * 
+		 * @param  {number} length
+		 * @return {string}
+		 */
+		function random (length) {
+		    var text = '';
+
+		    // 52 is the length of characters in the string `randomChars`
+		    for (var i = 0; i < length; i++) {
+		        text += randomChars[Math.floor(Math.random() * 52)];
+		    }
+
+		    return text;
+		}
+
+		var output = stylis(`[data-jsx=${random(6)}]`, `
+			color: red;
+			& { color: red; }
+			:host { color: red; }
+
+			:host(.fancy) { color: red; }
+			:host-context(body) { color: red; }
+		`);
+
+		console.log(output);
+	</script>
+
 	<script src='./index.js'></script>
 </body>
 </html>

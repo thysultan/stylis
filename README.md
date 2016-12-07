@@ -3,8 +3,8 @@
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) 
  ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~900bytes minified+gzipped
-- ~1kb minified
+- ~1020bytes minified+gzipped
+- ~2kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -18,6 +18,18 @@ Where `styles` is the following css
 
 font-size: 2em;
 font-family: sans-serif;
+
+:host {
+    color: red;
+}
+
+:host(.fancy) {
+    color: red;
+}
+
+:host-context(body) {
+    color: red;
+}
 
 // a line comment
 
@@ -67,9 +79,17 @@ into this (minus the whitespace)
 	font-size: 2em;
 	font-family: sans-serif;
 }
+#user {
+    color: red;
+}
+#user.fancy {
+    color: red;
+}
+body #user {
+    color: red;
+}
 #user .name {
     -webkit-transform: rotate(30deg);
-    -moz-transform: rotate(30deg);
     -ms-transform: rotate(30deg);
     transform: rotate(30deg);
 }
@@ -94,47 +114,33 @@ body {
     user-select: none;
 
     -webkit-animation: userslidein 3s ease infinite;
-    -moz-animation: userslidein 3s ease infinite;
     animation: userslidein 3s ease infinite;
 }
 #user:before {
     -webkit-animation: userslidein 3s ease infinite;
-    -moz-animation: userslidein 3s ease infinite;
     animation: userslidein 3s ease infinite;
 }
 @-webkit-keyframes userslidein {
     from {
         -webkit-transform: translate(10px);
-        -moz-transform: translate(10px);
+        -ms-transform: translate(10px);
         transform: translate(10px);
     }
     to {
         -webkit-transform: translate(200px);
-        -moz-transform: translate(200px);
-        transform: translate(200px);
-    }
-}
-@-moz-keyframes userslidein {
-    from {
-        -webkit-transform: translate(10px);
-        -moz-transform: translate(10px);
-        transform: translate(10px);
-    }
-    to {
-        -webkit-transform: translate(200px);
-        -moz-transform: translate(200px);
+        -ms-transform: translate(200px);
         transform: translate(200px);
     }
 }
 @keyframes userslidein {
     from {
         -webkit-transform: translate(10px);
-        -moz-transform: translate(10px);
+        -ms-transform: translate(10px);
         transform: translate(10px);
     }
     to {
         -webkit-transform: translate(200px);
-        -moz-transform: translate(200px);
+        -ms-transform: translate(200px);
         transform: translate(200px);
     }
 }
@@ -170,7 +176,7 @@ body {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.6.6/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.6.7/stylis.min.js></script>
 ```
 
 #### npm
