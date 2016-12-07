@@ -204,7 +204,7 @@ var tests = {
 			`@keyframes userslidein `+
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
-	'prefixer': {
+	':host': {
 		name: ':host',
 		sample: `
 			color: red;
