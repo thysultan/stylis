@@ -1,3 +1,11 @@
+## 0.6.8 (December 06, 2016)
+
+- patch `:host...` implementation conflict with `:root...`
+
+## 0.6.7 (December 06, 2016)
+
+- add support for shadow dom selectors `:host, :host(selector), :host-context(selector)`
+
 ## 0.6.6 (December 06, 2016)
 
 - reduction to output payload(unused prefixes)

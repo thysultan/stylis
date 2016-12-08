@@ -194,7 +194,7 @@
                                     selector = prefix + selector.substring(1);
                                 }
                                 // :host 
-                                else if (firstChar === 58) {
+                                else if (firstChar === 58 && selector.charCodeAt(1) === 104) {
                                     var nextChar = (selector = selector.substring(5)).charCodeAt(0);
                                     
                                     // :host(selector)                                                    
@@ -209,7 +209,7 @@
                                     else {
                                         selector = prefix + selector;
                                     }
-                                  }
+                                }
                                 else {
                                     selector = prefix + (firstChar === 58 ? '' : ' ') + selector;
                                 }
