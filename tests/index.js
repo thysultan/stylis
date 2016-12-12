@@ -116,16 +116,19 @@ var tests = {
 		`,
 		expected: `.user {color: blue;}`
 	},
-	'root': {
-		name: '@root',
+	'globals': {
+		name: '@global/:global',
 		sample: `
-			@root {
+			@global {
 				body {
 					background: yellow;
 				}
 			}
+			:global(body) {
+				background: yellow;
+			}
 		`,
-		expected: 'body {background: yellow;}'
+		expected: 'body {background: yellow;}body {background: yellow;}'
 	},
 	'comment': {
 		name: 'comments',

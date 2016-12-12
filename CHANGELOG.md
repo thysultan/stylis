@@ -1,3 +1,7 @@
+## 0.7.0 (December 12, 2016)
+
+- add inline `:global()` function, change `@root` to `@global`
+
 ## 0.6.8 (December 06, 2016)
 
 - patch `:host...` implementation conflict with `:root...`

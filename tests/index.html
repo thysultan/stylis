@@ -32,10 +32,10 @@
 			color: red;
 			& { color: red; }
 			:host { color: red; }
-
 			:host(.fancy) { color: red; }
 			:host-context(body) { color: red; }
 			:root { color: red; }
+			div, :global(.bootstrap) { color: red; }
 		`);
 
 		console.log(output);

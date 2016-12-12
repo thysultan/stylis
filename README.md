@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) 
  ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~1020bytes minified+gzipped
+- ~1Kb minified+gzipped
 - ~2kb minified
 
 Stylis is a small css compiler that turns this
@@ -31,23 +31,23 @@ font-family: sans-serif;
     color: red;
 }
 
-// a line comment
+// removes line comment
 
 .name {
     transform: rotate(30deg);
 }
 
-@root {
+@global {
     body {
         background: yellow;
     }
 }
 
-span, h1 {
+span, h1, :global(h2) {
 	color:red;
 
 	/**
-	 * removes block comments and line comments
+	 * removes block comments
 	 */
 }
 
@@ -97,7 +97,8 @@ body {
     background: yellow;
 }
 #user span,
-#user h1 {
+#user h1,
+h2 {
     color: red;
 }
 #user {
@@ -176,7 +177,7 @@ body {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.6.8/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.7.0/stylis.min.js></script>
 ```
 
 #### npm

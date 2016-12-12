@@ -2,7 +2,7 @@
 	"name": "stylis",
 	"main": "stylis.js",
 	"description": "stylis is a small css compiler",
-	"version": "0.6.8",
+	"version": "0.7.0",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {
