@@ -177,7 +177,7 @@ h2 {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.7.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.7.1/stylis.min.js></script>
 ```
 
 #### npm

@@ -219,6 +219,15 @@ var tests = {
 		`,
 		expected: `.user {color: red;}.user {color: red;}.user {color: red;}.user.fancy {color: red;}body .user {color: red;}`
 	},
+	'[title="a,b"]': {
+		name: '[title="a,b"]',
+		sample: `
+			[title="a,b,c, something"], h1 {
+		  		color: red
+			}
+		`,
+		expected: `.user [title="a,b,c, something"],.user h1 {color: red}`
+	}
 };
 
 

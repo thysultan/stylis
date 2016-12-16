@@ -189,6 +189,20 @@
                                     firstChar = (selector = selector.trim()).charCodeAt(0);
                                 }
 
+                                // [, [title="a,b,..."]
+                                if (firstChar === 91) {
+                                    for (var k = j+1, l = length-j; k < l; k++) {
+                                        var broken = (selector += ',' + split[k]).trim();
+
+                                        // ]
+                                        if (broken.charCodeAt(broken.length-1) === 93) {
+                                            length -= k;
+                                            split.splice(j, k);
+                                            break;
+                                        }
+                                    }
+                                }
+
                                 // &
                                 if (firstChar === 38) {
                                     selector = prefix + selector.substring(1);
