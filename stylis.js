@@ -184,7 +184,7 @@
                     else if (code === 123) {
                         depth++;
 
-                        if (special === 0) {
+                        if (special === 0 || type === 2) {
                             // nested selector
                             if (depth === 2) {
                                 // discard first character {
@@ -224,7 +224,7 @@
                                 }
 
                                 // create block and update styles length
-                                len += (styles += (prevSel.join(',') + '{' + inner + '}').replace(/&| +&/g, '')).length;
+                                len += (styles += (prevSel.join(',') + '{'+inner+'}').replace(/&| +&/g, '')).length;
 
                                 // clear current line, to avoid add block elements to the normal flow
                                 line = '';

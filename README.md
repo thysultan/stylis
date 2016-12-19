@@ -16,9 +16,11 @@ Where `styles` is the following css
 
 ```scss
 
+// flat css
 font-size: 2em;
 font-family: sans-serif;
 
+// polyfill for shadow dom selectors
 :host {
     color: red;
 }
@@ -37,12 +39,14 @@ font-family: sans-serif;
     transform: rotate(30deg);
 }
 
+// inject to global scope
 @global {
     body {
         background: yellow;
     }
 }
 
+// inject to global scope inline
 span, h1, :global(h2) {
 	color:red;
 
@@ -51,22 +55,26 @@ span, h1, :global(h2) {
 	 */
 }
 
-&{
+// prefixing
+& {
 	animation: slidein 3s ease infinite;
     display: flex;
     flex: 1;
     user-select: none;
 }
 
+// namespaced animations
 &:before {
 	animation: slidein 3s ease infinite;	
 }
 
+// namespaced keyframes
 @keyframes slidein {
 	from { transform: translate(10px); }
 	to { transform: translate(200px); }
 }
 
+// flat namespaced css in @media
 @media (max-width: 600px) {
     display: block;
 
@@ -215,7 +223,7 @@ h1 h2 h2:hover {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.8.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.8.1/stylis.min.js></script>
 ```
 
 #### npm
