@@ -1,3 +1,7 @@
+## 0.8.2 (December 19, 2016)
+
+- better handle line comments
+
 ## 0.8.1 (December 19, 2016)
 
 - patch 0.8.0 regression with @media blocks skipping namespaces

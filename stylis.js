@@ -97,15 +97,8 @@
                 // default to 0 instead of NaN if there is no second character
                 var second = line.charCodeAt(1) || 0;
 
-                // /, *, block comment
-                if (first === 47 && second === 42) {
-                    // travel to end of comment and update first and second characters
-                    first = (line = line.substring(line.indexOf('*/')+2)).charCodeAt(0);
-                    second = line.charCodeAt(1) || 0;
-                }
-
-                // ignore line comments
-                if (comment === 1) {
+                // ignore comments
+                if (comment === 2) {
                     line = ''; comment = 0;
                 }
                 // @, special block
@@ -371,14 +364,14 @@
             }
             // build line by line
             else {
-                // \r, \n, ignore line comments
-                if (comment === 1 && (code === 13 || code === 10)) {
-                    line = '';
+                // \r, \n, ignore line and block comments
+                if (comment === 2 && (code === 13 || code === 10)) {
+                    line = ''; comment = 0;
                 }
                 // not `\t`, `\r`, `\n` characters
                 else if (code !== 9 && code !== 13 && code !== 10) {
                     // / line comment signal
-                    code === 47 && comment === 0 && (comment = 1);
+                    code === 47 && comment < 2 && comment++;
 
                     // build line buffer
                     line += styles[i];
