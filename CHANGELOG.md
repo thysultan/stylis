@@ -1,3 +1,10 @@
+## 0.8.0 (December 19, 2016)
+
+- add nested support `h1 { color: red; &:hover { color: blue; } }`
+- add support for flat css in @media block
+- improve flat css support
+- patch `//` line comments
+
 ## 0.7.0 (December 12, 2016)
 
 - add inline `:global()` function, change `@root` to `@global`

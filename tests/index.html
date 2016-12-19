@@ -8,27 +8,7 @@
 </head>
 <body>
 	<script>
-		// random characters
-		var randomChars  = 'JrIFgLKeEuQUPbhBnWZCTXDtRcxwSzaqijOvfpklYdAoMHmsVNGy';
-
-		/**
-		 * generate random string of a certain length
-		 * 
-		 * @param  {number} length
-		 * @return {string}
-		 */
-		function random (length) {
-		    var text = '';
-
-		    // 52 is the length of characters in the string `randomChars`
-		    for (var i = 0; i < length; i++) {
-		        text += randomChars[Math.floor(Math.random() * 52)];
-		    }
-
-		    return text;
-		}
-
-		var output = stylis(`[data-jsx=${random(6)}]`, `
+		var output = stylis(`.abc`, `
 			color: red;
 			& { color: red; }
 			:host { color: red; }
@@ -40,13 +20,30 @@
 
 		console.log(output);
 
-		console.log(
-			stylis('#ns', `
-				[title="a,b,c, something"], h1 {
-			  		color: red
+		// console.log(
+		// 	stylis('#ns', `
+		// 		[title="a,b,c, something"], h1 {
+		// 	  		color: red
+		// 		}
+		// 	`)
+		// )
+
+		console.log(stylis('.abc', `
+			@media (max-width: 600px) {
+				color: red;	
+				h1 { color: red; }
+				display: none;
+			}
+		`))
+
+		console.log(stylis(`.foo`, `
+			h1 {
+				h2 {
+					color: blue;
 				}
-			`)
-		)
+			}
+		`))
+
 	</script>
 
 	<script src='./index.js'></script>

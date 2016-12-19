@@ -4,7 +4,7 @@
  ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
 - ~1Kb minified+gzipped
-- ~2kb minified
+- ~3kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -68,8 +68,28 @@ span, h1, :global(h2) {
 }
 
 @media (max-width: 600px) {
-	& { appearance: none; }
+    display: block;
+
+	&, h1 { 
+        appearance: none; 
+    }
 }
+
+// nested
+h1 {
+    color: red;
+
+    h2 {
+        display: block;
+
+        h3, &:hover {
+            color: blue;
+        }
+    }
+
+    font-size: 12px;
+}
+
 ```
 
 into this (minus the whitespace)
@@ -146,11 +166,29 @@ h2 {
     }
 }
 @media (max-width: 600px) {
-    #user {
+    #user, #user h1 {
         -webkit-appearance: none;
         -moz-appearance: none;
         appearance: none;
     }
+
+    #user {
+        display: block;
+    }
+}
+
+h1 {
+    color: red;
+    font-size: 12px;
+}
+
+h1 h2 {
+    display: block;
+}
+
+h1 h2 h3,
+h1 h2 h2:hover {
+    color: blue;
 }
 ```
 
@@ -177,7 +215,7 @@ h2 {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.7.1/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.8.0/stylis.min.js></script>
 ```
 
 #### npm

@@ -135,6 +135,8 @@ var tests = {
 		sample: `
 			// line comment
 
+			// color: red;
+
 			/**
 			 * removes block comments and line comments
 			 */
@@ -163,10 +165,12 @@ var tests = {
 		name: '@media',
 		sample: `
 			@media (max-width: 600px) {
+				color: red;	
 				h1 { color: red; }
+				display: none;
 			}
 		`,
-		expected: `@media (max-width: 600px) {.user h1 {color: red;}}`
+		expected: `@media (max-width: 600px) {.user h1 {color: red;}.user {color: red;display: none;}}`
 	},
 	'multiple selectors': {
 		name: 'multiple selectors',
@@ -217,7 +221,8 @@ var tests = {
 			:host(.fancy) { color: red; }
 			:host-context(body) { color: red; }
 		`,
-		expected: `.user {color: red;}.user {color: red;}.user {color: red;}.user.fancy {color: red;}body .user {color: red;}`
+		expected: '.user {color: red;}.user {color: red;}.user.fancy {color: red;}'+
+			'body .user {color: red;}.user {color: red;}'
 	},
 	'[title="a,b"]': {
 		name: '[title="a,b"]',
@@ -227,6 +232,26 @@ var tests = {
 			}
 		`,
 		expected: `.user [title="a,b,c, something"],.user h1 {color: red}`
+	},
+	'nested': {
+		name: 'nested',
+		sample: `
+			h1, div {
+				color: red;
+
+				h2, &:before {
+					color: red;
+				}
+
+				color: blue;
+
+				header {
+					font-size: 12px;
+				}
+			}
+		`,
+		expected: '.user h1,.user div {color: red;color: blue;}.user h1 h2,.user h1:before,.user div h2,'+
+		'.user div:before{color: red;}.user h1 header,.user div header{font-size: 12px;}'
 	}
 };
 

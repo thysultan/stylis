@@ -1,5 +1,4 @@
 /*!
- *
  *          __        ___     
  *    _____/ /___  __/ (_)____
  *   / ___/ __/ / / / / / ___/
@@ -39,10 +38,10 @@
         var id     = '';
         var type   = selector.charCodeAt(0) || 0;
 
-        // [
+        // [ attr selector
         if (type === 91) {
             // `[data-id=namespace]` -> ['data-id', 'namespace']
-            var attr = selector.substring(1, selector.length-1).split('=');            
+            var attr = selector.substring(1, selector.length-1).split('=');     
             var char = (id = attr[1]).charCodeAt(0);
 
             // [data-id="namespace"]/[data-id='namespace']
@@ -51,10 +50,9 @@
                 id = id.substring(1, id.length-1);
             }
 
-            // re-build and extract namespace/id
             prefix = '['+ attr[0] + '=\'' + id +'\']';
         }
-        // `#` or `.` or `>`
+        // `#` `.` `>` id class and descendant selectors
         else if (type === 35 || type === 46 || type === 62) {
             id = (prefix = selector).substring(1);
         }
@@ -69,6 +67,8 @@
         var output  = '';
         var line    = '';
         var blob    = '';
+        var prev    = '';
+        var flat    = '';
 
         var len     = styles.length;
 
@@ -76,8 +76,8 @@
         var special = 0;
         var type    = 0;
         var close   = 0;
-        var flat    = 1; 
         var comment = 0;
+        var depth   = 0;
 
         // parse + compile
         while (i < len) {
@@ -94,32 +94,43 @@
                     first = (line = line.trim()).charCodeAt(0); 
                 }
 
+                // default to 0 instead of NaN if there is no second character
                 var second = line.charCodeAt(1) || 0;
 
                 // /, *, block comment
                 if (first === 47 && second === 42) {
+                    // travel to end of comment and update first and second characters
                     first = (line = line.substring(line.indexOf('*/')+2)).charCodeAt(0);
                     second = line.charCodeAt(1) || 0;
                 }
 
+                // ignore line comments
+                if (comment === 1) {
+                    line = ''; comment = 0;
+                }
                 // @, special block
-                if (first === 64) {
-                    // exit flat css context with the first block context
-                    flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + ' {'+output+'}'));
-
+                else if (first === 64) {
                     // @keyframe/@global, `k` or @global, `g` character
                     if (second === 107 || second === 103) {
-                        special++;
-
+                        // k, @keyframes
                         if (second === 107) {
                             blob = line.substring(1, 11) + keyframeNs + line.substring(11);
                             line = '@-webkit-'+blob;
                             type = 1;
-                        } else {
+                        }
+                        // g, @global 
+                        else {
                             line = '';
                         }
                     }
-                } else {
+                    // @media `m` character
+                    else if (second === 109) {
+                        type = 2;
+                    }
+
+                    special++;
+                }
+                else {
                     var third = line.charCodeAt(2) || 0;
 
                     // animation: a, n, i characters
@@ -171,91 +182,151 @@
                     }
                     // { character, selector declaration
                     else if (code === 123) {
-                        // exit flat css context with the first block context
-                        flat === 1 && (flat = 0, output.length !== 0 && (output = prefix + ' {'+output+'}'));
+                        depth++;
 
                         if (special === 0) {
-                            var split = line.split(',');
-                            var build = '';
+                            // nested selector
+                            if (depth === 2) {
+                                // discard first character {
+                                i++;
 
-                            // prefix multiple selectors with namesapces
-                            // @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
-                            for (var j = 0, length = split.length; j < length; j++) {
-                                var selector = split[j];
-                                var firstChar = selector.charCodeAt(0);
+                                // inner content of block
+                                var inner   = '';
+                                var nestSel = line.substring(0, line.length-1).split(',');
+                                var prevSel = prev.substring(0, prev.length-1).split(',');
 
-                                // ` `, trim if first char is space
-                                if (firstChar === 32) {
-                                    firstChar = (selector = selector.trim()).charCodeAt(0);
+                                // keep track of opening `{` and `}` occurrences
+                                var counter = 1;
+
+                                // travel to the end of the block
+                                while (i < len) {
+                                    var char = styles.charCodeAt(i);
+                                    // {, }, nested blocks may have nested blocks
+                                    char === 123 ? counter++ : char === 125 && counter--;
+                                    // break when the has ended
+                                    if (counter === 0) break;
+                                    // build content of nested block
+                                    inner += styles[i++];
                                 }
 
-                                // [, [title="a,b,..."]
-                                if (firstChar === 91) {
-                                    for (var k = j+1, l = length-j; k < l; k++) {
-                                        var broken = (selector += ',' + split[k]).trim();
-
-                                        // ]
-                                        if (broken.charCodeAt(broken.length-1) === 93) {
-                                            length -= k;
-                                            split.splice(j, k);
-                                            break;
-                                        }
+                                // handle multiple selectors: h1, h2 { div, h4 {} } should generate
+                                // -> h1 div, h2 div, h2 h4, h2 div {}
+                                for (var j = 0, length = prevSel.length; j < length; j++) {
+                                    // extract value, prep index for reuse
+                                    var val = prevSel[j]; prevSel[j] = '';
+                                    // since there can also be multiple nested selectors
+                                    for (var k = 0, l = nestSel.length; k < l; k++) {
+                                        prevSel[j] += (
+                                            (val.replace(prefix, '').trim() + ' ' + nestSel[k].trim()).trim() + 
+                                            (k === l-1  ? '' : ',')
+                                        );
                                     }
                                 }
 
-                                // &
-                                if (firstChar === 38) {
-                                    selector = prefix + selector.substring(1);
-                                }
-                                // : 
-                                else if (firstChar === 58) {
-                                    var secondChar = selector.charCodeAt(1);
+                                // create block and update styles length
+                                len += (styles += (prevSel.join(',') + '{' + inner + '}').replace(/&| +&/g, '')).length;
 
-                                    // :host 
-                                    if (secondChar === 104) {
-                                        var nextChar = (selector = selector.substring(5)).charCodeAt(0);
-                                        
-                                        // :host(selector)                                                    
-                                        if (nextChar === 40) {
-                                            selector = prefix + selector.substring(1).replace(')', '');
-                                        } 
-                                        // :host-context(selector)
-                                        else if (nextChar === 45) {
-                                            selector = selector.substring(9, selector.indexOf(')')) + ' ' + prefix + ' {';
+                                // clear current line, to avoid add block elements to the normal flow
+                                line = '';
+
+                                // decreament depth
+                                depth--;
+                            }
+                            // top-level selector
+                            else {
+                                var split = line.split(',');
+                                var build = '';
+
+                                // prefix multiple selectors with namesapces
+                                // @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
+                                for (var j = 0, length = split.length; j < length; j++) {
+                                    var selector = split[j];
+                                    var firstChar = selector.charCodeAt(0);
+
+                                    // ` `, trim if first char is space
+                                    if (firstChar === 32) {
+                                        firstChar = (selector = selector.trim()).charCodeAt(0);
+                                    }
+
+                                    // [, [title="a,b,..."]
+                                    if (firstChar === 91) {
+                                        for (var k = j+1, l = length-j; k < l; k++) {
+                                            var broken = (selector += ',' + split[k]).trim();
+
+                                            // ]
+                                            if (broken.charCodeAt(broken.length-1) === 93) {
+                                                length -= k;
+                                                split.splice(j, k);
+                                                break;
+                                            }
                                         }
-                                        // :host
+                                    }
+
+                                    // &
+                                    if (firstChar === 38) {
+                                        // before: & {
+                                        selector = prefix + selector.substring(1);
+                                        // after: ${prefix} {
+                                    }
+                                    // : 
+                                    else if (firstChar === 58) {
+                                        var secondChar = selector.charCodeAt(1);
+
+                                        // :host 
+                                        if (secondChar === 104) {
+                                            var nextChar = (selector = selector.substring(5)).charCodeAt(0);
+                                            
+                                            // :host(selector)                                                    
+                                            if (nextChar === 40) {
+                                                // before: `(selector)`
+                                                selector = prefix + selector.substring(1).replace(')', '');
+                                                // after: ${prefx} selector {
+                                            } 
+                                            // :host-context(selector)
+                                            else if (nextChar === 45) {
+                                                // before: `-context(selector)`
+                                                selector = selector.substring(9, selector.indexOf(')')) + ' ' + prefix + ' {';
+                                                // after: selector ${prefix} {
+                                            }
+                                            // :host
+                                            else {
+                                                selector = prefix + selector;
+                                            }
+                                        }
+                                        // :global(selector)
+                                        else if (secondChar === 103) {
+                                            // before: `:global(selector)`
+                                            selector = selector.substring(8).replace(')', '');
+                                            // after: selector
+                                        }
+                                        // :hover, :active, :focus, etc...
                                         else {
-                                            selector = prefix + selector;
+                                            // :, insure `div:hover` does not end up as `div :hover` 
+                                            selector = prefix + (firstChar === 58 ? '' : ' ') + selector;
                                         }
                                     }
-                                    // :global()
-                                    else if (secondChar === 103) {
-                                        selector = selector.substring(8).replace(')', '');
-                                    }
-                                    // :hover, :active, :focus, etc...
                                     else {
+                                        // :, insure `div:hover` does not end up as `div :hover` 
                                         selector = prefix + (firstChar === 58 ? '' : ' ') + selector;
                                     }
-                                }
-                                else {
-                                    selector = prefix + (firstChar === 58 ? '' : ' ') + selector;
+
+                                    // if first selector do not prefix with `,`
+                                    build += j === 0 ? selector : ',' + selector;
                                 }
 
-                                build += j === 0 ? selector : ',' + selector;
+                                prev = line = build;
                             }
-
-                            line = build;
                         }
                     }
-
+                    // } character
+                    else if (code === 125 && depth !== 0) {
+                        depth--;
+                    }
+                    
                     // @global/@keyframes
                     if (special !== 0) {
                         // find the closing tag
-                        if (code === 125) {
-                            close++;
-                        } else if (code === 123 && close !== 0) {
-                            close--;
-                        }
+                        code === 125 ? close++ : (code === 123 && close !== 0 && close--);
 
                         // closing tag
                         if (close === 2) {
@@ -264,38 +335,52 @@
                                 line = '';
                             }
                             // @keyframes 
-                            else {
+                            else if (type === 1) {
                                 // vendor prefix
                                 line = '}@'+blob+'}';
                                 // reset blob
                                 blob = '';
                             }
+                            // @media
+                            else if (type === 2) {
+                                blob.length !== 0 && (line = prefix + ' {'+blob+'}' + line);
+                                // reset blob
+                                blob = '';
+                            }
 
                             // reset flags
-                            type = 0;
-                            close = special > 1 ? 1 : 0;
-                            special--;
+                            type = 0; close--; special--;
                         }
                         // @keyframes 
                         else if (type === 1) {
                             blob += line;
                         }
+                        // @media flat context
+                        else if (type === 2 && depth === 0 && code !== 125) {
+                            blob += line; line = '';
+                        }
+                    }
+                    // flat context
+                    else if (depth === 0 && code !== 125) {
+                        flat += line; line = '';
                     }
                 }
 
-                output += line;
-                line    = '';
-                comment = 0;
+                // add line to output, reset line buffer and comment signal
+                output += line; line = ''; comment = 0;
             }
             // build line by line
             else {
-                // \r, \n, remove line comments
+                // \r, \n, ignore line comments
                 if (comment === 1 && (code === 13 || code === 10)) {
                     line = '';
                 }
                 // not `\t`, `\r`, `\n` characters
                 else if (code !== 9 && code !== 13 && code !== 10) {
+                    // / line comment signal
                     code === 47 && comment === 0 && (comment = 1);
+
+                    // build line buffer
                     line += styles[i];
                 }
             }
@@ -304,7 +389,8 @@
             i++; 
         }
 
-        return flat === 1 && output.length !== 0 ? prefix+' {'+output+'}' : output;
+        // if there is flat css, append
+        return output + (flat.length === 0 ? '' : prefix + ' {' + flat + '}');
     }
 
     return stylis;
