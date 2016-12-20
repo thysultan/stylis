@@ -24,75 +24,6 @@
  */
 
 
-var browser = this && !!this.window;
-var stylis = browser ? this.stylis : require('../stylis.js');
-
-/**
- * run tests
- * @return {Object} tests
- */
-function run (tests) {
-	var start = Date.now();
-
-	var passed = [];
-	var failed = [];
-
-	var format = {
-		reset:     browser ? '' : '\x1b[0m',
-		green:     browser ? '' : '\x1b[32m',
-		red:       browser ? '' : '\x1b[31m',
-		yellow:    browser ? '' : '\x1b[33m',
-		underline: browser ? '' : '\x1b[4m',
-		dim:       browser ? '' : '\x1b[2m',
-		bold:      browser ? '' : '\x1b[1m',
-		clear:     browser ? '' : '\x1Bc\n'
-	};
-
-	for (var name in tests) {
-		var test = tests[name];
-
-		var name = test.name.trim();
-		var sample = test.sample.trim();
-		var expected = test.expected.trim();
-
-		var result = stylis('.user', sample, true, true);
-
-		(result === expected ? passed : failed).push(name);
-
-		if (result !== expected) {
-			// log why it failed
-			console.log('failed:\n'+ result);
-			console.log('expected:\n'+ expected);
-		}
-	}
-
-	var end = '\n\n'+format.reset+'[Finnished In] '+(Date.now()-start)+'ms\n';
-
-	// start test logger
-	console.log('\n------');
-
-	// passed
-	console.log(
-		format.bold+'\nTests Passed '+passed.length+format.reset+format.green + '\n\n'+passed.join('\n')+end
-	);
-
-	// failed
-	console.log(
-		format.bold+'Tests Failed '+failed.length+format.reset+format.red + 
-		'\n\n'+(failed.join('\n') || 'no failed tests')+end
-	);
-
-	// if failed trigger exit
-	if (failed.length) {
-		if (browser) {
-			console.error(new Error('^^^'));
-		} else {
-			process.exit(1);
-		}
-	}
-}
-
-
 /**
  * define tests
  * @type {Object}
@@ -254,6 +185,75 @@ var tests = {
 		'.user div:before{color: red;}.user h1 header,.user div header{font-size: 12px;}'
 	}
 };
+
+
+var browser = this && !!this.window;
+var stylis = browser ? this.stylis : require('../stylis.js');
+
+/**
+ * run tests
+ * @return {Object} tests
+ */
+function run (tests) {
+	var start = Date.now();
+
+	var passed = [];
+	var failed = [];
+
+	var format = {
+		reset:     browser ? '' : '\x1b[0m',
+		green:     browser ? '' : '\x1b[32m',
+		red:       browser ? '' : '\x1b[31m',
+		yellow:    browser ? '' : '\x1b[33m',
+		underline: browser ? '' : '\x1b[4m',
+		dim:       browser ? '' : '\x1b[2m',
+		bold:      browser ? '' : '\x1b[1m',
+		clear:     browser ? '' : '\x1Bc\n'
+	};
+
+	for (var name in tests) {
+		var test = tests[name];
+
+		var name = test.name.trim();
+		var sample = test.sample.trim();
+		var expected = test.expected.trim();
+
+		var result = stylis('.user', sample, true, true);
+
+		(result === expected ? passed : failed).push(name);
+
+		if (result !== expected) {
+			// log why it failed
+			console.log('failed:\n'+ result);
+			console.log('expected:\n'+ expected);
+		}
+	}
+
+	var end = '\n\n'+format.reset+'[Finnished In] '+(Date.now()-start)+'ms\n';
+
+	// start test logger
+	console.log('\n------');
+
+	// passed
+	console.log(
+		format.bold+'\nTests Passed '+passed.length+format.reset+format.green + '\n\n'+passed.join('\n')+end
+	);
+
+	// failed
+	console.log(
+		format.bold+'Tests Failed '+failed.length+format.reset+format.red + 
+		'\n\n'+(failed.join('\n') || 'no failed tests')+end
+	);
+
+	// if failed trigger exit
+	if (failed.length) {
+		if (browser) {
+			console.error(new Error('^^^'));
+		} else {
+			process.exit(1);
+		}
+	}
+}
 
 
 /**

@@ -1,6 +1,7 @@
-## 0.8.2 (December 19, 2016)
+## 0.8.2 (December 20, 2016)
 
 - better handle line comments
+- small improvements to compiler
 
 ## 0.8.1 (December 19, 2016)
 
