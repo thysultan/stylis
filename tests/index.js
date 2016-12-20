@@ -148,12 +148,14 @@ var tests = {
 			color: red;
 			& { color: red; }
 			:host { color: red; }
+			:hover { color: red; }
 
 			:host(.fancy) { color: red; }
 			:host-context(body) { color: red; }
+			:root { color: red; }
 		`,
-		expected: '.user {color: red;}.user {color: red;}.user.fancy {color: red;}'+
-			'body .user {color: red;}.user {color: red;}'
+		expected: '.user {color: red;}.user {color: red;}.user:hover {color: red;}.user.fancy {color: red;}'+
+			'body .user {color: red;}.user:root {color: red;}.user {color: red;}'
 	},
 	'[title="a,b"]': {
 		name: '[title="a,b"]',

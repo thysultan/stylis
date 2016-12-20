@@ -1,3 +1,7 @@
+## 0.8.3 (December 20, 2016)
+
+- patch `:host` conflict with `:hover`
+
 ## 0.8.2 (December 20, 2016)
 
 - better handle line comments

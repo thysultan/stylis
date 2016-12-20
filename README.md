@@ -222,7 +222,7 @@ h1 h2 h2:hover {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.8.2/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.8.3/stylis.min.js></script>
 ```
 
 #### npm

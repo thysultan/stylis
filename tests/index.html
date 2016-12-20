@@ -8,31 +8,18 @@
 </head>
 <body>
 	<script>
-		// console.log(
-		// 	stylis('.abc', `
-		// 		h1 {
-		// 			h2 {
-		// 				color:red;
-		// 			}
-		// 		}
+		var output = stylis(`.abc`, `
+			color: red;
+			& { color: red; }
+			:hover {color:red;}
+			:host { color: red; }
+			:host(.fancy) { color: red; }
+			:host-context(body) { color: red; }
+			:root { color: red; }
+			div, :global(.bootstrap) { color: red; }
+		`);
 
-		// 		h4 {
-		// 			color:blue;
-		// 		}
-		// 	`)
-		// );
-
-		// var output = stylis(`.abc`, `
-		// 	color: red;
-		// 	& { color: red; }
-		// 	:host { color: red; }
-		// 	:host(.fancy) { color: red; }
-		// 	:host-context(body) { color: red; }
-		// 	:root { color: red; }
-		// 	div, :global(.bootstrap) { color: red; }
-		// `);
-
-		// console.log(output);
+		console.log(output);
 
 		// console.log(
 		// 	stylis('#ns', `

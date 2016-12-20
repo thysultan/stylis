@@ -265,11 +265,11 @@
 									else if (firstChar === 58) {
 										var secondChar = selector.charCodeAt(1);
 
-										// :host 
-										if (secondChar === 104) {
+										// h, t, :host 
+										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
 											var nextChar = (selector = selector.substring(5)).charCodeAt(0);
 											
-											// :host(selector)                                                    
+											// :host(selector)                                                 
 											if (nextChar === 40) {
 												// before: `(selector)`
 												selector = prefix + selector.substring(1).replace(')', '');
@@ -286,7 +286,7 @@
 												selector = prefix + selector;
 											}
 										}
-										// :global(selector)
+										// g, :global(selector)
 										else if (secondChar === 103) {
 											// before: `:global(selector)`
 											selector = selector.substring(8).replace(')', '');
