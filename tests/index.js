@@ -185,7 +185,16 @@ var tests = {
 		`,
 		expected: '.user h1,.user div {color: red;color: blue;}.user h1 h2,.user h1:before,.user div h2,'+
 		'.user div:before{color: red;}.user h1 header,.user div header{font-size: 12px;}'
-	}
+	},
+	'strings': {
+		name: 'strings',
+		sample: `
+			.foo:before {
+		  	content: ".hello {world}"
+			}
+		`,
+		expected: `.user .foo:before {content: ".hello {world}"}`
+	},
 };
 
 
