@@ -138,7 +138,7 @@ var tests = {
 	},
 	'animations disabled prefix': {
 		options: {
-			namespaceAnimations: false
+			animations: false
 		},
 		name: 'animations disable namespace',
 		sample: `
