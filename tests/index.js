@@ -30,10 +30,6 @@
  */
 var tests = {
 	'flat': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'flat',
 		sample: `
 			color: 20px;
@@ -43,10 +39,6 @@ var tests = {
 		expected: `.user {color: 20px;font-size: 20px;-webkit-transition: all;transition: all;}`
 	},
 	'namespace': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'namespace',
 		sample: `
 			{
@@ -56,10 +48,6 @@ var tests = {
 		expected: `.user {color: blue;}`
 	},
 	'globals': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: '@global/:global',
 		sample: `
 			@global {
@@ -74,10 +62,6 @@ var tests = {
 		expected: 'body {background: yellow;}body {background: yellow;}'
 	},
 	'comment': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'comments',
 		sample: `
 			// line comment
@@ -91,10 +75,6 @@ var tests = {
 		expected: ''
 	},
 	'&': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: '&',
 		sample: `
 			&{
@@ -104,10 +84,6 @@ var tests = {
 		expected: '.user{color: blue;}'
 	},
 	'&:before': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: '&:before',
 		sample: `
 			&:before{
@@ -117,10 +93,6 @@ var tests = {
 		expected: '.user:before{color: blue;}'
 	},
 	'@media': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: '@media',
 		sample: `
 			@media (max-width: 600px) {
@@ -132,10 +104,6 @@ var tests = {
 		expected: `@media (max-width: 600px) {.user h1 {color: red;}.user {color: red;display: none;}}`
 	},
 	'multiple selectors': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'multiple selectors',
 		sample: `
 			span, h1 {
@@ -148,10 +116,6 @@ var tests = {
 		expected: `.user span,.user h1 {color:red;}.user h1,.user:after,.user:before {color:red;}`
 	},
 	'prefixer': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'prefixer',
 		sample: `
 			& {
@@ -161,10 +125,6 @@ var tests = {
 		expected: `.user {-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);}`
 	},
 	'animations': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'animations',
 		sample: `
 			span {
@@ -178,8 +138,6 @@ var tests = {
 	},
 	'animations disabled prefix': {
 		options: {
-			disableWebComponents: false,
-			disableFlat: false,
 			namespaceAnimations: false
 		},
 		name: 'animations disable namespace',
@@ -194,10 +152,6 @@ var tests = {
 			`animation-name:slidein;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}`
 	},
 	'keyframes': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'keyframes',
 		sample: `
 			&{
@@ -217,9 +171,7 @@ var tests = {
 	},
 	'keyframes': {
 		options: {
-			disableWebComponents: false,
-			disableFlat: false,
-			namespaceAnimations: false
+			animations: false
 		},
 		name: 'keyframes disable namespace',
 		sample: `
@@ -239,10 +191,6 @@ var tests = {
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
 	':host': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: ':host',
 		sample: `
 			color: red;
@@ -258,10 +206,6 @@ var tests = {
 			'body .user {color: red;}.user:root {color: red;}.user {color: red;}'
 	},
 	'[title="a,b"]': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: '[title="a,b"]',
 		sample: `
 			[title="a,b,c, something"], h1 {
@@ -271,10 +215,6 @@ var tests = {
 		expected: `.user [title="a,b,c, something"],.user h1 {color: red}`
 	},
 	'nested': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'nested',
 		sample: `
 			h1, div {
@@ -295,10 +235,6 @@ var tests = {
 		'.user div:before{color: red;}.user h1 header,.user div header{font-size: 12px;}'
 	},
 	'variables': {
-		options: {
-			disableWebComponents: false,
-			disableFlat: false
-		},
 		name: 'variables',
 		sample: `
 			$foo: 20px;
@@ -360,9 +296,7 @@ function run (tests) {
 		var result = stylis(
 			'.user', 
 			sample, 
-			options.namespaceAnimations, 
-			!options.disableFlat, 
-			!options.disableWebComponents, 
+			options.animations, 
 			options.middleware
 		);
 
