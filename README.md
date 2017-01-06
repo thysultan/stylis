@@ -2,8 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) [![Build Status](https://semaphoreci.com/api/v1/thysultan/stylis-js/branches/master/shields_badge.svg)](https://semaphoreci.com/thysultan/stylis-js) ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~1Kb minified+gzipped
-- ~3kb minified
+- ~2Kb minified+gzipped
+- ~4kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -15,11 +15,15 @@ Where `styles` is the following css
 
 ```scss
 
+// variables
+$foo: 20px;
+
 // flat css
 font-size: 2em;
 font-family: sans-serif;
+width: $foo;
 
-// polyfill for shadow dom selectors
+// emulation for shadow dom selectors
 :host {
     color: red;
 }
@@ -38,7 +42,7 @@ font-family: sans-serif;
     transform: rotate(30deg);
 }
 
-// inject to global scope
+// inject to global scope block
 @global {
     body {
         background: yellow;
@@ -82,7 +86,7 @@ span, h1, :global(h2) {
     }
 }
 
-// nested
+// nesting
 h1 {
     color: red;
 
@@ -97,6 +101,28 @@ h1 {
     font-size: 12px;
 }
 
+// static mixins
+@mixin large-text {
+    font-size: 20px;
+}
+
+// function mixins
+@mixin linx ($link, $visit, $hover, $active) {
+    a {
+        color: $link;
+        &:hover {
+          color: $hover;   
+        }
+    }
+}
+
+// use static mixins
+& {
+    @include large-text;
+}
+
+// use function mixins
+@include linx(white, blue, green, red);
 ```
 
 into this (minus the whitespace)
@@ -105,6 +131,7 @@ into this (minus the whitespace)
 #user {
 	font-size: 2em;
 	font-family: sans-serif;
+    width: 20px;
 }
 #user {
     color: red;
@@ -184,18 +211,29 @@ h2 {
     }
 }
 
-h1 {
+#user h1 {
     color: red;
     font-size: 12px;
 }
 
-h1 h2 {
+#user h1 h2 {
     display: block;
 }
 
-h1 h2 h3,
-h1 h2 h2:hover {
+#user h1 h2 h3,
+#user h1 h2 h2:hover {
     color: blue;
+}
+
+#user {
+    font-size: 20px;
+}
+
+a {
+    color: white;
+    &:hover {
+      color: green;   
+    }
 }
 ```
 
@@ -222,7 +260,7 @@ h1 h2 h2:hover {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.8.3/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.9.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -235,16 +273,31 @@ npm install stylis --save
 
 ```javascript
 stylis(
-    selector: {string}, 
-    cssString: {string}, 
-    namespaceAnimations, {boolean}
-    namespaceKeyframes {boolean}
+    selector: {string},     // selector - i.e `.class` or `#id` or `[attr=id]`
+    styles: {string},       // css string
+    animations: {boolean=}  // false to prevent prefixing animations, true by default
+    middleware: {function=}
 );
-
-// namespaceAnimations and namespaceKeyframes allow 
-// you to prevent keyframes and animations
-// from being namespaced
 ```
+
+## Middleware
+
+The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed 1. at every token `ctx = 0` and 2. before a block of compiled css is added to the output string `ctx = 1`, 3. when flat css is appened to the output bundle `ctx = 2` and 4. When an `import` statement is found `ctx = 3`.
+
+If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it will parse/compile. The str value on import context is the file i.e `foo` or `foo.scss` or multiple files `foo, bar`.
+
+If the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
+
+
+```javascript
+stylis(``, `width: calc(random()*10)`, false, function (ctx, str, line, column) {
+    switch (ctx) {
+        case 0: return str.replace(/random\(\)/g, Math.random());
+    }
+});
+```
+
+Will replace all instances of `random()` with a random number
 
 ## Intergration
 

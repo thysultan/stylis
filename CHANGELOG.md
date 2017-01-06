@@ -1,3 +1,12 @@
+## 0.9.0 (January 06, 2016)
+
+- add support for sass-like mixins
+- add support for sass-like variables in string format `$foo: 1; color: $foo;`
+- add support for middleware
+- patch comments in flat css context
+- patch animation property
+- patch tokens in strings
+
 ## 0.8.3 (December 20, 2016)
 
 - patch `:host` conflict with `:hover`
