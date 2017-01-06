@@ -1,3 +1,7 @@
+## 0.9.1 (January 06, 2016)
+
+- patch animation property namespacing
+
 ## 0.9.0 (January 06, 2016)
 
 - add support for sass-like mixins

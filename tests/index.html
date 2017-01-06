@@ -8,10 +8,19 @@
 </head>
 <body>
 	<script>
-		var output = stylis(``, `
-			.foo:before {
-		  		content: ".hello {world} ' "
-			}
+		var output = stylis(`.abc`, `
+			$selector: .user;
+			animation:0.6s infinite slidein;
+			animation-name:slidein;
+			animation-duration:4s;
+
+			// body.firefox $selector:before {
+			  // content: "Hi, Firefox users!" $selector;
+			// }
+
+			// .foo:before {
+		 //  		content: ".hello {world} ' "
+			// }
 
 			// @mixin large-text {
 		 //    	font-size: 20px;

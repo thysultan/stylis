@@ -62,7 +62,7 @@
 		}
 
 		// animation and keyframe namespace
-		var anim = (animations === void 0 || animations === true) ? namespace : '';
+		var animns = (animations === void 0 || animations === true) ? namespace : '';
 
 		// has middleware
 		var plugin = middleware !== void 0 && typeof middleware === 'function';
@@ -134,7 +134,7 @@
 					if (second === 107 || second === 103) {
 						// k, @keyframes
 						if (second === 107) {
-							blob = buff.substring(1, 11) + anim + buff.substring(11);
+							blob = buff.substring(1, 11) + animns + buff.substring(11);
 							buff = '@-webkit-'+blob;
 							type = 1;
 						}
@@ -262,18 +262,49 @@
 				else {
 					// animation: a, n, i characters
 					if (first === 97 && second === 110 && third === 105) {
-						var ninth = buff.charCodeAt(9) || 0;
-						var tenth = buff.charCodeAt(10) || 0;
-
 						var colon = buff.indexOf(':')+1;
 						var build = buff.substring(0, colon);
 						var anims = buff.substring(colon).split(',');
 
-						// -, n
-						var ns = (ninth !== 45 ? anim : ( tenth !== 110 ? '' : anim));
+						// short hand animation syntax
+						if ((buff.charCodeAt(9) || 0) !== 45) {
+							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
+							for (var j = 0, length = anims.length; j < length; j++) {
+								var anim = anims[j];
+								var props = anim.split(' ');
 
-						for (var j = 0, length = anims.length; j < length; j++) {
-							build += (j === 0 ? '' : ',') + ns + anims[j].trim();
+								// since we can't be sure of the position of the name of the animation name
+								// we have to find it
+								for (var k = 0, l = props.length; k < l; k++) {
+									var prop = props[k].trim();
+
+									// animation name is anything not in this list
+									if (
+										prop !== 'infinite' &&
+										prop !== 'linear' &&
+										prop !== 'alternate' &&
+										prop !== 'normal' &&
+										prop !== 'forwards' &&
+										prop !== 'backwards' &&
+										prop !== 'both' &&
+										prop !== 'none' &&
+										prop !== 'ease' &&
+										prop.indexOf('cubic-bezier(') === -1 &&
+										prop.indexOf('ease-') === -1 &&
+										isNaN(parseInt(prop))
+									) {
+										props[k] = animns+prop;
+										anim = props.join(' ');
+									}
+								}
+
+								build += (j === 0 ? '' : ',') + anim.trim();
+							}
+						}
+						// explicit syntax 
+						else {
+							// n
+							build += ((buff.charCodeAt(10) || 0) !== 110 ? '' : animns) + anims[0].trim();
 						}
 
 						// vendor prefix
@@ -600,7 +631,7 @@
 		// has variables
 		if (vars !== void 0) {
 			// replace all variables
-			for (var i = 0, l = vars.length; i < l; i++) {	
+			for (var i = 0, l = vars.length; i < l; i++) {
 				output = output.replace(new RegExp('\\'+vars[i][0], 'g'), vars[i][1]);
 			}
 		}
