@@ -315,10 +315,12 @@ var tests = {
 		name: 'strings',
 		sample: `
 			.foo:before {
-		  		content: ".hello {world}"
+		  		content: ".hello {world}";
+		  		content: ".hello {world} ' ";
+		  		content: '.hello {world} " ';
 			}
 		`,
-		expected: `.user .foo:before {content: ".hello {world}"}`
+		expected: `.user .foo:before {content: ".hello {world}";content: ".hello {world} ' ";content: '.hello {world} " ';}`
 	}
 };
 

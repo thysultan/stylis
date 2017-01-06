@@ -27,10 +27,10 @@
 	 *
 	 * @example compiler('.class1', 'css...', false);
 	 * 
-	 * @param  {string}              selector   - i.e `.class` or `#id` or `[attr=id]`
-	 * @param  {string}              styles
-	 * @param  {boolean=}            animations - pass false to prevent prefixing animations, true by default
-	 * @param  {function({string})=} middleware
+	 * @param  {string}       selector   - i.e `.class` or `#id` or `[attr=id]`
+	 * @param  {string}       styles
+	 * @param  {boolean=}     animations - pass false to prevent prefixing animations, true by default
+	 * @param  {function(4)=} middleware
 	 * @return {string}
 	 */
 	function stylis (selector, styles, animations, middleware) {
@@ -82,7 +82,7 @@
 		var blck = '';
 		var indexOf = 0;
 
-		// position
+		// positions
 		var caret = 0;
 		var depth = 0;
 		var column = 0;
@@ -151,6 +151,8 @@
 
 							// retrieve mixin identifier
 							blob = (mixin = buff.substring(7, buff.indexOf('{')) + ' ').trim();
+
+							// cache current mixin name
 							mixin = mixin.substring(0, mixin.indexOf(' ')).trim();
 
 							// append mixin identifier
@@ -223,7 +225,7 @@
 						// @import `m` character
 						else if (third === 109 && plugin) {
 							// avoid "foo.css"; "foo" screen; "http://foo.com/bar"; url(foo);
-							var match = /@import.*?(["'][^\.\n\r]*?["'];|["'].*\.scss["'])/g.exec(buff);								
+							var match = /@import.*?(["'][^\.\n\r]*?["'];|["'].*\.scss["'])/g.exec(buff);							
 
 							if (match !== null) {
 								// middleware
@@ -498,7 +500,7 @@
 								blob = '';
 							}
 
-							// reset flags
+							// reset signatures
 							type = 0;
 							close--;
 							special--;
@@ -560,12 +562,12 @@
 					// " character
 					if (code === 34) {
 						// exit string " context / enter string context
-						strings = strings === 34 ? 0 : 34;
+						strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
 					}
 					// ' character
 					else if (code === 39) {
 						// exit string ' context / enter string context
-						strings = strings === 39 ? 0 : 39;
+						strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
 					}
 					// / character
 					else if (code === 47) {
@@ -584,7 +586,7 @@
 			column++;
 		}
 
-		// has flat css 
+		// has flat css, since flat css can appear any where we add them last
 		if (flat.length !== 0) {
 			flat = prefix + ' {' + flat + '}';
 
@@ -595,8 +597,9 @@
 			output += flat;
 		}
 
-		// replace variables
+		// has variables
 		if (vars !== void 0) {
+			// replace all variables
 			for (var i = 0, l = vars.length; i < l; i++) {	
 				output = output.replace(new RegExp('\\'+vars[i][0], 'g'), vars[i][1]);
 			}
