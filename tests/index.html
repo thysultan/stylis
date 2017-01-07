@@ -9,14 +9,17 @@
 <body>
 	<script>
 		var output = stylis(`.abc`, `
-			$selector: .user;
-			animation:0.6s infinite slidein;
-			animation-name:slidein;
-			animation-duration:4s;
+			~~selector: .user;
 
-			// body.firefox $selector:before {
-			  // content: "Hi, Firefox users!" $selector;
-			// }
+			& {}
+
+			// animation:0.6s infinite slidein cubic-bezier() ease-in-out linear alternate normal backwords forwards both none ease;
+			// animation-name:slidein;
+			// animation-duration:4s;
+
+			body.firefox var(~~selector):before {
+				content: "Hi, Firefox users!" var(~~selector);
+			}
 
 			// .foo:before {
 		 //  		content: ".hello {world} ' "
@@ -26,16 +29,18 @@
 		 //    	font-size: 20px;
 			// }
 
-			// @mixin linx ($link, $visit, $hover, $active) {
-			// 	a {
-			// 	    color: $link;
-			// 	    &:hover {
-			// 	      color: $hover;   
-			// 	    }
-			//   	}
-			// }
+			@mixin linx (link, visit, hover, active) {
+				a {
+				    color: var(~~link);
+				    &:hover {
+				      color: var(~~hover);   
+				    }
+			  	}
+			}
 
 			// @include large-text;
+			
+			@include linx(white, blue, green, yellow);
 
 			// & {
 			// 	@include large-text;
@@ -119,20 +124,20 @@
 			// 	font-size: 18px; 
 			// }
 `, true, function (ctx, str, line, col) {
-	var len = str.length-1;
+	// var len = str.length-1;
 
 	// this will by pass stylis and add prefix on it's own
-	if ((str[len] === '{') && str[0] !== '/' && str.indexOf('[data-id=woot]') === -1 && str.indexOf('@') === -1) {
-		var selector = str.substring(0, len).trim();
-		return selector.split(',').map(function (value) {
-			return value + '[data-id=woot]';
-		}).join(',') + ' {';
-	}
+	// if ((str[len] === '{') && str[0] !== '/' && str.indexOf('[data-id=woot]') === -1 && str.indexOf('@') === -1) {
+	// 	var selector = str.substring(0, len).trim();
+	// 	return selector.split(',').map(function (value) {
+	// 		return value + '[data-id=woot]';
+	// 	}).join(',') + ' {';
+	// }
 
-	// import, if an import is return it is inserted
-	if (ctx === 3) {
-		return `& { color: orange; }`
-	}
+	// // import, if an import is return it is inserted
+	// if (ctx === 3) {
+	// 	return `& { color: orange; }`
+	// }
 });
 
 		console.log(output);

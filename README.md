@@ -16,12 +16,12 @@ Where `styles` is the following css
 ```scss
 
 // variables
-$foo: 20px;
+~~foo: 20px;
 
 // flat css
 font-size: 2em;
 font-family: sans-serif;
-width: $foo;
+width: var(~~foo);
 
 // emulation for shadow dom selectors
 :host {
@@ -107,11 +107,11 @@ h1 {
 }
 
 // function mixins
-@mixin linx ($link, $visit, $hover, $active) {
+@mixin linx (link, visit, hover, active) {
     a {
-        color: $link;
+        color: var(~~link);
         &:hover {
-          color: $hover;   
+          color: var(~~hover);   
         }
     }
 }
@@ -229,7 +229,7 @@ h2 {
     font-size: 20px;
 }
 
-a {
+#user a {
     color: white;
     &:hover {
       color: green;   
@@ -260,7 +260,7 @@ a {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.9.1/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.9.2/stylis.min.js></script>
 ```
 
 #### npm
@@ -268,6 +268,21 @@ a {
 ```
 npm install stylis --save
 ```
+
+## Features
+
+- variables via `~~foo` and `var(~~foo)`;
+- web component emulation of `:host`, `:host()` and `:host-context()`
+- inline global injection via `:global(selector)`
+- block level global injection via `@global {}`
+- nesting `a { &:hover {} }`
+- static and function mixins via `@mixin ...` and `@include`
+- prefixer
+- namespacing
+- flat css `color: red; h1 { color: red; }`
+- middleware support
+- keyframes and animation namespacing (with the option to disable)
+
 
 ## API
 

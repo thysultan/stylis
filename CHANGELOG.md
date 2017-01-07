@@ -1,3 +1,9 @@
+## 0.9.2 (January 06, 2016)
+
+- variables `$foo: ;` -> `~~foo: ;` and `color: var(~~foo);`
+- prevent variable declarations in selectors
+- improve animation name finder
+
 ## 0.9.1 (January 06, 2016)
 
 - patch animation property namespacing

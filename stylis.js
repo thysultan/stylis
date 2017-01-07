@@ -41,7 +41,7 @@
 		// [ attr selector
 		if (type === 91) {
 			// `[data-id=namespace]` -> ['data-id', 'namespace']
-			var attr = selector.substring(1, selector.length-1).split('=');     
+			var attr = selector.substring(1, selector.length-1).split('=');
 			var char = (namespace = attr[1]).charCodeAt(0);
 
 			// [data-id="namespace"]/[data-id='namespace']
@@ -65,7 +65,7 @@
 		var animns = (animations === void 0 || animations === true) ? namespace : '';
 
 		// has middleware
-		var plugin = middleware !== void 0 && typeof middleware === 'function';
+		var plugin = middleware != null && typeof middleware === 'function';
 
 		// variables, i.e $a = 1;
 		var vars;
@@ -109,8 +109,8 @@
 				var first = buff.charCodeAt(0);
 
 				// only trim when the first character is a space ` `
-				if (first === 32) { 
-					first = (buff = buff.trim()).charCodeAt(0); 
+				if (first === 32) {
+					first = (buff = buff.trim()).charCodeAt(0);
 				}
 
 				// default to 0 instead of NaN if there is no second/third character
@@ -122,10 +122,7 @@
 
 				// ignore comments
 				if (comment === 2) {
-					if (code === 125) {
-						comment = 0;
-					}
-
+					code === 125 && (comment = 0);
 					buff = ''; 
 				}
 				// @, special block
@@ -138,7 +135,7 @@
 							buff = '@-webkit-'+blob;
 							type = 1;
 						}
-						// g, @global 
+						// g, @global
 						else {
 							buff = '';
 						}
@@ -162,7 +159,7 @@
 							buff = '';
 							blob = '';
 						}
-						// @media 
+						// @media
 						else {
 							type = 2;
 						}
@@ -193,11 +190,11 @@
 								buff = data.body;
 
 								for (var i = 0, length = argsPassed.length; i < length; i++) {
-									var arg = argsExpected[i].trim();	
+									var arg = argsExpected[i].trim();
 
 									// if the mixin has a slot for that arg
 									if (arg !== void 0) {
-										buff = buff.replace(new RegExp('\\'+arg, 'g'), argsPassed[i].trim());
+										buff = buff.replace(new RegExp('var\\(~~'+arg+'\\)', 'g'), argsPassed[i].trim());
 									}
 								}
 
@@ -225,7 +222,7 @@
 						// @import `m` character
 						else if (third === 109 && plugin) {
 							// avoid "foo.css"; "foo" screen; "http://foo.com/bar"; url(foo);
-							var match = /@import.*?(["'][^\.\n\r]*?["'];|["'].*\.scss["'])/g.exec(buff);							
+							var match = /@import.*?(["'][^\.\n\r]*?["'];|["'].*\.scss["'])/g.exec(buff);					
 
 							if (match !== null) {
 								// middleware
@@ -245,8 +242,8 @@
 						special++;
 					}
 				}
-				// $, variable
-				else if (first === 36) {
+				// ~, ; variables
+				else if (code === 59 && first === 126 && second === 126) {
 					var colon = buff.indexOf(':');
 
 					// first match create variables store 
@@ -262,11 +259,19 @@
 				else {
 					// animation: a, n, i characters
 					if (first === 97 && second === 110 && third === 105) {
-						var colon = buff.indexOf(':')+1;
-						var build = buff.substring(0, colon);
-						var anims = buff.substring(colon).split(',');
+						// removes ;
+						buff = buff.substring(0, buff.length-1);
 
-						// short hand animation syntax
+						// position of :
+						var colon = buff.indexOf(':')+1;
+
+						// left hand side everything before `:`
+						var build = buff.substring(0, colon);
+
+						// right hand side everything after `:` /* @type string[] */
+						var anims = buff.substring(colon).trim().split(',');
+
+						// - short hand animation syntax
 						if ((buff.charCodeAt(9) || 0) !== 45) {
 							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
 							for (var j = 0, length = anims.length; j < length; j++) {
@@ -277,21 +282,48 @@
 								// we have to find it
 								for (var k = 0, l = props.length; k < l; k++) {
 									var prop = props[k].trim();
+									var frst = prop.charCodeAt(0);
+									var third = prop.charCodeAt(2);
+									var slen = prop.length;
+									var last = prop.charCodeAt(slen-1);
 
 									// animation name is anything not in this list
 									if (
-										prop !== 'infinite' &&
-										prop !== 'linear' &&
-										prop !== 'alternate' &&
-										prop !== 'normal' &&
-										prop !== 'forwards' &&
-										prop !== 'backwards' &&
-										prop !== 'both' &&
-										prop !== 'none' &&
-										prop !== 'ease' &&
-										prop.indexOf('cubic-bezier(') === -1 &&
-										prop.indexOf('ease-') === -1 &&
-										isNaN(parseInt(prop))
+										// cubic-bezier()
+										!(frst === 99 && last === 41) &&
+
+										// infinite, i, f, e
+										!(frst === 105 && third === 102 && last === 101 && slen === 8) &&
+
+										// linear, l, n, r
+										!(frst === 108 && third === 110 && last === 114 && slen === 6) &&
+
+										// alternate, a, t, e
+										!(frst === 97 && third === 116 && last === 101 && slen === 9) &&
+
+										// normal, n, r, l
+										!(frst === 110 && third === 114 && last === 108 && slen === 6) &&
+
+										// backwords, b, c, s
+										!(frst === 98 && third === 99 && last === 115 && slen === 9) &&
+
+										// forwards, f, r, s
+										!(frst === 102 && third === 114 && last === 115 && slen === 8) &&
+
+										// both, b, t, h
+										!(frst === 98 && third === 116 && last === 104 && slen === 4) &&
+
+										// none, n, n, e
+										!(frst === 110 && third === 110 && last === 101 && slen === 4)&&
+
+										// ease, e, s, e
+										!(frst === 101 && third === 115 && last === 101 && slen === 4) &&
+
+										// ease-
+										!(frst === 101 && slen > 4 && prop.charCodeAt(4) === 45) &&
+
+										// 0.4ms, .4s, 400ms ...
+										isNaN(parseFloat(prop))
 									) {
 										props[k] = animns+prop;
 										anim = props.join(' ');
@@ -301,14 +333,14 @@
 								build += (j === 0 ? '' : ',') + anim.trim();
 							}
 						}
-						// explicit syntax 
+						// explicit syntax, anims array should have only one elemenet
 						else {
 							// n
 							build += ((buff.charCodeAt(10) || 0) !== 110 ? '' : animns) + anims[0].trim();
 						}
 
 						// vendor prefix
-						buff = '-webkit-' + build + build;
+						buff = '-webkit-' + build + ';' + build + ';';
 					}
 					// appearance: a, p, p
 					else if (first === 97 && second === 112 && third === 112) {
@@ -361,17 +393,17 @@
 								var prevSel = prev.substring(0, prev.length-1).split(',');
 
 								// keep track of opening `{` and `}` occurrences
-								var counter = 1;
+								var closed = 1;
 
 								// travel to the end of the block
 								while (caret < eof) {
 									var char = styles.charCodeAt(caret);
 
 									// {, }, nested blocks may have nested blocks
-									char === 123 ? counter++ : char === 125 && counter--;
+									char === 123 ? closed++ : char === 125 && closed--;
 
-									// break when the has ended
-									if (counter === 0) {
+									// break when the nested block has ended
+									if (closed === 0) {
 										break;
 									}
 
@@ -395,10 +427,10 @@
 								}
 
 								// create block and update styles length
-								// the new line is to avoid conflicts when the last line is a // line comments
-								eof += (styles += ('\n' + prevSel.join(',') + '{'+inner+'}').replace(/&| +&/g, '')).length;
+								// the `new line` is to avoid conflicts when the last line is a // line comment
+								eof += (styles += ('\n' + prevSel.join(',') + ' {'+inner+'}').replace(/&| +&/g, '')).length;
 
-								// clear current line, to avoid add block elements to the normal flow
+								// clear current line, to avoid adding nested blocks to the normal flow
 								buff = '';
 
 								// decreament depth
@@ -440,20 +472,20 @@
 										selector = prefix + selector.substring(1);
 										// after: ${prefix} {
 									}
-									// : 
+									// :
 									else if (firstChar === 58) {
 										var secondChar = selector.charCodeAt(1);
 
-										// h, t, :host 
+										// h, t, :host
 										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
 											var nextChar = (selector = selector.substring(5)).charCodeAt(0);
-											
-											// :host(selector)                                                 
+
+											// :host(selector)                    
 											if (nextChar === 40) {
 												// before: `(selector)`
 												selector = prefix + selector.substring(1).replace(')', '');
 												// after: ${prefx} selector {
-											} 
+											}
 											// :host-context(selector)
 											else if (nextChar === 45) {
 												// before: `-context(selector)`
@@ -493,7 +525,7 @@
 					else if (code === 125 && depth !== 0) {
 						depth--;
 					}
-					
+
 					// @global/@keyframes
 					if (special !== 0) {
 						// find the closing tag
@@ -546,27 +578,32 @@
 						}
 						// @media flat context
 						else if (type === 2 && depth === 0 && code !== 125) {
-							blob += buff; 
+							blob += buff;
 							buff = '';
 						}
 					}
 					// flat context
 					else if (depth === 0 && code !== 125) {
-						flat += buff; 
+						flat += buff;
 						buff = '';
 					}
 				}
 
 				// append line to blck buffer
-				blck += buff; 
+				blck += buff;
 
 				// reset line buffer
-				buff = ''; 
+				buff = '';
 
-				// add blck buffer to output, 
+				// add blck buffer to output
 				if (code === 125 && type === 0 && comment === 0) {
-					// middleware
-					plugin && blck.length !== 0 && (blck = middleware(1, blck, line, column) || blck);
+					// remove empty blocks
+					if (blck.charCodeAt(blck.length-2) === 123) {
+						blck = '';
+					} else {
+						// middleware
+						plugin && blck.length !== 0 && (blck = middleware(1, blck, line, column) || blck);
+					}
 
 					// append blck buffer
 					output += blck;
@@ -581,7 +618,7 @@
 				if (code === 13 || code === 10) {
 					// ignore line and block comments
 					if (comment === 2) {
-						buff = ''; 
+						buff = '';
 						comment = 0;
 					}
 
@@ -632,7 +669,7 @@
 		if (vars !== void 0) {
 			// replace all variables
 			for (var i = 0, l = vars.length; i < l; i++) {
-				output = output.replace(new RegExp('\\'+vars[i][0], 'g'), vars[i][1]);
+				output = output.replace(new RegExp('var\\('+vars[i][0]+'\\)', 'g'), vars[i][1]);
 			}
 		}
 

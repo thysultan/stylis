@@ -232,17 +232,17 @@ var tests = {
 			}
 		`,
 		expected: '.user h1,.user div {color: red;color: blue;}.user h1 h2,.user h1:before,.user div h2,'+
-		'.user div:before{color: red;}.user h1 header,.user div header{font-size: 12px;}'
+		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'
 	},
 	'variables': {
 		name: 'variables',
 		sample: `
-			$foo: 20px;
+			~~foo: 20px;
 
-			width: $foo;
+			width: var(~~foo);
 
 			& {
-				margin: $foo;
+				margin: var(~~foo);
 			}
 		`,
 		expected: '.user {margin: 20px;}.user {width: 20px;}'
@@ -257,6 +257,39 @@ var tests = {
 			}
 		`,
 		expected: `.user .foo:before {content: ".hello {world}";content: ".hello {world} ' ";content: '.hello {world} " ';}`
+	},
+	'mixins': {
+		name: 'mixins',
+		sample: `
+			@mixin large-text {
+		    	font-size: 20px;
+			}
+
+			@mixin linx (link, visit, hover, active) {
+				a {
+				    color: var(~~link);
+				    &:hover {
+				      color: var(~~hover);   
+				    }
+			  	}
+			}
+
+			& {
+				@include large-text;
+			}
+
+			@include linx(white, blue, green, red);
+		`,
+		expected: `.user {font-size: 20px;}.user a {color: white;}.user a:hover {color: green;}`
+	},
+	'remove empty css': {
+		name: 'remove empty css',
+		sample: `
+			& {
+
+			}
+		`,
+		expected: ``
 	}
 };
 
