@@ -8,18 +8,84 @@
 </head>
 <body>
 	<script>
-		var output = stylis(`.abc`, `
-			~~selector: .user;
+		(function () {
+			// output = stylis('abc', `
+			// 	h1 {
+			// 		animation: loading 1s ease infinite forwards;
+			// 		animation-fill-mode: none;
+			// 	}
+			// `);
 
-			& {}
+			// console.log(output);
+
+			// return;
+
+			output = stylis(``, `
+			.namespace {
+			  	.foo {
+			  		color: red;
+			  	}
+			  	/* .namespace .foo */ 
+			  	& .foo {
+			  		color: red;
+			  	}
+			  	/* .namespace .foo */
+			  	&.foo {
+			  		color: red;
+			  	}
+			  	/* .namespace.foo */
+			  	.foo & {
+			  		color: red;
+			  	}
+		  		/* .foo .namespace */
+			}
+
+			// order: reverse;
+			// align-items: center;
+			// align-self: left;
+			// align-content: left;
+
+			// html &, & h1 {
+			// 	color: red;
+			// }
+
+			// :host-context(body) { color: red; }
+			// :host-context(body) h1 { color: red; }
+
+			// :global(.html.something) & {
+			// 	color: red;
+			// }
+
+			// .example {
+			//     display: flex;
+			// 	flex-direction: column;
+			// 	align-items: center;
+			// 	align: left;
+			// }
+
+			// h2, h1 {
+			// 	background-color: blue;
+
+		 //  		@media screen and (min-width: 250px) {
+		 //  			background-color: red;
+	  // 			}
+			// }
+
+			// html & {
+			// 	color: red;
+			// }
+
+			// ~~selector: .user;
+
+			// & {}
 
 			// animation:0.6s infinite slidein cubic-bezier() ease-in-out linear alternate normal backwords forwards both none ease;
 			// animation-name:slidein;
 			// animation-duration:4s;
 
-			body.firefox var(~~selector):before {
-				content: "Hi, Firefox users!" var(~~selector);
-			}
+			// body.firefox var(~~selector):before {
+			// 	content: "Hi, Firefox users!" var(~~selector);
+			// }
 
 			// .foo:before {
 		 //  		content: ".hello {world} ' "
@@ -29,18 +95,18 @@
 		 //    	font-size: 20px;
 			// }
 
-			@mixin linx (link, visit, hover, active) {
-				a {
-				    color: var(~~link);
-				    &:hover {
-				      color: var(~~hover);   
-				    }
-			  	}
-			}
+			// @mixin linx (link, visit, hover, active) {
+			// 	a {
+			// 	    color: var(~~link);
+			// 	    &:hover {
+			// 	      color: var(~~hover);   
+			// 	    }
+			//   	}
+			// }
 
 			// @include large-text;
 			
-			@include linx(white, blue, green, yellow);
+			// @include linx(white, blue, green, yellow);
 
 			// & {
 			// 	@include large-text;
@@ -59,16 +125,11 @@
 				
 			// @include linx(white, blue, green, red);
 
-			// $a: 1px;
-
 			// & { width: calc(random()*10); }
 	
 			// margin: calc(random()*10);
-			// color: $a;
 
 			// & { color: red; color: $foo; }
-
-			// $foo: purple;
 
 			// :hover {color:red;}
 			// :host { color: red; }
@@ -123,24 +184,25 @@
 			// h6 { 
 			// 	font-size: 18px; 
 			// }
-`, true, function (ctx, str, line, col) {
-	// var len = str.length-1;
+		`, true, true, function (ctx, str, line, col) {
+			// var len = str.length-1;
 
-	// this will by pass stylis and add prefix on it's own
-	// if ((str[len] === '{') && str[0] !== '/' && str.indexOf('[data-id=woot]') === -1 && str.indexOf('@') === -1) {
-	// 	var selector = str.substring(0, len).trim();
-	// 	return selector.split(',').map(function (value) {
-	// 		return value + '[data-id=woot]';
-	// 	}).join(',') + ' {';
-	// }
+			// this will by pass stylis and add prefix on it's own
+			// if ((str[len] === '{') && str[0] !== '/' && str.indexOf('[data-id=woot]') === -1 && str.indexOf('@') === -1) {
+			// 	var selector = str.substring(0, len).trim();
+			// 	return selector.split(',').map(function (value) {
+			// 		return value + '[data-id=woot]';
+			// 	}).join(',') + ' {';
+			// }
 
-	// // import, if an import is return it is inserted
-	// if (ctx === 3) {
-	// 	return `& { color: orange; }`
-	// }
-});
+			// // import, if an import is return it is inserted
+			if (ctx === 3) {
+				return `.imported { color: orange; }`;
+			}
+		});
 
 		console.log(output);
+
 
 		// console.log(
 		// 	stylis('#ns', `
@@ -165,6 +227,7 @@
 		// 		}
 		// 	}
 		// `))
+		})();
 	</script>
 
 	<script src='./index.js'></script>

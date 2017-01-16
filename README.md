@@ -2,8 +2,8 @@
 
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) [![Build Status](https://semaphoreci.com/api/v1/thysultan/stylis-js/branches/master/shields_badge.svg)](https://semaphoreci.com/thysultan/stylis-js) ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~1Kb minified+gzipped
-- ~4kb minified
+- ~2Kb minified+gzipped
+- ~5kb minified
 
 Stylis is a small css compiler that turns this
 
@@ -260,7 +260,7 @@ h2 {
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.9.2/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.10.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -291,23 +291,31 @@ stylis(
     selector: {string},     // selector - i.e `.class` or `#id` or `[attr=id]`
     styles: {string},       // css string
     animations: {boolean=}  // false to prevent prefixing animations, true by default
+    compact: {boolean=}     // enable additional features (mixins, variables)
     middleware: {function=}
 );
 ```
 
 ## Middleware
 
-The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed 1. at every token `ctx = 0` and 2. before a block of compiled css is added to the output string `ctx = 1`, 3. when flat css is appened to the output bundle `ctx = 2` and 4. When an `import` statement is found `ctx = 3`.
+The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed at 4 stages.
 
-If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it will parse/compile. The str value on import context is the file i.e `foo` or `foo.scss` or multiple files `foo, bar`.
+1. at every selector declaration `ctx = 0` i.e `.class` / `.foo, .bar`
+2. at every property declaration `ctx = 1` i.e `color: red;`
+3. before a block of compiled css is added to the output string `ctx = 2`, i.e `.class {color:red;}`
+4. when flat css is appened to the output bundle `ctx = 3`, i.e `.prefix { color:red; }`
+5. When an `import` statement is found `ctx = 4`, i.e `import 'foo'`
 
-If the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
+If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
+
+For any stage if the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
 
 
 ```javascript
-stylis(``, `width: calc(random()*10)`, false, function (ctx, str, line, column) {
+stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column) {
     switch (ctx) {
-        case 0: return str.replace(/random\(\)/g, Math.random());
+        // str will be `width: calc(random()*10);`
+        case 1: return str.replace(/random\(\)/g, Math.random());
     }
 });
 ```

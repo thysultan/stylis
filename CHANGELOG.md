@@ -1,3 +1,10 @@
+## 0.10.0 (January 16, 2016)
+
+- enable compact flag to enable additional features(variables and mixins)
+- support nested @media blocks
+- patch `&` token useage `html & {}` to produce `html ${namespace} {}`
+- seperate tokens passed to middleware into `selector, property, block, flat, imports`
+
 ## 0.9.2 (January 06, 2016)
 
 - variables `$foo: ;` -> `~~foo: ;` and `color: var(~~foo);`

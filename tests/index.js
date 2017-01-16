@@ -58,8 +58,12 @@ var tests = {
 			:global(body) {
 				background: yellow;
 			}
+
+			html & {
+				color: red;
+			}
 		`,
-		expected: 'body {background: yellow;}body {background: yellow;}'
+		expected: 'body {background: yellow;}body {background: yellow;}html .user {color: red;}'
 	},
 	'comment': {
 		name: 'comments',
@@ -229,9 +233,15 @@ var tests = {
 				header {
 					font-size: 12px;
 				}
+
+				@media {
+					color: red;
+				}
 			}
 		`,
-		expected: '.user h1,.user div {color: red;color: blue;}.user h1 h2,.user h1:before,.user div h2,'+
+		expected: '.user h1,.user div {color: red;color: blue;}'+
+		'@media {.user h1 {color: red;}.user div {color: red;}}'+
+		'.user h1 h2,.user h1:before,.user div h2,'+
 		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'
 	},
 	'variables': {
@@ -290,6 +300,72 @@ var tests = {
 			}
 		`,
 		expected: ``
+	},
+	'disable compact': {
+		name: 'disable compact',
+		options: {
+			compact: false
+		},
+		sample: `
+			~~foo: 20px;
+
+			width: var(~~foo);
+
+			@mixin large-text {
+		    	font-size: 20px;
+			}
+
+			@mixin linx (link, visit, hover, active) {
+				a {
+				    color: var(~~link);
+			  	}
+			}
+
+			& {
+				@include large-text;
+			}
+		`,
+		expected: '@mixin large-text {font-size: 20px;}'+
+		'@mixin linx (link, visit, hover, active) {a {color: var(~~link);}}'+
+		'.user {@include large-text;}'+
+		'.user {~~foo: 20px;width: var(~~foo);}'
+	},
+	'middleware imports': {
+		name: 'middleware & imports',
+		options: {
+			middleware: function (ctx, str, line, col) {
+				if (ctx === 4) {
+					return `.imported { color: orange; }`;
+				}
+			}
+		},
+		sample: `
+			@import "foo.scss";
+		`,
+		expected: `.user .imported {color: orange;}`
+	},
+	'middleware contexts': {
+		name: 'middleware contexts',
+		options: {
+			middleware: function (ctx, str, line, col) {
+				switch (ctx) {
+					case 0: return str+'/* selector */';
+					case 1: return str+'/* property */';
+					case 2: return str+'/* block */';
+					case 3: return str+'/* flat */';
+					case 4: return '.imported { color: orange; }';
+				}
+			}
+		},
+		sample: `
+			color: blue;
+			
+			@import "bar.scss";
+
+			h1 { color: red; }
+		`,
+		expected: '.user h1/* selector */{color: red;/* property */}/* block */.user .imported/* selector */'+
+		'{color: orange;/* property */}/* block */.user {color: blue;/* property */}/* flat */'
 	}
 };
 
@@ -330,6 +406,7 @@ function run (tests) {
 			'.user', 
 			sample, 
 			options.animations, 
+			options.compact === void 0 ? true : options.compact,
 			options.middleware
 		);
 
@@ -337,8 +414,8 @@ function run (tests) {
 
 		if (result !== expected) {
 			// log why it failed
-			console.log('failed:\n'+ result);
-			console.log('expected:\n'+ expected);
+			console.log('failed: '+name+'\n'+ result);
+			console.log('expected: '+'\n'+ expected);
 		}
 	}
 
