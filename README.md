@@ -3,7 +3,55 @@
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) [![Build Status](https://semaphoreci.com/api/v1/thysultan/stylis-js/branches/master/shields_badge.svg)](https://semaphoreci.com/thysultan/stylis-js) ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
 - ~2Kb minified+gzipped
-- ~5kb minified
+
+## Supports
+
+* Edge
+* IE 9+
+* Chrome
+* Firefox
+* Safari
+* Node.js
+
+---
+
+## Installation
+
+#### direct download
+
+```html
+<script src=stylis.min.js></script>
+```
+
+#### CDN
+
+
+```html
+<script src=https://unpkg.com/stylis@0.11.0/stylis.min.js></script>
+```
+
+#### npm
+
+```
+npm install stylis --save
+```
+
+## Features
+
+- variables via `~~foo` and `var(~~foo)`
+- web component emulation of `:host`, `:host()` and `:host-context()`
+- inline global injection via `:global(selector)`
+- block level global injection via `@global {}`
+- nesting `a { &:hover {} }`
+- static and function mixins via `@mixin ...` and `@include`
+- prefixer
+- namespacing
+- flat css `color: red; h1 { color: red; }`
+- middleware support
+- keyframes and animation namespacing (with the option to disable)
+- including an option to disable compact features like variables and mixins.
+
+---
 
 Stylis is a small css compiler that turns this
 
@@ -237,53 +285,6 @@ h2 {
 }
 ```
 
-## Supports
-
-* Edge
-* IE 9+
-* Chrome
-* Firefox
-* Safari
-* Node.js
-
----
-
-## Installation
-
-#### direct download
-
-```html
-<script src=stylis.min.js></script>
-```
-
-#### CDN
-
-
-```html
-<script src=https://unpkg.com/stylis@0.10.0/stylis.min.js></script>
-```
-
-#### npm
-
-```
-npm install stylis --save
-```
-
-## Features
-
-- variables via `~~foo` and `var(~~foo)`;
-- web component emulation of `:host`, `:host()` and `:host-context()`
-- inline global injection via `:global(selector)`
-- block level global injection via `@global {}`
-- nesting `a { &:hover {} }`
-- static and function mixins via `@mixin ...` and `@include`
-- prefixer
-- namespacing
-- flat css `color: red; h1 { color: red; }`
-- middleware support
-- keyframes and animation namespacing (with the option to disable)
-
-
 ## API
 
 ```javascript
@@ -303,12 +304,13 @@ The optional middleware function accepts four arguments `ctx, str, line, column`
 1. at every selector declaration `ctx = 0` i.e `.class` / `.foo, .bar`
 2. at every property declaration `ctx = 1` i.e `color: red;`
 3. before a block of compiled css is added to the output string `ctx = 2`, i.e `.class {color:red;}`
-4. when flat css is appened to the output bundle `ctx = 3`, i.e `.prefix { color:red; }`
+4. before a block of flat compiled css is added to the output string `ctx = 3`, i.e `color:blue;`
 5. When an `import` statement is found `ctx = 4`, i.e `import 'foo'`
+6. before the compiled css output is returned `ctx = 5`
 
 If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
 
-For any stage if the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
+If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
 
 
 ```javascript
@@ -320,7 +322,30 @@ stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, 
 });
 ```
 
-Will replace all instances of `random()` with a random number
+Will replace all instances of `random()` with a random number.
+
+### Extending css syntax with function
+
+As you can tell from the above middleware it is possible to extend css's syntax. In the previous example we used a function as middleware which allows for much lower level access and control but we could as well use an object of functions that define what different function in the css will generate. For example a `random()` and `darken(value)` extension can look like
+
+```javascript
+stylis(``, `
+        h1 { 
+            width: calc(random()*10); 
+            color: darken(#FFF);
+        }
+`, false, {
+    random () {
+        return Math.random();
+    }
+    darken (value) {
+        return '#000';
+    }
+});
+```
+
+If we had used `darken(#FFF, #CCC)` in our css the two arguments would have been passed to the darken function.
+
 
 ## Intergration
 

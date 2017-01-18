@@ -101,11 +101,17 @@ var tests = {
 		sample: `
 			@media (max-width: 600px) {
 				color: red;	
-				h1 { color: red; }
+				h1 { 
+					color: red; 
+
+					h2 {
+						color: blue;
+					}
+				}
 				display: none;
 			}
 		`,
-		expected: `@media (max-width: 600px) {.user h1 {color: red;}.user {color: red;display: none;}}`
+		expected: `@media (max-width: 600px) {.user {color: red;}.user h1 {color: red;}.user h1 h2 {color: blue;}.user {display: none;}}`
 	},
 	'multiple selectors': {
 		name: 'multiple selectors',
@@ -173,7 +179,7 @@ var tests = {
 			`@keyframes userslidein `+
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
-	'keyframes': {
+	'keyframes disable namespace': {
 		options: {
 			animations: false
 		},
@@ -206,8 +212,8 @@ var tests = {
 			:host-context(body) { color: red; }
 			:root { color: red; }
 		`,
-		expected: '.user {color: red;}.user {color: red;}.user:hover {color: red;}.user.fancy {color: red;}'+
-			'body .user {color: red;}.user:root {color: red;}.user {color: red;}'
+		expected: '.user {color: red;}.user {color: red;}.user {color: red;}.user:hover {color: red;}.user.fancy {color: red;}'+
+			'body .user {color: red;}.user:root {color: red;}'
 	},
 	'[title="a,b"]': {
 		name: '[title="a,b"]',
@@ -255,7 +261,7 @@ var tests = {
 				margin: var(~~foo);
 			}
 		`,
-		expected: '.user {margin: 20px;}.user {width: 20px;}'
+		expected: '.user {width: 20px;}.user {margin: 20px;}'
 	},
 	'strings': {
 		name: 'strings',
@@ -325,13 +331,12 @@ var tests = {
 				@include large-text;
 			}
 		`,
-		expected: '@mixin large-text {font-size: 20px;}'+
+		expected: '.user {~~foo: 20px;width: var(~~foo);}@mixin large-text {font-size: 20px;}'+
 		'@mixin linx (link, visit, hover, active) {a {color: var(~~link);}}'+
-		'.user {@include large-text;}'+
-		'.user {~~foo: 20px;width: var(~~foo);}'
+		'.user {@include large-text;}'
 	},
 	'middleware imports': {
-		name: 'middleware & imports',
+		name: 'middleware imports',
 		options: {
 			middleware: function (ctx, str, line, col) {
 				if (ctx === 4) {
@@ -354,6 +359,7 @@ var tests = {
 					case 2: return str+'/* block */';
 					case 3: return str+'/* flat */';
 					case 4: return '.imported { color: orange; }';
+					case 5: return str+'/* output */';
 				}
 			}
 		},
@@ -364,8 +370,9 @@ var tests = {
 
 			h1 { color: red; }
 		`,
-		expected: '.user h1/* selector */{color: red;/* property */}/* block */.user .imported/* selector */'+
-		'{color: orange;/* property */}/* block */.user {color: blue;/* property */}/* flat */'
+		expected: '.user {color: blue;/* property */}/* flat */'+
+		'.user .imported/* selector */{color: orange;/* property */}/* block */'+
+		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
 	}
 };
 

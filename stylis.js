@@ -71,8 +71,49 @@
 		// animation and keyframe namespace
 		var animns = (animations === void 0 || animations === true) ? namespace : '';
 
-		// has middleware
-		var plugin = middleware != null && typeof middleware === 'function';
+		// uses middleware
+		var use = middleware != null;
+
+		// object
+		if (use) {
+			var uses = (typeof middleware).charCodeAt(0);
+
+			// o, object of middlewares
+			if (uses === 111) {
+				var keys = Object.keys(middleware).map(function (key) {
+					return [key, new RegExp(key+'\\([ \t\r\n]*([^\0]*?)[ \t\r\n]*\\)', 'g')];
+				});
+
+				var plugins = middleware;
+				var funcs = keys.length;
+
+				middleware = function (ctx, str, line, col) {
+					// block context
+					if (ctx === 2) {
+						for (var i = 0; i < funcs; i++) {
+							var plugin = keys[i];
+							var key = plugin[0];
+							var regex = plugin[1];
+
+							str = str.replace(regex, function (match, capture) {
+								return (
+										plugins[key].apply(
+										null, 
+										capture.replace(/[ \t\r\n]*,[ \t\r\n]*/g, ',').split(',')
+									) || match
+								);
+							});
+						}
+
+						return str;
+					}
+				};
+			}
+			// f, single function middleware
+			else if (uses !== 102) {
+				use = false;
+			}
+		}
 
 		var inner;
 		var selectors;
@@ -94,6 +135,7 @@
 		var buff = '';
 		var blob = '';
 		var blck = '';
+		var nest = '';
 
 		// positions
 		var caret = 0;
@@ -108,6 +150,11 @@
 		var closed = 0;
 		var comment = 0;
 		var strings = 0;
+		var nested = 0;
+
+		// context(flat) signatures
+		var levels = 0;
+		var level = 0;
 
 		// prefixes
 		var moz = '-moz-';
@@ -136,12 +183,12 @@
 				var third = buff.charCodeAt(2) || 0;
 
 				// middleware, selector/property context, }
-				if (plugin && code !== 125) {
-					// selector, {
+				if (use && code !== 125) {
+					// { selector context
 					if (code === 123) {
 						temp = middleware(0, buff.substring(0, buff.length-1).trim(), line, column);
 					} 
-					// property, ;
+					// ; property context
 					else {
 						temp = middleware(1, buff, line, column);
 					}
@@ -158,6 +205,22 @@
 				}
 				// @, special block
 				else if (first === 64) {
+					// push flat css
+					if (levels === 1 && flat.length !== 0) {
+						levels = 0;
+						flat = prefix + ' {' + flat + '}';
+
+						// middleware, flat context
+						if (use) {
+							temp = middleware(3, flat, line, column);
+						
+							temp !== void 0 && (flat = temp);
+						}
+
+						output += flat;
+						flat = '';
+					}
+
 					// @keyframe/@global, `k` or @global, `g` character
 					if (second === 107 || second === 103) {
 						// k, @keyframes
@@ -305,7 +368,7 @@
 								}
 							}
 							// @import `m` character
-							else if (third === 109 && plugin) {
+							else if (third === 109 && use) {
 								// avoid "foo.css"; "foo" screen; "http://foo.com/bar"; url(foo);
 								var match = /@import.*?(["'][^\.\n\r]*?["'];|["'].*\.scss["'])/g.exec(buff);
 
@@ -315,7 +378,7 @@
 
 									if (buff) {
 										// create block and update styles length
-										styles += buff;
+										styles = styles.substring(0, caret+1) + buff + styles.substring(caret+1);
 										eof += buff.length;
 									}
 
@@ -324,7 +387,7 @@
 							}
 						}
 					}
-					// flag special block context
+					// flag special, i.e @keyframes, @global
 					else if (type !== 4) {
 						close = -1;
 						special++;
@@ -521,6 +584,22 @@
 					else if (code === 123) {
 						depth++;
 
+						// push flat css
+						if (levels === 1 && flat.length !== 0) {
+							levels = 0;
+							flat = prefix + ' {' + flat + '}';
+
+							// middleware, flat context
+							if (use) {
+								temp = middleware(3, flat, line, column);
+							
+								temp !== void 0 && (flat = temp);
+							}
+
+							output += flat;
+							flat = '';
+						}
+
 						if (special === 0 || type === 2) {
 							// nested selector
 							if (depth === 2) {
@@ -573,9 +652,14 @@
 									}
 								}
 
-								// create block and update styles length
 								// the `new line` is to avoid conflicts when the last line is a // line comment
-								eof += (styles += ('\n' + prevSelector.join(',') + ' {'+inner+'}').replace(/&| +&/g, '')).length;
+								buff = ('\n' + prevSelector.join(',') + ' {'+inner+'}');
+
+								// append nest
+								nest += buff.replace(/&| +&/g, '');
+
+								// signature
+								nested = 1;
 
 								// clear current line, to avoid adding nested blocks to the normal flow
 								buff = '';
@@ -684,14 +768,38 @@
 						}
 					}
 					// } character
-					else if (code === 125 && depth !== 0) {
-						depth--;
+					else if (code === 125) {
+						if (depth !== 0) {
+							depth--;
+						}
+
+						// concat nested css
+						if (depth === 0 && nested === 1) {
+							styles = styles.substring(0, caret+1) + nest + styles.substring(caret+1);
+							eof += nest.length;
+							nest = '';
+							nested = 0;
+							close++;
+						}
 					}
 
 					// @global/@keyframes
 					if (special !== 0) {
-						// find the closing tag
-						code === 125 ? close++ : (code === 123 && close !== 0 && close--);
+						// }, find closing tag
+						if (code === 125) {
+							close++;
+						} 
+						// {
+						else if (code === 123 && close !== 0) {
+							close--;
+						}
+
+						// append flat @media css
+						if (level === 1 && (code === 123 || close === 0) && flat.length !== 0) {
+							level = 0;
+							buff = prefix + ' {'+flat+'}' + buff;
+							flat = '';
+						}
 
 						// closing tag
 						if (close === 0) {
@@ -703,13 +811,6 @@
 							else if (type === 1) {
 								// vendor prefix
 								buff = '}@'+blob+'}';
-
-								// reset
-								blob = '';
-							}
-							// @media
-							else if (type === 2) {
-								blob.length !== 0 && (buff = prefix + ' {'+blob+'}' + buff);
 
 								// reset
 								blob = '';
@@ -739,13 +840,22 @@
 							}
 						}
 						// @media flat context
-						else if (type === 2 && depth === 0 && code !== 125) {
-							blob += buff;
-							buff = '';
+						else if (type === 2 && depth === 0) {
+							if (code !== 125) {
+								if (level === 0) {
+									flat = '';
+								}
+
+								flat += buff;
+								buff = '';
+							}
+
+							level = 1;
 						}
 					}
 					// flat context
 					else if (depth === 0 && code !== 125) {
+						levels = 1;
 						flat = flat === void 0 ? buff : flat + buff;
 						buff = '';
 					}
@@ -762,7 +872,7 @@
 					// append if the block is not empty {}
 					if (blck.charCodeAt(blck.length-2) !== 123) {
 						// middleware, block context
-						if (plugin && blck.length !== 0) {
+						if (use && blck.length !== 0) {
 							temp = middleware(2, blck, line, column);
 
 							temp !== void 0 && (blck = temp);
@@ -775,7 +885,7 @@
 					// nested @media
 					if (type === 4) {
 						// middleware, block context
-						if (plugin) {
+						if (use) {
 							temp = middleware(2, media, line, column);
 
 							temp !== void 0 && (media = temp);
@@ -834,14 +944,14 @@
 			column++;
 		}
 
-		// has flat css, since flat css can appear any where we add them last
-		if (flat !== void 0) {
+		// trailing flat css
+		if (flat !== void 0 && flat.length !== 0) {
 			flat = prefix + ' {' + flat + '}';
 
 			// middleware, flat context
-			if (plugin) {
+			if (use) {
 				temp = middleware(3, flat, line, column);
-				
+			
 				temp !== void 0 && (flat = temp);
 			}
 
@@ -850,11 +960,18 @@
 		}
 
 		// has variables
-		if (variables !== void 0) {
+		if (compact && variables !== void 0) {
 			// replace all variables
 			for (var i = 0, l = variables.length; i < l; i++) {
 				output = output.replace(new RegExp('var\\('+variables[i][0]+'\\)', 'g'), variables[i][1]);
 			}
+		}
+
+		// middleware, output context
+		if (use) {
+			temp = middleware(5, output, line, column);
+		
+			temp !== void 0 && (output = temp);
 		}
 
 		return output;

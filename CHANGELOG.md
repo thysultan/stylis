@@ -1,3 +1,9 @@
+## 0.11.0 (January 18, 2016)
+
+- patch flat, nested and import css order
+- add new context that executes middleware just before compiled output is returned
+- add support for higher level middleware support with middleware objects
+
 ## 0.10.0 (January 16, 2016)
 
 - enable compact flag to enable additional features(variables and mixins)

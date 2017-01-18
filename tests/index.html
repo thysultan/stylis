@@ -9,7 +9,75 @@
 <body>
 	<script>
 		(function () {
-			// output = stylis('abc', `
+			output = stylis('.abc', `
+				color: red;
+				width: 100px;
+
+				@media {
+					color: red;
+
+					h1 {
+						color: red;
+
+						h2 {
+							color: orange;
+						}
+					}
+
+					color: blue;
+
+					div {color: red;}
+				}
+
+				h1 {
+					color: blue;
+
+					h2 {
+						color: red;
+
+						h3, h4 {
+							color: purple;
+						}
+					}
+				}
+
+				div {
+					color: orange;
+
+					span {
+						color: red;
+					}
+				}
+
+				// color: blue;
+				// height: 100px;
+
+				h1 {
+					color: darken(  #FFF, #CCC lol  );
+					width: random(100*10);
+
+					h2 {
+						color: blue;
+					}
+				}
+
+				// div {
+				// 	color: red;
+				// }
+			`, false, false, {
+				darken () {
+					console.log('darken', arguments);
+				},
+				random (value) {
+					console.log('random', arguments, eval(value));
+				}
+			});
+
+			console.log(output);
+
+			return;
+
+			// output = stylis('.abc', `
 			// 	h1 {
 			// 		animation: loading 1s ease infinite forwards;
 			// 		animation-fill-mode: none;
