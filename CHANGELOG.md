@@ -1,3 +1,7 @@
+## 0.11.0 (January 20, 2016)
+
+- patch for @media flat css
+
 ## 0.11.0 (January 18, 2016)
 
 - patch flat, nested and import css order

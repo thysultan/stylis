@@ -119,7 +119,6 @@
 		var selectors;
 		var build;
 		var media;
-		var flat;
 		var temp;
 		var prev;
 		var indexOf;
@@ -136,6 +135,7 @@
 		var blob = '';
 		var blck = '';
 		var nest = '';
+		var flat = '';
 
 		// positions
 		var caret = 0;
