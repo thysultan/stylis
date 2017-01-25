@@ -1,3 +1,9 @@
+## 0.12.0 (January 25, 2016)
+
+- more supported extensions to the `@import` parser.
+- finallize middleware lifecycles, adds one before compiling
+- add `stylis.use` to register multiple middlewares independently
+
 ## 0.11.0 (January 20, 2016)
 
 - patch for @media flat css

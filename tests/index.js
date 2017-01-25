@@ -339,7 +339,8 @@ var tests = {
 		name: 'middleware imports',
 		options: {
 			middleware: function (ctx, str, line, col) {
-				if (ctx === 4) {
+				if (ctx === 5) {
+					console.log(1);
 					return `.imported { color: orange; }`;
 				}
 			}
@@ -354,12 +355,12 @@ var tests = {
 		options: {
 			middleware: function (ctx, str, line, col) {
 				switch (ctx) {
-					case 0: return str+'/* selector */';
-					case 1: return str+'/* property */';
-					case 2: return str+'/* block */';
-					case 3: return str+'/* flat */';
-					case 4: return '.imported { color: orange; }';
-					case 5: return str+'/* output */';
+					case 1: return str+'/* selector */';
+					case 2: return str+'/* property */';
+					case 3: return str+'/* block */';
+					case 4: return str+'/* flat */';
+					case 5: return '.imported { color: orange; }';
+					case 6: return str+'/* output */';
 				}
 			}
 		},
@@ -408,6 +409,8 @@ function run (tests) {
 		var sample = test.sample.trim();
 		var expected = test.expected.trim();
 		var options = test.options || {};
+
+		stylis.plugins.length = 0;
 
 		var result = stylis(
 			'.user', 

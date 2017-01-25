@@ -27,7 +27,7 @@
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.11.1/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@0.12.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -301,12 +301,13 @@ stylis(
 
 The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed at 4 stages.
 
-1. at every selector declaration `ctx = 0` i.e `.class` / `.foo, .bar`
-2. at every property declaration `ctx = 1` i.e `color: red;`
-3. before a block of compiled css is added to the output string `ctx = 2`, i.e `.class {color:red;}`
-4. before a block of flat compiled css is added to the output string `ctx = 3`, i.e `color:blue;`
-5. When an `import` statement is found `ctx = 4`, i.e `import 'foo'`
-6. before the compiled css output is returned `ctx = 5`
+1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
+2. at every selector declaration `ctx = 1` i.e `.class` / `.foo, .bar`
+3. at every property declaration `ctx = 2` i.e `color: red;`
+4. before a block of compiled css is added to the output string `ctx = 3`, i.e `.class {color:red;}`
+5. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
+6. When an `import` statement is found `ctx = 5`, i.e `import 'foo'`
+7. before the compiled css output is returned `ctx = 6`
 
 If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
 
@@ -317,7 +318,7 @@ If at any context point the middleware returns a non-falsey value the token or b
 stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column) {
     switch (ctx) {
         // str will be `width: calc(random()*10);`
-        case 1: return str.replace(/random\(\)/g, Math.random());
+        case 2: return str.replace(/random\(\)/g, Math.random());
     }
 });
 ```
@@ -345,6 +346,8 @@ stylis(``, `
 ```
 
 If we had used `darken(#FFF, #CCC)` in our css the two arguments would have been passed to the darken function.
+
+The same can be done with `stylis.use` to register middleware individually, and `stylis.plugins.length = 0` to flush all middleware.
 
 
 ## Intergration

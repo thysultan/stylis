@@ -9,45 +9,101 @@
 <body>
 	<script>
 		(function () {
+			// stylis.use('darken', function (value) {
+			// 	console.log('darken', arguments);
+			// 	return 'something';
+			// });
+
+			// stylis.use((ctx, str, line, col) => {
+			// 	switch (ctx) {
+			// 		case 2: {
+			// 			console.log('random', str);
+			// 			return 'something';
+			// 		}
+			// 	}
+			// });
+
+			// stylis.use([
+			// 	(ctx, str, line, col) => {
+			// 		switch (ctx) {
+			// 			case 0: {
+			// 				// console.log('begin', str);
+			// 				break;
+			// 			}
+			// 			case 4: {
+			// 				console.log('import', str);
+			// 				return;
+			// 			}
+			// 			case 5: {
+			// 				console.log(1, 'random', str);
+			// 				// return 'something';
+			// 			}
+			// 		}
+			// 	}
+			// ])
+
+			// var plugins = null;
+
+			var plugins = {
+				darken () {
+					console.log('darken', arguments);
+					return 'something';
+				},
+				random (value) {
+					console.log('random', arguments, eval(value));
+					return 'something';
+				}
+			};
+
 			output = stylis('.abc', `
-				color: red;
-				width: 100px;
+				@import "foo.js";
 
-				@media {
-					color: red;
+				/* this does not work */
+				// .root :global(p + p) {
+				//   color: green;
+				// }
 
-					h1 {
-						color: red;
+				/* this works */
 
-						h2 {
-							color: orange;
-						}
-					}
 
-					color: blue;
+				// color: red;
+				// width: 100px;
 
-					div {color: red;}
-				}
+				// @media {
+				// 	color: red;
 
-				h1 {
-					color: blue;
+				// 	h1 {
+				// 		color: red;
 
-					h2 {
-						color: red;
+				// 		h2 {
+				// 			color: orange;
+				// 		}
+				// 	}
 
-						h3, h4 {
-							color: purple;
-						}
-					}
-				}
+				// 	color: blue;
 
-				div {
-					color: orange;
+				// 	div {color: red;}
+				// }
 
-					span {
-						color: red;
-					}
-				}
+				// h1 {
+				// 	color: blue;
+
+				// 	h2 {
+				// 		color: red;
+
+				// 		h3, h4 {
+				// 			color: purple;
+				// 		}
+				// 	}
+				// }
+
+				// div {
+				// 	color: orange;
+
+				// 	span {
+				// 		color: red;
+				// 	}
+				// }
 
 				// color: blue;
 				// height: 100px;
@@ -64,14 +120,7 @@
 				// div {
 				// 	color: red;
 				// }
-			`, false, false, {
-				darken () {
-					console.log('darken', arguments);
-				},
-				random (value) {
-					console.log('random', arguments, eval(value));
-				}
-			});
+			`, false, false, plugins);
 
 			console.log(output);
 
