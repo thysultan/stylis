@@ -6,7 +6,7 @@
  * /____/\__/\__, /_/_/____/  
  *          /____/            
  * 
- * stylis is a small css compiler
+ * stylis is a feature-rich css preprocessor
  * 
  * @licence MIT
  */
@@ -21,6 +21,8 @@
 		window.stylis = factory(window);
 	}
 }(function (window) {
+
+	
 	'use strict';
 
 
@@ -70,8 +72,17 @@
 		// reset type signature
 		type = 0;
 
+		var animns;
+
 		// animation and keyframe namespace
-		var animns = (animations === void 0 || animations === true) ? namespace : '';
+		if (animations == void 0 || animations === true) {
+			animations = true;
+			animns = namespace;
+		}
+		else {
+			animns = '';
+			animations = false;
+		}
 
 		// uses middleware
 		var use = middleware != null;
@@ -83,9 +94,7 @@
 
 			// o, object of middlewares
 			if (uses === 111) {
-				for (var i = 0, keys = Object.keys(middleware), length = keys.length; i < length; i++) {
-					stylis.use(keys[i], middleware[keys[i]]);
-				}
+				stylis.use(middleware, null);
 			}
 			// f, not a single function middleware
 			else if (uses !== 102) {
@@ -173,7 +182,7 @@
 
 			// {, }, ; characters, parse line by line
 			if (strings === 0 && (code === 123 || code === 125 || code === 59)) {
-				buff += styles[caret];
+				buff += styles.charAt(caret);
 
 				var first = buff.charCodeAt(0);
 
@@ -287,7 +296,7 @@
 									}
 
 									// build content of nested block
-									inner += styles[caret++];
+									inner += styles.charAt(caret++);
 								}
 
 								for (var i = 0, length = selectors.length; i < length; i++) {
@@ -427,7 +436,7 @@
 						var anims = buff.substring(colon).trim().split(',');
 
 						// - short hand animation syntax
-						if ((buff.charCodeAt(9) || 0) !== 45) {
+						if (animations === true && (buff.charCodeAt(9) || 0) !== 45) {
 							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
 							for (var j = 0, length = anims.length; j < length; j++) {
 								var anim = anims[j];
@@ -443,8 +452,8 @@
 
 									// animation name is anything not in this list
 									if (
-										// cubic-bezier()
-										!(frst === 99 && last === 41) &&
+										// cubic-bezier()/steps(), ) 
+										last !== 41 && len !== 0 &&
 
 										// infinite, i, f, e
 										!(frst === 105 && third === 102 && last === 101 && len === 8) &&
@@ -452,13 +461,13 @@
 										// linear, l, n, r
 										!(frst === 108 && third === 110 && last === 114 && len === 6) &&
 
-										// alternate, a, t, e
-										!(frst === 97 && third === 116 && last === 101 && len === 9) &&
+										// alternate/alternate-reverse, a, t, e
+										!(frst === 97 && third === 116 && last === 101 && (len === 9 || len === 17)) &&
 
 										// normal, n, r, l
 										!(frst === 110 && third === 114 && last === 108 && len === 6) &&
 
-										// backwords, b, c, s
+										// backwards, b, c, s
 										!(frst === 98 && third === 99 && last === 115 && len === 9) &&
 
 										// forwards, f, r, s
@@ -470,21 +479,41 @@
 										// none, n, n, e
 										!(frst === 110 && third === 110 && last === 101 && len === 4)&&
 
-										// ease, e, s, e
-										!(frst === 101 && third === 115 && last === 101 && len === 4) &&
+										// running, r, n, g 
+										!(frst === 114 && third === 110 && last === 103 && len === 7) &&
 
-										// ease-
-										!(frst === 101 && len > 4 && prop.charCodeAt(4) === 45) &&
+										// paused, p, u, d
+										!(frst === 112 && third === 117 && last === 100 && len === 6) &&
 
-										// durations 0.4ms, .4s, 400ms ...
-										isNaN(parseFloat(prop))
+										// reversed, r, v, d
+										!(frst === 114 && third === 118 && last === 100 && len === 8) &&
+
+										// step-start/step-end, s, e, (t/d)
+										!(
+											frst === 115 && third === 101 && 
+											((last === 116 && len === 10) || (last === 100 && len === 8)) 
+										) &&
+
+										// ease/ease-in/ease-out/ease-in-out, e, s, e
+										!(
+											frst === 101 && third === 115 &&
+											(
+												(last === 101 && len === 4) ||
+												(len === 11 || len === 7 || len === 8) && prop.charCodeAt(4) === 45
+											)
+										) &&
+
+										// durations, 0.4ms, .4s, 400ms ...
+										isNaN(parseFloat(prop)) &&
+
+										// handle spaces in cubic-bezier()/steps() functions
+										prop.indexOf('(') === -1
 									) {
-										props[k] = animns+prop;
-										anim = props.join(' ');
+										props[k] = animns + prop;
 									}
 								}
 
-								build += (j === 0 ? '' : ',') + anim.trim();
+								build += (j === 0 ? '' : ',') + props.join(' ').trim();
 							}
 						}
 						// explicit syntax, anims array should have only one elemenet
@@ -634,7 +663,7 @@
 									}
 
 									// build content of nested block
-									inner += styles[caret++];
+									inner += styles.charAt(caret++);
 								}
 
 								// handle multiple selectors: h1, h2 { div, h4 {} } should generate
@@ -944,7 +973,7 @@
 					}
 
 					// build line buffer
-					buff += styles[caret];
+					buff += styles.charAt(caret);
 				}
 			}
 
@@ -1009,31 +1038,39 @@
 			key = void 0;
 		}
 
-		// array of plugins
-		if (plugin instanceof Array) {
-			for (var i = 0, length = plugin.length; i < length; i++) {
-				plugins[length++] = plugin[i];
+		if (plugin != null) {
+			// object of plugins
+			if (plugin.constructor === Object) {
+				for (var name in plugin) {
+					this.use(name, plugin[name]);
+				}
 			}
-		}
-		// single un-keyed plugin
-		else if (key == null) {
-			plugins[length] = plugin;
-		}
-		// keyed plugin
-		else {
-			var pattern = (key instanceof RegExp) ? key : new RegExp(key + '\\([ \\t\\r\\n]*([^\\0]*?)[ \\t\\r\\n]*\\)', 'g');
-			var regex = /[ \t\r\n]*,[ \t\r\n]*/g;
+			// array of plugins
+			else if (plugin.constructor === Array) {
+				for (var i = 0, length = plugin.length; i < length; i++) {
+					plugins[length++] = plugin[i];
+				}
+			}
+			// single un-keyed plugin
+			else if (key == null) {
+				plugins[length] = plugin;
+			}
+			// keyed plugin
+			else {
+				var pattern = (key instanceof RegExp) ? key : new RegExp(key + '\\([ \\t\\r\\n]*([^\\0]*?)[ \\t\\r\\n]*\\)', 'g');
+				var regex = /[ \t\r\n]*,[ \t\r\n]*/g;
 
-			plugins[length] = function (ctx, str, line, col) {
-				if (ctx === 6) {
-					str = str.replace(pattern, function (match, group) {
-						var args = group.replace(regex, ',').split(',');
-						var replace = plugin.apply(null, args);
+				plugins[length] = function (ctx, str, line, col) {
+					if (ctx === 6) {
+						str = str.replace(pattern, function (match, group) {
+							var args = group.replace(regex, ',').split(',');
+							var replace = plugin.apply(null, args);
 
-						return replace != null ? replace : match;
-					});
+							return replace != null ? replace : match;
+						});
 
-					return str;
+						return str;
+					}
 				}
 			}
 		}

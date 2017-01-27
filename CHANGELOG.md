@@ -1,3 +1,11 @@
+## 1.0.0 (January 27, 2016)
+
+- improve parsing and namespacing animations names in the `animation:` property
+- avoid parsing for animation name when animation namespacing is disabled
+- performance improvements
+- support adding middleware/plugins with objects via `stylis.use`
+- add IE 8 support
+
 ## 0.12.0 (January 25, 2016)
 
 - more supported extensions to the `@import` parser.

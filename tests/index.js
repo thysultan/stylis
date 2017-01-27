@@ -137,13 +137,68 @@ var tests = {
 	'animations': {
 		name: 'animations',
 		sample: `
+			h1 {
+				animation:` +
+				`
+				0.6s
+				.6ms
+				200ms
+				infinite
+				something-ease
+				infinite-fire
+				slidein
+				cubic-bezier()
+				cubic-bezier(1, 2, 4)
+				ease-in-out
+				ease
+				ease-inOuter
+				linear
+				alternate
+				normal
+				forwards
+				both
+				none
+				ease-in
+				ease-out
+				backwards
+				running
+				paused
+				reversed
+				alternate-reverse
+				step-start
+				step-end
+				step-end-something
+				steps(4, end)
+				`.replace(/\n|\r| +/g, ' ') +
+				`;
+			}
 			span {
       			animation-duration: 0.6s;
       			animation-name: slidein;
       			animation-iteration-count: infinite;
 		    }
 		`,
-		expected: `.user span {-webkit-animation-duration:0.6s;animation-duration:0.6s;-webkit-animation-name:userslidein;`+
+		expected: 
+		/* 
+			this also tests the parses ability to find and namespace 
+			the animation-name in a grouped animation: property 
+		*/
+
+		`.user h1 {`+
+
+		`-webkit-animation:0.6s .6ms 200ms infinite usersomething-ease userinfinite-fire userslidein `+
+		`cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease userease-inOuter linear alternate normal forwards `+
+		`both none ease-in ease-out backwards running paused reversed alternate-reverse `+
+		`step-start step-end userstep-end-something steps(4,end);`+
+
+		`animation:0.6s .6ms 200ms infinite usersomething-ease userinfinite-fire userslidein `+
+		`cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease userease-inOuter linear alternate normal forwards `+
+		`both none ease-in ease-out backwards running paused reversed alternate-reverse `+
+		`step-start step-end userstep-end-something steps(4,end);`+
+
+		`}`+
+
+		`.user span {-webkit-animation-duration:0.6s;animation-duration:0.6s;-webkit-animation-name:userslidein;`+
 			`animation-name:userslidein;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}`
 	},
 	'animations disabled prefix': {
@@ -340,7 +395,6 @@ var tests = {
 		options: {
 			middleware: function (ctx, str, line, col) {
 				if (ctx === 5) {
-					console.log(1);
 					return `.imported { color: orange; }`;
 				}
 			}

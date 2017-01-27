@@ -245,7 +245,7 @@
 		var middleware = (ctx, str, line, col) => str;
 		var start = performance.now();
 
-		stylis(ns, css, true, true, middleware);
+		var output = stylis(ns, css, true, true, middleware);
 
 		console.log((performance.now()-start) + 'ms - 230 LOC \n\nusing ever feature including nesting and middleware');
 	</script>

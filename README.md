@@ -2,16 +2,16 @@
 
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) [![Build Status](https://semaphoreci.com/api/v1/thysultan/stylis-js/branches/master/shields_badge.svg)](https://semaphoreci.com/thysultan/stylis-js) ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
-- ~2Kb minified+gzipped
+- ~3Kb minified+gzipped
 
 ## Supports
 
 * Edge
-* IE 9+
+* IE 8+
 * Chrome
 * Firefox
 * Safari
-* Node.js
+* Node
 
 ---
 
@@ -27,7 +27,7 @@
 
 
 ```html
-<script src=https://unpkg.com/stylis@0.12.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@1.0.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -38,22 +38,21 @@ npm install stylis --save
 
 ## Features
 
-- variables via `~~foo` and `var(~~foo)`
+- variables via `~~foo` and `var(~~foo)` similar to css variables `--foo` and `var(--foo)`
 - web component emulation of `:host`, `:host()` and `:host-context()`
+- namespacing
 - inline global injection via `:global(selector)`
 - block level global injection via `@global {}`
 - nesting `a { &:hover {} }`
 - static and function mixins via `@mixin ...` and `@include`
-- prefixer
-- namespacing
+- prefixer (flex-box, etc...)
 - flat css `color: red; h1 { color: red; }`
 - middleware support
-- keyframes and animation namespacing (with the option to disable)
-- including an option to disable compact features like variables and mixins.
+- keyframes and animation namespacing
 
 ---
 
-Stylis is a small css compiler that turns this
+stylis is a feature-rich css preprocessor that turns this
 
 ```javascript
 stylis('#user', styles);
@@ -62,7 +61,6 @@ stylis('#user', styles);
 Where `styles` is the following css
 
 ```scss
-
 // variables
 ~~foo: 20px;
 
@@ -295,6 +293,11 @@ stylis(
     compact: {boolean=}     // enable additional features (mixins, variables)
     middleware: {function=}
 );
+
+stylis.use(
+    key/middleware: {(string|RegExp|function|array|object)}
+    plugin: {function=}
+)
 ```
 
 ## Middleware
@@ -348,7 +351,6 @@ stylis(``, `
 If we had used `darken(#FFF, #CCC)` in our css the two arguments would have been passed to the darken function.
 
 The same can be done with `stylis.use` to register middleware individually, and `stylis.plugins.length = 0` to flush all middleware.
-
 
 ## Intergration
 
