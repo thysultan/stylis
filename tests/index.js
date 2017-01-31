@@ -432,10 +432,14 @@ var tests = {
 	'urls': {
 		name: 'urls',
 		sample: `
+			background: url(http://url.com/});
+
 			background: url(http://url.com//1234) '('; // sdsd
+
 			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
 			`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");`,
-		expected: `.user {background: url(http://url.com//1234) '(';`+
+		expected: `.user {background: url(http://url.com/});`+
+		`background: url(http://url.com//1234) '(';`+
 		`background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
 		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
 	},

@@ -182,7 +182,7 @@
 			var code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
-			if (strings === 0 && (code === 123 || code === 125 || code === 59)) {
+			if (strings === 0 && func === 0 && (code === 123 || code === 125 || code === 59)) {
 				buff += styles.charAt(caret);
 
 				var first = buff.charCodeAt(0);

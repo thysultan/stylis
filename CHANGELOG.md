@@ -1,3 +1,7 @@
+## 1.0.2 (January 31, 2016)
+
+- patch parsing tokens in urls
+
 ## 1.0.1 (January 31, 2016)
 
 - patch urls and data uri's
