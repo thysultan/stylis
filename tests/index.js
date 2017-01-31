@@ -428,7 +428,17 @@ var tests = {
 		expected: '.user {color: blue;/* property */}/* flat */'+
 		'.user .imported/* selector */{color: orange;/* property */}/* block */'+
 		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
-	}
+	},
+	'urls': {
+		name: 'urls',
+		sample: `
+			background: url(http://url.com//1234) '('; // sdsd
+			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
+			`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");`,
+		expected: `.user {background: url(http://url.com//1234) '(';`+
+		`background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
+		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
+	},
 };
 
 

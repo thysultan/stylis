@@ -1,3 +1,7 @@
+## 1.0.1 (January 31, 2016)
+
+- patch urls and data uri's
+
 ## 1.0.0 (January 27, 2016)
 
 - improve parsing and namespacing animations names in the `animation:` property

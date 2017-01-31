@@ -148,6 +148,7 @@
 		var comment = 0;
 		var strings = 0;
 		var nested = 0;
+		var func = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -957,19 +958,36 @@
 				}
 				// not `\t` tab character
 				else if (code !== 9) {
-					// " character
-					if (code === 34) {
-						// exit string " context / enter string context
-						strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
-					}
-					// ' character
-					else if (code === 39) {
-						// exit string ' context / enter string context
-						strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
-					}
-					// / character
-					else if (code === 47) {
-						code === 47 && comment < 2 && comment++;
+					switch (code) {
+						// " character
+						case 34: {
+							// exit string " context / enter string context
+							strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
+							break;
+						}
+						// ' character
+						case 39: {
+							// exit string ' context / enter string context
+							strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
+							break;
+						}
+						// ( character
+						case 40: {
+							strings === 0 && (func = 1);
+							break;
+						}
+						// ) character
+						case 41: {
+							strings === 0 && (func = 0);
+							break;
+						}
+						// / character
+						case 47: {
+							if (strings === 0 && func !== 1) {
+								code === 47 && comment < 2 && comment++;
+							}
+							break;
+						}
 					}
 
 					// build line buffer
@@ -1030,7 +1048,7 @@
 	 * @return {Object} {use, plugins}
 	 */
 	stylis.use = function (key, plugin) {
-		var plugins = this.plugins;
+		var plugins = stylis.plugins;
 		var length = plugins.length;
 
 		if (plugin == null) {
@@ -1042,7 +1060,7 @@
 			// object of plugins
 			if (plugin.constructor === Object) {
 				for (var name in plugin) {
-					this.use(name, plugin[name]);
+					stylis.use(name, plugin[name]);
 				}
 			}
 			// array of plugins
