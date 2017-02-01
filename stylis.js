@@ -537,9 +537,13 @@
 					}
 					// display: d, i, s
 					else if (first === 100 && second === 105 && third === 115) {
-						if (buff.indexOf('flex') > -1) {
+						// flex/inline-flex
+						if ((indexOf = buff.indexOf('flex')) > -1) {
+							// e, inline-flex
+							temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
+
 							// vendor prefix
-							buff = 'display:'+webkit+'box;display:'+webkit+'flex;'+ms+'flexbox;display:flex;';
+							buff = 'display:'+webkit+temp+'box;display:'+webkit+temp+'flex;'+ms+'flexbox;display:'+temp+'flex;';
 						}
 					}
 					// transforms & transitions: t, r, a 

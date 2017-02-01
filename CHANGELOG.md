@@ -1,3 +1,7 @@
+## 1.0.3 (February 01, 2016)
+
+- patch `inline-flex` property being replaced with `flex`
+
 ## 1.0.2 (January 31, 2016)
 
 - patch parsing tokens in urls
