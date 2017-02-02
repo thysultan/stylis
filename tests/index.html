@@ -11,6 +11,20 @@
 		(function () {
 			console.log(
 				stylis('.abc', `
+					&.foo,&.baz { 
+						&.bar {
+							color: yesplease
+						}
+					}
+
+					&.foo { 
+						&.bar { 
+							&.barbar {
+								color: yesplease
+							}
+						}
+					}
+
 					h2 {
 						display: inline-flex;
 					}

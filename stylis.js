@@ -648,7 +648,7 @@
 
 								// inner content of block
 								inner = '';
-								
+
 								var nestSelector = buff.substring(0, buff.length-1).split(',');
 								var prevSelector = prev.substring(0, prev.length-1).split(',');
 
@@ -680,7 +680,7 @@
 
 									// since there could also be multiple nested selectors
 									for (var k = 0, l = nestSelector.length; k < l; k++) {
-										selector = temp.replace(prefix, '').trim();
+										selector = temp.replace(prefix, '&').trim();
 
 										if (nestSelector[k].indexOf(' &') > 0) {
 											selector = nestSelector[k].replace('&', '').trim() + ' ' + selector;
@@ -697,7 +697,7 @@
 								buff = ('\n' + prevSelector.join(',') + ' {'+inner+'}');
 
 								// append nest
-								nest += buff.replace(/&| +&/g, '');
+								nest += buff.replace(/ +&/g, '');
 
 								// signature
 								nested = 1;

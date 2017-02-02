@@ -1,3 +1,7 @@
+## 1.0.4 (February 02, 2016)
+
+- patch `&` nested selectors
+
 ## 1.0.3 (February 01, 2016)
 
 - patch `inline-flex` property being replaced with `flex`

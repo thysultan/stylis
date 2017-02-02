@@ -299,11 +299,27 @@ var tests = {
 					color: red;
 				}
 			}
+
+			&.foo { 
+				&.bar {
+					color: yesplease
+				}
+			}
+
+			&.foo { 
+				&.bar { 
+					&.barbar {
+						color: yesplease
+					}
+				}
+			}
 		`,
 		expected: '.user h1,.user div {color: red;color: blue;}'+
 		'@media {.user h1 {color: red;}.user div {color: red;}}'+
 		'.user h1 h2,.user h1:before,.user div h2,'+
-		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'
+		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'+
+		'.user.foo.bar {color: yesplease}'+
+		'.user.foo.bar.barbar {color: yesplease}'
 	},
 	'variables': {
 		name: 'variables',
