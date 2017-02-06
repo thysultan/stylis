@@ -75,8 +75,23 @@ var tests = {
 			/**
 			 * removes block comments and line comments
 			 */
+
+			 button /*
+			 	// what
+
+			 	xxx
+			  */
+			 {color: blue;}
+
+			 
+			 // hello
+
+			 button /* 1 */
+			 {
+			   color: red; /* 2 */
+			 }
 		`,
-		expected: ''
+		expected: '.user button {color: blue;}.user button {color: red;}'
 	},
 	'&': {
 		name: '&',
@@ -276,8 +291,13 @@ var tests = {
 			[title="a,b,c, something"], h1 {
 		  		color: red
 			}
+
+			[title="a"],
+			[title="b"] {
+				color: red;
+			}
 		`,
-		expected: `.user [title="a,b,c, something"],.user h1 {color: red}`
+		expected: `.user [title="a,b,c, something"],.user h1 {color: red}.user [title="a"],.user [title="b"] {color: red;}`
 	},
 	'nested': {
 		name: 'nested',

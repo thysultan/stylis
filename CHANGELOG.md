@@ -1,3 +1,8 @@
+## 1.0.5 (February 06, 2016)
+
+- patch block comments inlined with selectors
+- patch attribute selectors
+
 ## 1.0.4 (February 02, 2016)
 
 - patch `&` nested selectors

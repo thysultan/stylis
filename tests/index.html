@@ -13,14 +13,14 @@
 				stylis('.abc', `
 					&.foo,&.baz { 
 						&.bar {
-							color: yesplease
+							color: yesplease;
 						}
 					}
 
 					&.foo { 
 						&.bar { 
 							&.barbar {
-								color: yesplease
+								color: yesplease;
 							}
 						}
 					}
@@ -43,6 +43,14 @@
 						background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");
 					}
 				`)
+					.replace(/\{/g, '{\n\t')
+					.replace(/\}\./g, '}\n.')
+					.replace(/,/g, ',\n')
+					.replace(/\;/g, ';\n\t')
+					.replace(/\t\}/g, '}')
+					.replace(/url\([^\0]+?\)(?: |;)/g, function (match) {
+						return match.replace(/[\t\n]*/g, '');
+					})
 			)
 
 			return;
