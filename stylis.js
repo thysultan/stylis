@@ -746,12 +746,12 @@
 									}
 
 									// [, [title="a,b,..."]
-									if (firstChar === 91 && selector.charCodeAt(selector.length-1) !== 93) {
-										for (var k = j+1, l = length-j; k < l; k++) {
+									if (firstChar === 91 && selector.indexOf(']') === -1) {
+										for (var k = j + 1, l = length; k < l; k++) {
 											var broken = (selector += ',' + selectors[k]).trim();
 
 											// ], end
-											if (broken.charCodeAt(broken.length-1) === 93) {
+											if (broken.indexOf(']') !== -1) {
 												length -= k;
 												selectors.splice(j, k);
 												break;

@@ -1,3 +1,7 @@
+## 1.0.6 (February 06, 2016)
+
+- improve handling `,` comma tokens in attribute selectors
+
 ## 1.0.5 (February 06, 2016)
 
 - patch block comments inlined with selectors

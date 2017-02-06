@@ -288,7 +288,7 @@ var tests = {
 	'[title="a,b"]': {
 		name: '[title="a,b"]',
 		sample: `
-			[title="a,b,c, something"], h1 {
+			[title="a,b,c, something"], h1, [title="a,b,c"] {
 		  		color: red
 			}
 
@@ -297,7 +297,7 @@ var tests = {
 				color: red;
 			}
 		`,
-		expected: `.user [title="a,b,c, something"],.user h1 {color: red}.user [title="a"],.user [title="b"] {color: red;}`
+		expected: `.user [title="a,b,c, something"],.user h1,.user [title="a,b,c"] {color: red}.user [title="a"],.user [title="b"] {color: red;}`
 	},
 	'nested': {
 		name: 'nested',
