@@ -305,7 +305,8 @@ var tests = {
 			h1, div {
 				color: red;
 
-				h2, &:before {
+				h2, 
+				&:before {
 					color: red;
 				}
 

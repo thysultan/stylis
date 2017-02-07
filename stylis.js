@@ -132,6 +132,7 @@
 		var first;
 		var second;
 		var third;
+		var sel;
 
 		// variables
 		var variables;
@@ -703,12 +704,13 @@
 									// since there could also be multiple nested selectors
 									for (var k = 0, l = nestSelector.length; k < l; k++) {
 										selector = temp.replace(prefix, '&').trim();
+										sel = nestSelector[k].trim();
 
-										if (nestSelector[k].indexOf(' &') > 0) {
-											selector = nestSelector[k].replace('&', '').trim() + ' ' + selector;
+										if (sel.indexOf(' &') > 0) {
+											selector = sel.replace('&', '').trim() + ' ' + selector;
 										}
 										else {
-											selector = selector + ' ' + nestSelector[k].trim();
+											selector = selector + ' ' + sel;
 										}
 
 										prevSelector[j] += selector.trim() + (k === l - 1  ? '' : ',');

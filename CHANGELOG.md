@@ -1,3 +1,7 @@
+## 1.0.7 (February 06, 2016)
+
+- patch selectors in nested block
+
 ## 1.0.6 (February 06, 2016)
 
 - improve handling `,` comma tokens in attribute selectors

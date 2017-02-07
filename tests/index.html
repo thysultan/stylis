@@ -11,10 +11,19 @@
 		(function () {
 			console.log(
 				stylis('.abc', `
-				
-					[title="a,b,d"], h1, [title="f,r,c"] {
-				  		color: red
+
+					a {
+					  color: blue;
+
+					  &:active,&:focus,
+					  &:hover {
+					    color: yellow;
+					  }
 					}
+				
+					// [title="a,b,d"], h1, [title="f,r,c"] {
+				 //  		color: red
+					// }
 
 					// &.foo,&.baz { 
 					// 	&.bar {
