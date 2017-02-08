@@ -1,4 +1,4 @@
-# Stylis
+# STYLIS
 
 [![stylis](https://thysultan.github.io/stylis.js/assets/logo.svg)](https://github.com/thysultan/stylis.js)
 
