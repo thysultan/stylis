@@ -561,7 +561,7 @@
 							temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
 
 							// vendor prefix
-							buff = 'display:'+webkit+temp+'box;display:'+webkit+temp+'flex;display:'+ms+'flexbox;display:'+temp+'flex;';
+							buff = 'display: '+webkit+temp+'box;display: '+webkit+temp+'flex;display: '+ms+'flexbox;display: '+temp+'flex;';
 						}
 					}
 					// transforms & transitions: t, r, a 

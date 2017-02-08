@@ -8,15 +8,142 @@
 		
 		<title>stylis</title>
 		
-		<!-- <link rel="stylesheet" href="assets/style.css"> -->
+		<link rel="stylesheet" href="assets/style.css">
 	</head>
 	<body>
-		<div class="header"></div>
-		<div class="container"></div>
+		<div class="header">
+			<div class="wrap">
+				<div class="logo">
+					<a class="./">
+					<img src="assets/logo.svg"></a>
+				</div>
+				<div class="nav">
+					<ul>
+						<li>
+							<a href="https://github.com/thysultan/stylis.js">Github</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="welcome">
+				<p>stylis is a feature-rich css preprocessor</p>
+				<div class="code">
+					<div spellcheck=false>
+<pre contenteditable id=editor>
+:global(h1) {
+	font-size: 22px;
+}
+
+div {
+	display: flex;
+
+	h1 {
+		color: red;
+	} 
+}
+</pre>
+<pre id=output>
+h1 { 
+    font-size: 22px; 
+}
+
+#namespace div {
+    display: -webkit-box; 
+    display: -webkit-flex;
+    display: -ms-flexbox; 
+    display: flex;
+}
+
+#namespace div h1 {
+	color: red;
+}
+</pre>
+					</div>
+				</div>
+			</div>
+		</div>
 		
-		<!-- <script src="https://unpkg.com/md.js@0.2.6/md.min.js"></script> -->
-		<!-- <script src="assets/highlighter.min.js"></script> -->
-		<!-- <script src="assets/dio.min.js"></script> -->
-		<!-- <script src="assets/app.min.js"></script> -->
+		<script src="../stylis.js"></script>
+	
+		<script>
+			(function () {
+				var editor = document.getElementById('editor');
+				var output = document.getElementById('output');
+				var namespace = '#namespace';
+				var timeStamp = 0;
+
+				// simple syntax highlighter
+				var highlight = {
+					tabs: function (match) {
+						return '\t' + match;
+					},
+					newlines: function (match, group) {
+						return group + (group === '}' ? '\n\n' : '\n');
+					},
+					value: function () {
+
+					},
+					selector: function (match, group) {
+						return '<span class=selector>' + group.trim() + '</span> {\n';
+					}
+				};
+
+				function input (e) {
+					var keyCode = e.keyCode;
+					var shiftKey = e.shiftKey;
+
+					switch (keyCode) {
+						// \t
+						case 9: {
+							e.preventDefault();
+
+				            var selection = window.getSelection();
+				            var range = selection.getRangeAt(0); 
+				            var text = document.createTextNode('\t');
+
+				            range.deleteContents(); 
+				            range.insertNode(text);
+				            range.setStartAfter(text);
+				            selection.removeAllRanges();
+				            selection.addRange(range);
+
+				            break;
+				        }
+				        // ;
+				        case 186:
+				        // {
+				        case 219:
+				        // } 
+				        case 221: {
+				        	if (keyCode !== 186 && shiftKey || keyCode === 186 && !shiftKey) {
+				        		var raw = editor.textContent;
+				        		var processed = stylis('#namespace', raw, true, true, null);
+
+				        		processed = processed.replace(/(;|\})/g, highlight.newlines);
+				        		processed = processed.replace(/(.*?)\{/g, highlight.selector);
+				        		processed = processed.replace(/^.*;$/gm, highlight.tabs);
+				        		processed = processed.replace(/\}\n\n\}/g, '}\n}');
+
+				        		output.innerHTML = processed;
+				        	}
+
+				        	break;
+				        }
+					}
+				}
+
+				editor.addEventListener('keydown', input);
+
+				editor.addEventListener('keyup', function (e) {
+					if (e.keyCode !== 9) {
+						input(e);
+					}
+				});
+
+				input({keyCode: 219, shiftKey: true});
+			})();
+		</script>
 	</body>
 </html>
