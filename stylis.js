@@ -27,7 +27,7 @@
 
 
 	/**
-	 * css compiler
+	 * css preprocessor
 	 *
 	 * @example stylis('.foo', 'css...', true, true, null);
 	 * 
