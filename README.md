@@ -27,7 +27,7 @@
 
 
 ```html
-<script src=https://unpkg.com/stylis@1.0.7/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@1.0.8/stylis.min.js></script>
 ```
 
 #### npm

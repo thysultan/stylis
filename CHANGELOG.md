@@ -1,3 +1,7 @@
+## 1.0.8 (February 08, 2016)
+
+- patch prefix `-ms-flexbox`
+
 ## 1.0.7 (February 06, 2016)
 
 - patch selectors in nested block
