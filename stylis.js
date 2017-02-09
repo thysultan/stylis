@@ -999,9 +999,9 @@
 				}
 				// not `\t` tab character
 				else if (code !== 9) {
-					if (comment === 2) {
+					if (comment === 2 && comments === 1) {
 						comment = comments = 0;
-						buff = buff.substring(0, buff.indexOf('/*')).trim();
+						buff.substring(0, buff.indexOf('/*')).trim();
 					}
 
 					switch (code) {
