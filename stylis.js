@@ -991,8 +991,7 @@
 							}
 						}
 
-						comments = 0;
-						comment = 0;
+						comment = comments = 0;
 					}
 
 					column = 0;
@@ -1000,6 +999,11 @@
 				}
 				// not `\t` tab character
 				else if (code !== 9) {
+					if (comment === 2) {
+						comment = comments = 0;
+						buff = buff.substring(0, buff.indexOf('/*')).trim();
+					}
+
 					switch (code) {
 						// " character
 						case 34: {

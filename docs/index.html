@@ -19,9 +19,8 @@
 				</div>
 				<div class="nav">
 					<ul>
-						<li>
-							<a href="https://github.com/thysultan/stylis.js">Github</a>
-						</li>
+						<li><a href="https://github.com/thysultan/stylis.js">Github</a></li>
+						<li><a href="https://npmjs.com/package/stylis">NPM</a></li>
 					</ul>
 				</div>
 			</div>
@@ -32,6 +31,8 @@
 				<div class="code">
 					<div spellcheck=false>
 <pre contenteditable id=editor>
+/* @namespace .user */
+
 :global(h1) {
 	font-size: 22px;
 }
@@ -42,6 +43,12 @@ div {
 	h1 {
 		color: red;
 	} 
+}
+
+@media {
+	h1 {
+		color: red;
+	}
 }
 </pre>
 <pre id=output>
@@ -71,8 +78,6 @@ h1 {
 			(function () {
 				var editor = document.getElementById('editor');
 				var output = document.getElementById('output');
-				var namespace = '#namespace';
-				var timeStamp = 0;
 
 				// simple syntax highlighter
 				var highlight = {
@@ -82,67 +87,62 @@ h1 {
 					newlines: function (match, group) {
 						return group + (group === '}' ? '\n\n' : '\n');
 					},
-					value: function () {
-
+					value: function (match, group) {
+						return ': <span class=value>' + group.trim() + '</span>;';
 					},
 					selector: function (match, group) {
 						return '<span class=selector>' + group.trim() + '</span> {\n';
+					},
+					block: function (match, group1, group2, group3) {
+						return group1 + group2.split('\n').join('\n\t') + group3;
 					}
 				};
 
-				function input (e) {
-					var keyCode = e.keyCode;
-					var shiftKey = e.shiftKey;
+				function refresh (e) {
+					if (e.keyCode === 9) {
+						e.preventDefault();
 
-					switch (keyCode) {
-						// \t
-						case 9: {
-							e.preventDefault();
+			            var selection = window.getSelection();
+			            var range = selection.getRangeAt(0); 
+			            var text = document.createTextNode('\t');
 
-				            var selection = window.getSelection();
-				            var range = selection.getRangeAt(0); 
-				            var text = document.createTextNode('\t');
+			            range.deleteContents(); 
+			            range.insertNode(text);
+			            range.setStartAfter(text);
+			            selection.removeAllRanges();
+			            selection.addRange(range);
 
-				            range.deleteContents(); 
-				            range.insertNode(text);
-				            range.setStartAfter(text);
-				            selection.removeAllRanges();
-				            selection.addRange(range);
-
-				            break;
-				        }
-				        // ;
-				        case 186:
-				        // {
-				        case 219:
-				        // } 
-				        case 221: {
-				        	if (keyCode !== 186 && shiftKey || keyCode === 186 && !shiftKey) {
-				        		var raw = editor.textContent;
-				        		var processed = stylis('#namespace', raw, true, true, null);
-
-				        		processed = processed.replace(/(;|\})/g, highlight.newlines);
-				        		processed = processed.replace(/(.*?)\{/g, highlight.selector);
-				        		processed = processed.replace(/^.*;$/gm, highlight.tabs);
-				        		processed = processed.replace(/\}\n\n\}/g, '}\n}');
-
-				        		output.innerHTML = processed;
-				        	}
-
-				        	break;
-				        }
+			            return;
 					}
+
+					var namespace = '#namespace';
+					var raw = editor.textContent;
+					var pragma = /\/\*.*@namespace (.*) \*\//g.exec(raw);
+
+					if (pragma != null) {
+						namespace = pragma[1].trim();
+					}
+
+					var processed = stylis(namespace, raw, true, true, null);
+
+					processed = processed.replace(/(;|\})/g, highlight.newlines);
+					processed = processed.replace(/(.*?)\{/g, highlight.selector);
+					processed = processed.replace(/:(.*);/g, highlight.value);
+					processed = processed.replace(/^.*;$/gm, highlight.tabs);
+					processed = processed.replace(/\}\n\n\}/g, '}\n}');
+					processed = processed.replace(/(.*@.*\{)([^\0]+\})(\n\})/g, highlight.block);
+
+					output.innerHTML = processed;
 				}
 
-				editor.addEventListener('keydown', input);
+				function input (e) {
+					refresh(e);
+				}
 
-				editor.addEventListener('keyup', function (e) {
-					if (e.keyCode !== 9) {
-						input(e);
-					}
-				});
+				editor.addEventListener('keydown', refresh);
+				editor.addEventListener('input', input);
 
-				input({keyCode: 219, shiftKey: true});
+				refresh({keyCode: 219, shiftKey: true});
 			})();
 		</script>
 	</body>

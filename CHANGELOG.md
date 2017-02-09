@@ -1,3 +1,8 @@
+## 1.0.9 (February 09, 2016)
+
+- patch inline-block comments
+- follow a property-value format for `display: flex;` prefix
+
 ## 1.0.8 (February 08, 2016)
 
 - patch prefix `-ms-flexbox`
