@@ -117,3 +117,7 @@ span.selector {
 span.value {
 	color: #C41913;
 }
+
+span.string {
+	color: #007400;
+}

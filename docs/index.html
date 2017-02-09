@@ -33,6 +33,12 @@
 <pre contenteditable id=editor>
 /* @namespace .user */
 
+~~logo: 'logo.svg';
+
+.logo {
+	background-url: url(var(~~logo));
+}
+
 :global(h1) {
 	font-size: 22px;
 }
@@ -72,78 +78,8 @@ h1 {
 			</div>
 		</div>
 		
-		<script src="https://unpkg.com/stylis@1.0.9/stylis.min.js"></script>
-	
-		<script>
-			(function () {
-				var editor = document.getElementById('editor');
-				var output = document.getElementById('output');
-
-				// simple syntax highlighter
-				var highlight = {
-					tabs: function (match) {
-						return '\t' + match;
-					},
-					newlines: function (match, group) {
-						return group + (group === '}' ? '\n\n' : '\n');
-					},
-					value: function (match, group) {
-						return ': <span class=value>' + group.trim() + '</span>;';
-					},
-					selector: function (match, group) {
-						return '<span class=selector>' + group.trim() + '</span> {\n';
-					},
-					block: function (match, group1, group2, group3) {
-						return group1 + group2.split('\n').join('\n\t') + group3;
-					}
-				};
-
-				function refresh (e) {
-					if (e.keyCode === 9) {
-						e.preventDefault();
-
-			            var selection = window.getSelection();
-			            var range = selection.getRangeAt(0); 
-			            var text = document.createTextNode('\t');
-
-			            range.deleteContents(); 
-			            range.insertNode(text);
-			            range.setStartAfter(text);
-			            selection.removeAllRanges();
-			            selection.addRange(range);
-
-			            return;
-					}
-
-					var namespace = '#namespace';
-					var raw = editor.textContent;
-					var pragma = /\/\*.*@namespace (.*) \*\//g.exec(raw);
-
-					if (pragma != null) {
-						namespace = pragma[1].trim();
-					}
-
-					var processed = stylis(namespace, raw, true, true, null);
-
-					processed = processed.replace(/(;|\})/g, highlight.newlines);
-					processed = processed.replace(/(.*?)\{/g, highlight.selector);
-					processed = processed.replace(/:(.*);/g, highlight.value);
-					processed = processed.replace(/^.*;$/gm, highlight.tabs);
-					processed = processed.replace(/\}\n\n\}/g, '}\n}');
-					processed = processed.replace(/(.*@.*\{)([^\0]+\})(\n\})/g, highlight.block);
-
-					output.innerHTML = processed;
-				}
-
-				function input (e) {
-					refresh(e);
-				}
-
-				editor.addEventListener('keydown', refresh);
-				editor.addEventListener('input', input);
-
-				refresh({keyCode: 219, shiftKey: true});
-			})();
-		</script>
+		<script src=../stylis.js></script>
+		<!-- <script src="https://unpkg.com/stylis@1.0.10/stylis.min.js"></script> -->
+		<script src="assets/editor.js"></script>
 	</body>
 </html>

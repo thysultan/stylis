@@ -141,6 +141,15 @@
 		var mixins;
 		var mixin;
 
+		// context(flat) signatures
+		var levels = 0;
+		var level = 0;
+
+		// prefixes
+		var moz = '-moz-';
+		var ms = '-ms-';
+		var webkit = '-webkit-';
+
 		// buffers
 		var buff = '';
 		var blob = '';
@@ -153,20 +162,14 @@
 		var special = 0;
 		var close = 0;
 		var closed = 0;
-		var comment = 0;
-		var comments = 0;
 		var strings = 0;
 		var nested = 0;
 		var func = 0;
 
-		// context(flat) signatures
-		var levels = 0;
-		var level = 0;
-
-		// prefixes
-		var moz = '-moz-';
-		var ms = '-ms-';
-		var webkit = '-webkit-';
+		// comments
+		var comment = 0;
+		var blockComment = 0;
+		var lineComment = 0;
 
 		if (use) {
 			temp = middleware(0, styles, line, column);
@@ -191,7 +194,7 @@
 			code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
-			if (strings === 0 && func === 0 && (code === 123 || code === 125 || code === 59)) {
+			if (strings === 0 && func === 0 && comment === 0 && (code === 123 || code === 125 || code === 59)) {
 				buff += styles.charAt(caret);
 
 				first = buff.charCodeAt(0);
@@ -221,15 +224,8 @@
 					}
 				}
 
-				// ignore comments
-				if (comment === 2) {
-					if (code === 125) {
-						comment = 0;
-					}
-					buff = ''; 
-				}
 				// @, special block
-				else if (first === 64) {
+				if (first === 64) {
 					// push flat css
 					if (levels === 1 && flat.length !== 0) {
 						levels = 0;
@@ -423,17 +419,15 @@
 						special++;
 					}
 				}
-				// ~, ; variables
-				else if (compact === true && code === 59 && first === 126 && second === 126) {
-					colon = buff.indexOf(':');
-
+				// ;, ~, ~ variables
+				else if (compact === true && code === 59 && first === 126 && second === 126 && (colon = buff.indexOf(':')) !== -1) {
 					// first match create variables store 
 					if (variables === void 0) {
 						variables = [];
 					}
 
 					// push key value pair
-					variables[variables.length] = [buff.substring(0, colon), buff.substring(colon+1, buff.length - 1).trim()];
+					variables[variables.length] = [buff.substring(0, colon), buff.substring(colon + 1, buff.length - 1).trim()];
 
 					// reset buffer
 					buff = '';
@@ -454,7 +448,7 @@
 						// right hand side everything after `:` /* @type string[] */
 						var anims = buff.substring(colon).trim().split(',');
 
-						// - short hand animation syntax
+						// short hand animation syntax
 						if (animations === true && (buff.charCodeAt(9) || 0) !== 45) {
 							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
 							for (var j = 0, length = anims.length; j < length; j++) {
@@ -933,7 +927,7 @@
 				buff = '';
 
 				// add blck buffer to output
-				if (code === 125 && comment === 0 && (type === 0 || type === 4)) {					
+				if (code === 125 && (type === 0 || type === 4)) {					
 					// append if the block is not empty {}
 					if (blck.charCodeAt(blck.length-2) !== 123) {
 						// middleware, block context
@@ -975,23 +969,9 @@
 			else {
 				// \r, \n, new lines
 				if (code === 13 || code === 10) {
-					// ignore line and block comments
-					if (comment === 2) {
-						// * character, block comment
-						if (buff.charCodeAt(buff.length - 2) === 42) {
-							buff = buff.substring(0, buff.indexOf('/*')).trim();
-						}
-						else {
-							// / character, does not start with `/`
-							if (buff.charCodeAt(0) !== 47 && (indexOf = buff.indexOf('//')) !== -1) {
-								buff = buff.substring(0, indexOf).trim();
-							}
-							else {
-								buff = '';
-							}
-						}
-
-						comment = comments = 0;
+					if (lineComment === 1) {
+						comment = lineComment = 0;
+						buff = buff.substring(0, buff.indexOf('//'));
 					}
 
 					column = 0;
@@ -999,10 +979,8 @@
 				}
 				// not `\t` tab character
 				else if (code !== 9) {
-					if (comment === 2 && comments === 1) {
-						comment = comments = 0;
-						buff.substring(0, buff.indexOf('/*')).trim();
-					}
+					// build line buffer
+					buff += styles.charAt(caret);
 
 					switch (code) {
 						// " character
@@ -1033,23 +1011,32 @@
 						}
 						// / character
 						case 47: {
-							if (strings === 0 && func !== 1 && comment < 2) {
-								// * character
-								if (comments === 0 || styles.charCodeAt(caret - 1) === 42) {
-									comment++;				
+							if (strings === 0 && func === 0) {
+								// /, begin line comment
+								if (blockComment === 0 && styles.charCodeAt(caret - 1) === 47) {
+									comment = lineComment = 1;
 								}
-
-								// * character, allow line comments in block comments
-								if (comments === 0 && styles.charCodeAt(caret + 1) === 42) {
-									comments = 1;
+								// *, end block comment
+								else if (styles.charCodeAt(caret - 1) === 42) {
+									comment = blockComment = 0;
+									buff = buff.substring(0, buff.indexOf('/*'));
 								}
 							}
+
+							break;
+						}
+						// * character
+						case 42: {
+							if (strings === 0 && func === 0 && lineComment === 0 && blockComment === 0) {
+								// /, begin block comment
+								if (styles.charCodeAt(caret - 1) === 47) {
+									comment = blockComment = 1;
+								}
+							}
+
 							break;
 						}
 					}
-
-					// build line buffer
-					buff += styles.charAt(caret);
 				}
 			}
 

@@ -76,20 +76,20 @@ var tests = {
 			 * removes block comments and line comments
 			 */
 
-			 button /*
+			button /*
 			 	// what
 
 			 	xxx
 			  */
-			 {color: blue;}
+			{color: blue;}
 
 			 
-			 // hello
+			// hello
 
-			 button /* 1 */
-			 {
-			   color: red; /* 2 */
-			 }
+			button /* 1 */
+			{
+				color: red; /* 2 */
+			}
 		`,
 		expected: '.user button {color: blue;}.user button {color: red;}'
 	},

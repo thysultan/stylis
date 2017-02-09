@@ -1,3 +1,7 @@
+## 1.0.10 (February 09, 2016)
+
+- patch block comments
+
 ## 1.0.9 (February 09, 2016)
 
 - patch inline-block comments
