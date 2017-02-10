@@ -2,7 +2,7 @@
 	"name": "stylis",
 	"main": "stylis.js",
 	"description": "stylis is a feature-rich css preprocessor",
-	"version": "1.0.10",
+	"version": "1.1.0",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {

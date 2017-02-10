@@ -172,7 +172,7 @@
 		var lineComment = 0;
 
 		if (use) {
-			temp = middleware(0, styles, line, column);
+			temp = middleware(0, styles, line, column, prefix);
 			
 			if (temp != null) {
 				styles = temp;
@@ -210,17 +210,17 @@
 
 				// middleware, selector/property context, }
 				if (use && code !== 125) {
-					// { selector context
+					// { pre-processed selector context
 					if (code === 123) {
-						temp = middleware(1, buff.substring(0, buff.length - 1).trim(), line, column);
+						temp = middleware(1, buff.substring(0, buff.length - 1).trim(), line, column, prefix);
 					} 
 					// ; property context
 					else {
-						temp = middleware(2, buff, line, column);
+						temp = middleware(2, buff, line, column, prefix);
 					}
 
 					if (temp != null) {
-						buff = code === 123 ? temp + '{' : temp;
+						buff = code === 123 ? temp + ' {' : temp;
 					}
 				}
 
@@ -233,7 +233,7 @@
 
 						// middleware, flat context
 						if (use) {
-							temp = middleware(4, flat, line, column);
+							temp = middleware(4, flat, line, column, prefix);
 						
 							if (temp != null) {
 								flat = temp;
@@ -401,7 +401,7 @@
 
 							if (match !== null) {
 								// middleware, import context
-								buff = middleware(5, match[1].replace(/['"; ]/g, ''), line, column) || '';
+								buff = middleware(5, match[1].replace(/['"; ]/g, ''), line, column, prefix) || '';
 
 								if (buff) {
 									// create block and update styles length
@@ -641,7 +641,7 @@
 
 							// middleware, flat context
 							if (use) {
-								temp = middleware(4, flat, line, column);
+								temp = middleware(4, flat, line, column, prefix);
 							
 								if (temp != null) {
 									flat = temp;
@@ -817,6 +817,20 @@
 										}
 									}
 
+									// middleware, post-processed selector context
+									if (use) {
+										temp = middleware(1.5, 
+											j === length - 1 ? selector.substring(0, selector.length-1).trim() : selector, 
+											line, 
+											column,
+											prefix
+										);
+
+										if (temp != null) {
+											selector = j === length - 1 ? temp + ' {' : temp;
+										}
+									}
+
 									// if first selector do not prefix with `,`
 									build += (j === 0 ? selector : ',' + selector);
 								}
@@ -932,7 +946,7 @@
 					if (blck.charCodeAt(blck.length-2) !== 123) {
 						// middleware, block context
 						if (use && blck.length !== 0) {
-							temp = middleware(3, blck, line, column);
+							temp = middleware(3, blck, line, column, prefix);
 
 							if (temp != null) {
 								blck = temp;
@@ -947,7 +961,7 @@
 					if (type === 4) {
 						// middleware, block context
 						if (use) {
-							temp = middleware(3, media, line, column);
+							temp = middleware(3, media, line, column, prefix);
 
 							if (temp != null) {
 								media = temp;
@@ -1053,7 +1067,7 @@
 
 			// middleware, flat context
 			if (use) {
-				temp = middleware(4, flat, line, column);
+				temp = middleware(4, flat, line, column, prefix);
 			
 				if (temp != null) {
 					flat = temp;
@@ -1074,7 +1088,7 @@
 
 		// middleware, output context
 		if (use) {
-			temp = middleware(6, output, line, column);
+			temp = middleware(6, output, line, column, prefix);
 		
 			if (temp != null) {
 				output = temp;

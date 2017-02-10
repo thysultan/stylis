@@ -463,8 +463,8 @@ var tests = {
 			h1 { color: red; }
 		`,
 		expected: '.user {color: blue;/* property */}/* flat */'+
-		'.user .imported/* selector */{color: orange;/* property */}/* block */'+
-		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
+		'.user .imported/* selector */ {color: orange;/* property */}/* block */'+
+		'.user h1/* selector */ {color: red;/* property */}/* block *//* output */'
 	},
 	'urls': {
 		name: 'urls',

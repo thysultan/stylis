@@ -9,6 +9,26 @@
 <body>
 	<script>
 		(function () {
+function middleware (ctx, str, line, col, prefix) {
+	if (ctx === 1.5) {
+		if (str.indexOf(prefix) === 0) {
+			return str.replace(prefix, '') + prefix;
+		}
+	}
+}
+
+			var css = `
+				h1, h2, :global(p) {
+					color: red;
+				}
+			`;
+
+			var output = stylis(`.abc`, css, true, true, middleware);
+
+			console.log(output);
+
+			return;
+
 			console.log(
 				stylis('.abc', `
 

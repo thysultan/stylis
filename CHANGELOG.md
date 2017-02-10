@@ -1,3 +1,7 @@
+## 1.1.0 (February 10, 2016)
+
+- add middleware context `ctx = 1.5` for every item in a selector
+
 ## 1.0.10 (February 09, 2016)
 
 - patch block comments

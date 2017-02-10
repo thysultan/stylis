@@ -31,7 +31,7 @@ stylis is a feature-rich css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@1.0.10/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@1.1.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -309,12 +309,13 @@ stylis.use(
 The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed at 4 stages.
 
 1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
-2. at every selector declaration `ctx = 1` i.e `.class` / `.foo, .bar`
-3. at every property declaration `ctx = 2` i.e `color: red;`
-4. before a block of compiled css is added to the output string `ctx = 3`, i.e `.class {color:red;}`
-5. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
-6. When an `import` statement is found `ctx = 5`, i.e `import 'foo'`
-7. before the compiled css output is returned `ctx = 6`
+2. at every selector declaration pre-processed `ctx = 1` i.e `.class` / `.foo, .bar`
+3. at every selector post-processed `ctx = 1.5` i.e `.prefix.foo`
+4. at every property declaration `ctx = 2` i.e `color: red;`
+5. before a block of compiled css is added to the output string `ctx = 3`, i.e `.class {color:red;}`
+6. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
+7. When an `import` statement is found `ctx = 5`, i.e `import 'foo'`
+8. before the compiled css output is returned `ctx = 6`
 
 If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
 
