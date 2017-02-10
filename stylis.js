@@ -35,15 +35,17 @@
 	 * @param  {string}   styles     - css string
 	 * @param  {boolean=} animations - prefix animations and keyframes, true by default
 	 * @param  {boolean=} compact    - enable additional features(mixins and variables)
-	 * @param  {function(context, content, line, column)=} middleware
+	 * @param  {function(context, content, line, column, namespace)=} middleware
 	 * @return {string}
 	 */
 	function stylis (selector, styles, animations, compact, middleware) {
-		// to string
+		/* @type {string} */
 		selector += '';
 
 		var prefix = '';
 		var namespace = '';
+
+		/* @type {number} */
 		var type = selector.charCodeAt(0) || 0;
 		
 		var char;
@@ -107,11 +109,11 @@
 
 		// plugins
 		if ((plugins = stylis.plugins).length !== 0) {
-			middleware = function (ctx, str, line, col) {
+			middleware = plugins.length === 1 ? plugins[0] : function (ctx, str, line, col) {
 				var output = str;
 
 				for (var i = 0, length = plugins.length; i < length; i++) {
-					output = plugins[i](ctx, output, line, col) || output;
+					output = plugins[i](ctx, output, line, col, prefix) || output;
 				}
 
 				return output !== str ? output : void 0;
@@ -141,10 +143,6 @@
 		var mixins;
 		var mixin;
 
-		// context(flat) signatures
-		var levels = 0;
-		var level = 0;
-
 		// prefixes
 		var moz = '-moz-';
 		var ms = '-ms-';
@@ -156,6 +154,8 @@
 		var blck = '';
 		var nest = '';
 		var flat = '';
+
+		// character code
 		var code = 0;
 
 		// context signatures		
@@ -165,6 +165,10 @@
 		var strings = 0;
 		var nested = 0;
 		var func = 0;
+
+		// context(flat) signatures
+		var levels = 0;
+		var level = 0;
 
 		// comments
 		var comment = 0;
@@ -191,6 +195,7 @@
 
 		// parse + compile
 		while (caret < eof) {
+			/* @type {number} */
 			code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
@@ -262,7 +267,9 @@
 						// @mixin
 						if (compact === true && third === 105) {
 							// first match create mixin store
-							mixins === void 0 && (mixins = {});
+							if (mixins === void 0) {
+								mixins = {};
+							}
 
 							// retrieve mixin identifier
 							blob = (mixin = buff.substring(7, buff.indexOf('{')) + ' ').trim();
@@ -405,7 +412,7 @@
 
 								if (buff) {
 									// create block and update styles length
-									styles = styles.substring(0, caret+1) + buff + styles.substring(caret+1);
+									styles = styles.substring(0, caret + 1) + buff + styles.substring(caret+1);
 									eof += buff.length;
 								}
 
@@ -555,7 +562,12 @@
 							temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
 
 							// vendor prefix
-							buff = 'display: '+webkit+temp+'box;display: '+webkit+temp+'flex;display: '+ms+'flexbox;display: '+temp+'flex;';
+							buff = (
+								'display: '+webkit+temp+'box;'+
+								'display: '+webkit+temp+'flex;'+
+								'display: '+ms+'flexbox;'+
+								'display: '+temp+'flex;'
+							);
 						}
 					}
 					// transforms & transitions: t, r, a 
@@ -819,7 +831,8 @@
 
 									// middleware, post-processed selector context
 									if (use) {
-										temp = middleware(1.5, 
+										temp = middleware(
+											1.5, 
 											j === length - 1 ? selector.substring(0, selector.length-1).trim() : selector, 
 											line, 
 											column,
@@ -991,74 +1004,76 @@
 					column = 0;
 					line++;
 				}
-				// not `\t` tab character
-				else if (code !== 9) {
-					// build line buffer
-					buff += styles.charAt(caret);
+				else {
+					// not `\t` tab character
+					if (code !== 9) {
+						// build line buffer
+						buff += styles.charAt(caret);
 
-					switch (code) {
-						// " character
-						case 34: {
-							// exit string " context / enter string context
-							strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
-							break;
-						}
-						// ' character
-						case 39: {
-							// exit string ' context / enter string context
-							strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
-							break;
-						}
-						// ( character
-						case 40: {
-							if (strings === 0) {
-								func = 1;
+						switch (code) {
+							// " character
+							case 34: {
+								// exit string " context / enter string context
+								strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
+								break;
 							}
-							break;
-						}
-						// ) character
-						case 41: {
-							if (strings === 0) {
-								func = 0;
+							// ' character
+							case 39: {
+								// exit string ' context / enter string context
+								strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
+								break;
 							}
-							break;
-						}
-						// / character
-						case 47: {
-							if (strings === 0 && func === 0) {
-								// /, begin line comment
-								if (blockComment === 0 && styles.charCodeAt(caret - 1) === 47) {
-									comment = lineComment = 1;
+							// ( character
+							case 40: {
+								if (strings === 0) {
+									func = 1;
 								}
-								// *, end block comment
-								else if (styles.charCodeAt(caret - 1) === 42) {
-									comment = blockComment = 0;
-									buff = buff.substring(0, buff.indexOf('/*'));
-								}
+								break;
 							}
+							// ) character
+							case 41: {
+								if (strings === 0) {
+									func = 0;
+								}
+								break;
+							}
+							// / character
+							case 47: {
+								if (strings === 0 && func === 0) {
+									// /, begin line comment
+									if (blockComment === 0 && styles.charCodeAt(caret - 1) === 47) {
+										comment = lineComment = 1;
+									}
+									// *, end block comment
+									else if (styles.charCodeAt(caret - 1) === 42) {
+										comment = blockComment = 0;
+										buff = buff.substring(0, buff.indexOf('/*'));
+									}
+								}
 
-							break;
-						}
-						// * character
-						case 42: {
-							if (strings === 0 && func === 0 && lineComment === 0 && blockComment === 0) {
-								// /, begin block comment
-								if (styles.charCodeAt(caret - 1) === 47) {
-									comment = blockComment = 1;
-								}
+								break;
 							}
+							// * character
+							case 42: {
+								if (strings === 0 && func === 0 && lineComment === 0 && blockComment === 0) {
+									// /, begin block comment
+									if (styles.charCodeAt(caret - 1) === 47) {
+										comment = blockComment = 1;
+									}
+								}
 
-							break;
+								break;
+							}
 						}
 					}
+
+					// move column position
+					column++;
 				}
 			}
 
 			// move caret position
 			caret++;
-
-			// move column position
-			column++;
 		}
 
 		// trailing flat css
@@ -1124,7 +1139,7 @@
 			}
 			// array of plugins
 			else if (plugin.constructor === Array) {
-				for (var i = 0, length = plugin.length; i < length; i++) {
+				for (var i = 0, len = plugin.length; i < len; i++) {
 					plugins[length++] = plugin[i];
 				}
 			}

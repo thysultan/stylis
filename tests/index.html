@@ -9,21 +9,33 @@
 <body>
 	<script>
 		(function () {
-function middleware (ctx, str, line, col, prefix) {
-	if (ctx === 1.5) {
-		if (str.indexOf(prefix) === 0) {
-			return str.replace(prefix, '') + prefix;
-		}
-	}
-}
+			function middleware (ctx, str, line, col, prefix) {
+				if (ctx === 1.5) {
+					if (str.indexOf(prefix+' ') === 0) {
+						var pos = (str = str.substring(prefix.length).replace('&', '').trim()).indexOf(' ');
+
+						return pos !== -1 ? str.substring(0, pos) + prefix + str.substring(pos) : str + prefix;
+					}
+				}
+			}
 
 			var css = `
-				h1, h2, :global(p) {
+				h1 h2, h2:hover h2, :global(p), &:hover {
 					color: red;
 				}
+
+				// div {
+				// 	display: flex;
+
+				// 	h1 {
+				// 		color: red;
+				// 	} 
+				// }
 			`;
 
-			var output = stylis(`.abc`, css, true, true, middleware);
+			stylis.use(middleware);
+
+			var output = stylis(`[data-jsx="4145527016"]`, css, true, true, null);
 
 			console.log(output);
 
@@ -427,6 +439,6 @@ function middleware (ctx, str, line, col, prefix) {
 		})();
 	</script>
 
-	<script src='./index.js'></script>
+	<!-- <script src='./index.js'></script> -->
 </body>
 </html>

@@ -4,7 +4,7 @@
 
 stylis is a feature-rich css preprocessor
 
-- ~3Kb minified+gzipped
+- ~3Kb
 
 [![npm](https://img.shields.io/npm/v/stylis.svg?style=flat)](https://www.npmjs.com/package/stylis) [![licence](https://img.shields.io/badge/licence-MIT-blue.svg?style=flat)](https://github.com/thysultan/stylis.js/blob/master/LICENSE.md) [![Build Status](https://semaphoreci.com/api/v1/thysultan/stylis-js/branches/master/shields_badge.svg)](https://semaphoreci.com/thysultan/stylis-js) ![dependencies](https://img.shields.io/badge/dependencies-none-green.svg?style=flat)
 
@@ -306,7 +306,7 @@ stylis.use(
 
 ## Middleware
 
-The optional middleware function accepts four arguments `ctx, str, line, column`, the middleware is executed at 4 stages.
+The optional middleware function accepts four arguments `ctx, str, line, column, namespace`, the middleware is executed at 4 stages.
 
 1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
 2. at every selector declaration pre-processed `ctx = 1` i.e `.class` / `.foo, .bar`
@@ -323,9 +323,9 @@ If at any context point the middleware returns a non-falsey value the token or b
 
 
 ```javascript
-stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column) {
+stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column, namespace) {
     switch (ctx) {
-        // str will be `width: calc(random()*10);`
+        // 2: property declaration, str will be `width: calc(random()*10);`
         case 2: return str.replace(/random\(\)/g, Math.random());
     }
 });
