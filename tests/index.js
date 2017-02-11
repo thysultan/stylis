@@ -96,11 +96,15 @@ var tests = {
 	'&': {
 		name: '&',
 		sample: `
-			&{
+			& {
 				color: blue;
 			}
+
+			&&& {
+				color: red;
+			}
 		`,
-		expected: '.user{color: blue;}'
+		expected: '.user {color: blue;}.user.user.user {color: red;}'
 	},
 	'&:before': {
 		name: '&:before',
@@ -144,10 +148,16 @@ var tests = {
 		name: 'prefixer',
 		sample: `
 			& {
+				display: flex;
 			    transform: rotate(30deg);
+			    cursor: grab;
 			}
 		`,
-		expected: `.user {-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);}`
+		expected: `.user {`+
+			`display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex;`+
+			`-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);`+
+			`cursor: -webkit-grab;cursor: -moz-grab;cursor: grab;`+
+			`}`
 	},
 	'animations': {
 		name: 'animations',
@@ -302,6 +312,14 @@ var tests = {
 	'nested': {
 		name: 'nested',
 		sample: `
+			.foo & {
+			    width: 1px;
+
+			    &:hover {
+			        color: black;
+			    }
+			}
+
 			h1, div {
 				color: red;
 
@@ -335,7 +353,8 @@ var tests = {
 				}
 			}
 		`,
-		expected: '.user h1,.user div {color: red;color: blue;}'+
+		expected: `.foo .user {width: 1px;}.foo .user:hover {color: black;}`+
+		'.user h1,.user div {color: red;color: blue;}'+
 		'@media {.user h1 {color: red;}.user div {color: red;}}'+
 		'.user h1 h2,.user h1:before,.user div h2,'+
 		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'+

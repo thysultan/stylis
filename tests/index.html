@@ -10,11 +10,17 @@
 	<script>
 		(function () {
 			console.log(stylis('.abc', `
-				.root-wrapper & {
-				    width: 1px;
+				// h1, div {
+				// 	color: red;
 
-				    cursor: grab;
-				    cursor: zoom-in;
+				// 	h2, 
+				// 	&:before {
+				// 		color: red;
+				// 	}
+				// }
+
+				.root & {
+				    width: 1px;
 
 				    &:hover {
 				        color: black;
@@ -470,6 +476,6 @@ function middleware (ctx, str, line, col, prefix) {
 		})();
 	</script>
 
-	<!-- <script src='./index.js'></script> -->
+	<script src='./index.js'></script>
 </body>
 </html>

@@ -254,7 +254,7 @@
 						// k, @keyframes
 						if (second === 107) {
 							blob = buff.substring(1, 11) + animns + buff.substring(11);
-							buff = '@'+webkit+blob;
+							buff = '@' + webkit + blob;
 							type = 1;
 						}
 						// g, @global
@@ -727,15 +727,12 @@
 											selector = selector + ' ' + sel;
 										}
 
-										prevSelector[j] += selector.trim() + (k === l - 1  ? '' : ',');
+										prevSelector[j] += selector.replace(/ +&/, '').trim() + (k === l - 1  ? '' : ',');
 									}
 								}
 
-								// the `new line` is to avoid conflicts when the last line is a // line comment
-								buff = ('\n' + prevSelector.join(',') + ' {'+inner+'}');
-
-								// append nest
-								nest += buff.replace(/ +&/g, '');
+								// append nest, `\n` to avoid conflicts when the last line is a // line comment
+								nest += '\n' + prevSelector.join(',') + ' {'+inner+'}';
 
 								// signature
 								nested = 1;
