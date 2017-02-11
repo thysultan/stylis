@@ -1,3 +1,8 @@
+## 1.1.1 (February 11, 2016)
+
+- prefix `cursor: grab|grabbing|zoom-in|zoom-out;`
+- allow `&` to be used as specifity multiplier `&&` when used in conjunction
+
 ## 1.1.0 (February 10, 2016)
 
 - add middleware context `ctx = 1.5` for every individual selector

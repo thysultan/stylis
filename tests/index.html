@@ -9,18 +9,49 @@
 <body>
 	<script>
 		(function () {
-			function middleware (ctx, str, line, col, prefix) {
-				if (ctx === 1.5) {
-					if (str.indexOf(prefix+' ') === 0) {
-						var pos = (str = str.substring(prefix.length).replace('&', '').trim()).indexOf(' ');
+			console.log(stylis('.abc', `
+				.root-wrapper & {
+				    width: 1px;
 
-						return pos !== -1 ? str.substring(0, pos) + prefix + str.substring(pos) : str + prefix;
-					}
+				    cursor: grab;
+				    cursor: zoom-in;
+
+				    &:hover {
+				        color: black;
+				    }
 				}
+			`))
+
+			return;
+
+function middleware (ctx, str, line, col, prefix) {
+	if (ctx === 1.5) {
+		if (str.indexOf(prefix+' ') === 0) {
+			str = str.substring(prefix.length).trim();
+
+			var pos = str.indexOf(' ');
+
+			if (pos !== -1) {
+				var parts = str.split(' ');
+
+				for (var i = 0; i < parts.length; i++) {
+					var part = parts[i];
+					pos = part.indexOf(':');
+
+					parts[i] = pos !== -1 ? part.substring(0, pos) + prefix + part.substring(pos) : part + prefix;
+				}
+
+				return parts.join(' ');
 			}
+			else {
+				return str + prefix;
+			}
+		}
+	}
+}
 
 			var css = `
-				h1 h2, h2:hover h2, :global(p), &:hover {
+				h1 h2, h2:hover h2, :global(p), &:hover, & {
 					color: red;
 				}
 

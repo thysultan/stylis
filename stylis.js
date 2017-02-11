@@ -642,6 +642,14 @@
 							}
 						}
 					}
+					// cursor, c, u, r
+					else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
+						buff = (
+							buff.replace(/: +/g, ': ' + webkit) + 
+							buff.replace(/: +/g, ': ' + moz) +  
+							buff
+						);
+					}
 					// { character, selector declaration
 					else if (code === 123) {
 						depth++;
@@ -769,9 +777,15 @@
 
 									// &
 									if (firstChar === 38) {
-										// before: & {
-										selector = prefix + selector.substring(1);
-										// after: ${prefix} {
+										// before: & { / &&... {
+										// & character
+										if (selector.charCodeAt(1) === 38) {
+											selector = selector.replace(/&/g, prefix);
+										}
+										else {
+											selector = prefix + selector.substring(1);
+										}										
+										// after: ${prefix} { / ${prefix}${prefix}...
 									}
 									else {
 										// default to :global if & exist outside of the first non-space character
