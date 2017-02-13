@@ -468,11 +468,10 @@
 						// left hand side everything before `:`
 						build = buff.substring(0, colon);
 
-						// right hand side everything after `:` /* @type string[] */
-						var anims = buff.substring(colon).trim().split(',');
-
 						// short hand animation syntax
 						if (animations === true && (buff.charCodeAt(9) || 0) !== 45) {
+							var anims = buff.substring(colon).trim().split(',');
+
 							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
 							for (var j = 0, length = anims.length; j < length; j++) {
 								var anim = anims[j];
@@ -555,7 +554,10 @@
 						// explicit syntax, anims array should have only one elemenet
 						else {
 							// n
-							build += ((buff.charCodeAt(10) || 0) !== 110 ? '' : animns) + anims[0].trim();
+							build += ( 
+								((buff.charCodeAt(10) || 0) !== 110 ? '' : animns) + 
+								buff.substring(colon).trim().trim()
+							);
 						}
 
 						// vendor prefix

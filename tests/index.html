@@ -8,7 +8,21 @@
 </head>
 <body>
 	<script>
+		// disableTests = true;
+
 		(function () {
+
+			console.log(
+				stylis(`.abc`, `
+					.logo {
+						animation: 1s slidein cubic-bezier(0.1,0.7,1.0,0.1);
+						animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
+					}
+				`)
+			)
+
+			return;
+
 			console.log(
 				stylis('.abc', `
 					@custom-selector:--button button, .button;

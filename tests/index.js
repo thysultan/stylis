@@ -211,6 +211,7 @@ var tests = {
       			animation-duration: 0.6s;
       			animation-name: slidein;
       			animation-iteration-count: infinite;
+      			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
 		    }
 		`,
 		expected: 
@@ -233,8 +234,11 @@ var tests = {
 
 		`}`+
 
-		`.user span {-webkit-animation-duration:0.6s;animation-duration:0.6s;-webkit-animation-name:userslidein;`+
-			`animation-name:userslidein;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}`
+		`.user span {`+
+			`-webkit-animation-duration:0.6s;animation-duration:0.6s;-webkit-animation-name:userslidein;`+
+			`animation-name:userslidein;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;`+
+			`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
+		`}`
 	},
 	'animations disabled prefix': {
 		options: {
@@ -593,4 +597,6 @@ function run (tests) {
 /**
  * execute tests
  */
-run(tests);
+if (typeof disableTests !== 'boolean') {
+	run(tests);
+}

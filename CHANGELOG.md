@@ -1,3 +1,7 @@
+## 1.1.3 (February 13, 2016)
+
+- patch `cubic-bezier`
+
 ## 1.1.2 (February 13, 2016)
 
 - patch `@font-face {}`
