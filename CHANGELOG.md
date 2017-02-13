@@ -1,3 +1,7 @@
+## 1.1.2 (February 13, 2016)
+
+- patch `@font-face {}`
+
 ## 1.1.1 (February 11, 2016)
 
 - prefix `cursor: grab|grabbing|zoom-in|zoom-out;`

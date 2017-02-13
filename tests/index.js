@@ -132,6 +132,16 @@ var tests = {
 		`,
 		expected: `@media (max-width: 600px) {.user {color: red;}.user h1 {color: red;}.user h1 h2 {color: blue;}.user {display: none;}}`
 	},
+	'@font-face': {
+		name: '@font-face',
+		sample: `
+			@font-face { 
+				font-family: Pangolin; 
+				src: url('Pangolin-Regular.ttf') format('truetype');
+			}
+		`,
+		expected: `@font-face {font-family: Pangolin;src: url('Pangolin-Regular.ttf') format('truetype');}`
+	},
 	'multiple selectors': {
 		name: 'multiple selectors',
 		sample: `

@@ -137,7 +137,8 @@
 		var sel;
 
 		// variables
-		var variables;
+		var vars;
+		var varlen;
 
 		// mixins
 		var mixins;
@@ -172,8 +173,8 @@
 
 		// comments
 		var comment = 0;
-		var blockComment = 0;
-		var lineComment = 0;
+		var comblck = 0;
+		var comline = 0;
 
 		if (use) {
 			temp = middleware(0, styles, line, column, prefix);
@@ -249,102 +250,105 @@
 						flat = '';
 					}
 
-					// @keyframe/@global, `k` or @global, `g` character
-					if (second === 107 || second === 103) {
-						// k, @keyframes
-						if (second === 107) {
-							blob = buff.substring(1, 11) + animns + buff.substring(11);
-							buff = '@' + webkit + blob;
-							type = 1;
-						}
-						// g, @global
-						else {
-							buff = '';
-						}
-					}
-					// @media/@mixin `m` character
-					else if (second === 109) {
-						// @mixin
-						if (compact === true && third === 105) {
-							// first match create mixin store
-							if (mixins === void 0) {
-								mixins = {};
+					// ;
+					if (code !== 59) {
+						// @keyframe/@global, `k` or @global, `g` character
+						if (second === 107 || second === 103) {
+							// k, @keyframes
+							if (second === 107) {
+								blob = buff.substring(1, 11) + animns + buff.substring(11);
+								buff = '@' + webkit + blob;
+								type = 1;
 							}
-
-							// retrieve mixin identifier
-							blob = (mixin = buff.substring(7, buff.indexOf('{')) + ' ').trim();
-
-							// cache current mixin name
-							mixin = mixin.substring(0, mixin.indexOf(' ')).trim();
-
-							// append mixin identifier
-							mixins[mixin] = {key: blob.trim(), body: ''};
-
-							type = 3;
-							buff = '';
-							blob = '';
-						}
-						// @media
-						else if (third === 101) {
-							// nested
-							if (depth !== 0) {
-								// discard first character {
-								caret++;
-								
-								media = '';
-								inner = '';
-								selectors = prev.split(',');
-
-								// keep track of opening `{` and `}` occurrences
-								closed = 1;
-
-								// travel to the end of the block
-								while (caret < eof) {
-									char = styles.charCodeAt(caret);
-
-									// {, }, nested blocks may have nested blocks
-									if (char === 123) {
-										closed++;
-									}
-									else if (char === 125) {
-										closed--;
-									}
-
-									// break when the nested block has ended
-									if (closed === 0) {
-										break;
-									}
-
-									// build content of nested block
-									inner += styles.charAt(caret++);
-								}
-
-								for (var i = 0, length = selectors.length; i < length; i++) {
-									selector = selectors[i];
-
-									// build media block
-									media += stylis(
-										// remove { on last selector
-										(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
-										inner, 
-										animations, 
-										compact, 
-										middleware
-									);
-								}
-
-								media = buff + media + '}';
-								buff = '';
-								type = 4;
-							}
-							// top-level
+							// g, @global
 							else {
-								type = 2;
+								buff = '';
 							}
 						}
-						// unknown
-						else {
-							type = 6;
+						// @media/@mixin `m` character
+						else if (second === 109) {
+							// @mixin
+							if (compact === true && third === 105) {
+								// first match create mixin store
+								if (mixins === void 0) {
+									mixins = {};
+								}
+
+								// retrieve mixin identifier
+								blob = (mixin = buff.substring(7, buff.indexOf('{')) + ' ').trim();
+
+								// cache current mixin name
+								mixin = mixin.substring(0, mixin.indexOf(' ')).trim();
+
+								// append mixin identifier
+								mixins[mixin] = {key: blob.trim(), body: ''};
+
+								type = 3;
+								buff = '';
+								blob = '';
+							}
+							// @media
+							else if (third === 101) {
+								// nested
+								if (depth !== 0) {
+									// discard first character {
+									caret++;
+									
+									media = '';
+									inner = '';
+									selectors = prev.split(',');
+
+									// keep track of opening `{` and `}` occurrences
+									closed = 1;
+
+									// travel to the end of the block
+									while (caret < eof) {
+										char = styles.charCodeAt(caret);
+
+										// {, }, nested blocks may have nested blocks
+										if (char === 123) {
+											closed++;
+										}
+										else if (char === 125) {
+											closed--;
+										}
+
+										// break when the nested block has ended
+										if (closed === 0) {
+											break;
+										}
+
+										// build content of nested block
+										inner += styles.charAt(caret++);
+									}
+
+									for (var i = 0, length = selectors.length; i < length; i++) {
+										selector = selectors[i];
+
+										// build media block
+										media += stylis(
+											// remove { on last selector
+											(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
+											inner, 
+											animations, 
+											compact, 
+											middleware
+										);
+									}
+
+									media = buff + media + '}';
+									buff = '';
+									type = 4;
+								}
+								// top-level
+								else {
+									type = 2;
+								}
+							}
+							// unknown
+							else {
+								type = 6;
+							}
 						}
 					}
 
@@ -420,21 +424,33 @@
 							}
 						}
 					}
-					// flag special, i.e @keyframes, @global
-					else if (type !== 4) {
+					// flag special, i.e @keyframes, @global, @font-face ...
+					else if (type !== 4 && code !== 59) {
+						// k, g, m
+						if (second !== 107 && second !== 103 && second !== 109) {
+							type = 5;
+						}
+
 						close = -1;
 						special++;
 					}
 				}
-				// ;, ~, ~ variables
-				else if (compact === true && code === 59 && first === 126 && second === 126 && (colon = buff.indexOf(':')) !== -1) {
+				// ~, ~, ; variables
+				else if (
+					compact === true && 
+					first === 126 && 
+					second === 126 && 
+					code === 59 && 
+					(colon = buff.indexOf(':')) !== -1
+				) {
 					// first match create variables store 
-					if (variables === void 0) {
-						variables = [];
+					if (varlen === void 0) {
+						vars = [];
+						varlen = 0;
 					}
 
 					// push key value pair
-					variables[variables.length] = [buff.substring(0, colon), buff.substring(colon + 1, buff.length - 1).trim()];
+					vars[varlen++] = [buff.substring(0, colon), buff.substring(colon + 1, buff.length - 1).trim()];
 
 					// reset buffer
 					buff = '';
@@ -691,10 +707,11 @@
 								while (caret < eof) {
 									char = styles.charCodeAt(caret);
 
-									// {, }, nested blocks may have nested blocks
+									// {, nested blocks may have nested blocks
 									if (char === 123) {
 										closed++;
 									}
+									// },
 									else if (char === 125) {
 										closed--;
 									}
@@ -967,7 +984,7 @@
 				// add blck buffer to output
 				if (code === 125 && (type === 0 || type === 4)) {					
 					// append if the block is not empty {}
-					if (blck.charCodeAt(blck.length-2) !== 123) {
+					if (blck.charCodeAt(blck.length - 2) !== 123) {
 						// middleware, block context
 						if (use && blck.length !== 0) {
 							temp = middleware(3, blck, line, column, prefix);
@@ -1007,8 +1024,8 @@
 			else {
 				// \r, \n, new lines
 				if (code === 13 || code === 10) {
-					if (lineComment === 1) {
-						comment = lineComment = 0;
+					if (comline === 1) {
+						comment = comline = 0;
 						buff = buff.substring(0, buff.indexOf('//'));
 					}
 
@@ -1052,12 +1069,12 @@
 							case 47: {
 								if (strings === 0 && func === 0) {
 									// /, begin line comment
-									if (blockComment === 0 && styles.charCodeAt(caret - 1) === 47) {
-										comment = lineComment = 1;
+									if (comblck === 0 && styles.charCodeAt(caret - 1) === 47) {
+										comment = comline = 1;
 									}
 									// *, end block comment
 									else if (styles.charCodeAt(caret - 1) === 42) {
-										comment = blockComment = 0;
+										comment = comblck = 0;
 										buff = buff.substring(0, buff.indexOf('/*'));
 									}
 								}
@@ -1066,10 +1083,10 @@
 							}
 							// * character
 							case 42: {
-								if (strings === 0 && func === 0 && lineComment === 0 && blockComment === 0) {
+								if (strings === 0 && func === 0 && comline === 0 && comblck === 0) {
 									// /, begin block comment
 									if (styles.charCodeAt(caret - 1) === 47) {
-										comment = blockComment = 1;
+										comment = comblck = 1;
 									}
 								}
 
@@ -1105,10 +1122,10 @@
 		}
 
 		// has variables
-		if (compact && variables !== void 0) {
+		if (compact && vars !== void 0) {
 			// replace all variables
-			for (var i = 0, length = variables.length; i < length; i++) {
-				output = output.replace(new RegExp('var\\('+variables[i][0]+'\\)', 'g'), variables[i][1]);
+			for (var i = 0; i < varlen; i++) {
+				output = output.replace(new RegExp('var\\(' + vars[i][0]+'\\)', 'g'), vars[i][1]);
 			}
 		}
 

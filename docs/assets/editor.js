@@ -60,7 +60,7 @@
 		processed = processed.replace(/^.*;$/gm, format.tabs);
 		processed = processed.replace(/\}\n\n\}/g, '}\n}');
 		processed = processed.replace(/(.*@.*\{)([^\0]+\})(\n\})/g, format.block);
-		processed = processed.replace(/['"`].*['"`]/g, format.string);
+		processed = processed.replace(/['"`].*?['"`]/g, format.string);
 
 		output.innerHTML = processed;
 	}

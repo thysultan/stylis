@@ -9,7 +9,29 @@
 <body>
 	<script>
 		(function () {
+			console.log(
+				stylis('.abc', `
+					@custom-selector:--button button, .button;
+					@custom-selector:--enter :hover, :focus;
+
+					:--button {
+						color: red;
+					}
+
+					:--button:--enter {
+						color: red;
+					}
+				`, true, true, null)
+			)
+
+			// return;
+
 			console.log(stylis('.abc', `
+				@font-face { 
+					font-family: Pangolin; 
+					src: url('Pangolin-Regular.ttf') format('truetype');
+				}
+
 				// h1, div {
 				// 	color: red;
 
@@ -19,16 +41,16 @@
 				// 	}
 				// }
 
-				.root & {
-				    width: 1px;
+				// .root & {
+				//     width: 1px;
 
-				    &:hover {
-				        color: black;
-				    }
-				}
+				//     &:hover {
+				//         color: black;
+				//     }
+				// }
 			`))
 
-			return;
+			// return;
 
 function middleware (ctx, str, line, col, prefix) {
 	if (ctx === 1.5) {
