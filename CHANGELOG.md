@@ -1,3 +1,7 @@
+## 1.1.5 (February 16, 2016)
+
+- patch nesting in `@global {}` block
+
 ## 1.1.4 (February 16, 2016)
 
 - patch `@global`

@@ -692,197 +692,198 @@
 							flat = '';
 						}
 
-						if (glob === 0 && (special === 0 || type === 2)) {
-							// nested selector
-							if (depth === 2) {
-								// discard first character {
-								caret++;
+						// nested selector
+						if (depth === 2) {
+							// discard first character {
+							caret++;
 
-								// inner content of block
-								inner = '';
+							// inner content of block
+							inner = '';
 
-								var nestSelector = buff.substring(0, buff.length-1).split(',');
-								var prevSelector = prev.substring(0, prev.length-1).split(',');
+							var nestSelector = buff.substring(0, buff.length-1).split(',');
+							var prevSelector = prev.substring(0, prev.length-1).split(',');
 
-								// keep track of opening `{` and `}` occurrences
-								closed = 1;
+							// keep track of opening `{` and `}` occurrences
+							closed = 1;
 
-								// travel to the end of the block
-								while (caret < eof) {
-									char = styles.charCodeAt(caret);
+							// travel to the end of the block
+							while (caret < eof) {
+								char = styles.charCodeAt(caret);
 
-									// {, nested blocks may have nested blocks
-									if (char === 123) {
-										closed++;
-									}
-									// },
-									else if (char === 125) {
-										closed--;
-									}
-
-									// break when the nested block has ended
-									if (closed === 0) {
-										break;
-									}
-
-									// build content of nested block
-									inner += styles.charAt(caret++);
+								// {, nested blocks may have nested blocks
+								if (char === 123) {
+									closed++;
+								}
+								// },
+								else if (char === 125) {
+									closed--;
 								}
 
-								// handle multiple selectors: h1, h2 { div, h4 {} } should generate
-								// -> h1 div, h2 div, h2 h4, h2 div {}
-								for (var j = 0, length = prevSelector.length; j < length; j++) {
-									// extract value, prep index for reuse
-									temp = prevSelector[j];
-									prevSelector[j] = '';
-
-									// since there could also be multiple nested selectors
-									for (var k = 0, l = nestSelector.length; k < l; k++) {
-										selector = temp.replace(prefix, '&').trim();
-										sel = nestSelector[k].trim();
-
-										if (sel.indexOf(' &') > 0) {
-											selector = sel.replace('&', '').trim() + ' ' + selector;
-										}
-										else {
-											selector = selector + ' ' + sel;
-										}
-
-										prevSelector[j] += selector.replace(/ +&/, '').trim() + (k === l - 1  ? '' : ',');
-									}
+								// break when the nested block has ended
+								if (closed === 0) {
+									break;
 								}
 
-								// append nest, `\n` to avoid conflicts when the last line is a // line comment
-								nest += '\n' + prevSelector.join(',') + ' {'+inner+'}';
-
-								// signature
-								nested = 1;
-
-								// clear current line, to avoid adding nested blocks to the normal flow
-								buff = '';
-
-								// decreament depth
-								depth--;
+								// build content of nested block
+								inner += styles.charAt(caret++);
 							}
-							// top-level selector
-							else {
-								selectors = buff.split(',');
-								build = '';
 
-								// prefix multiple selectors with namesapces
-								// @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
-								for (var j = 0, length = selectors.length; j < length; j++) {
-									var firstChar = (selector = selectors[j]).charCodeAt(0);
+							// handle multiple selectors: h1, h2 { div, h4 {} } should generate
+							// -> h1 div, h2 div, h2 h4, h2 div {}
+							for (var j = 0, length = prevSelector.length; j < length; j++) {
+								// extract value, prep index for reuse
+								temp = prevSelector[j];
+								prevSelector[j] = '';
 
-									// ` `, trim if first character is a space
-									if (firstChar === 32) {
-										firstChar = (selector = selector.trim()).charCodeAt(0);
-									}
+								// since there could also be multiple nested selectors
+								for (var k = 0, l = nestSelector.length; k < l; k++) {
+									selector = temp.replace(prefix, '&').trim();
+									sel = nestSelector[k].trim();
 
-									// [, [title="a,b,..."]
-									if (firstChar === 91 && selector.indexOf(']') === -1) {
-										for (var k = j + 1, l = length; k < l; k++) {
-											var broken = (selector += ',' + selectors[k]).trim();
-
-											// ], end
-											if (broken.indexOf(']') !== -1) {
-												length -= k;
-												selectors.splice(j, k);
-												break;
-											}
-										}
-									}
-
-									// &
-									if (firstChar === 38) {
-										// before: & { / &&... {
-										// & character
-										if (selector.charCodeAt(1) === 38) {
-											selector = selector.replace(/&/g, prefix);
-										}
-										else {
-											selector = prefix + selector.substring(1);
-										}										
-										// after: ${prefix} { / ${prefix}${prefix}...
+									if (sel.indexOf(' &') > 0) {
+										selector = sel.replace('&', '').trim() + ' ' + selector;
 									}
 									else {
-										// default to :global if & exist outside of the first non-space character
-										if ((indexOf = selector.indexOf(' &')) > 0) {
-											// `:`
-											firstChar = 58;
-											// before: html & {
-											selector = ':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf);
-											// after: html ${prefix} {
+										selector = selector + ' ' + sel;
+									}
+
+									prevSelector[j] += selector.replace(/ +&/, '').trim() + (k === l - 1  ? '' : ',');
+								}
+							}
+
+							// append nest, `\n` to avoid conflicts when the last line is a // line comment
+							nest += '\n' + prevSelector.join(',') + ' {'+inner+'}';
+
+							// signature
+							nested = 1;
+
+							// clear current line, to avoid adding nested blocks to the normal flow
+							buff = '';
+
+							// decreament depth
+							depth--;
+						}
+						// top-level selector
+						else if (glob === 0 && (special === 0 || type === 2)) {
+							selectors = buff.split(',');
+							build = '';
+
+							// prefix multiple selectors with namesapces
+							// @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
+							for (var j = 0, length = selectors.length; j < length; j++) {
+								var firstChar = (selector = selectors[j]).charCodeAt(0);
+
+								// ` `, trim if first character is a space
+								if (firstChar === 32) {
+									firstChar = (selector = selector.trim()).charCodeAt(0);
+								}
+
+								// [, [title="a,b,..."]
+								if (firstChar === 91 && selector.indexOf(']') === -1) {
+									for (var k = j + 1, l = length; k < l; k++) {
+										var broken = (selector += ',' + selectors[k]).trim();
+
+										// ], end
+										if (broken.indexOf(']') !== -1) {
+											length -= k;
+											selectors.splice(j, k);
+											break;
 										}
+									}
+								}
 
-										// :
-										if (firstChar === 58) {
-											var secondChar = selector.charCodeAt(1);
+								// &
+								if (firstChar === 38) {
+									// before: & { / &&... {
+									// & character
+									if (selector.charCodeAt(1) === 38) {
+										selector = selector.replace(/&/g, prefix);
+									}
+									else {
+										selector = prefix + selector.substring(1);
+									}										
+									// after: ${prefix} { / ${prefix}${prefix}...
+								}
+								else {
+									// default to :global if & exist outside of the first non-space character
+									if ((indexOf = selector.indexOf(' &')) > 0) {
+										// `:`
+										firstChar = 58;
+										// before: html & {
+										selector = ':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf);
+										// after: html ${prefix} {
+									}
 
-											// h, t, :host
-											if (secondChar === 104 && selector.charCodeAt(4) === 116) {
-												var nextChar = (selector = selector.substring(5)).charCodeAt(0);
+									// :
+									if (firstChar === 58) {
+										var secondChar = selector.charCodeAt(1);
 
-												// :host(selector)                    
-												if (nextChar === 40) {
-													// before: `(selector)`
-													selector = prefix + selector.substring(1).replace(')', '');
-													// after: ${prefx} selector {
-												}
-												// :host-context(selector)
-												else if (nextChar === 45) {
-													indexOf = selector.indexOf(')');
+										// h, t, :host
+										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
+											var nextChar = (selector = selector.substring(5)).charCodeAt(0);
 
-													// before: `-context(selector)`
-													selector = (
-														selector.substring(9, indexOf)+' '+prefix+selector.substring(indexOf+1)
-													);
-													// after: selector ${prefix} {
-												}
-												// :host
-												else {
-													selector = prefix + selector;
-												}
+											// :host(selector)                    
+											if (nextChar === 40) {
+												// before: `(selector)`
+												selector = prefix + selector.substring(1).replace(')', '');
+												// after: ${prefx} selector {
 											}
-											// g, :global(selector)
-											else if (secondChar === 103) {
-												// before: `:global(selector)`
-												selector = selector.substring(8).replace(')', '').replace('&', prefix);
-												// after: selector
+											// :host-context(selector)
+											else if (nextChar === 45) {
+												indexOf = selector.indexOf(')');
+
+												// before: `-context(selector)`
+												selector = (
+													selector.substring(9, indexOf)+' '+prefix+selector.substring(indexOf+1)
+												);
+												// after: selector ${prefix} {
 											}
-											// :hover, :active, :focus, etc...
+											// :host
 											else {
 												selector = prefix + selector;
 											}
 										}
-										// non-pseudo selectors
+										// g, :global(selector)
+										else if (secondChar === 103) {
+											// before: `:global(selector)`
+											selector = selector.substring(8).replace(')', '').replace('&', prefix);
+											// after: selector
+										}
+										// :hover, :active, :focus, etc...
 										else {
-											selector = prefix + ' ' + selector;
+											selector = prefix + selector;
 										}
 									}
-
-									// middleware, post-processed selector context
-									if (use) {
-										temp = middleware(
-											1.5, 
-											j === length - 1 ? selector.substring(0, selector.length-1).trim() : selector, 
-											line, 
-											column,
-											prefix
-										);
-
-										if (temp != null) {
-											selector = j === length - 1 ? temp + ' {' : temp;
-										}
+									// non-pseudo selectors
+									else {
+										selector = prefix + ' ' + selector;
 									}
-
-									// if first selector do not prefix with `,`
-									build += (j === 0 ? selector : ',' + selector);
 								}
 
-								// cache current selector
-								prev = (buff = build);
+								// middleware, post-processed selector context
+								if (use) {
+									temp = middleware(
+										1.5, 
+										j === length - 1 ? selector.substring(0, selector.length-1).trim() : selector, 
+										line, 
+										column,
+										prefix
+									);
+
+									if (temp != null) {
+										selector = j === length - 1 ? temp + ' {' : temp;
+									}
+								}
+
+								// if first selector do not prefix with `,`
+								build += (j === 0 ? selector : ',' + selector);
 							}
+
+							// cache current selector
+							prev = (buff = build);
+						}
+						else {
+							prev = buff;
 						}
 					}
 					// } character
@@ -893,7 +894,7 @@
 
 						// concat nested css
 						if (depth === 0 && nested === 1) {
-							styles = styles.substring(0, caret+1) + nest + styles.substring(caret+1);
+							styles = styles.substring(0, caret + 1) + nest + styles.substring(caret + 1);
 							eof += nest.length;
 							nest = '';
 							nested = 0;
