@@ -49,6 +49,7 @@
 		var type = selector.charCodeAt(0) || 0;
 		
 		var char;
+		var chars;
 		var attr;
 		var animns;
 		var plugins;
@@ -57,13 +58,13 @@
 		// [ attr selector
 		if (type === 91) {
 			// `[data-id=namespace]` -> ['data-id', 'namespace']
-			attr = selector.substring(1, selector.length-1).split('=');
+			attr = selector.substring(1, selector.length - 1).split('=');
 			char = (namespace = attr[1]).charCodeAt(0);
 
 			// [data-id="namespace"]/[data-id='namespace']
 			// --> "namespace"/'namspace' --> namespace
 			if (char === 34 || char === 39) {
-				namespace = namespace.substring(1, namespace.length-1);
+				namespace = namespace.substring(1, namespace.length - 1);
 			}
 
 			prefix = '['+ attr[0] + '="' + namespace +'"]';
@@ -135,6 +136,8 @@
 		var second;
 		var third;
 		var sel;
+		var blob;
+		var nest;
 
 		// variables
 		var vars;
@@ -151,9 +154,7 @@
 
 		// buffers
 		var buff = '';
-		var blob = '';
 		var blck = '';
-		var nest = '';
 		var flat = '';
 
 		// character code
@@ -163,10 +164,11 @@
 		var special = 0;
 		var close = 0;
 		var closed = 0;
-		var strings = 0;
 		var nested = 0;
 		var func = 0;
 		var glob = 0;
+		var medias = 0;
+		var strings = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -295,8 +297,13 @@
 								if (depth !== 0) {
 									// discard first character {
 									caret++;
+									column++;
 									
-									media = '';
+									if (media === void 0) {
+										media = '';
+									}
+
+									temp = '';
 									inner = '';
 									selectors = prev.split(',');
 
@@ -322,13 +329,16 @@
 
 										// build content of nested block
 										inner += styles.charAt(caret++);
+
+										// move column and line position
+										column = (char === 13 || char === 10) ? (line++, 0) : column + 1; 
 									}
 
 									for (var i = 0, length = selectors.length; i < length; i++) {
 										selector = selectors[i];
 
 										// build media block
-										media += stylis(
+										temp += stylis(
 											// remove { on last selector
 											(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
 											inner, 
@@ -338,8 +348,9 @@
 										);
 									}
 
-									media = buff + media + '}';
+									media += buff + temp + '}';
 									buff = '';
+									medias = 1;
 									type = 4;
 								}
 								// top-level
@@ -370,7 +381,7 @@
 								var data = mixins[name];
 
 								// args passed to the mixin
-								var argsPassed = buff.substring(name.length+1, buff.length - 1).split(',');
+								var argsPassed = buff.substring(name.length + 1, buff.length - 1).split(',');
 
 								// args the mixin expects
 								var argsExpected = data.key.replace(name, '').replace(/\(|\)/g, '').trim().split(',');
@@ -696,12 +707,13 @@
 						if (depth === 2) {
 							// discard first character {
 							caret++;
+							column++;
 
 							// inner content of block
 							inner = '';
 
-							var nestSelector = buff.substring(0, buff.length-1).split(',');
-							var prevSelector = prev.substring(0, prev.length-1).split(',');
+							var nestSelector = buff.substring(0, buff.length - 1).split(',');
+							var prevSelector = prev.substring(0, prev.length - 1).split(',');
 
 							// keep track of opening `{` and `}` occurrences
 							closed = 1;
@@ -726,6 +738,9 @@
 
 								// build content of nested block
 								inner += styles.charAt(caret++);
+
+								// move column and line position
+								column = (char === 13 || char === 10) ? (line++, 0) : column + 1; 
 							}
 
 							// handle multiple selectors: h1, h2 { div, h4 {} } should generate
@@ -749,6 +764,10 @@
 
 									prevSelector[j] += selector.replace(/ +&/, '').trim() + (k === l - 1  ? '' : ',');
 								}
+							}
+
+							if (nest === void 0) {
+								nest = '';
 							}
 
 							// append nest, `\n` to avoid conflicts when the last line is a // line comment
@@ -864,7 +883,7 @@
 								if (use) {
 									temp = middleware(
 										1.5, 
-										j === length - 1 ? selector.substring(0, selector.length-1).trim() : selector, 
+										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector, 
 										line, 
 										column,
 										prefix
@@ -988,11 +1007,23 @@
 				buff = '';
 
 				// add blck buffer to output
-				if (code === 125 && (type === 0 || type === 4)) {					
-					// append if the block is not empty {}
-					if (blck.charCodeAt(blck.length - 2) !== 123) {
+				if (code === 125 && (type === 0 || type === 4)) {
+					chars = blck.charCodeAt(blck.length - 2);
+
+					if (type === 4) {
+						type = 0;
+					}
+
+					if (media !== void 0 && media.length !== 0) {
+						blck = chars === 123 ? media : blck + media;
+						media = '';
+						chars = 0;
+					}
+
+					// {, @
+					if (chars !== 123) {
 						// middleware, block context
-						if (use && blck.length !== 0) {
+						if (use) {
 							temp = middleware(3, blck, line, column, prefix);
 
 							if (temp != null) {
@@ -1001,30 +1032,12 @@
 						}
 
 						// append blck buffer
-						output += blck.trim();
-					}
-
-					// nested @media
-					if (type === 4) {
-						// middleware, block context
-						if (use) {
-							temp = middleware(3, media, line, column, prefix);
-
-							if (temp != null) {
-								media = temp;
-							}
-						}
-
-						// reset
-						type = 0;
-
-						// concat nested @media block
-						output += media;
+						output += blck;
 					}
 
 					// reset blck buffer
 					blck = '';
-				}
+				}				
 			}
 			// build line by line
 			else {

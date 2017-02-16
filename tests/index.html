@@ -126,42 +126,42 @@ if (ctx === 1.5) {
 // 	color: red;
 // }
 
-@global {
-	h1 {
-		color: red;
+// @global {
+// 	h1 {
+// 		color: red;
 
-		h2 {
-			color: blue;
-		}
-	}
-}
+// 		h2 {
+// 			color: blue;
+// 		}
+// 	}
+// }
 
-@global {
-	@media (min-width: 64em) {
-		html {font-size: 12px;}
-	}
+// @global {
+// 	@media (min-width: 64em) {
+// 		html {font-size: 12px;}
+// 	}
 
-	p {
-		color: red;
-	}
+// 	p {
+// 		color: red;
+// 	}
 
-	@media (min-width: 24em) {
-		html {font-size: 12px;}
-	}
+// 	@media (min-width: 24em) {
+// 		html {font-size: 12px;}
+// 	}
 
-	@keyframes {
-		0% {
-			color: red;
-		}
-		100% {
-			color: blue;
-		}
-	}
-}
+// 	@keyframes {
+// 		0% {
+// 			color: red;
+// 		}
+// 		100% {
+// 			color: blue;
+// 		}
+// 	}
+// }
 
-h1 {
-	color: red;
-}
+// h1 {
+// 	color: red;
+// }
 
 // h1 h2 {
 //   margin: auto
@@ -184,9 +184,29 @@ h1 {
 				// }
 			`;
 
+var css = `
+div {
+	h1 {
+		color: red;
+	}
+
+	@media (10px) {
+		h2 {
+			color: red;
+		}
+	}
+
+	@media (20px) {
+		h2 {
+			color: red;
+		}
+	}
+}
+`;
+
 			// stylis.use(middleware);
 
-			var output = stylis(`[data-jsx="123"]`, css, true, true, null);
+			var output = stylis(`.abc`, css, true, true, null);
 
 			console.log(output);
 

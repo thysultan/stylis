@@ -1,3 +1,8 @@
+## 1.1.6 (February 16, 2016)
+
+- patch `@media {}` in nested block
+- patch column and line number in nested block
+
 ## 1.1.5 (February 16, 2016)
 
 - patch nesting in `@global {}` block
