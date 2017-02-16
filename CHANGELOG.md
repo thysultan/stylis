@@ -1,3 +1,7 @@
+## 1.1.10 (February 16, 2016)
+
+- patch token in selector i.e `.test[title=","]`
+
 ## 1.1.9 (February 16, 2016)
 
 - patch arguments passed to middleware current `output` character count `length`

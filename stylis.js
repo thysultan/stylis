@@ -816,7 +816,7 @@
 								}
 
 								// [, [title="a,b,..."]
-								if (chars === 91 && selector.indexOf(']') === -1) {
+								if (/\[.+=/g.exec(selector) !== null && selector.indexOf(']') === -1) {
 									for (var k = j + 1, l = length; k < l; k++) {
 										var broken = (selector += ',' + selectors[k]).trim();
 
