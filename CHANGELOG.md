@@ -1,3 +1,7 @@
+## 1.1.8 (February 16, 2016)
+
+- patch `&` specifity overloaded, i.e `&&, & + &...`
+
 ## 1.1.7 (February 16, 2016)
 
 - patch `:global(:not())`, `&:global()` and `:global` in nested block

@@ -103,8 +103,12 @@ var tests = {
 			&&& {
 				color: red;
 			}
+
+			& + & {
+				color: red;
+			}
 		`,
-		expected: '.user {color: blue;}.user.user.user {color: red;}'
+		expected: '.user {color: blue;}.user.user.user {color: red;}.user + .user {color: red;}'
 	},
 	'&:before': {
 		name: '&:before',

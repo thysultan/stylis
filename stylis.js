@@ -818,17 +818,13 @@
 								// &
 								if (chars === 38) {
 									// before: & { / &&... {
-									// & character
-									if ((chars = selector.charCodeAt(1)) === 38) {
-										selector = selector.replace(/&/g, prefix);
-									}
 									// :, g, &:global()
-									else if (chars === 58 && selector.charCodeAt(2) === 103) {
+									if (chars === 58 && selector.charCodeAt(2) === 103) {
 										selector = selector.substring(1).replace(/:global\((.*)\)/g, '$1').replace(/&/g, prefix);
 									}
 									else {
-										selector = prefix + selector.substring(1);
-									}										
+										selector = prefix + selector.substring(1).replace(/&/g, prefix);
+									}								
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
 								else {
@@ -837,7 +833,9 @@
 										// `:`
 										chars = 58;
 										// before: html & {
-										selector = ':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf);
+										selector = (
+											':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
+										);
 										// after: html ${prefix} {
 									}
 
