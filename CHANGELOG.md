@@ -1,3 +1,7 @@
+## 1.1.4 (February 16, 2016)
+
+- patch `@global`
+
 ## 1.1.3 (February 13, 2016)
 
 - patch `cubic-bezier`

@@ -166,6 +166,7 @@
 		var strings = 0;
 		var nested = 0;
 		var func = 0;
+		var glob = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -256,12 +257,13 @@
 						if (second === 107 || second === 103) {
 							// k, @keyframes
 							if (second === 107) {
-								blob = buff.substring(1, 11) + animns + buff.substring(11);
+								blob = buff.substring(1, 11) + (glob === 0 ? animns : '') + buff.substring(11);
 								buff = '@' + webkit + blob;
 								type = 1;
 							}
 							// g, @global
 							else {
+								glob = 1;
 								buff = '';
 							}
 						}
@@ -690,7 +692,7 @@
 							flat = '';
 						}
 
-						if (special === 0 || type === 2) {
+						if (glob === 0 && (special === 0 || type === 2)) {
 							// nested selector
 							if (depth === 2) {
 								// discard first character {
@@ -921,6 +923,7 @@
 						if (close === 0) {
 							// @global
 							if (type === 0) {
+								glob = 0;
 								buff = '';
 							}
 							// @keyframes 

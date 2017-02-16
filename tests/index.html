@@ -8,82 +8,97 @@
 </head>
 <body>
 	<script>
-		// disableTests = true;
+		disableTests = true;
 
 		(function () {
 
-			console.log(
-				stylis(`.abc`, `
-					.logo {
-						animation: 1s slidein cubic-bezier(0.1,0.7,1.0,0.1);
-						animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
-					}
-				`)
-			)
-
-			return;
-
-			console.log(
-				stylis('.abc', `
-					@custom-selector:--button button, .button;
-					@custom-selector:--enter :hover, :focus;
-
-					:--button {
-						color: red;
-					}
-
-					:--button:--enter {
-						color: red;
-					}
-				`, true, true, null)
-			)
+			// console.log(
+			// 	stylis(`.abc`, `
+			// 		.logo {
+			// 			animation: 1s slidein cubic-bezier(0.1,0.7,1.0,0.1);
+			// 			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
+			// 		}
+			// 	`)
+			// )
 
 			// return;
 
-			console.log(stylis('.abc', `
-				@font-face { 
-					font-family: Pangolin; 
-					src: url('Pangolin-Regular.ttf') format('truetype');
-				}
+			// console.log(
+			// 	stylis('.abc', `
+			// 		@custom-selector:--button button, .button;
+			// 		@custom-selector:--enter :hover, :focus;
 
-				// h1, div {
-				// 	color: red;
+			// 		:--button {
+			// 			color: red;
+			// 		}
 
-				// 	h2, 
-				// 	&:before {
-				// 		color: red;
-				// 	}
-				// }
+			// 		:--button:--enter {
+			// 			color: red;
+			// 		}
+			// 	`, true, true, null)
+			// )
 
-				// .root & {
-				//     width: 1px;
+			// return;
 
-				//     &:hover {
-				//         color: black;
-				//     }
-				// }
-			`))
+			// console.log(stylis('.abc', `
+			// 	@font-face { 
+			// 		font-family: Pangolin; 
+			// 		src: url('Pangolin-Regular.ttf') format('truetype');
+			// 	}
+
+			// 	// h1, div {
+			// 	// 	color: red;
+
+			// 	// 	h2, 
+			// 	// 	&:before {
+			// 	// 		color: red;
+			// 	// 	}
+			// 	// }
+
+			// 	// .root & {
+			// 	//     width: 1px;
+
+			// 	//     &:hover {
+			// 	//         color: black;
+			// 	//     }
+			// 	// }
+			// `))
 
 			// return;
 
 function middleware (ctx, str, line, col, prefix) {
-	if (ctx === 1.5) {
-		if (str.indexOf(prefix+' ') === 0) {
-			str = str.substring(prefix.length).trim();
 
-			var pos = str.indexOf(' ');
+if (ctx === 1.5) {
+	// stylis does not prefix `:global()`
+	if (str.indexOf(prefix) === 0 && str.indexOf(' ') !== -1) {
+		// remove prefix
+		str = str.substring(prefix.length).trim();
 
-			if (pos !== -1) {
-				var parts = str.split(' ');
+		var indexOf;
 
-				for (var i = 0; i < parts.length; i++) {
-					var part = parts[i];
-					pos = part.indexOf(':');
-
-					parts[i] = pos !== -1 ? part.substring(0, pos) + prefix + part.substring(pos) : part + prefix;
+		// single selector
+		if (str.indexOf(' ') !== -1) {
+			return str.replace(/^[^ \t]*?\[.*?\]|[^ \n\r\t\+\~\>]+|.+\]/g, function (match) {
+				// :hover etc...
+				if ((indexOf = match.indexOf(':')) !== -1) {
+					// :global()
+					if (match.charCodeAt(indexOf+1) === 103) {
+						return match.replace(/:global\((.*)\)/g, '$1').trim();
+					}
+					else {
+						return match.substring(0, indexOf) + prefix + match.substring(indexOf);
+					}
 				}
+				else {
+					return match + prefix;
+				}
+			});
+		}
+		else {
+			console.log(1, str);
 
-				return parts.join(' ');
+			if ((indexOf = str.indexOf(':')) !== -1) {
+				return str.substring(0, indexOf) + prefix + str.substring(indexOf);
 			}
 			else {
 				return str + prefix;
@@ -92,10 +107,63 @@ function middleware (ctx, str, line, col, prefix) {
 	}
 }
 
+}
+
 			var css = `
-				h1 h2, h2:hover h2, :global(p), &:hover, & {
-					color: red;
-				}
+// p:hover {
+//   color: red;
+// }
+
+// p::before {
+//   color: red;
+// }
+
+// :hover p {
+//   color: red;
+// }
+
+// h1 :global(div:not(.foo)) {
+// 	color: red;
+// }
+
+@global {
+	@media (min-width: 64em) {
+		html {font-size: 12px;}
+	}
+
+	p {
+		color: red;
+	}
+
+	@media (min-width: 24em) {
+		html {font-size: 12px;}
+	}
+
+	@keyframes {
+		0% {
+			color: red;
+		}
+		100% {
+			color: blue;
+		}
+	}
+}
+
+h1 {
+	color: red;
+}
+
+// h1 h2 {
+//   margin: auto
+// }
+
+				// h1, h2:hover h2, span :global(p){
+				// 	color: red;
+				// }
+
+				// h1, [title="hello world"] {
+				// 	color: red;
+				// }
 
 				// div {
 				// 	display: flex;
@@ -106,9 +174,9 @@ function middleware (ctx, str, line, col, prefix) {
 				// }
 			`;
 
-			stylis.use(middleware);
+			// stylis.use(middleware);
 
-			var output = stylis(`[data-jsx="4145527016"]`, css, true, true, null);
+			var output = stylis(`[data-jsx="123"]`, css, true, true, null);
 
 			console.log(output);
 
