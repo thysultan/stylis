@@ -770,8 +770,12 @@
 								nest = '';
 							}
 
-							// append nest, `\n` to avoid conflicts when the last line is a // line comment
-							nest += '\n' + prevSelector.join(',') + ' {'+inner+'}';
+							// concat nest
+							nest += (
+								'\n' + 
+								prevSelector.join(',').replace(/(?:&| | .*):global\((.*)\)/g, ' $1') + 
+								' {'+inner+'}'
+							);
 
 							// signature
 							nested = 1;
@@ -790,15 +794,15 @@
 							// prefix multiple selectors with namesapces
 							// @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
 							for (var j = 0, length = selectors.length; j < length; j++) {
-								var firstChar = (selector = selectors[j]).charCodeAt(0);
+								chars = (selector = selectors[j]).charCodeAt(0);
 
 								// ` `, trim if first character is a space
-								if (firstChar === 32) {
-									firstChar = (selector = selector.trim()).charCodeAt(0);
+								if (chars === 32) {
+									chars = (selector = selector.trim()).charCodeAt(0);
 								}
 
 								// [, [title="a,b,..."]
-								if (firstChar === 91 && selector.indexOf(']') === -1) {
+								if (chars === 91 && selector.indexOf(']') === -1) {
 									for (var k = j + 1, l = length; k < l; k++) {
 										var broken = (selector += ',' + selectors[k]).trim();
 
@@ -812,11 +816,15 @@
 								}
 
 								// &
-								if (firstChar === 38) {
+								if (chars === 38) {
 									// before: & { / &&... {
 									// & character
-									if (selector.charCodeAt(1) === 38) {
+									if ((chars = selector.charCodeAt(1)) === 38) {
 										selector = selector.replace(/&/g, prefix);
+									}
+									// :, g, &:global()
+									else if (chars === 58 && selector.charCodeAt(2) === 103) {
+										selector = selector.substring(1).replace(/:global\((.*)\)/g, '$1').replace(/&/g, prefix);
 									}
 									else {
 										selector = prefix + selector.substring(1);
@@ -827,45 +835,41 @@
 									// default to :global if & exist outside of the first non-space character
 									if ((indexOf = selector.indexOf(' &')) > 0) {
 										// `:`
-										firstChar = 58;
+										chars = 58;
 										// before: html & {
 										selector = ':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf);
 										// after: html ${prefix} {
 									}
 
 									// :
-									if (firstChar === 58) {
+									if (chars === 58) {
 										var secondChar = selector.charCodeAt(1);
 
 										// h, t, :host
 										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
-											var nextChar = (selector = selector.substring(5)).charCodeAt(0);
+											var nextChar = selector.charCodeAt(5);
 
-											// :host(selector)                    
+											// (, :host(selector)                    
 											if (nextChar === 40) {
 												// before: `(selector)`
-												selector = prefix + selector.substring(1).replace(')', '');
+												selector = prefix + selector.replace(/:host\((.*)\)/g, '$1');
 												// after: ${prefx} selector {
 											}
-											// :host-context(selector)
+											// -, :host-context(selector)
 											else if (nextChar === 45) {
-												indexOf = selector.indexOf(')');
-
 												// before: `-context(selector)`
-												selector = (
-													selector.substring(9, indexOf)+' '+prefix+selector.substring(indexOf+1)
-												);
+												selector = selector.replace(/:host-context\((.*)\)/g, '$1 ' + prefix);
 												// after: selector ${prefix} {
 											}
 											// :host
 											else {
-												selector = prefix + selector;
+												selector = prefix + selector.substring(5);
 											}
 										}
 										// g, :global(selector)
 										else if (secondChar === 103) {
 											// before: `:global(selector)`
-											selector = selector.substring(8).replace(')', '').replace('&', prefix);
+											selector = selector.replace(/:global\((.*)\)/g, '$1').replace(/&/g, prefix);
 											// after: selector
 										}
 										// :hover, :active, :focus, etc...

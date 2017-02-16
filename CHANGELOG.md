@@ -1,3 +1,7 @@
+## 1.1.7 (February 16, 2016)
+
+- patch `:global(:not())`, `&:global()` and `:global` in nested block
+
 ## 1.1.6 (February 16, 2016)
 
 - patch `@media {}` in nested block

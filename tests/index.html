@@ -185,23 +185,45 @@ if (ctx === 1.5) {
 			`;
 
 var css = `
-div {
-	h1 {
-		color: red;
+a {
+	&:global(.active) {
+    	color: orange;
 	}
 
-	@media (10px) {
-		h2 {
-			color: red;
-		}
+	:global(.active) {
+    	color: red;
 	}
 
-	@media (20px) {
-		h2 {
-			color: red;
-		}
+	div:global(.active) {
+		color: blue;
 	}
 }
+
+// :host-context(body) { 
+// 	color: red; 
+// }
+
+// a, &:global(h1), :global(h1:not(foo)), :host-context(.foo), :host {
+// 	color: blue;
+// }
+
+// div {
+// 	h1 {
+// 		color: red;
+// 	}
+
+// 	@media (10px) {
+// 		h2 {
+// 			color: red;
+// 		}
+// 	}
+
+// 	@media (20px) {
+// 		h2 {
+// 			color: red;
+// 		}
+// 	}
+// }
 `;
 
 			// stylis.use(middleware);
