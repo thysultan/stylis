@@ -31,7 +31,7 @@ stylis is a feature-rich css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@1.1.8/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@1.1.9/stylis.min.js></script>
 ```
 
 #### npm
@@ -306,7 +306,7 @@ stylis.use(
 
 ## Middleware
 
-The optional middleware function accepts four arguments `ctx, str, line, column, namespace`, the middleware is executed at 4 stages.
+The optional middleware function accepts four arguments `ctx, str, line, column, namespace, length`, the middleware is executed at 4 stages.
 
 1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
 2. at every selector declaration pre-processed `ctx = 1` i.e `.class` / `.foo, .bar`
@@ -323,7 +323,7 @@ If at any context point the middleware returns a non-falsey value the token or b
 
 
 ```javascript
-stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column, namespace) {
+stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column, namespace, length) {
     switch (ctx) {
         // 2: property declaration, str will be `width: calc(random()*10);`
         case 2: return str.replace(/random\(\)/g, Math.random());

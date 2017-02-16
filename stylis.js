@@ -180,7 +180,7 @@
 		var comline = 0;
 
 		if (use) {
-			temp = middleware(0, styles, line, column, prefix);
+			temp = middleware(0, styles, line, column, prefix, 0);
 			
 			if (temp != null) {
 				styles = temp;
@@ -221,11 +221,18 @@
 				if (use && code !== 125) {
 					// { pre-processed selector context
 					if (code === 123) {
-						temp = middleware(1, buff.substring(0, buff.length - 1).trim(), line, column, prefix);
+						temp = middleware(
+							1, 
+							buff.substring(0, buff.length - 1).trim(), 
+							line, 
+							column, 
+							prefix, 
+							output.length
+						);
 					} 
 					// ; property context
 					else {
-						temp = middleware(2, buff, line, column, prefix);
+						temp = middleware(2, buff, line, column, prefix, output.length);
 					}
 
 					if (temp != null) {
@@ -242,7 +249,7 @@
 
 						// middleware, flat context
 						if (use) {
-							temp = middleware(4, flat, line, column, prefix);
+							temp = middleware(4, flat, line, column, prefix, output.length);
 						
 							if (temp != null) {
 								flat = temp;
@@ -425,7 +432,14 @@
 
 							if (match !== null) {
 								// middleware, import context
-								buff = middleware(5, match[1].replace(/['"; ]/g, ''), line, column, prefix) || '';
+								buff = middleware(
+									5, 
+									match[1].replace(/['"; ]/g, ''), 
+									line, 
+									column, 
+									prefix, 
+									output.length
+								) || '';
 
 								if (buff) {
 									// create block and update styles length
@@ -692,7 +706,7 @@
 
 							// middleware, flat context
 							if (use) {
-								temp = middleware(4, flat, line, column, prefix);
+								temp = middleware(4, flat, line, column, prefix, output.length);
 							
 								if (temp != null) {
 									flat = temp;
@@ -888,7 +902,8 @@
 										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector, 
 										line, 
 										column,
-										prefix
+										prefix,
+										output.length
 									);
 
 									if (temp != null) {
@@ -1026,7 +1041,7 @@
 					if (chars !== 123) {
 						// middleware, block context
 						if (use) {
-							temp = middleware(3, blck, line, column, prefix);
+							temp = middleware(3, blck, line, column, prefix, output.length);
 
 							if (temp != null) {
 								blck = temp;
@@ -1131,7 +1146,7 @@
 
 			// middleware, flat context
 			if (use) {
-				temp = middleware(4, flat, line, column, prefix);
+				temp = middleware(4, flat, line, column, prefix, output.length);
 			
 				if (temp != null) {
 					flat = temp;
@@ -1152,7 +1167,7 @@
 
 		// middleware, output context
 		if (use) {
-			temp = middleware(6, output, line, column, prefix);
+			temp = middleware(6, output, line, column, prefix, output.length);
 		
 			if (temp != null) {
 				output = temp;

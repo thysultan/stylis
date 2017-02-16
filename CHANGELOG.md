@@ -1,3 +1,7 @@
+## 1.1.9 (February 16, 2016)
+
+- patch arguments passed to middleware current `output` character count `length`
+
 ## 1.1.8 (February 16, 2016)
 
 - patch `&` specifity overloaded, i.e `&&, & + &...`
