@@ -1,0 +1,36 @@
+{
+	"name": "custom-selectors",
+	"main": "custom-selectors.js",
+	"description": "stylis plugin for @custom-selectors support",
+	"version": "0.1.0",
+	"homepage": "https://github.com/thysultan/stylis.js",
+	"license": "MIT",
+	"author": {
+		"name": "Sultan Tarimo",
+		"email": "sultantarimo@me.com"
+	},
+	"keywords": [
+		"stylis",
+		"plugin",
+		"shim",
+		"polyfill"
+		"@custom-selectors",
+		"custom-selectors"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/thysultan/stylis.js"
+	},
+	"bugs": {
+		"url": "https://github.com/thysultan/stylis.js/issues"
+	},
+	"scripts": {
+		"test": "node ./tests"
+	},
+	"files": [
+		"custom-selectors.js"
+	],
+	"devDependencies": {
+  		"stylis": "1.x"
+	}
+}
