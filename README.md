@@ -1,6 +1,6 @@
 # STYLIS
 
-[![stylis](https://thysultan.github.io/stylis.js/assets/logo.svg)](https://github.com/thysultan/stylis.js)
+[![stylis](https://stylis.js.org/assets/logo.svg)](https://github.com/thysultan/stylis.js)
 
 stylis is a feature-rich css preprocessor
 
