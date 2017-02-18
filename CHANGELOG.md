@@ -1,3 +1,7 @@
+## 1.1.11 (February 18, 2016)
+
+- patch `:matches(a, b, c)` and simplify `,` token handler
+
 ## 1.1.10 (February 16, 2016)
 
 - patch token in selector i.e `.test[title=","]`

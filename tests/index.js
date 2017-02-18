@@ -298,8 +298,8 @@ var tests = {
 			`@keyframes slidein `+
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
-	':host': {
-		name: ':host',
+	':host, :host(), :host-context': {
+		name: ':host, :host(), :host-context',
 		sample: `
 			color: red;
 			& { color: red; }
@@ -313,9 +313,13 @@ var tests = {
 		expected: '.user {color: red;}.user {color: red;}.user {color: red;}.user:hover {color: red;}.user.fancy {color: red;}'+
 			'body .user {color: red;}.user:root {color: red;}'
 	},
-	'[title="a,b"]': {
-		name: '[title="a,b"]',
+	'[title="a,b"] and :matches(a,b)': {
+		name: '[title="a,b"] and :matches(a,b)',
 		sample: `
+			.test:matches(a, b, c), .test {
+				color: blue;
+			}
+
 			.test[title=","] {
 				color: red;
 			}
@@ -329,7 +333,10 @@ var tests = {
 				color: red;
 			}
 		`,
-		expected: `.user .test[title=","] {color: red;}.user [title="a,b,c, something"],.user h1,.user [title="a,b,c"] {color: red}.user [title="a"],.user [title="b"] {color: red;}`
+		expected: `.user .test:matches(a, b, c),.user .test {color: blue;}`+
+		`.user .test[title=","] {color: red;}`+
+		`.user [title="a,b,c, something"],.user h1,.user [title="a,b,c"] {color: red}`+
+		`.user [title="a"],.user [title="b"] {color: red;}`
 	},
 	'nested': {
 		name: 'nested',

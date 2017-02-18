@@ -46,7 +46,7 @@
 		var namespace = '';
 
 		/* @type {number} */
-		var type = selector.charCodeAt(0) || 0;
+		var type = selector.charCodeAt(0);
 		
 		var char;
 		var chars;
@@ -206,17 +206,6 @@
 			if (strings === 0 && func === 0 && comment === 0 && (code === 123 || code === 125 || code === 59)) {
 				buff += styles.charAt(caret);
 
-				first = buff.charCodeAt(0);
-
-				// only trim when the first character is a space ` `
-				if (first === 32) {
-					first = (buff = buff.trim()).charCodeAt(0);
-				}
-
-				// default to 0 instead of NaN if there is no second/third character
-				second = buff.charCodeAt(1) || 0;
-				third = buff.charCodeAt(2) || 0;
-
 				// middleware, selector/property context, }
 				if (use && code !== 125) {
 					// { pre-processed selector context
@@ -239,6 +228,17 @@
 						buff = code === 123 ? temp + ' {' : temp;
 					}
 				}
+
+				first = buff.charCodeAt(0);
+
+				// only trim when the first character is a space ` `
+				if (first === 32) {
+					first = (buff = buff.trim()).charCodeAt(0);
+				}
+
+				// default to 0 instead of NaN if there is no second/third character
+				second = buff.charCodeAt(1);
+				third = buff.charCodeAt(2);
 
 				// @, special block
 				if (first === 64) {
@@ -312,7 +312,7 @@
 
 									temp = '';
 									inner = '';
-									selectors = prev.split(',');
+									selectors = prev.split(stylis.regex.split);
 
 									// keep track of opening `{` and `}` occurrences
 									closed = 1;
@@ -388,19 +388,19 @@
 								var data = mixins[name];
 
 								// args passed to the mixin
-								var argsPassed = buff.substring(name.length + 1, buff.length - 1).split(',');
+								var passed = buff.substring(name.length + 1, buff.length - 1).split(',');
 
 								// args the mixin expects
-								var argsExpected = data.key.replace(name, '').replace(/\(|\)/g, '').trim().split(',');
+								var expected = data.key.replace(name, '').replace(/\(|\)/g, '').trim().split(',');
 								
 								buff = data.body;
 
-								for (var i = 0, length = argsPassed.length; i < length; i++) {
-									var arg = argsExpected[i].trim();
+								for (var i = 0, length = passed.length; i < length; i++) {
+									var arg = expected[i].trim();
 
 									// if the mixin has a slot for that arg
 									if (arg !== void 0) {
-										buff = buff.replace(new RegExp('var\\(~~'+arg+'\\)', 'g'), argsPassed[i].trim());
+										buff = buff.replace(new RegExp('var\\(~~'+arg+'\\)', 'g'), passed[i].trim());
 									}
 								}
 
@@ -496,7 +496,7 @@
 						build = buff.substring(0, colon);
 
 						// short hand animation syntax
-						if (animations === true && (buff.charCodeAt(9) || 0) !== 45) {
+						if (animations === true && buff.charCodeAt(9) !== 45) {
 							var anims = buff.substring(colon).trim().split(',');
 
 							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
@@ -582,7 +582,7 @@
 						else {
 							// n
 							build += ( 
-								((buff.charCodeAt(10) || 0) !== 110 ? '' : animns) + 
+								(buff.charCodeAt(10) !== 110 ? '' : animns) + 
 								buff.substring(colon).trim().trim()
 							);
 						}
@@ -657,8 +657,8 @@
 						);
 					}
 					// align-items, align-center, align-self: a, l, i, -
-					else if (first === 97 && second === 108 && third === 105 && (buff.charCodeAt(5) || 0) === 45) {
-						switch (buff.charCodeAt(6) || 0) {
+					else if (first === 97 && second === 108 && third === 105 && buff.charCodeAt(5) === 45) {
+						switch (buff.charCodeAt(6)) {
 							// align-items, i
 							case 105: {
 								temp = buff.replace('-items', '');
@@ -726,8 +726,8 @@
 							// inner content of block
 							inner = '';
 
-							var nestSelector = buff.substring(0, buff.length - 1).split(',');
-							var prevSelector = prev.substring(0, prev.length - 1).split(',');
+							var nestSelector = buff.substring(0, buff.length - 1).split(stylis.regex.split);
+							var prevSelector = prev.substring(0, prev.length - 1).split(stylis.regex.split);
 
 							// keep track of opening `{` and `}` occurrences
 							closed = 1;
@@ -787,7 +787,7 @@
 							// concat nest
 							nest += (
 								'\n' + 
-								prevSelector.join(',').replace(/(?:&| | .*):global\((.*)\)/g, ' $1') + 
+								prevSelector.join(',').replace(stylis.regex.global[1], ' $1') + 
 								' {'+inner+'}'
 							);
 
@@ -802,7 +802,7 @@
 						}
 						// top-level selector
 						else if (glob === 0 && (special === 0 || type === 2)) {
-							selectors = buff.split(',');
+							selectors = buff.split(stylis.regex.split);
 							build = '';
 
 							// prefix multiple selectors with namesapces
@@ -815,29 +815,20 @@
 									chars = (selector = selector.trim()).charCodeAt(0);
 								}
 
-								// [, [title="a,b,..."]
-								if (/\[.+=/g.exec(selector) !== null && selector.indexOf(']') === -1) {
-									for (var k = j + 1, l = length; k < l; k++) {
-										var broken = (selector += ',' + selectors[k]).trim();
-
-										// ], end
-										if (broken.indexOf(']') !== -1) {
-											length -= k;
-											selectors.splice(j, k);
-											break;
-										}
-									}
-								}
-
 								// &
 								if (chars === 38) {
 									// before: & { / &&... {
 									// :, g, &:global()
 									if (chars === 58 && selector.charCodeAt(2) === 103) {
-										selector = selector.substring(1).replace(/:global\((.*)\)/g, '$1').replace(/&/g, prefix);
+										selector = (
+											selector
+												.substring(1)
+												.replace(stylis.regex.global[0], '$1')
+												.replace(stylis.regex.and, prefix)
+										);
 									}
 									else {
-										selector = prefix + selector.substring(1).replace(/&/g, prefix);
+										selector = prefix + selector.substring(1).replace(stylis.regex.and, prefix);
 									}								
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
@@ -881,7 +872,11 @@
 										// g, :global(selector)
 										else if (secondChar === 103) {
 											// before: `:global(selector)`
-											selector = selector.replace(/:global\((.*)\)/g, '$1').replace(/&/g, prefix);
+											selector = (
+												selector
+													.replace(stylis.regex.global[0], '$1')
+													.replace(stylis.regex.and, prefix)
+											);
 											// after: selector
 										}
 										// :hover, :active, :focus, etc...
@@ -1214,18 +1209,18 @@
 			// keyed plugin
 			else {
 				var pattern = (key instanceof RegExp) ? key : new RegExp(key + '\\([ \\t\\r\\n]*([^\\0]*?)[ \\t\\r\\n]*\\)', 'g');
-				var regex = /[ \t\r\n]*,[ \t\r\n]*/g;
+				var trim = /[ \t\r\n]*,[ \t\r\n]*/g;
 
-				plugins[length] = function (ctx, str, line, col) {
+				var replace = function (match, group) {
+					var params = group.replace(trim, ',').split(',');
+					var replace = plugin.apply(null, params);
+
+					return replace != null ? replace : match;
+				}
+
+				plugins[length] = function (ctx, str) {
 					if (ctx === 6) {
-						str = str.replace(pattern, function (match, group) {
-							var args = group.replace(regex, ',').split(',');
-							var replace = plugin.apply(null, args);
-
-							return replace != null ? replace : match;
-						});
-
-						return str;
+						return str.replace(pattern, replace);
 					}
 				}
 			}
@@ -1241,6 +1236,19 @@
 	 * @type {function[]}
 	 */
 	stylis.plugins = [];
+
+
+	/**
+	 * regular expresions
+	 * 
+	 * @type {Object<string, RegExp>}
+	 */
+	stylis.regex = {
+		and: /&/g,
+		split: /,[\s]*(?![^\r\n\[]*[\]\)])/g,
+		import: /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g,
+		global: [/:global\((.*)\)/g, /(?:&| | .*):global\((.*)\)/g]
+	};
 
 
 	return stylis;
