@@ -1,4 +1,4 @@
-# custom selector
+# stylis custom selector
 
 Allows you to create your own selectors
 
