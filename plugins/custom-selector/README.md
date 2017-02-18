@@ -1,4 +1,4 @@
-# custom selectors
+# custom selector
 
 Allows you to create your own selectors
 
