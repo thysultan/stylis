@@ -1,7 +1,7 @@
 var server = this.window !== this;
 
 var stylis = this.stylis || require('stylis');
-var customSelectors = this.customSelectors || require('../');
+var customSelector = this.customSelectors || require('../custom-selector.js');
 
 var sample = `
 	@custom-selector :--heading h1, h2, h3, h4, h5, h6;
@@ -13,7 +13,7 @@ var sample = `
 
 var expected = `.ns h1,.ns h2,.ns h3,.ns h4,.ns h5,.ns h6 {color: red;}`;
 
-var output = stylis('.ns', sample, false, false, customSelectors);
+var output = stylis('.ns', sample, false, false, customSelector);
 
 if (!server) {
 	console.log(output+'\n\n');
