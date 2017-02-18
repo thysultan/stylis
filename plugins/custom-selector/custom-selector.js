@@ -10,8 +10,7 @@
 	}
 }(function (window) {
 	var regex = /(:--[^:\s]*).*/g;
-
-	var vars = Object.create(null);
+	var vars = {};
 	
 	function process (match, group) {
 		// everything after the first space(if it exists) are sibling selectors
@@ -71,6 +70,11 @@
 		// :, -, -
 		if (ctx === 1 && str.charCodeAt(0) === 58 && str.charCodeAt(1) === 45 && str.charCodeAt(2) === 45) {
 			return str.replace(regex, process);
+		}
+
+		// flush store
+		if (ctx === 6) {
+			vars = {};
 		}
 	}
 }));
