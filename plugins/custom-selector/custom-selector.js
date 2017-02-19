@@ -10,6 +10,7 @@
 	}
 }(function (window) {
 	var find = /([^\r\n:]*)(:--[^:\s]*).*/g;
+	var test = /:--[^\s]+/;
 	var vars = {};
 	
 	function process (match, prefix, group) {
@@ -76,7 +77,7 @@
 		}
 
 		// :, -, -
-		if (ctx === 1.5 && /:--[^\s]+/g.test(str)) {
+		if (ctx === 1.5 && test.exec(str) !== null) {
 			return str.replace(find, process);
 		}
 
