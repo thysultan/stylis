@@ -6,31 +6,37 @@
 		define(factory(window));
 	} 
 	else {
-		window.customSelectors = factory(window);
+		window.customSelector = factory(window);
 	}
 }(function (window) {
-	var regex = /(:--[^:\s]*).*/g;
+	var find = /([^\r\n:]*)(:--[^:\s]*).*/g;
 	var vars = {};
 	
-	function process (match, group) {
-		// everything after the first space(if it exists) are sibling selectors
+	function process (match, prefix, group) {
+		if (prefix) {
+			match = match.substring(prefix.length);
+			prefix = prefix.trim() + ' ';
+		}
+
+		// everything after the first space(if it exists) are suffix selectors
 		var indexOf = match.indexOf(' ');
-		var sibling = '';
+		var suffix = '';
 
-		// sibling selectors exists i.e `div` in :--heading div {}
+		// suffix selectors exists i.e `div` in :--heading div {}
 		if (indexOf !== -1) {
-			sibling = ' ' + match.substring(indexOf + 1).trim();
+			suffix = ' ' + match.substring(indexOf + 1).trim();
 
-			// remove sibling selectors
+			// remove suffix selectors
 			match = match.substring(0, indexOf);
 		}
 
 		// retrieve custom-selector value
 		var selector = vars[group] || '';
 
+
 		// split parts
 		var parents = selector.split(',');
-		var children = match.replace(group, '').replace(regex, process).split(',');
+		var children = match.replace(group, '').replace(find, process).split(',');
 
 		// if a custom selector :--heading holds `h1, h2` and :--enter holds `:hover, :active`
 		// :--heading:--enter should yield `h1:hover, h1:active, h2:hover, h2:active`
@@ -42,10 +48,12 @@
 				match = children[j].trim();
 
 				parents[i] += (
+					// prefix +
 					(j === 0 ? '' : ',') + 
+					prefix +
 					selector + 
 					(match.charCodeAt(0) === 58 ? match : (match.length === 0 ? '' : ' ') + match) + 
-					sibling
+					suffix
 				);
 			}
 		}
@@ -53,7 +61,7 @@
 		return parents.join(',');
 	}
 
-	return function (ctx, str) {
+	return function (ctx, str, line, col, prefix) {		
 		// @, c
 		if (ctx === 2 && str.charCodeAt(0) === 64 && str.charCodeAt(1) === 99) {
 			str = str.substring(16).trim();
@@ -68,8 +76,8 @@
 		}
 
 		// :, -, -
-		if (ctx === 1 && str.charCodeAt(0) === 58 && str.charCodeAt(1) === 45 && str.charCodeAt(2) === 45) {
-			return str.replace(regex, process);
+		if (ctx === 1.5 && /:--[^\s]+/g.test(str)) {
+			return str.replace(find, process);
 		}
 
 		// flush store

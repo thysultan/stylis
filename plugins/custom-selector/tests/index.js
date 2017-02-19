@@ -1,23 +1,28 @@
 var server = this.window !== this;
 
 var stylis = this.stylis || require('stylis');
-var customSelector = this.customSelectors || require('../custom-selector.js');
+var customSelector = this.customSelector || require('../custom-selector.js');
 
 var sample = `
-	@custom-selector :--heading h1, h2, h3, h4, h5, h6;
+	@custom-selector :--heading h1, h2;
+	@custom-selector :--enter :hover, :active;
+	@custom-selector :--button a, button;
 
-	:--heading {
-		color: red;
-	}
+	:--heading { color: red; }
+	:--heading:--enter { color: red; }
+	:--button div { display: block; }
+	div :--button { display: block; }
+
 `;
 
-var expected = `.ns h1,.ns h2,.ns h3,.ns h4,.ns h5,.ns h6 {color: red;}`;
+var expected = (
+	`.ns h1,.ns h2 {color: red;}`+
+	`.ns h1:hover,.ns h1:active,.ns h2:hover,.ns h2:active {color: red;}`+
+	`.ns a div,.ns button div {display: block;}`+
+	`.ns div a,.ns div button {display: block;}`
+);
 
 var output = stylis('.ns', sample, false, false, customSelector);
-
-if (!server) {
-	console.log(output+'\n\n');
-}
 
 if (output === expected) {
 	// passed
@@ -37,4 +42,6 @@ if (output === expected) {
 		,
 		!server ? 'color:red;font-weight:bold' : ''
 	);
+
+	console.log('\n\n'+output);
 }
