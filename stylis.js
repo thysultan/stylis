@@ -208,24 +208,26 @@
 
 				// middleware, selector/property context, }
 				if (use && code !== 125) {
-					// { pre-processed selector context
-					if (code === 123) {
-						temp = middleware(
-							1, 
-							buff.substring(0, buff.length - 1).trim(), 
-							line, 
-							column, 
-							prefix, 
-							output.length
-						);
-					} 
-					// ; property context
-					else {
-						temp = middleware(2, buff, line, column, prefix, output.length);
-					}
+					if (use) {
+						// { pre-processed selector context
+						if (code === 123) {
+							temp = middleware(
+								1, 
+								buff.substring(0, buff.length - 1).trim(), 
+								line, 
+								column, 
+								prefix, 
+								output.length
+							);
+						} 
+						// ; property context
+						else {
+							temp = middleware(2, buff, line, column, prefix, output.length);
+						}
 
-					if (temp != null) {
-						buff = code === 123 ? temp + ' {' : temp;
+						if (temp != null) {
+							buff = code === 123 ? temp + ' {' : temp;
+						}
 					}
 				}
 
@@ -600,7 +602,7 @@
 						);
 					}
 					// display: d, i, s
-					else if (first === 100 && second === 105 && third === 115) {
+					else if (first === 100 && second === 105 && third === 115) {						
 						// flex/inline-flex
 						if ((indexOf = buff.indexOf('flex')) !== -1) {
 							// e, inline-flex
@@ -611,7 +613,7 @@
 								'display: '+webkit+temp+'box;'+
 								'display: '+webkit+temp+'flex;'+
 								'display: '+ms+'flexbox;'+
-								'display: '+temp+'flex;'
+								'display: '+temp+'flex'+(code === 125 ? '}' : ';')
 							);
 						}
 					}
@@ -917,8 +919,9 @@
 							prev = buff;
 						}
 					}
+					
 					// } character
-					else if (code === 125) {
+					if (code === 125) {
 						if (depth !== 0) {
 							depth--;
 						}
@@ -930,6 +933,11 @@
 							nest = '';
 							nested = 0;
 							close++;
+						}
+
+						// }, ` ` whitespace
+						if (first !== 125 && buff.charCodeAt(buff.length - 2) === 32) {
+							buff = buff.substring(0, buff.length-1).trim() + '}';
 						}
 					}
 

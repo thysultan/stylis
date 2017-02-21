@@ -533,6 +533,29 @@ var tests = {
 		`background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
 		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
 	},
+	'semicolon omission': {
+		name: 'semicolon omission',
+		sample: `
+			.content {
+				display: none
+			}
+			
+			.content {
+				display: flex
+			}
+		`,
+		expected: `.user .content {display: none}`+
+		`.user .content {display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex}`
+	},
+	':matches(:not())': {
+		name: ':matches()',
+		sample: `
+			h1:matches(.a, .b, :not(.c)) {
+				display: none
+			}
+		`,
+		expected: `.user h1:matches(.a, .b, :not(.c)) {display: none}`
+	}
 };
 
 

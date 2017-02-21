@@ -1,3 +1,7 @@
+## 1.1.12 (February 21, 2016)
+
+- patch to better handle `semicolon` omission on the last property of a selector
+
 ## 1.1.11 (February 18, 2016)
 
 - patch `:matches(a, b, c)` and simplify `,` token handler
