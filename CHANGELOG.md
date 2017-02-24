@@ -1,3 +1,8 @@
+## 1.1.13 (February 24, 2016)
+
+- patch nesting in a `@media` block
+- patch parent reference selector `selector &`
+
 ## 1.1.12 (February 21, 2016)
 
 - patch to better handle `semicolon` omission on the last property of a selector

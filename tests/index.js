@@ -124,7 +124,7 @@ var tests = {
 		sample: `
 			@media (max-width: 600px) {
 				color: red;	
-				h1 { 
+				h1 {
 					color: red; 
 
 					h2 {
@@ -133,8 +133,30 @@ var tests = {
 				}
 				display: none;
 			}
+
+			@media (min-width: 576px) {
+				&.card-deck {
+					.card {
+				 		&:not(:first-child) { 
+				   			margin-left: 15px; 
+				 		}
+						&:not(:last-child) { 
+				   			margin-right: 15px; 
+						}
+					}
+				}
+			}
 		`,
-		expected: `@media (max-width: 600px) {.user {color: red;}.user h1 {color: red;}.user h1 h2 {color: blue;}.user {display: none;}}`
+		expected: `@media (max-width: 600px) {`+
+		`.user {color: red;}`+
+		`.user h1 {color: red;}`+
+		`.user h1 h2 {color: blue;}`+
+		`.user {display: none;}`+`}`+
+
+		`@media (min-width: 576px) {`+
+		`.user.card-deck .card:not(:first-child) {margin-left: 15px;}`+
+		`.user.card-deck .card:not(:last-child) {margin-right: 15px;}`+
+		`}`
 	},
 	'@font-face': {
 		name: '@font-face',
@@ -347,6 +369,10 @@ var tests = {
 			    &:hover {
 			        color: black;
 			    }
+
+			    li {
+			  		color: white;
+			    }
 			}
 
 			h1, div {
@@ -386,7 +412,7 @@ var tests = {
 				}
 			}
 		`,
-		expected: `.foo .user {width: 1px;}.foo .user:hover {color: black;}`+
+		expected: `.foo .user {width: 1px;}.foo .user:hover {color: black;}.foo .user li {color: white;}`+
 		'.user h1,.user div {color: red;color: blue;}'+
 		'@media {.user h1 {color: red;}.user div {color: red;}}'+
 		`@media {.user h1 {color: blue;}.user div {color: blue;}}`+
@@ -605,7 +631,7 @@ function run (tests) {
 
 		if (result !== expected) {
 			// log why it failed
-			console.log('failed: '+name+'\n'+ result);
+			console.log('failed: \n'+name+'\n'+ result);
 			console.log('expected: '+'\n'+ expected);
 		}
 	}

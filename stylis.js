@@ -138,6 +138,7 @@
 		var sel;
 		var blob;
 		var nest;
+		var query;
 
 		// variables
 		var vars;
@@ -365,6 +366,8 @@
 								// top-level
 								else {
 									type = 2;
+									query = buff;
+									buff = '';
 								}
 							}
 							// unknown
@@ -764,11 +767,19 @@
 							for (var j = 0, length = prevSelector.length; j < length; j++) {
 								// extract value, prep index for reuse
 								temp = prevSelector[j];
+								indexOf = temp.indexOf(prefix);
+
 								prevSelector[j] = '';
 
 								// since there could also be multiple nested selectors
 								for (var k = 0, l = nestSelector.length; k < l; k++) {
-									selector = temp.replace(prefix, '&').trim();
+									if (indexOf > 0) {
+										selector = ':global()' + temp.trim();
+									}
+									else {
+										selector = temp.replace(prefix, '&').trim();
+									}
+									
 									sel = nestSelector[k].trim();
 
 									if (sel.indexOf(' &') > 0) {
@@ -839,11 +850,14 @@
 									if ((indexOf = selector.indexOf(' &')) > 0) {
 										// `:`
 										chars = 58;
-										// before: html & {
-										selector = (
-											':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
-										);
-										// after: html ${prefix} {
+
+										if (selector.indexOf(':global()') !== 0) {
+											// before: html & {
+											selector = (
+												':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
+											);
+											// after: html ${prefix} {
+										}
 									}
 
 									// :
@@ -1023,11 +1037,8 @@
 				// append line to blck buffer
 				blck += buff;
 
-				// reset line buffer
-				buff = '';
-
 				// add blck buffer to output
-				if (code === 125 && (type === 0 || type === 4)) {
+				if (code === 125 && (type === 0 || type === 2 || type === 4)) {					
 					chars = blck.charCodeAt(blck.length - 2);
 
 					if (type === 4) {
@@ -1037,7 +1048,7 @@
 					if (media !== void 0 && media.length !== 0) {
 						blck = chars === 123 ? media : blck + media;
 						media = '';
-						chars = 0;
+						chars = blck.charCodeAt(blck.length - 2);
 					}
 
 					// {, @
@@ -1051,13 +1062,27 @@
 							}
 						}
 
-						// append blck buffer
-						output += blck;
+						if (query !== void 0) {
+							query += blck;
+
+							// }
+							if (query.charCodeAt(query.length - 2) === 125) {
+								output += query;
+								query = void 0;
+							}
+						}
+						else {
+							// append blck buffer
+							output += blck;
+						}
 					}
 
 					// reset blck buffer
 					blck = '';
-				}				
+				}
+
+				// reset line buffer
+				buff = '';			
 			}
 			// build line by line
 			else {
@@ -1255,7 +1280,10 @@
 		and: /&/g,
 		split: /,[\s]*(?![^\r\n\[]*[\]\)])/g,
 		import: /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g,
-		global: [/:global\((.*)\)/g, /(?:&| | .*):global\((.*)\)/g]
+		global: [
+			/:global\((.*)\)/g, 
+			/(?:&| | .*):global\((.*)\)/g
+		]
 	};
 
 
