@@ -1,3 +1,10 @@
+## 1.2.0 (March 3, 2016)
+
+- patch single apostrophes in comments
+- patch nested selector `:global()`
+- patch middleware param ignored when `stylis.use` is used to register middlewares
+- add new middleware context `ctx = 7` to allow for better linter plugins
+
 ## 1.1.13 (February 24, 2016)
 
 - patch nesting in a `@media` block

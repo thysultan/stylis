@@ -73,11 +73,12 @@ var tests = {
 			// color: red;
 
 			/**
-			 * removes block comments and line comments
+			 * removes block comments and line comments, 
+			 * there's a fire in the house // there is
 			 */
 
 			button /*
-			 	// what
+			 	// what's
 
 			 	xxx
 			  */
@@ -363,6 +364,16 @@ var tests = {
 	'nested': {
 		name: 'nested',
 		sample: `
+			:global(div) {
+				h2 {
+					color: red;
+
+					h3 {
+						color: blue;
+					}
+				}
+			}
+
 			.foo & {
 			    width: 1px;
 
@@ -412,7 +423,8 @@ var tests = {
 				}
 			}
 		`,
-		expected: `.foo .user {width: 1px;}.foo .user:hover {color: black;}.foo .user li {color: white;}`+
+		expected: `div h2 {color: red;}div h2 h3 {color: blue;}`+
+		`.foo .user {width: 1px;}.foo .user:hover {color: black;}.foo .user li {color: white;}`+
 		'.user h1,.user div {color: red;color: blue;}'+
 		'@media {.user h1 {color: red;}.user div {color: red;}}'+
 		`@media {.user h1 {color: blue;}.user div {color: blue;}}`+
