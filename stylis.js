@@ -608,7 +608,7 @@
 						}
 
 						// vendor prefix
-						buff = (webkit + build + ';' + build + ';') + (code === 125 ? '}' : '');
+						buff = webkit + build + ';' + build + (code === 125 ? ';}' : ';');
 					}
 					// appearance: a, p, p
 					else if (first === 97 && second === 112 && third === 112) {

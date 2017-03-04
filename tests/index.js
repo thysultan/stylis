@@ -199,6 +199,10 @@ var tests = {
 	'animations': {
 		name: 'animations',
 		sample: `
+			div {
+				animation-name: bounce
+			}
+
 			h1 {
 				animation:` +
 				`
@@ -247,8 +251,8 @@ var tests = {
 			the animation-name in a grouped animation: property 
 		*/
 
+		`.user div {-webkit-animation-name:userbounce;animation-name:userbounce;}`+
 		`.user h1 {`+
-
 		`-webkit-animation:0.6s .6ms 200ms infinite usersomething-ease userinfinite-fire userslidein `+
 		`cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease userease-inOuter linear alternate normal forwards `+
 		`both none ease-in ease-out backwards running paused reversed alternate-reverse `+
