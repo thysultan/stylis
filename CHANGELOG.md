@@ -1,3 +1,7 @@
+## 1.2.1 (March 4, 2016)
+
+- patch for `animation*}` when used as a last property without a semicolon
+
 ## 1.2.0 (March 3, 2016)
 
 - patch single apostrophes in comments

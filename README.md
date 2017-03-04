@@ -31,7 +31,7 @@ stylis is a feature-rich css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@1.2.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@1.2.1/stylis.min.js></script>
 ```
 
 #### npm
@@ -316,7 +316,7 @@ The optional middleware function accepts four arguments `ctx, str, line, column,
 6. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
 7. When an `import` statement is found `ctx = 5`, i.e `import 'foo'`
 8. before the compiled css output is returned `ctx = 6`
-9. after every new line `ctx = 7`
+9. after every new line that does not end with a token `ctx = 7`
 
 If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
 
