@@ -55,15 +55,33 @@ var tests = {
 					background: yellow;
 				}
 			}
+
 			:global(body) {
 				background: yellow;
+
+				h1 {
+					color: red;
+				}
+			}
+
+			:global(body > li) {
+				color: yellow;
+			}
+
+			h1 :global(body > li) {
+				color: red;
 			}
 
 			html & {
 				color: red;
 			}
 		`,
-		expected: 'body {background: yellow;}body {background: yellow;}html .user {color: red;}'
+		expected: `body {background: yellow;}`+
+		`body {background: yellow;}`+
+		`body h1 {color: red;}`+
+		`body > li {color: yellow;}`+
+		`h1 body > li {color: red;}`+
+		`html .user {color: red;}`
 	},
 	'comment': {
 		name: 'comments',

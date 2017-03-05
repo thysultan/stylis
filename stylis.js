@@ -854,93 +854,84 @@
 								// &
 								if (char === 38) {
 									// before: & { / &&... {
-									// :, g, &:global()
-									if (char === 58 && selector.charCodeAt(2) === 103) {
-										selector = (
-											selector
-												.substring(1)
-												.replace(stylis.regex.global[0], '$1')
-												.replace(stylis.regex.and, prefix)
-										);
-									}
-									else {
-										selector = prefix + selector.substring(1).replace(stylis.regex.and, prefix);
-									}								
+									selector = prefix + selector.substring(1).replace(stylis.regex.and, prefix);
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
-								else {
-									// default to :global if & exist outside of the first non-space character
-									if ((indexOf = selector.indexOf(' &')) > 0) {
-										// `:`
-										char = 58;
-										globs = 2;
 
-										if (selector.indexOf(':global()') !== 0) {
-											// before: html & {
-											selector = (
-												':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
-											);
-											// after: html ${prefix} {
-										}
+								// default to :global if & exist outside of the first non-space character
+								if ((indexOf = selector.indexOf(' &')) > 0) {
+									// `:`
+									globs = 2;
+
+									if (selector.indexOf(':global()') !== 0) {
+										// before: html & {
+										selector = (
+											':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
+										);
+										// after: html ${prefix} {
+									}
+								}
+
+								// g, :global(selector)
+								if ((indexOf = selector.indexOf(':global(')) !== -1) {											
+									if (globs !== 2) {
+										globs = 1;
 									}
 
-									// :
-									if (char === 58) {
-										var secondChar = selector.charCodeAt(1);
+									if (indexOf === 0) {
+										char = 0;
+									}
 
-										// h, t, :host
-										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
-											var nextChar = selector.charCodeAt(5);
+									// before: `:global(selector)`
+									selector = (
+										selector
+											.replace(stylis.regex.global[0], '$1')
+											.replace(stylis.regex.and, prefix)
+									);
+									// after: selector
+								}
 
-											// (, :host(selector)                    
-											if (nextChar === 40) {
-												// before: `(selector)`
-												selector = (
-													prefix + (
-														selector
-															.replace(/:host\((.*)\)/g, '$1')
-															.replace(stylis.regex.and, prefix)
-													)
-												);
-												// after: ${prefx} selector {
-											}
-											// -, :host-context(selector)
-											else if (nextChar === 45) {
-												// before: `-context(selector)`
-												selector = selector
-													.replace(/:host-context\((.*)\)/g, '$1 ' + prefix)
-													.replace(stylis.regex.and, prefix)
-												// after: selector ${prefix} {
-											}
-											// :host
-											else {
-												selector = prefix + selector.substring(5);
-											}
-										}
-										// g, :global(selector)
-										else if (secondChar === 103) {											
-											if (globs !== 2) {
-												globs = 1;
-											}
+								// :
+								if (char === 58) {
+									var secondChar = selector.charCodeAt(1);
 
-											// before: `:global(selector)`
+									// h, t, :host
+									if (secondChar === 104 && selector.charCodeAt(4) === 116) {
+										var nextChar = selector.charCodeAt(5);
+
+										// (, :host(selector)                    
+										if (nextChar === 40) {
+											// before: `(selector)`
 											selector = (
-												selector
-													.replace(stylis.regex.global[0], '$1')
-													.replace(stylis.regex.and, prefix)
+												prefix + (
+													selector
+														.replace(/:host\((.*)\)/g, '$1')
+														.replace(stylis.regex.and, prefix)
+												)
 											);
-
-											// after: selector
+											// after: ${prefx} selector {
 										}
-										// :hover, :active, :focus, etc...
+										// -, :host-context(selector)
+										else if (nextChar === 45) {
+											// before: `-context(selector)`
+											selector = selector
+												.replace(/:host-context\((.*)\)/g, '$1 ' + prefix)
+												.replace(stylis.regex.and, prefix)
+											// after: selector ${prefix} {
+										}
+										// :host
 										else {
-											selector = prefix + selector;
+											selector = prefix + selector.substring(5);
 										}
 									}
-									// non-pseudo selectors
+									// :hover, :active, :focus, etc...
 									else {
-										selector = prefix + ' ' + selector;
+										selector = prefix + selector;
 									}
+								}
+								// non-pseudo selectors
+								else if (globs === 0 && char !== 38) {
+									selector = prefix + ' ' + selector;
 								}
 
 								// middleware, post-processed selector context
@@ -966,13 +957,9 @@
 							buff = build;
 
 							// cache current selector
-							if (globs !== 1) {
-								prev = build;
-							}
-							else {
-								prev = ':global()' + build;
-								globs = 0;
-							}
+							prev = globs !== 1 ? build : ':global()' + build;
+
+							globs = 0;
 						}
 						else {
 							prev = buff;

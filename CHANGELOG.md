@@ -1,3 +1,7 @@
+## 1.2.2 (March 5, 2016)
+
+- patch `:global()` selector
+
 ## 1.2.1 (March 4, 2016)
 
 - patch for `animation*}` when used as a last property without a semicolon
