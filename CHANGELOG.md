@@ -1,3 +1,7 @@
+## 1.2.3 (March 5, 2016)
+
+- patch `:global()` selector
+
 ## 1.2.2 (March 5, 2016)
 
 - patch `:global()` selector
