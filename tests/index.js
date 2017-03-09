@@ -59,7 +59,7 @@ var tests = {
 			:global(body) {
 				background: yellow;
 
-				h1 {
+				h1, h2 {
 					color: red;
 				}
 			}
@@ -78,7 +78,7 @@ var tests = {
 		`,
 		expected: `body {background: yellow;}`+
 		`body {background: yellow;}`+
-		`body h1 {color: red;}`+
+		`body h1,body h2 {color: red;}`+
 		`body > li,.user li {color: yellow;}`+
 		`.user h1 :global(body > li) {color: red;}`+
 		`html .user {color: red;}`

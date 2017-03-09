@@ -1,3 +1,7 @@
+## 1.2.4 (March 9, 2016)
+
+- patch nesting for `:global()` selectors
+
 ## 1.2.3 (March 5, 2016)
 
 - patch `:global()` selector

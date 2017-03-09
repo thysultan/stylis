@@ -81,7 +81,7 @@
 		type = 0;
 
 		// animation and keyframe namespace
-		if (animations == void 0 || animations === true) {
+		if (animations == undefined || animations === true) {
 			animations = true;
 			animns = namespace;
 		}
@@ -293,7 +293,7 @@
 							// @mixin
 							if (compact === true && third === 105) {
 								// first match create mixin store
-								if (mixins === void 0) {
+								if (mixins === undefined) {
 									mixins = {};
 								}
 
@@ -318,7 +318,7 @@
 									caret++;
 									column++;
 									
-									if (media === void 0) {
+									if (media === undefined) {
 										media = '';
 									}
 
@@ -417,7 +417,7 @@
 									var arg = expected[i].trim();
 
 									// if the mixin has a slot for that arg
-									if (arg !== void 0) {
+									if (arg !== undefined) {
 										buff = buff.replace(new RegExp('var\\(~~'+arg+'\\)', 'g'), passed[i].trim());
 									}
 								}
@@ -489,7 +489,7 @@
 					(colon = buff.indexOf(':')) !== -1
 				) {
 					// first match create variables store 
-					if (varlen === void 0) {
+					if (varlen === undefined) {
 						vars = [];
 						varlen = 0;
 					}
@@ -814,7 +814,7 @@
 								}
 							}
 
-							if (nest === void 0) {
+							if (nest === undefined) {
 								nest = '';
 							}
 
@@ -1063,7 +1063,7 @@
 					// flat context
 					else if (depth === 0 && code !== 125) {
 						levels = 1;
-						flat = flat === void 0 ? buff : flat + buff;
+						flat = flat === undefined ? buff : flat + buff;
 						buff = '';
 					}
 				}
@@ -1079,7 +1079,7 @@
 						type = 0;
 					}
 
-					if (media !== void 0 && media.length !== 0) {
+					if (media !== undefined && media.length !== 0) {
 						blck = char === 123 ? media : blck + media;
 						media = '';
 						char = blck.charCodeAt(blck.length - 2);
@@ -1096,13 +1096,13 @@
 							}
 						}
 
-						if (query !== void 0) {
+						if (query !== undefined) {
 							query += blck;
 
 							// }
 							if (query.charCodeAt(query.length - 2) === 125) {
 								output += query;
-								query = void 0;
+								query = undefined;
 							}
 						}
 						else {
@@ -1228,7 +1228,7 @@
 		}
 
 		// trailing flat css
-		if (flat !== void 0 && flat.length !== 0) {
+		if (flat !== undefined && flat.length !== 0) {
 			flat = prefix + ' {' + flat + '}';
 
 			// middleware, flat context
@@ -1245,7 +1245,7 @@
 		}
 
 		// has variables
-		if (compact && vars !== void 0) {
+		if (compact && vars !== undefined) {
 			// replace all variables
 			for (var i = 0; i < varlen; i++) {
 				output = output.replace(new RegExp('var\\(' + vars[i][0]+'\\)', 'g'), vars[i][1]);
@@ -1278,7 +1278,7 @@
 
 		if (plugin == null) {
 			plugin = key;
-			key = void 0;
+			key = undefined;
 		}
 
 		if (plugin != null) {
@@ -1340,8 +1340,8 @@
 		split: /,[\s]*(?![^\r\n\[]*[\]\)])/g,
 		import: /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g,
 		global: [
-			/:global\((.*)\)/g, 
-			/(?:&| | .*):global\((.*)\)/g
+			/:global\((.*?)\)/g, 
+			/(?:&| ):global\((.*?)\)/g
 		]
 	};
 
