@@ -203,6 +203,7 @@
 		var column = 0;
 		var line = 1;
 		var eof = styles.length;
+		var last = eof - 1;
 
 		// compiled output
 		var output = '';
@@ -213,7 +214,14 @@
 			code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
-			if (strings === 0 && func === 0 && comment === 0 && (code === 123 || code === 125 || code === 59)) {
+			if (
+				strings === 0 && func === 0 && comment === 0 && 
+				(
+					(code === 123 || code === 125 || code === 59)
+					|| 
+					((caret === eof - 1) && buff.length !== 0)
+				)
+			) {
 				buff += styles.charAt(caret);
 
 				// middleware, selector/property context, }
@@ -502,221 +510,8 @@
 				}
 				// property/selector
 				else {
-					// animation: a, n, i characters
-					if (first === 97 && second === 110 && third === 105) {
-						// removes ;
-						buff = buff.substring(0, buff.length - 1);
-
-						// position of :
-						colon = buff.indexOf(':')+1;
-
-						// left hand side everything before `:`
-						build = buff.substring(0, colon);
-
-						// short hand animation syntax
-						if (animations === true && buff.charCodeAt(9) !== 45) {
-							var anims = buff.substring(colon).trim().split(',');
-
-							length = anims.length;
-
-							// because we can have multiple animations `animation: slide 4s, slideOut 2s`
-							for (var j = 0; j < length; j++) {
-								var anim = anims[j];
-								var props = anim.split(' ');
-
-								// since we can't be sure of the position of the name of the animation we have to find it
-								for (var k = 0, l = props.length; k < l; k++) {
-									var prop = props[k].trim();
-									var frst = prop.charCodeAt(0);
-									var thrd = prop.charCodeAt(2);
-									var len = prop.length;
-									var last = prop.charCodeAt(len - 1);
-
-									// animation name is anything not in this list
-									if (
-										// cubic-bezier()/steps(), ) 
-										last !== 41 && len !== 0 &&
-
-										// infinite, i, f, e
-										!(frst === 105 && thrd === 102 && last === 101 && len === 8) &&
-
-										// linear, l, n, r
-										!(frst === 108 && thrd === 110 && last === 114 && len === 6) &&
-
-										// alternate/alternate-reverse, a, t, e
-										!(frst === 97 && thrd === 116 && last === 101 && (len === 9 || len === 17)) &&
-
-										// normal, n, r, l
-										!(frst === 110 && thrd === 114 && last === 108 && len === 6) &&
-
-										// backwards, b, c, s
-										!(frst === 98 && thrd === 99 && last === 115 && len === 9) &&
-
-										// forwards, f, r, s
-										!(frst === 102 && thrd === 114 && last === 115 && len === 8) &&
-
-										// both, b, t, h
-										!(frst === 98 && thrd === 116 && last === 104 && len === 4) &&
-
-										// none, n, n, e
-										!(frst === 110 && thrd === 110 && last === 101 && len === 4)&&
-
-										// running, r, n, g 
-										!(frst === 114 && thrd === 110 && last === 103 && len === 7) &&
-
-										// paused, p, u, d
-										!(frst === 112 && thrd === 117 && last === 100 && len === 6) &&
-
-										// reversed, r, v, d
-										!(frst === 114 && thrd === 118 && last === 100 && len === 8) &&
-
-										// step-start/step-end, s, e, (t/d)
-										!(
-											frst === 115 && thrd === 101 && 
-											((last === 116 && len === 10) || (last === 100 && len === 8)) 
-										) &&
-
-										// ease/ease-in/ease-out/ease-in-out, e, s, e
-										!(
-											frst === 101 && thrd === 115 &&
-											(
-												(last === 101 && len === 4) ||
-												(len === 11 || len === 7 || len === 8) && prop.charCodeAt(4) === 45
-											)
-										) &&
-
-										// durations, 0.4ms, .4s, 400ms ...
-										isNaN(parseFloat(prop)) &&
-
-										// handle spaces in cubic-bezier()/steps() functions
-										prop.indexOf('(') === -1
-									) {
-										props[k] = animns + prop;
-									}
-								}
-
-								build += (j === 0 ? '' : ',') + props.join(' ').trim();
-							}
-						}
-						// explicit syntax, anims array should have only one elemenet
-						else {
-							// n
-							build += ( 
-								(buff.charCodeAt(10) !== 110 ? '' : animns) + 
-								buff.substring(colon).trim().trim()
-							);
-						}
-
-						// vendor prefix
-						buff = webkit + build + ';' + build + (code === 125 ? ';}' : ';');
-					}
-					// appearance: a, p, p
-					else if (first === 97 && second === 112 && third === 112) {
-						// vendor prefix -webkit- and -moz-
-						buff = (
-							webkit + buff + 
-							moz + buff + 
-							buff
-						);
-					}
-					// display: d, i, s
-					else if (first === 100 && second === 105 && third === 115) {						
-						// flex/inline-flex
-						if ((indexOf = buff.indexOf('flex')) !== -1) {
-							// e, inline-flex
-							temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
-
-							// vendor prefix
-							buff = (
-								'display: '+webkit+temp+'box;'+
-								'display: '+webkit+temp+'flex;'+
-								'display: '+ms+'flexbox;'+
-								'display: '+temp+'flex'+(code === 125 ? '}' : ';')
-							);
-						}
-					}
-					// transforms & transitions: t, r, a 
-					else if (first === 116 && second === 114 && third === 97) {
-						// vendor prefix -webkit- and -ms- if transform
-						buff = (
-							webkit + buff + 
-							(buff.charCodeAt(5) === 102 ? ms + buff : '') + 
-							buff
-						);
-					}
-					// hyphens: h, y, p
-					// user-select: u, s, e
-					else if (
-						(first === 104 && second === 121 && third === 112) ||
-						(first === 117 && second === 115 && third === 101)
-					) {
-						// vendor prefix all
-						buff = (
-							webkit + buff + 
-							moz + buff + 
-							ms + buff + 
-							buff
-						);
-					}
-					// flex: f, l, e
-					else if (first === 102 && second === 108 && third === 101) {
-						// vendor prefix all but moz
-						buff = (
-							webkit + buff + 
-							ms + buff + 
-							buff
-						);
-					}
-					// order: o, r, d
-					else if (first === 111 && second === 114 && third === 100) {
-						// vendor prefix all but moz
-						buff = (
-							webkit + buff + 
-							ms + 'flex-' + buff + 
-							buff
-						);
-					}
-					// align-items, align-center, align-self: a, l, i, -
-					else if (first === 97 && second === 108 && third === 105 && buff.charCodeAt(5) === 45) {
-						switch (buff.charCodeAt(6)) {
-							// align-items, i
-							case 105: {
-								temp = buff.replace('-items', '');
-								buff = (
-									webkit + 'box-' + temp + 
-									ms + 'flex-'+ temp + 
-									buff
-								);
-								break;
-							}
-							// align-self, s
-							case 115: {
-								buff = (
-									ms + 'flex-item-' + buff.replace('-self', '') + 
-									buff
-								);
-								break;
-							}
-							// align-content
-							default: {
-								buff = (
-									ms + 'flex-line-pack' + buff.replace('align-content', '') + 
-									buff
-								);
-								break;
-							}
-						}
-					}
-					// cursor, c, u, r
-					else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
-						buff = (
-							buff.replace(/: +/g, ': ' + webkit) + 
-							buff.replace(/: +/g, ': ' + moz) +  
-							buff
-						);
-					}
 					// { character, selector declaration
-					else if (code === 123) {
+					if (code === 123) {
 						depth++;
 
 						// push flat css
@@ -924,6 +719,7 @@
 													.replace(stylis.regex.global[0], '$1')
 													.replace(stylis.regex.and, prefix)
 											);
+
 											// after: selector
 										}
 										// :hover, :active, :focus, etc...
@@ -965,6 +761,247 @@
 						}
 						else {
 							prev = buff;
+						}
+					}
+					// not single `}`
+					else if ((code === 125 && buff.length === 1) === false) {
+						// ;
+						if (code !== 59) {
+							buff = (code === 125 ? buff.substring(0, buff.length - 1) : buff.trim()) + ';';
+						}
+
+						// animation: a, n, i characters
+						if (first === 97 && second === 110 && third === 105) {
+							// removes ;
+							buff = buff.substring(0, buff.length - 1);
+
+							// position of :
+							colon = buff.indexOf(':')+1;
+
+							// left hand side everything before `:`
+							build = buff.substring(0, colon);
+
+							// short hand animation syntax
+							if (animations === true && buff.charCodeAt(9) !== 45) {
+								var anims = buff.substring(colon).trim().split(',');
+
+								length = anims.length;
+
+								// because we can have multiple animations `animation: slide 4s, slideOut 2s`
+								for (var j = 0; j < length; j++) {
+									var anim = anims[j];
+									var props = anim.split(' ');
+
+									// since we can't be sure of the position of the name of the animation we have to find it
+									for (var k = 0, l = props.length; k < l; k++) {
+										var prop = props[k].trim();
+										var frst = prop.charCodeAt(0);
+										var thrd = prop.charCodeAt(2);
+										var len = prop.length;
+										var last = prop.charCodeAt(len - 1);
+
+										// animation name is anything not in this list
+										if (
+											// cubic-bezier()/steps(), ) 
+											last !== 41 && len !== 0 &&
+
+											// infinite, i, f, e
+											!(frst === 105 && thrd === 102 && last === 101 && len === 8) &&
+
+											// linear, l, n, r
+											!(frst === 108 && thrd === 110 && last === 114 && len === 6) &&
+
+											// alternate/alternate-reverse, a, t, e
+											!(frst === 97 && thrd === 116 && last === 101 && (len === 9 || len === 17)) &&
+
+											// normal, n, r, l
+											!(frst === 110 && thrd === 114 && last === 108 && len === 6) &&
+
+											// backwards, b, c, s
+											!(frst === 98 && thrd === 99 && last === 115 && len === 9) &&
+
+											// forwards, f, r, s
+											!(frst === 102 && thrd === 114 && last === 115 && len === 8) &&
+
+											// both, b, t, h
+											!(frst === 98 && thrd === 116 && last === 104 && len === 4) &&
+
+											// none, n, n, e
+											!(frst === 110 && thrd === 110 && last === 101 && len === 4)&&
+
+											// running, r, n, g 
+											!(frst === 114 && thrd === 110 && last === 103 && len === 7) &&
+
+											// paused, p, u, d
+											!(frst === 112 && thrd === 117 && last === 100 && len === 6) &&
+
+											// reversed, r, v, d
+											!(frst === 114 && thrd === 118 && last === 100 && len === 8) &&
+
+											// step-start/step-end, s, e, (t/d)
+											!(
+												frst === 115 && thrd === 101 && 
+												((last === 116 && len === 10) || (last === 100 && len === 8)) 
+											) &&
+
+											// ease/ease-in/ease-out/ease-in-out, e, s, e
+											!(
+												frst === 101 && thrd === 115 &&
+												(
+													(last === 101 && len === 4) ||
+													(len === 11 || len === 7 || len === 8) && prop.charCodeAt(4) === 45
+												)
+											) &&
+
+											// durations, 0.4ms, .4s, 400ms ...
+											isNaN(parseFloat(prop)) &&
+
+											// handle spaces in cubic-bezier()/steps() functions
+											prop.indexOf('(') === -1
+										) {
+											props[k] = animns + prop;
+										}
+									}
+
+									build += (j === 0 ? '' : ',') + props.join(' ').trim();
+								}
+							}
+							// explicit syntax, anims array should have only one elemenet
+							else {
+								// n
+								build += ( 
+									(buff.charCodeAt(10) !== 110 ? '' : animns) + 
+									buff.substring(colon).trim().trim()
+								);
+							}
+
+							// vendor prefix
+							buff = webkit + build + ';' + build + (code === 125 ? ';}' : ';');
+						}
+						// appearance: a, p, p
+						else if (first === 97 && second === 112 && third === 112) {
+							// vendor prefix -webkit- and -moz-
+							buff = (
+								webkit + buff + 
+								moz + buff + 
+								buff
+							);
+						}
+						// display: d, i, s
+						else if (first === 100 && second === 105 && third === 115) {						
+							// flex/inline-flex
+							if ((indexOf = buff.indexOf('flex')) !== -1) {
+								// e, inline-flex
+								temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
+
+								// vendor prefix
+								buff = (
+									'display: ' + webkit + temp + 'box;'+
+									'display: ' + webkit + temp + 'flex;'+
+									'display: ' + ms + 'flexbox;' +
+									'display: ' + temp + 'flex;'
+								);
+							}
+						}
+						// transforms & transitions: t, r, a 
+						else if (first === 116 && second === 114 && third === 97) {
+							// vendor prefix -webkit- and -ms- if transform
+							buff = (
+								webkit + buff +
+								(buff.charCodeAt(5) === 102 ? ms + buff : '') + 
+								buff
+							);
+						}
+						// hyphens: h, y, p
+						// user-select: u, s, e
+						else if (
+							(first === 104 && second === 121 && third === 112) ||
+							(first === 117 && second === 115 && third === 101)
+						) {
+							// vendor prefix all
+							buff = (
+								webkit + buff + 
+								moz + buff + 
+								ms + buff + 
+								buff
+							);
+						}
+						// flex: f, l, e
+						else if (first === 102 && second === 108 && third === 101) {
+							// vendor prefix all but moz
+							buff = (
+								webkit + buff + 
+								ms + buff + 
+								buff
+							);
+						}
+						// order: o, r, d
+						else if (first === 111 && second === 114 && third === 100) {
+							// vendor prefix all but moz
+							buff = (
+								webkit + buff + 
+								ms + 'flex-' + buff + 
+								buff
+							);
+						}
+						// align-items, align-center, align-self: a, l, i, -
+						else if (first === 97 && second === 108 && third === 105 && buff.charCodeAt(5) === 45) {
+							switch (buff.charCodeAt(6)) {
+								// align-items, i
+								case 105: {
+									temp = buff.replace('-items', '');
+									buff = (
+										webkit + 'box-' + temp + 
+										ms + 'flex-'+ temp + 
+										buff
+									);
+									break;
+								}
+								// align-self, s
+								case 115: {
+									buff = (
+										ms + 'flex-item-' + buff.replace('-self', '') + 
+										buff
+									);
+									break;
+								}
+								// align-content
+								default: {
+									buff = (
+										ms + 'flex-line-pack' + buff.replace('align-content', '') + 
+										buff
+									);
+									break;
+								}
+							}
+						}
+						// cursor, c, u, r
+						else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
+							buff = (
+								buff.replace(/: +/g, ': ' + webkit) + 
+								buff.replace(/: +/g, ': ' + moz) +  
+								buff
+							);
+						}
+						// width: min-content / width: max-content
+						else if (first === 119 && second === 105 && third === 100 && (indexOf = buff.indexOf('-content')) !== -1) {
+							temp = buff.substring(indexOf - 3);
+
+							// vendor prefix all but moz
+							buff = (
+								'width: -webkit-' + temp +
+								'width: -moz-' + temp +
+								'width: ' + temp
+							);
+						}
+
+						if (code !== 59) {
+							buff = buff.substring(0, buff.length - 1);
+
+							// }
+							if (code === 125) {
+								buff += '}';
+							}
 						}
 					}
 					
@@ -1340,8 +1377,8 @@
 		split: /,[\s]*(?![^\r\n\[]*[\]\)])/g,
 		import: /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g,
 		global: [
-			/:global\((.*?)\)/g, 
-			/(?:&| ):global\((.*?)\)/g
+			/:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g, 
+			/(?:&| ):global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g
 		]
 	};
 

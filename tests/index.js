@@ -34,9 +34,9 @@ var tests = {
 		sample: `
 			color: 20px;
 			font-size: 20px;
-			transition: all;
+			transition: all
 		`,
-		expected: `.user {color: 20px;font-size: 20px;-webkit-transition: all;transition: all;}`
+		expected: `.user {color: 20px;font-size: 20px;-webkit-transition: all;transition: all}`
 	},
 	'namespace': {
 		name: 'namespace',
@@ -54,6 +54,10 @@ var tests = {
 				body {
 					background: yellow;
 				}
+			}
+		
+			:global([title="[]()"]:not(h2)):not(h2) {
+				color: red;
 			}
 
 			:global(body) {
@@ -77,6 +81,7 @@ var tests = {
 			}
 		`,
 		expected: `body {background: yellow;}`+
+		`[title="[]()"]:not(h2):not(h2) {color: red;}`+
 		`body {background: yellow;}`+
 		`body h1,body h2 {color: red;}`+
 		`body > li,.user li {color: yellow;}`+
@@ -203,12 +208,16 @@ var tests = {
 		name: 'prefixer',
 		sample: `
 			& {
+				width: max-content;
+				width: min-content; 
 				display: flex;
 			    transform: rotate(30deg);
 			    cursor: grab;
 			}
 		`,
 		expected: `.user {`+
+			`width: -webkit-max-content;width: -moz-max-content;width: max-content;`+
+			`width: -webkit-min-content;width: -moz-min-content;width: min-content;`+
 			`display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex;`+
 			`-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);`+
 			`cursor: -webkit-grab;cursor: -moz-grab;cursor: grab;`+

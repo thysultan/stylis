@@ -1,3 +1,12 @@
+## 1.2.6 March 14, 2016)
+
+- improve vendor prefixer, adds max-content and min-content
+
+## 1.2.5 (March 11, 2016)
+
+- imrpove last semicolon omission
+- improve `:global()` selector parsing
+
 ## 1.2.4 (March 9, 2016)
 
 - patch nesting for `:global()` selectors
