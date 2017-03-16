@@ -30,7 +30,7 @@ function benchPostCSS () {
 }
 
 function benchStylis () {
-	return stylis('', test);
+	return stylis('', test, true, false);
 }
 
 function benchCSSTree () {
@@ -51,10 +51,3 @@ bench(benchStylis, 'stylis');
 bench(benchCSSTree, 'css-tree');
 bench(benchPostCSS, 'post-css');
 benchStylus();
-
-// * denotes without vendor prefixing & namespacing
-// 
-// 4ms stylis
-// 5ms css-tree *
-// 7ms post-css *
-// 132ms stylus *
