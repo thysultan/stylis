@@ -52,7 +52,7 @@ bench(benchCSSTree, 'css-tree');
 bench(benchPostCSS, 'post-css');
 benchStylus();
 
-// * denotes without prefixing/namespacing
+// * denotes without vendor prefixing & namespacing
 // 
 // 4ms stylis
 // 5ms css-tree *
