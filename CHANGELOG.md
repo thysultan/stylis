@@ -1,3 +1,7 @@
+## 1.2.7 March 25, 2016)
+
+- patch short hand animation name parser
+
 ## 1.2.6 March 14, 2016)
 
 - improve vendor prefixer, adds max-content and min-content

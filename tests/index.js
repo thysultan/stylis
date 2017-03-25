@@ -226,6 +226,12 @@ var tests = {
 	'animations': {
 		name: 'animations',
 		sample: `
+			h2 {
+				animation: initial inherit unset;
+			}
+			span {
+				animation: _name_ -name %name 1name __name;
+			}
 			div {
 				animation-name: bounce
 			}
@@ -277,7 +283,8 @@ var tests = {
 			this also tests the parses ability to find and namespace 
 			the animation-name in a grouped animation: property 
 		*/
-
+		`.user h2 {-webkit-animation:initial inherit unset;animation:initial inherit unset;}`+
+		`.user span {-webkit-animation:user_name_ user-name %name 1name __name;animation:user_name_ user-name %name 1name __name;}`+
 		`.user div {-webkit-animation-name:userbounce;animation-name:userbounce;}`+
 		`.user h1 {`+
 		`-webkit-animation:0.6s .6ms 200ms infinite usersomething-ease userinfinite-fire userslidein `+

@@ -800,13 +800,36 @@
 										var len = prop.length;
 										var last = prop.charCodeAt(len - 1);
 
-										// animation name is anything not in this list
+										// animation name parser
 										if (
+											// first character
+											(
+											    // letters
+											    (frst > 64 && frst < 90) || 
+											    (frst > 96 && frst < 122) || 
+											    // the exception `underscores or dashes`
+											    frst === 45 || 
+											    // but two dashes at the beginning are forbidden
+											    (frst === 95 && prop.charCodeAt(1) !== 95)
+											) &&
+
 											// cubic-bezier()/steps(), ) 
 											last !== 41 && len !== 0 &&
 
-											// infinite, i, f, e
-											!(frst === 105 && thrd === 102 && last === 101 && len === 8) &&
+											!(
+												frst === 105 && 
+												(
+													// infinite, i, f, e
+													(thrd === 102 && last === 101 && len === 8) ||
+													// initial
+													(thrd === 105 && last === 108 && len === 7) ||
+													// inherit
+													(thrd === 104 && last === 116 && len === 7)
+												)
+											) &&
+
+											// unset
+											!(frst === 117 && thrd === 115 && last === 116 && len === 5) &&
 
 											// linear, l, n, r
 											!(frst === 108 && thrd === 110 && last === 114 && len === 6) &&
