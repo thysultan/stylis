@@ -1,3 +1,7 @@
+## 1.2.8 March 26, 2016)
+
+- patch `!important` in `display: flex` vendor prefixing
+
 ## 1.2.7 March 25, 2016)
 
 - patch short hand animation name parser

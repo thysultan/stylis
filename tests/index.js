@@ -210,7 +210,7 @@ var tests = {
 			& {
 				width: max-content;
 				width: min-content; 
-				display: flex;
+				display: flex !important;
 			    transform: rotate(30deg);
 			    cursor: grab;
 			}
@@ -218,7 +218,8 @@ var tests = {
 		expected: `.user {`+
 			`width: -webkit-max-content;width: -moz-max-content;width: max-content;`+
 			`width: -webkit-min-content;width: -moz-min-content;width: min-content;`+
-			`display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex;`+
+			`display: -webkit-box !important;display: -webkit-flex !important;`+
+			`display: -ms-flexbox !important;display: flex !important;`+
 			`-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);`+
 			`cursor: -webkit-grab;cursor: -moz-grab;cursor: grab;`+
 			`}`

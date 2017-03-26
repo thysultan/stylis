@@ -916,13 +916,14 @@
 							if ((indexOf = buff.indexOf('flex')) !== -1) {
 								// e, inline-flex
 								temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
+								buff = buff.indexOf(' !important') !== -1 ? ' !important' : '';
 
 								// vendor prefix
 								buff = (
-									'display: ' + webkit + temp + 'box;'+
-									'display: ' + webkit + temp + 'flex;'+
-									'display: ' + ms + 'flexbox;' +
-									'display: ' + temp + 'flex;'
+									'display: ' + webkit + temp + 'box' + buff + ';' +
+									'display: ' + webkit + temp + 'flex' + buff + ';' +
+									'display: ' + ms + 'flexbox' + buff + ';' +
+									'display: ' + temp + 'flex' + buff + ';'
 								);
 							}
 						}
