@@ -5,6 +5,7 @@
 - patch vendor prefix for `align-items`
 - remove mixins, variables and block level `@global {}`
 - improve disabling compact features option
+- 3.67KB -> 3.12KB
 
 ## 1.2.8 March 26, 2016)
 
