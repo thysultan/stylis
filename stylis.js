@@ -25,14 +25,15 @@
 
 	'use strict';
 
+
 	// plugins
 	var plugins = [];
 
 	// regular expressions
-	var andReg = /&/g;
-	var splitReg = /,[\s]*(?:(?![^\r\n\[]*[\]\)])|(?=:[^n]*\())/g;
-	var globalReg = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
-	var globalsReg = /(?:&| ):global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
+	var andPattern = /&/g;
+	var splitPattern = /,\f/g;
+	var globalPattern = /:global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
+	var globalsPattern = /(?:&| ):global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
 
 	// prefixes
 	var moz = '-moz-';
@@ -62,7 +63,6 @@
 		var character;
 		var attr;
 		var animns;
-		var uses;
 
 		// [ attr selector
 		if (type === 91) {
@@ -101,22 +101,23 @@
 		}
 
 		// middleware
-		var use = middleware != null;
+		var has;
+		var uses = middleware != null;
 		var length = plugins.length;
 
-		if (use) {
-			uses = (typeof middleware).charCodeAt(0);
+		if (uses === true) {
+			has = (typeof middleware).charCodeAt(0);
 
 			// o, object/array
-			if (uses === 111) {
-				puse(middleware, null);
+			if (has === 111) {
+				use(middleware);
 			}
 			// f, function
-			else if (uses === 102) {
+			else if (has === 102) {
 				plugins[length++] = middleware;
 			}
 			else {
-				use = false;
+				uses = false;
 			}
 		}
 
@@ -133,7 +134,7 @@
 				}
 			};
 
-			use = true;
+			uses = true;
 		}
 
 		// declare
@@ -162,6 +163,7 @@
 
 		// character code
 		var code = 0;
+		var nextcode;
 
 		// context signatures
 		var special = 0;
@@ -173,7 +175,6 @@
 		var strings = 0;
 		var globs = 0;
 		var isplace = 0;
-		var property = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -185,7 +186,7 @@
 		var comline = 0;
 
 		// pre-process
-		if (use) {
+		if (uses === true) {
 			temp = middleware(0, styles, line, column, prefix, 0);
 
 			if (temp != null) {
@@ -224,27 +225,25 @@
 				buff += styles.charAt(caret);
 
 				// middleware, selector/property context, }
-				if (use && code !== 125) {
-					if (use) {
-						// { pre-processed selector context
-						if (code === 123) {
-							temp = middleware(
-								1,
-								buff.substring(0, buff.length - 1).trim(),
-								line,
-								column,
-								prefix,
-								output.length
-							);
-						}
-						// ; property context
-						else {
-							temp = middleware(2, buff, line, column, prefix, output.length);
-						}
+				if (uses === true && code !== 125) {
+					// { pre-processed selector context
+					if (code === 123) {
+						temp = middleware(
+							1,
+							buff.substring(0, buff.length - 1).trim(),
+							line,
+							column,
+							prefix,
+							output.length
+						);
+					}
+					// ; property context
+					else {
+						temp = middleware(2, buff, line, column, prefix, output.length);
+					}
 
-						if (temp != null) {
-							buff = code === 123 ? temp + ' {' : temp;
-						}
+					if (temp != null) {
+						buff = code === 123 ? temp + ' {' : temp;
 					}
 				}
 
@@ -266,7 +265,7 @@
 						flat = prefix + ' {' + flat + '}';
 
 						// middleware, flat context
-						if (use) {
+						if (uses === true) {
 							temp = middleware(4, flat, line, column, prefix, output.length);
 
 							if (temp != null) {
@@ -300,7 +299,7 @@
 
 								temp = '';
 								inner = '';
-								selectors = prev.split(splitReg);
+								selectors = prev.split(splitPattern);
 
 								// keep track of opening `{` and `}` occurrences
 								closed = 1;
@@ -386,7 +385,7 @@
 							flat = prefix + ' {' + flat + '}';
 
 							// middleware, flat context
-							if (use) {
+							if (uses === true) {
 								temp = middleware(4, flat, line, column, prefix, output.length);
 
 								if (temp != null) {
@@ -407,8 +406,8 @@
 							// inner content of block
 							inner = '';
 
-							var nestSelector = buff.substring(0, buff.length - 1).split(splitReg);
-							var prevSelector = prev.substring(0, prev.length - 1).split(splitReg);
+							var nestSelector = buff.substring(0, buff.length - 1).split(splitPattern);
+							var prevSelector = prev.substring(0, prev.length - 1).split(splitPattern);
 
 							// keep track of opening `{` and `}` occurrences
 							closed = 1;
@@ -452,7 +451,7 @@
 								// since there could also be multiple nested selectors
 								for (var k = 0, l = nestSelector.length; k < l; k++) {
 									if (indexOf > 0) {
-										selector = ':global()' + temp.trim();
+										selector = ':global(%)' + temp.trim();
 									}
 									else {
 										selector = temp.replace(prefix, '&').trim();
@@ -463,7 +462,7 @@
 									if (sel.indexOf(' &') > 0) {
 										selector = sel.replace('&', '').trim() + ' ' + selector;
 									}
-									else if (globalReg.exec(sel) !== null) {
+									else if (globalPattern.exec(sel) !== null) {
 										selector = sel;
 									}
 									else {
@@ -481,7 +480,7 @@
 							// concat nest
 							nest += (
 								'\n' +
-								prevSelector.join(',').replace(globalsReg, ' $1') +
+								prevSelector.join(',').replace(globalsPattern, ' $1') +
 								' {'+inner+'}'
 							);
 
@@ -496,7 +495,7 @@
 						}
 						// top-level selector
 						else if (special === 0 || type === 2) {
-							selectors = buff.split(splitReg);
+							selectors = buff.split(splitPattern);
 
 							// current selector
 							build = '';
@@ -519,7 +518,7 @@
 								// &
 								if (char === 38) {
 									// before: & { / &&... {
-									selector = prefix + selector.substring(1).replace(andReg, prefix);
+									selector = prefix + selector.substring(1).replace(andPattern, prefix);
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
 								else {
@@ -531,35 +530,35 @@
 									// default to :global if & exists outside of the first non-space character
 									if ((indexOf = selector.indexOf(' &')) > 0) {
 										// before: html & {
-										selector = selector.replace(andReg, prefix).trim();
+										selector = selector.replace(andPattern, prefix).trim();
 										// after: html ${prefix} {
 									}
 									// :
 									else if (char === 58) {
-										var nextChar = selector.charCodeAt(1);
+										nextcode = selector.charCodeAt(1);
 
 										// h, t, :host
-										if (compact && nextChar === 104 && selector.charCodeAt(4) === 116) {
-											var nextChar = selector.charCodeAt(5);
+										if (compact === true && nextcode === 104 && selector.charCodeAt(4) === 116) {
+											nextcode = selector.charCodeAt(5);
 
 											// (, :host(selector)
-											if (nextChar === 40) {
+											if (nextcode === 40) {
 												// before: `(selector)`
 												selector = (
 													prefix + (
 														selector
 															.replace(/:host\((.*)\)/g, '$1')
-															.replace(andReg, prefix)
+															.replace(andPattern, prefix)
 													)
 												);
 												// after: ${prefx} selector {
 											}
 											// -, :host-context(selector)
-											else if (nextChar === 45) {
+											else if (nextcode === 45) {
 												// before: `-context(selector)`
 												selector = selector
 													.replace(/:host-context\((.*)\)/g, '$1 ' + prefix)
-													.replace(andReg, prefix)
+													.replace(andPattern, prefix)
 												// after: selector ${prefix} {
 											}
 											// :host
@@ -568,14 +567,21 @@
 											}
 										}
 										// g, :global(selector)
-										else if (compact && nextChar === 103) {
+										else if (
+											nextcode === 103 &&
+											(
+												compact === true
+												||
+												((nextcode = selector.charCodeAt(8)) === 37)
+											)
+										) {
 											globs = 1;
 
 											// before: `:global(selector)`
 											selector = (
 												selector
-													.replace(globalReg, '$1')
-													.replace(andReg, prefix).trim()
+													.replace(globalPattern, '$1')
+													.replace(andPattern, prefix).trim()
 											);
 											// after: selector
 										}
@@ -591,7 +597,7 @@
 								}
 
 								// middleware, post-processed selector context
-								if (use) {
+								if (uses === true) {
 									temp = middleware(
 										1.5,
 										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector,
@@ -607,7 +613,7 @@
 								}
 
 								// if first selector do not prefix with `,`
-								prev += (j !== 0 ? ',' : '') + (globs !== 1 ? selector : ':global()' + selector);
+								prev += (j !== 0 ? ',\f' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
 								build += j !== 0 ? ',' + selector : selector;
 
 								// reset :global flag
@@ -999,7 +1005,7 @@
 					// {, @
 					if (char !== 123) {
 						// middleware, block context
-						if (use) {
+						if (uses === true) {
 							temp = middleware(3, blck, line, column, prefix, output.length);
 
 							if (temp != null) {
@@ -1051,7 +1057,7 @@
 						buff = buff.substring(0, buff.indexOf('//')).trim();
 					}
 					// /
-					else if (use && comment === 0 && (length = (str = str.trim()).length) !== 0 && str.charCodeAt(0) !== 47) {
+					else if (uses === true && comment === 0 && (length = (str = str.trim()).length) !== 0 && str.charCodeAt(0) !== 47) {
 						if (buff.length !== 0) {
 							temp = middleware(7, str, line, column, prefix, output.length);
 
@@ -1072,7 +1078,7 @@
 						character = styles.charAt(caret);
 
 						// build line buffer
-						if (use && comment === 0) {
+						if (uses === true && comment === 0) {
 							str += character;
 						}
 
@@ -1080,10 +1086,10 @@
 						buff += character;
 
 						switch (code) {
-							// : character
-							case 58: {
+							// ,
+							case 44: {
 								if (strings === 0 && comment === 0 && func === 0) {
-									property = 1;
+									buff += '\f';
 								}
 								break;
 							}
@@ -1163,7 +1169,7 @@
 			flat = prefix + ' {' + flat + '}';
 
 			// middleware, flat context
-			if (use) {
+			if (uses === true) {
 				temp = middleware(4, flat, line, column, prefix, output.length);
 
 				if (temp != null) {
@@ -1176,7 +1182,7 @@
 		}
 
 		// middleware, output context
-		if (use) {
+		if (uses === true) {
 			temp = middleware(6, output, line, column, prefix, output.length);
 
 			if (temp != null) {
@@ -1195,7 +1201,7 @@
 	 * @param  {function?} plugin
 	 * @return {Object} {plugins}
 	 */
-	function puse (plugin) {
+	function use (plugin) {
 		var length = plugins.length;
 
 		if (plugin != null) {
@@ -1214,7 +1220,7 @@
 		return stylis;
 	};
 
-	stylis.use = puse;
+	stylis.use = use;
 
 
 	/**
@@ -1231,10 +1237,10 @@
 	 * @type {Object<string, RegExp>}
 	 */
 	stylis.r = {
-		a: andReg,
-		s: splitReg,
-		g: globalReg,
-		gs: globalsReg
+		a: andPattern,
+		s: splitPattern,
+		g: globalPattern,
+		n: globalsPattern
 	};
 
 

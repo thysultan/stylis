@@ -4,7 +4,7 @@
 - add vendor prefix for `justify-content`
 - patch vendor prefix for `align-items`
 - remove mixins, variables and block level `@global {}`
-- improve compact feature disabling options
+- improve disabling compact features option
 
 ## 1.2.8 March 26, 2016)
 

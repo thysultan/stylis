@@ -30,17 +30,17 @@
 		if (e.keyCode === 9) {
 			e.preventDefault();
 
-            var selection = window.getSelection();
-            var range = selection.getRangeAt(0); 
-            var text = document.createTextNode('\t');
+         var selection = window.getSelection();
+         var range = selection.getRangeAt(0);
+         var text = document.createTextNode('\t');
 
-            range.deleteContents(); 
-            range.insertNode(text);
-            range.setStartAfter(text);
-            selection.removeAllRanges();
-            selection.addRange(range);
+         range.deleteContents();
+         range.insertNode(text);
+         range.setStartAfter(text);
+         selection.removeAllRanges();
+         selection.addRange(range);
 
-            return;
+         return;
 		}
 
 		var namespace = '#namespace';

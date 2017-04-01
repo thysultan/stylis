@@ -256,14 +256,11 @@ stylis(
     selector: {string},     // selector - i.e `.class` or `#id` or `[attr=id]`
     styles: {string},       // css string
     animations: {boolean=}  // false to prevent prefixing animations, true by default
-    compact: {boolean=}     // enable additional features (mixins, variables)
-    middleware: {function=}
+    compact: {boolean=}     // enable additional features(:global, :host, :host-context)
+    middleware: {function|function[]=}
 );
 
-stylis.use(
-    key/middleware: {(string|RegExp|function|array|object)}
-    plugin: {function=}
-)
+stylis.use(middleware: {function|function[]=})
 ```
 
 ## Middleware
@@ -279,10 +276,7 @@ The optional middleware function accepts four arguments `ctx, str, line, column,
 8. before the compiled css output is returned `ctx = 6`
 9. after every new line that does not end with a token `ctx = 7`
 
-If you wanted to you could parse import statements in the middleware and return the imported file, stylis will then insert the content of it into the css that it later parse/compile. The str value on import context is the file name i.e `foo` or `foo.scss` or multiple files `foo, bar`.
-
 If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
-
 
 ```javascript
 stylis(``, `h1 { width: calc(random()*10); }`, false, function (ctx, str, line, column, namespace, length) {
@@ -348,7 +342,9 @@ React.Component.prototype.stylis = function (self) {
     var namespace = this.displayName;
 
     return function () {
-        stylis(namespace, self.stylesheet(), document.head);
+        var style = document.createElement('style');
+        style.textContent = stylis(namespace, self.stylesheet());
+        document.head.appendChild(style);
         mounted = true;
         this.setAttribute(namespace);
     }
