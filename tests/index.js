@@ -9,13 +9,13 @@
  * log format
  *
  * ------
- * 
+ *
  * Tests Passed #
  *
  * ...
  *
  * [Finnished In] #ms
- * 
+ *
  * Tests Failed #
  *
  * ...
@@ -47,15 +47,13 @@ var tests = {
 		`,
 		expected: `.user {color: blue;}`
 	},
-	'globals': {
-		name: '@global/:global',
+	':global()': {
+		name: ':global()',
 		sample: `
-			@global {
-				body {
-					background: yellow;
-				}
+			h1, :global(h2) {
+				color: red;
 			}
-		
+
 			:global([title="[]()"]:not(h2)):not(h2) {
 				color: red;
 			}
@@ -80,7 +78,7 @@ var tests = {
 				color: red;
 			}
 		`,
-		expected: `body {background: yellow;}`+
+		expected: `.user h1,h2 {color: red;}`+
 		`[title="[]()"]:not(h2):not(h2) {color: red;}`+
 		`body {background: yellow;}`+
 		`body h1,body h2 {color: red;}`+
@@ -88,7 +86,7 @@ var tests = {
 		`.user h1 :global(body > li) {color: red;}`+
 		`html .user {color: red;}`
 	},
-	'comment': {
+	'comments': {
 		name: 'comments',
 		sample: `
 			// line comment
@@ -96,7 +94,7 @@ var tests = {
 			// color: red;
 
 			/**
-			 * removes block comments and line comments, 
+			 * removes block comments and line comments,
 			 * there's a fire in the house // there is
 			 */
 
@@ -107,7 +105,7 @@ var tests = {
 			  */
 			{color: blue;}
 
-			 
+
 			// hello
 
 			button /* 1 */
@@ -115,7 +113,7 @@ var tests = {
 				color: red; /* 2 */
 			}
 		`,
-		expected: '.user button {color: blue;}.user button {color: red;}'
+		expected: '.user button{color: blue;}.user button{color: red;}'
 	},
 	'&': {
 		name: '&',
@@ -147,9 +145,9 @@ var tests = {
 		name: '@media',
 		sample: `
 			@media (max-width: 600px) {
-				color: red;	
+				color: red;
 				h1 {
-					color: red; 
+					color: red;
 
 					h2 {
 						color: blue;
@@ -161,11 +159,11 @@ var tests = {
 			@media (min-width: 576px) {
 				&.card-deck {
 					.card {
-				 		&:not(:first-child) { 
-				   			margin-left: 15px; 
+				 		&:not(:first-child) {
+				   			margin-left: 15px;
 				 		}
-						&:not(:last-child) { 
-				   			margin-right: 15px; 
+						&:not(:last-child) {
+				   			margin-right: 15px;
 						}
 					}
 				}
@@ -185,8 +183,8 @@ var tests = {
 	'@font-face': {
 		name: '@font-face',
 		sample: `
-			@font-face { 
-				font-family: Pangolin; 
+			@font-face {
+				font-family: Pangolin;
 				src: url('Pangolin-Regular.ttf') format('truetype');
 			}
 		`,
@@ -207,21 +205,40 @@ var tests = {
 	'prefixer': {
 		name: 'prefixer',
 		sample: `
+			input.red::placeholder,
+			input.error::placeholder {
+		  		color:red;
+			}
 			& {
 				width: max-content;
-				width: min-content; 
+				width: min-content;
 				display: flex !important;
-			    transform: rotate(30deg);
-			    cursor: grab;
+			   transform: rotate(30deg);
+			   cursor: grab;
+
+			   justify-content: flex-end;
+			   justify-content: flex-start;
+			   justify-content: justify;
 			}
 		`,
-		expected: `.user {`+
+		expected:
+			`.user input.red::-webkit-input-placeholder,.user input.error::-webkit-input-placeholder {color:red;}`+
+			`.user input.red::-moz-placeholder,.user input.error::-moz-placeholder {color:red;}`+
+			`.user input.red:-ms-input-placeholder,.user input.error:-ms-input-placeholder {color:red;}`+
+			`.user input.red::placeholder,.user input.error::placeholder {color:red;}`+
+
+			`.user {`+
 			`width: -webkit-max-content;width: -moz-max-content;width: max-content;`+
 			`width: -webkit-min-content;width: -moz-min-content;width: min-content;`+
 			`display: -webkit-box !important;display: -webkit-flex !important;`+
 			`display: -ms-flexbox !important;display: flex !important;`+
 			`-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);`+
 			`cursor: -webkit-grab;cursor: -moz-grab;cursor: grab;`+
+
+			'-webkit-box-pack: end;-webkit-justify-content: flex-end;-ms-flex-pack: end;justify-content: flex-end;'+
+			'-webkit-box-pack: start;-webkit-justify-content: flex-start;-ms-flex-pack: start;justify-content: flex-start;'+
+			'-webkit-box-pack: justify;-webkit-justify-content: justify;-ms-flex-pack: justify;justify-content: justify;'+
+
 			`}`
 	},
 	'animations': {
@@ -279,10 +296,10 @@ var tests = {
       			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
 		    }
 		`,
-		expected: 
-		/* 
-			this also tests the parses ability to find and namespace 
-			the animation-name in a grouped animation: property 
+		expected:
+		/*
+			this also tests the parses ability to find and namespace
+			the animation-name in a grouped animation: property
 		*/
 		`.user h2 {-webkit-animation:initial inherit unset;animation:initial inherit unset;}`+
 		`.user span {-webkit-animation:user_name_ user-name %name 1name __name;animation:user_name_ user-name %name 1name __name;}`+
@@ -428,7 +445,7 @@ var tests = {
 			h1, div {
 				color: red;
 
-				h2, 
+				h2,
 				&:before {
 					color: red;
 				}
@@ -448,14 +465,14 @@ var tests = {
 				}
 			}
 
-			&.foo { 
+			&.foo {
 				&.bar {
 					color: yesplease
 				}
 			}
 
-			&.foo { 
-				&.bar { 
+			&.foo {
+				&.bar {
 					&.barbar {
 						color: yesplease
 					}
@@ -472,19 +489,6 @@ var tests = {
 		'.user.foo.bar {color: yesplease}'+
 		'.user.foo.bar.barbar {color: yesplease}'
 	},
-	'variables': {
-		name: 'variables',
-		sample: `
-			~~foo: 20px;
-
-			width: var(~~foo);
-
-			& {
-				margin: var(~~foo);
-			}
-		`,
-		expected: '.user {width: 20px;}.user {margin: 20px;}'
-	},
 	'strings': {
 		name: 'strings',
 		sample: `
@@ -495,30 +499,6 @@ var tests = {
 			}
 		`,
 		expected: `.user .foo:before {content: ".hello {world}";content: ".hello {world} ' ";content: '.hello {world} " ';}`
-	},
-	'mixins': {
-		name: 'mixins',
-		sample: `
-			@mixin large-text {
-		    	font-size: 20px;
-			}
-
-			@mixin linx (link, visit, hover, active) {
-				a {
-				    color: var(~~link);
-				    &:hover {
-				      color: var(~~hover);   
-				    }
-			  	}
-			}
-
-			& {
-				@include large-text;
-			}
-
-			@include linx(white, blue, green, red);
-		`,
-		expected: `.user {font-size: 20px;}.user a {color: white;}.user a:hover {color: green;}`
 	},
 	'remove empty css': {
 		name: 'remove empty css',
@@ -557,20 +537,6 @@ var tests = {
 		'@mixin linx (link, visit, hover, active) {a {color: var(~~link);}}'+
 		'.user {@include large-text;}'
 	},
-	'middleware imports': {
-		name: 'middleware imports',
-		options: {
-			middleware: function (ctx, str, line, col) {
-				if (ctx === 5) {
-					return `.imported { color: orange; }`;
-				}
-			}
-		},
-		sample: `
-			@import "foo.scss";
-		`,
-		expected: `.user .imported {color: orange;}`
-	},
 	'middleware contexts': {
 		name: 'middleware contexts',
 		options: {
@@ -580,20 +546,15 @@ var tests = {
 					case 2: return str+'/* property */';
 					case 3: return str+'/* block */';
 					case 4: return str+'/* flat */';
-					case 5: return '.imported { color: orange; }';
 					case 6: return str+'/* output */';
 				}
 			}
 		},
 		sample: `
 			color: blue;
-			
-			@import "bar.scss";
-
 			h1 { color: red; }
 		`,
 		expected: '.user {color: blue;/* property */}/* flat */'+
-		'.user .imported/* selector */ {color: orange;/* property */}/* block */'+
 		'.user h1/* selector */ {color: red;/* property */}/* block *//* output */'
 	},
 	'urls': {
@@ -616,7 +577,7 @@ var tests = {
 			.content {
 				display: none
 			}
-			
+
 			.content {
 				display: flex
 			}
@@ -625,7 +586,7 @@ var tests = {
 		`.user .content {display: -webkit-box;display: -webkit-flex;display: -ms-flexbox;display: flex}`
 	},
 	':matches(:not())': {
-		name: ':matches()',
+		name: ':matches(:not())',
 		sample: `
 			h1:matches(.a, .b, :not(.c)) {
 				display: none
@@ -668,12 +629,12 @@ function run (tests) {
 		var expected = test.expected.trim();
 		var options = test.options || {};
 
-		stylis.plugins.length = 0;
+		stylis.p.length = 0;
 
 		var result = stylis(
-			'.user', 
-			sample, 
-			options.animations, 
+			'.user',
+			sample,
+			options.animations,
 			options.compact === void 0 ? true : options.compact,
 			options.middleware
 		);
@@ -699,7 +660,7 @@ function run (tests) {
 
 	// failed
 	console.log(
-		format.bold+'Tests Failed '+failed.length+format.reset+format.red + 
+		format.bold+'Tests Failed '+failed.length+format.reset+format.red +
 		'\n\n'+(failed.join('\n') || 'no failed tests')+end
 	);
 

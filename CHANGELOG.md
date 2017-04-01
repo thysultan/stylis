@@ -1,3 +1,11 @@
+## 2.0.0 April 01, 2016)
+
+- add vendor prefix for `::placeholder`
+- add vendor prefix for `justify-content`
+- patch vendor prefix for `align-items`
+- remove mixins, variables and block level `@global {}`
+- improve compact feature disabling options
+
 ## 1.2.8 March 26, 2016)
 
 - patch `!important` in `display: flex` vendor prefixing
@@ -12,7 +20,7 @@
 
 ## 1.2.5 (March 11, 2016)
 
-- imrpove last semicolon omission
+- improve last semicolon omission
 - improve `:global()` selector parsing
 
 ## 1.2.4 (March 9, 2016)

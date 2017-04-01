@@ -13,21 +13,6 @@
 			transition: 4s all;
 			transform: translate(20px);
 
-			@global {
-				* {
-					box-sizing: border-box; 
-					margin: 0; 
-					padding: 0;
-				}
-
-				body {
-					background: #F8F5F2;
-					font-family: 'Helvetica Neue', sans-serif;
-					-webkit-font-smoothing: antialiased;
-					-moz-osx-font-smoothing: grayscale;
-				}
-			}
-
 			h2, h1 {
 				background-color: blue;
 
@@ -36,39 +21,12 @@
 	  			}
 			}
 
-			~~selector: .user;
-
 			& {}
-
-			body.firefox var(~~selector):before {
-				content: "Hi, Firefox users!" var(~~selector);
-			}
 
 			.foo:before {
 		  		content: ".hello {world} ' "
 			}
 
-			@mixin large-text {
-		    	font-size: 20px;
-			}
-
-			@mixin linx (link, visit, hover, active) {
-				a {
-				    color: var(~~link);
-				    &:hover {
-				      color: var(~~hover);   
-				    }
-			  	}
-			}
-
-			@include large-text;
-			
-			@include linx(white, blue, green, yellow);
-
-			& {
-				@include large-text;
-			}
-		
 			@import "foo.scss";
 
 			display: block;
@@ -114,17 +72,17 @@
 			.row { flex: 1; }
 
 			.container > .welcome > *:not(pre):not(div),
-			.wrap { 
-				max-width: 600px; 
+			.wrap {
+				max-width: 600px;
 				width: 100%;
 				margin: 0 auto;
 				padding:0 20px;
 			}
 
-			.header { 
+			.header {
 				padding-top: 40px;
 				padding-bottom: 30px;
-				min-height: 203px; 
+				min-height: 203px;
 			}
 
 			.logo {
@@ -221,7 +179,7 @@
 				margin-top: 34px;
 			}
 
-			h2, 
+			h2,
 			h3,
 			h4,
 			h5,
@@ -232,8 +190,8 @@
 
 			h4,
 			h5,
-			h6 { 
-				font-size: 18px; 
+			h6 {
+				font-size: 18px;
 			}
 
 			hr {

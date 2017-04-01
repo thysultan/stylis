@@ -1,13 +1,13 @@
 /*
- *          __        ___     
+ *          __        ___
  *    _____/ /___  __/ (_)____
  *   / ___/ __/ / / / / / ___/
- *  (__  ) /_/ /_/ / / (__  ) 
- * /____/\__/\__, /_/_/____/  
- *          /____/            
- * 
+ *  (__  ) /_/ /_/ / / (__  )
+ * /____/\__/\__, /_/_/____/
+ *          /____/
+ *
  * stylis is a feature-rich css preprocessor
- * 
+ *
  * @licence MIT
  */
 (function (factory) {
@@ -16,38 +16,48 @@
 	}
 	else if (typeof define === 'function' && define.amd) {
 		define(factory(window));
-	} 
+	}
 	else {
 		window.stylis = factory(window);
 	}
 }(function (window) {
 
-	
+
 	'use strict';
+
+	// plugins
+	var plugins = [];
+
+	// regular expressions
+	var andReg = /&/g;
+	var splitReg = /,[\s]*(?:(?![^\r\n\[]*[\]\)])|(?=:[^n]*\())/g;
+	var globalReg = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
+	var globalsReg = /(?:&| ):global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
+
+	// prefixes
+	var moz = '-moz-';
+	var ms = '-ms-';
+	var webkit = '-webkit-';
 
 
 	/**
 	 * css preprocessor
 	 *
-	 * @example stylis('.foo', 'css...', true, true, null);
-	 * 
-	 * @param  {string}   selector   - i.e `.class` or `#id` or `[attr=id]`
-	 * @param  {string}   styles     - css string
-	 * @param  {boolean=} animations - prefix animations and keyframes, true by default
-	 * @param  {boolean=} compact    - enable additional features(mixins and variables)
-	 * @param  {function(context, content, line, column, namespace)=} middleware
+	 * @param  {String}   selector   - i.e `.class` or `#id` or `[attr=id]`
+	 * @param  {String}   styles     - css string
+	 * @param  {Boolean=} animations - prefix animations and keyframes, true by default
+	 * @param  {Boolean=} compact    - enable additional shadow dom features(:host, :host-context)
+	 * @param  {Function} middleware
 	 * @return {string}
 	 */
 	function stylis (selector, styles, animations, compact, middleware) {
-		/* @type {string} */
 		selector += '';
 
 		var prefix = '';
 		var namespace = '';
 
-		/* @type {number} */
 		var type = selector.charCodeAt(0);
-		
+
 		var char;
 		var character;
 		var attr;
@@ -92,7 +102,6 @@
 
 		// middleware
 		var use = middleware != null;
-		var plugins = stylis.plugins;
 		var length = plugins.length;
 
 		if (use) {
@@ -100,7 +109,7 @@
 
 			// o, object/array
 			if (uses === 111) {
-				stylis.use(middleware, null);
+				puse(middleware, null);
 			}
 			// f, function
 			else if (uses === 102) {
@@ -144,19 +153,7 @@
 		var nest;
 		var query;
 		var str;
-
-		// variables
-		var vars;
-		var varlen;
-
-		// mixins
-		var mixins;
-		var mixin;
-
-		// prefixes
-		var moz = '-moz-';
-		var ms = '-ms-';
-		var webkit = '-webkit-';
+		var regex;
 
 		// buffers
 		var buff = '';
@@ -166,7 +163,7 @@
 		// character code
 		var code = 0;
 
-		// context signatures		
+		// context signatures
 		var special = 0;
 		var close = 0;
 		var closed = 0;
@@ -174,8 +171,9 @@
 		var func = 0;
 		var medias = 0;
 		var strings = 0;
-		var glob = 0;
 		var globs = 0;
+		var isplace = 0;
+		var property = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -189,7 +187,7 @@
 		// pre-process
 		if (use) {
 			temp = middleware(0, styles, line, column, prefix, 0);
-			
+
 			if (temp != null) {
 				styles = temp;
 			}
@@ -203,23 +201,24 @@
 		var column = 0;
 		var line = 1;
 		var eof = styles.length;
-		var last = eof - 1;
 
 		// compiled output
 		var output = '';
 
 		// parse + compile
 		while (caret < eof) {
-			/* @type {number} */
 			code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
-			if (
-				strings === 0 && func === 0 && comment === 0 && 
+			if (strings === 0 && func === 0 && comment === 0 &&
 				(
+					// {, }, ;
 					(code === 123 || code === 125 || code === 59)
-					|| 
-					((caret === eof - 1) && buff.length !== 0)
+					||
+					// eof buffer
+					(
+						(caret === eof - 1) && buff.length !== 0
+					)
 				)
 			) {
 				buff += styles.charAt(caret);
@@ -230,14 +229,14 @@
 						// { pre-processed selector context
 						if (code === 123) {
 							temp = middleware(
-								1, 
-								buff.substring(0, buff.length - 1).trim(), 
-								line, 
-								column, 
-								prefix, 
+								1,
+								buff.substring(0, buff.length - 1).trim(),
+								line,
+								column,
+								prefix,
 								output.length
 							);
-						} 
+						}
 						// ; property context
 						else {
 							temp = middleware(2, buff, line, column, prefix, output.length);
@@ -256,7 +255,6 @@
 					first = (buff = buff.trim()).charCodeAt(0);
 				}
 
-				// default to 0 instead of NaN if there is no second/third character
 				second = buff.charCodeAt(1);
 				third = buff.charCodeAt(2);
 
@@ -270,7 +268,7 @@
 						// middleware, flat context
 						if (use) {
 							temp = middleware(4, flat, line, column, prefix, output.length);
-						
+
 							if (temp != null) {
 								flat = temp;
 							}
@@ -282,231 +280,99 @@
 
 					// ;
 					if (code !== 59) {
-						// @keyframe/@global, `k` or @global, `g` character
-						if (second === 107 || second === 103) {
-							// k, @keyframes
-							if (second === 107) {
-								blob = buff.substring(1, 11) + (glob === 0 ? animns : '') + buff.substring(11);
-								buff = '@' + webkit + blob;
-								type = 1;
-							}
-							// g, @global
-							else {
-								glob = 1;
-								buff = '';
-							}
+						// @keyframe, `k`
+						if (second === 107) {
+							blob = buff.substring(1, 11) + animns + buff.substring(11);
+							buff = '@' + webkit + blob;
+							type = 1;
 						}
-						// @media/@mixin `m` character
-						else if (second === 109) {
-							// @mixin
-							if (compact === true && third === 105) {
-								// first match create mixin store
-								if (mixins === undefined) {
-									mixins = {};
+						// @media `m` character, @global `g` character
+						else if ((second === 109 && third === 101) || (second === 103)) {
+							// nested
+							if (depth !== 0) {
+								// discard first character {
+								caret++;
+								column++;
+
+								if (media === undefined) {
+									media = '';
 								}
 
-								// retrieve mixin identifier
-								blob = (mixin = buff.substring(7, buff.indexOf('{')) + ' ').trim();
+								temp = '';
+								inner = '';
+								selectors = prev.split(splitReg);
 
-								// cache current mixin name
-								mixin = mixin.substring(0, mixin.indexOf(' ')).trim();
+								// keep track of opening `{` and `}` occurrences
+								closed = 1;
 
-								// append mixin identifier
-								mixins[mixin] = {key: blob.trim(), body: ''};
+								// travel to the end of the block
+								while (caret < eof) {
+									char = styles.charCodeAt(caret);
 
-								type = 3;
-								buff = '';
-								blob = '';
-							}
-							// @media
-							else if (third === 101) {
-								// nested
-								if (depth !== 0) {
-									// discard first character {
-									caret++;
-									column++;
-									
-									if (media === undefined) {
-										media = '';
+									// {, }, nested blocks may have nested blocks
+									if (char === 123) {
+										closed++;
+									}
+									else if (char === 125) {
+										closed--;
 									}
 
-									temp = '';
-									inner = '';
-									selectors = prev.split(stylis.regex.split);
-
-									// keep track of opening `{` and `}` occurrences
-									closed = 1;
-
-									// travel to the end of the block
-									while (caret < eof) {
-										char = styles.charCodeAt(caret);
-
-										// {, }, nested blocks may have nested blocks
-										if (char === 123) {
-											closed++;
-										}
-										else if (char === 125) {
-											closed--;
-										}
-
-										// break when the nested block has ended
-										if (closed === 0) {
-											break;
-										}
-
-										// build content of nested block
-										inner += styles.charAt(caret++);
-
-										// move column and line position
-										column = (char === 13 || char === 10) ? (line++, 0) : column + 1; 
+									// break when the nested block has ended
+									if (closed === 0) {
+										break;
 									}
 
-									length = selectors.length;
+									// build content of nested block
+									inner += styles.charAt(caret++);
 
-									for (var i = 0; i < length; i++) {
-										selector = selectors[i];
-
-										// build media block
-										temp += stylis(
-											// remove { on last selector
-											(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
-											inner, 
-											animations, 
-											compact, 
-											middleware
-										);
-									}
-
-									media += buff + temp + '}';
-									buff = '';
-									medias = 1;
-									type = 4;
+									// move column and line position
+									column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
 								}
-								// top-level
-								else {
-									type = 2;
-									query = buff;
-									buff = '';
-								}
-							}
-							// unknown
-							else {
-								type = 6;
-							}
-						}
-					}
 
-					// @include/@import `i` character
-					if (second === 105) {
-						// @include `n` character
-						if (compact === true && third === 110) {
-							buff = buff.substring(9, buff.length - 1);
-							indexOf = buff.indexOf('(');
-
-							// function mixins
-							if (indexOf !== -1) {
-								// mixin name
-								var name = buff.substring(0, indexOf);
-
-								// mixin data
-								var data = mixins[name];
-
-								// args passed to the mixin
-								var passed = buff.substring(name.length + 1, buff.length - 1).split(',');
-
-								// args the mixin expects
-								var expected = data.key.replace(name, '').replace(/\(|\)/g, '').trim().split(',');
-								
-								buff = data.body;
-
-								length = passed.length;
+								length = selectors.length;
 
 								for (var i = 0; i < length; i++) {
-									var arg = expected[i].trim();
+									selector = selectors[i];
 
-									// if the mixin has a slot for that arg
-									if (arg !== undefined) {
-										buff = buff.replace(new RegExp('var\\(~~'+arg+'\\)', 'g'), passed[i].trim());
-									}
+									// build media block
+									temp += stylis(
+										// remove { on last selector
+										(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
+										inner,
+										animations,
+										compact,
+										middleware
+									);
 								}
 
-								// create block and update styles length
-								styles += buff;
-								eof += buff.length;
-
-								// reset
+								media += buff + temp + '}';
 								buff = '';
+								medias = 1;
+								type = 4;
 							}
-							// static mixins
+							// top-level
 							else {
-								buff = mixins[buff].body;
-
-								if (depth === 0) {
-									// create block and update styles length
-									styles += buff;
-									eof += buff.length;
-
-									// reset
-									buff = '';
-								}
+								type = 2;
+								query = buff;
+								buff = '';
 							}
 						}
-						// @import `m` character
-						else if (third === 109 && use) {
-							// avoid "foo.css"; "foo" screen; "http://foo.com/bar"; url(foo);
-							var match = /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g.exec(buff);
-
-							if (match !== null) {
-								// middleware, import context
-								buff = middleware(
-									5, 
-									match[1].replace(/['"; ]/g, ''), 
-									line, 
-									column, 
-									prefix, 
-									output.length
-								) || '';
-
-								if (buff) {
-									// create block and update styles length
-									styles = styles.substring(0, caret + 1) + buff + styles.substring(caret+1);
-									eof += buff.length;
-								}
-
-								buff = '';
-							}
+						// unknown
+						else {
+							type = 6;
 						}
 					}
-					// flag special, i.e @keyframes, @global, @font-face ...
-					else if (type !== 4 && code !== 59) {
-						// k, g, m
-						if (second !== 107 && second !== 103 && second !== 109) {
+
+					// flag special, i.e @keyframes, @font-face ...
+					if (type !== 4 && code !== 59 && second !== 105) {
+						// k, m
+						if (second !== 107 && second !== 109 && second !== 103) {
 							type = 5;
 						}
 
 						close = -1;
 						special++;
 					}
-				}
-				// ~, ~, ; variables
-				else if (
-					compact === true && 
-					first === 126 && 
-					second === 126 && 
-					code === 59 && 
-					(colon = buff.indexOf(':')) !== -1
-				) {
-					// first match create variables store 
-					if (varlen === undefined) {
-						vars = [];
-						varlen = 0;
-					}
-
-					// push key value pair
-					vars[varlen++] = [buff.substring(0, colon), buff.substring(colon + 1, buff.length - 1).trim()];
-
-					// reset buffer
-					buff = '';
 				}
 				// property/selector
 				else {
@@ -522,7 +388,7 @@
 							// middleware, flat context
 							if (use) {
 								temp = middleware(4, flat, line, column, prefix, output.length);
-							
+
 								if (temp != null) {
 									flat = temp;
 								}
@@ -541,8 +407,8 @@
 							// inner content of block
 							inner = '';
 
-							var nestSelector = buff.substring(0, buff.length - 1).split(stylis.regex.split);
-							var prevSelector = prev.substring(0, prev.length - 1).split(stylis.regex.split);
+							var nestSelector = buff.substring(0, buff.length - 1).split(splitReg);
+							var prevSelector = prev.substring(0, prev.length - 1).split(splitReg);
 
 							// keep track of opening `{` and `}` occurrences
 							closed = 1;
@@ -569,12 +435,11 @@
 								inner += styles.charAt(caret++);
 
 								// move column and line position
-								column = (char === 13 || char === 10) ? (line++, 0) : column + 1; 
+								column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
 							}
 
 							// handle multiple selectors: h1, h2 { div, h4 {} } should generate
 							// -> h1 div, h2 div, h2 h4, h2 div {}
-							
 							length = prevSelector.length;
 
 							for (var j = 0; j < length; j++) {
@@ -598,7 +463,7 @@
 									if (sel.indexOf(' &') > 0) {
 										selector = sel.replace('&', '').trim() + ' ' + selector;
 									}
-									else if (stylis.regex.global[0].exec(sel) !== null) {
+									else if (globalReg.exec(sel) !== null) {
 										selector = sel;
 									}
 									else {
@@ -615,8 +480,8 @@
 
 							// concat nest
 							nest += (
-								'\n' + 
-								prevSelector.join(',').replace(stylis.regex.global[1], ' $1') + 
+								'\n' +
+								prevSelector.join(',').replace(globalsReg, ' $1') +
 								' {'+inner+'}'
 							);
 
@@ -630,8 +495,8 @@
 							depth--;
 						}
 						// top-level selector
-						else if (glob === 0 && (special === 0 || type === 2)) {
-							selectors = buff.split(stylis.regex.split);
+						else if (special === 0 || type === 2) {
+							selectors = buff.split(splitReg);
 
 							// current selector
 							build = '';
@@ -654,42 +519,37 @@
 								// &
 								if (char === 38) {
 									// before: & { / &&... {
-									selector = prefix + selector.substring(1).replace(stylis.regex.and, prefix);
+									selector = prefix + selector.substring(1).replace(andReg, prefix);
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
 								else {
-									// default to :global if & exist outside of the first non-space character
-									if ((indexOf = selector.indexOf(' &')) > 0) {
-										// `:`
-										globs = 2;
-
-										if (selector.indexOf(':global()') !== 0) {
-											// before: html & {
-											selector = (
-												':global('+selector.substring(0, indexOf)+')' + selector.substring(indexOf)
-											);
-											// after: html ${prefix} {
-										}
-
-										char = 58;
+									// register block with placeholder selector
+									if (selector.indexOf('::place') !== -1) {
+										isplace = 1;
 									}
 
+									// default to :global if & exists outside of the first non-space character
+									if ((indexOf = selector.indexOf(' &')) > 0) {
+										// before: html & {
+										selector = selector.replace(andReg, prefix).trim();
+										// after: html ${prefix} {
+									}
 									// :
-									if (char === 58) {
-										var secondChar = selector.charCodeAt(1);
+									else if (char === 58) {
+										var nextChar = selector.charCodeAt(1);
 
 										// h, t, :host
-										if (secondChar === 104 && selector.charCodeAt(4) === 116) {
+										if (compact && nextChar === 104 && selector.charCodeAt(4) === 116) {
 											var nextChar = selector.charCodeAt(5);
 
-											// (, :host(selector)                    
+											// (, :host(selector)
 											if (nextChar === 40) {
 												// before: `(selector)`
 												selector = (
 													prefix + (
 														selector
 															.replace(/:host\((.*)\)/g, '$1')
-															.replace(stylis.regex.and, prefix)
+															.replace(andReg, prefix)
 													)
 												);
 												// after: ${prefx} selector {
@@ -699,7 +559,7 @@
 												// before: `-context(selector)`
 												selector = selector
 													.replace(/:host-context\((.*)\)/g, '$1 ' + prefix)
-													.replace(stylis.regex.and, prefix)
+													.replace(andReg, prefix)
 												// after: selector ${prefix} {
 											}
 											// :host
@@ -708,18 +568,15 @@
 											}
 										}
 										// g, :global(selector)
-										else if (secondChar === 103) {
-											if (globs !== 2) {
-												globs = 1;
-											}
+										else if (compact && nextChar === 103) {
+											globs = 1;
 
 											// before: `:global(selector)`
 											selector = (
 												selector
-													.replace(stylis.regex.global[0], '$1')
-													.replace(stylis.regex.and, prefix)
+													.replace(globalReg, '$1')
+													.replace(andReg, prefix).trim()
 											);
-
 											// after: selector
 										}
 										// :hover, :active, :focus, etc...
@@ -736,9 +593,9 @@
 								// middleware, post-processed selector context
 								if (use) {
 									temp = middleware(
-										1.5, 
-										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector, 
-										line, 
+										1.5,
+										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector,
+										line,
 										column,
 										prefix,
 										output.length
@@ -752,7 +609,7 @@
 								// if first selector do not prefix with `,`
 								prev += (j !== 0 ? ',' : '') + (globs !== 1 ? selector : ':global()' + selector);
 								build += j !== 0 ? ',' + selector : selector;
-								
+
 								// reset :global flag
 								globs = 0;
 							}
@@ -805,19 +662,19 @@
 											// first character
 											(
 											    // letters
-											    (frst > 64 && frst < 90) || 
-											    (frst > 96 && frst < 122) || 
+											    (frst > 64 && frst < 90) ||
+											    (frst > 96 && frst < 122) ||
 											    // the exception `underscores or dashes`
-											    frst === 45 || 
+											    frst === 45 ||
 											    // but two dashes at the beginning are forbidden
 											    (frst === 95 && prop.charCodeAt(1) !== 95)
 											) &&
 
-											// cubic-bezier()/steps(), ) 
+											// cubic-bezier()/steps(), )
 											last !== 41 && len !== 0 &&
 
 											!(
-												frst === 105 && 
+												frst === 105 &&
 												(
 													// infinite, i, f, e
 													(thrd === 102 && last === 101 && len === 8) ||
@@ -852,7 +709,7 @@
 											// none, n, n, e
 											!(frst === 110 && thrd === 110 && last === 101 && len === 4)&&
 
-											// running, r, n, g 
+											// running, r, n, g
 											!(frst === 114 && thrd === 110 && last === 103 && len === 7) &&
 
 											// paused, p, u, d
@@ -863,8 +720,8 @@
 
 											// step-start/step-end, s, e, (t/d)
 											!(
-												frst === 115 && thrd === 101 && 
-												((last === 116 && len === 10) || (last === 100 && len === 8)) 
+												frst === 115 && thrd === 101 &&
+												((last === 116 && len === 10) || (last === 100 && len === 8))
 											) &&
 
 											// ease/ease-in/ease-out/ease-in-out, e, s, e
@@ -889,11 +746,10 @@
 									build += (j === 0 ? '' : ',') + props.join(' ').trim();
 								}
 							}
-							// explicit syntax, anims array should have only one elemenet
+							// explicit syntax, anims array should have only one element
 							else {
-								// n
-								build += ( 
-									(buff.charCodeAt(10) !== 110 ? '' : animns) + 
+								build += (
+									(buff.charCodeAt(10) !== 110 ? '' : animns) +
 									buff.substring(colon).trim().trim()
 								);
 							}
@@ -905,13 +761,13 @@
 						else if (first === 97 && second === 112 && third === 112) {
 							// vendor prefix -webkit- and -moz-
 							buff = (
-								webkit + buff + 
-								moz + buff + 
+								webkit + buff +
+								moz + buff +
 								buff
 							);
 						}
 						// display: d, i, s
-						else if (first === 100 && second === 105 && third === 115) {						
+						else if (first === 100 && second === 105 && third === 115) {
 							// flex/inline-flex
 							if ((indexOf = buff.indexOf('flex')) !== -1) {
 								// e, inline-flex
@@ -927,12 +783,12 @@
 								);
 							}
 						}
-						// transforms & transitions: t, r, a 
+						// transforms & transitions: t, r, a
 						else if (first === 116 && second === 114 && third === 97) {
 							// vendor prefix -webkit- and -ms- if transform
 							buff = (
 								webkit + buff +
-								(buff.charCodeAt(5) === 102 ? ms + buff : '') + 
+								(buff.charCodeAt(5) === 102 ? ms + buff : '') +
 								buff
 							);
 						}
@@ -944,9 +800,9 @@
 						) {
 							// vendor prefix all
 							buff = (
-								webkit + buff + 
-								moz + buff + 
-								ms + buff + 
+								webkit + buff +
+								moz + buff +
+								ms + buff +
 								buff
 							);
 						}
@@ -954,8 +810,8 @@
 						else if (first === 102 && second === 108 && third === 101) {
 							// vendor prefix all but moz
 							buff = (
-								webkit + buff + 
-								ms + buff + 
+								webkit + buff +
+								ms + buff +
 								buff
 							);
 						}
@@ -963,8 +819,8 @@
 						else if (first === 111 && second === 114 && third === 100) {
 							// vendor prefix all but moz
 							buff = (
-								webkit + buff + 
-								ms + 'flex-' + buff + 
+								webkit + buff +
+								ms + 'flex-' + buff +
 								buff
 							);
 						}
@@ -975,8 +831,9 @@
 								case 105: {
 									temp = buff.replace('-items', '');
 									buff = (
-										webkit + 'box-' + temp + 
-										ms + 'flex-'+ temp + 
+										webkit + buff +
+										webkit + 'box-' + temp +
+										ms + 'flex-'+ temp +
 										buff
 									);
 									break;
@@ -984,7 +841,7 @@
 								// align-self, s
 								case 115: {
 									buff = (
-										ms + 'flex-item-' + buff.replace('-self', '') + 
+										ms + 'flex-item-' + buff.replace('-self', '') +
 										buff
 									);
 									break;
@@ -992,18 +849,30 @@
 								// align-content
 								default: {
 									buff = (
-										ms + 'flex-line-pack' + buff.replace('align-content', '') + 
+										ms + 'flex-line-pack' + buff.replace('align-content', '') +
 										buff
 									);
 									break;
 								}
 							}
 						}
+						// justify-content, j, u, s
+						else if (first === 106 && second === 117 && third === 115) {
+							colon = buff.indexOf(':');
+							temp = buff.substring(colon).replace('flex-', '')
+
+							buff = (
+								webkit + 'box-pack' + temp +
+								webkit + buff +
+								ms + 'flex-pack' + temp +
+								buff
+							);
+						}
 						// cursor, c, u, r
 						else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
 							buff = (
-								buff.replace(/: +/g, ': ' + webkit) + 
-								buff.replace(/: +/g, ': ' + moz) +  
+								buff.replace(/: +/g, ': ' + webkit) +
+								buff.replace(/: +/g, ': ' + moz) +
 								buff
 							);
 						}
@@ -1011,10 +880,10 @@
 						else if (first === 119 && second === 105 && third === 100 && (indexOf = buff.indexOf('-content')) !== -1) {
 							temp = buff.substring(indexOf - 3);
 
-							// vendor prefix all but moz
+							// vendor prefix
 							buff = (
-								'width: -webkit-' + temp +
-								'width: -moz-' + temp +
+								'width: ' + webkit + temp +
+								'width: ' + moz + temp +
 								'width: ' + temp
 							);
 						}
@@ -1028,7 +897,7 @@
 							}
 						}
 					}
-					
+
 					// } character
 					if (code === 125) {
 						if (depth !== 0) {
@@ -1050,12 +919,12 @@
 						}
 					}
 
-					// @global/@keyframes
+					// @@keyframes
 					if (special !== 0) {
 						// }, find closing tag
 						if (code === 125) {
 							close++;
-						} 
+						}
 						// {
 						else if (code === 123 && close !== 0) {
 							close--;
@@ -1070,27 +939,12 @@
 
 						// closing tag
 						if (close === 0) {
-							// @global
-							if (type === 0) {
-								glob = 0;
-								buff = '';
-							}
-							// @keyframes 
-							else if (type === 1) {
+							// @keyframes
+							if (type === 1) {
 								// vendor prefix
 								buff = '}@'+blob+'}';
 
 								// reset
-								blob = '';
-							}
-							// @mixin
-							else if (type === 3) {
-								// append body of mixin
-								mixins[mixin].body = blob;
-
-								// reset
-								mixin = '';
-								buff = '';
 								blob = '';
 							}
 
@@ -1099,13 +953,9 @@
 							close--;
 							special--;
 						}
-						// @keyframes, @mixin
-						else if (type === 1 || type === 3) {
+						// @keyframes
+						else if (type === 1) {
 							blob += buff;
-
-							if (type === 3) {
-								buff = '';
-							}
 						}
 						// @media flat context
 						else if (type === 2 && depth === 0) {
@@ -1133,7 +983,7 @@
 				blck += buff;
 
 				// add blck buffer to output
-				if (code === 125 && (type === 0 || type === 2 || type === 4)) {					
+				if (code === 125 && (type === 0 || type === 2 || type === 4)) {
 					char = blck.charCodeAt(blck.length - 2);
 
 					if (type === 4) {
@@ -1157,6 +1007,19 @@
 							}
 						}
 
+						if (isplace === 1) {
+							regex = /::place/g;
+							isplace = 0;
+							temp = 'input-place';
+
+							blck = (
+								blck.replace(regex, '::'+webkit+temp) +
+								blck.replace(regex, '::'+moz+'place') +
+								blck.replace(regex, ':'+ms+temp) +
+								blck
+							);
+						}
+
 						if (query !== undefined) {
 							query += blck;
 
@@ -1177,7 +1040,7 @@
 				}
 
 				// reset line buffer
-				buff = '';			
+				buff = '';
 			}
 			// build line by line
 			else {
@@ -1185,15 +1048,15 @@
 				if (code === 13 || code === 10) {
 					if (comline === 1) {
 						comment = comline = 0;
-						buff = buff.substring(0, buff.indexOf('//'));
+						buff = buff.substring(0, buff.indexOf('//')).trim();
 					}
 					// /
 					else if (use && comment === 0 && (length = (str = str.trim()).length) !== 0 && str.charCodeAt(0) !== 47) {
-						if (buff.length !== 0) {							
+						if (buff.length !== 0) {
 							temp = middleware(7, str, line, column, prefix, output.length);
 
 							if (temp != null) {
-								buff = buff.replace(new RegExp(str+'$'), temp);
+								buff = buff.replace(new RegExp(str+'$'), temp).trim();
 							}
 						}
 
@@ -1217,6 +1080,13 @@
 						buff += character;
 
 						switch (code) {
+							// : character
+							case 58: {
+								if (strings === 0 && comment === 0 && func === 0) {
+									property = 1;
+								}
+								break;
+							}
 							// " character
 							case 34: {
 								if (comment === 0) {
@@ -1259,7 +1129,7 @@
 									// *, end block comment
 									else if (char === 42) {
 										comment = comblck = 0;
-										buff = buff.substring(0, buff.indexOf('/*'));
+										buff = buff.substring(0, buff.indexOf('/*')).trim();
 									}
 								}
 
@@ -1295,7 +1165,7 @@
 			// middleware, flat context
 			if (use) {
 				temp = middleware(4, flat, line, column, prefix, output.length);
-			
+
 				if (temp != null) {
 					flat = temp;
 				}
@@ -1305,18 +1175,10 @@
 			output += flat;
 		}
 
-		// has variables
-		if (compact && vars !== undefined) {
-			// replace all variables
-			for (var i = 0; i < varlen; i++) {
-				output = output.replace(new RegExp('var\\(' + vars[i][0]+'\\)', 'g'), vars[i][1]);
-			}
-		}
-
 		// middleware, output context
 		if (use) {
 			temp = middleware(6, output, line, column, prefix, output.length);
-		
+
 			if (temp != null) {
 				output = temp;
 			}
@@ -1328,82 +1190,51 @@
 
 	/**
 	 * use plugin
-	 * 
+	 *
 	 * @param  {string|function|function[]} key
 	 * @param  {function?} plugin
-	 * @return {Object} {use, plugins}
+	 * @return {Object} {plugins}
 	 */
-	stylis.use = function (key, plugin) {
-		var plugins = stylis.plugins;
+	function puse (plugin) {
 		var length = plugins.length;
 
-		if (plugin == null) {
-			plugin = key;
-			key = undefined;
-		}
-
 		if (plugin != null) {
-			// object of plugins
-			if (plugin.constructor === Object) {
-				for (var name in plugin) {
-					stylis.use(name, plugin[name]);
-				}
-			}
 			// array of plugins
-			else if (plugin.constructor === Array) {
-				for (var i = 0, len = plugin.length; i < len; i++) {
+			if (plugin.constructor === Array) {
+				for (var i = 0, l = plugin.length; i < l; i++) {
 					plugins[length++] = plugin[i];
 				}
 			}
 			// single un-keyed plugin
-			else if (key == null) {
-				plugins[length] = plugin;
-			}
-			// keyed plugin
 			else {
-				var pattern = (key instanceof RegExp) ? key : new RegExp(key + '\\([ \\t\\r\\n]*([^\\0]*?)[ \\t\\r\\n]*\\)', 'g');
-				var trimmer = /[ \t\r\n]*,[ \t\r\n]*/g;
-
-				var replacer = function (match, group) {
-					var params = group.replace(trimmer, ',').split(',');
-					var replace = plugin.apply(null, params);
-
-					return replace != null ? replace : match;
-				}
-
-				plugins[length] = function (ctx, str) {
-					if (ctx === 6) {
-						return str.replace(pattern, replacer);
-					}
-				}
+				plugins[length] = plugin;
 			}
 		}
 
 		return stylis;
 	};
 
+	stylis.use = puse;
+
 
 	/**
 	 * plugin store
-	 * 
-	 * @type {function[]}
+	 *
+	 * @type {Function[]}
 	 */
-	stylis.plugins = [];
+	stylis.p = plugins;
 
 
 	/**
 	 * regular expresions
-	 * 
+	 *
 	 * @type {Object<string, RegExp>}
 	 */
-	stylis.regex = {
-		and: /&/g,
-		split: /,[\s]*(?![^\r\n\[]*[\]\)])/g,
-		import: /@import.*?(["'`][^\.\n\r]*?["'`];|["'`][^:\r\n]*?\.[^c].*?["'`])/g,
-		global: [
-			/:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g, 
-			/(?:&| ):global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g
-		]
+	stylis.r = {
+		a: andReg,
+		s: splitReg,
+		g: globalReg,
+		gs: globalsReg
 	};
 
 

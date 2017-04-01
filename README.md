@@ -31,7 +31,7 @@ stylis is a feature-rich css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@1.2.8/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@2.0.0/stylis.min.js></script>
 ```
 
 #### npm
@@ -42,13 +42,11 @@ npm install stylis --save
 
 ## Features
 
-- variables via `~~foo` and `var(~~foo)` similar to css variables `--foo` and `var(--foo)`
 - web component emulation of `:host`, `:host()` and `:host-context()`
 - namespacing
 - inline global injection via `:global(selector)`
 - block level global injection via `@global {}`
 - nesting `a { &:hover {} }`
-- static and function mixins via `@mixin ...` and `@include`
 - prefixer (flex-box, etc...)
 - flat css `color: red; h1 { color: red; }`
 - middleware support
@@ -65,15 +63,11 @@ stylis('#user', styles);
 Where `styles` is the following css
 
 ```scss
-// variables
-~~foo: 20px;
-
 // flat css
 font-size: 2em;
 font-family: sans-serif;
-width: var(~~foo);
 
-// emulation for shadow dom selectors
+// emulation of shadow dom selectors
 :host {
     color: red;
 }
@@ -100,7 +94,9 @@ width: var(~~foo);
 }
 
 // inject to global scope inline
-span, h1, :global(h2) {
+:global(h2),
+h2 &
+{
 	color:red;
 
 	/**
@@ -118,7 +114,7 @@ span, h1, :global(h2) {
 
 // namespaced animations
 &:before {
-	animation: slidein 3s ease infinite;	
+	animation: slidein 3s ease infinite;
 }
 
 // namespaced keyframes
@@ -131,8 +127,8 @@ span, h1, :global(h2) {
 @media (max-width: 600px) {
     display: block;
 
-	&, h1 { 
-        appearance: none; 
+	&, h1 {
+        appearance: none;
     }
 }
 
@@ -150,29 +146,6 @@ h1 {
 
     font-size: 12px;
 }
-
-// static mixins
-@mixin large-text {
-    font-size: 20px;
-}
-
-// function mixins
-@mixin linx (link, visit, hover, active) {
-    a {
-        color: var(~~link);
-        &:hover {
-          color: var(~~hover);   
-        }
-    }
-}
-
-// use static mixins
-& {
-    @include large-text;
-}
-
-// use function mixins
-@include linx(white, blue, green, red);
 ```
 
 into this (minus the whitespace)
@@ -200,8 +173,8 @@ body #user {
 body {
     background: yellow;
 }
-#user span,
-#user h1,
+
+h2,
 h2 {
     color: red;
 }
@@ -274,17 +247,6 @@ h2 {
 #user h1 h2 h2:hover {
     color: blue;
 }
-
-#user {
-    font-size: 20px;
-}
-
-#user a {
-    color: white;
-    &:hover {
-      color: green;   
-    }
-}
 ```
 
 ## API
@@ -306,7 +268,7 @@ stylis.use(
 
 ## Middleware
 
-The optional middleware function accepts four arguments `ctx, str, line, column, namespace, length`, the middleware is executed at 4 stages.
+The optional middleware function accepts four arguments `ctx, str, line, column, namespace, length`, the middleware is executed at 8 stages.
 
 1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
 2. at every selector declaration pre-processed `ctx = 1` i.e `.class` / `.foo, .bar`
@@ -314,7 +276,6 @@ The optional middleware function accepts four arguments `ctx, str, line, column,
 4. at every property declaration `ctx = 2` i.e `color: red;`
 5. before a block of compiled css is added to the output string `ctx = 3`, i.e `.class {color:red;}`
 6. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
-7. When an `import` statement is found `ctx = 5`, i.e `import 'foo'`
 8. before the compiled css output is returned `ctx = 6`
 9. after every new line that does not end with a token `ctx = 7`
 
@@ -340,8 +301,8 @@ As you can tell from the above middleware it is possible to extend css's syntax.
 
 ```javascript
 stylis(``, `
-        h1 { 
-            width: calc(random()*10); 
+        h1 {
+            width: calc(random()*10);
             color: darken(#FFF);
         }
 `, false, {
