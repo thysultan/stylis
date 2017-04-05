@@ -220,6 +220,9 @@ var tests = {
 			   justify-content: flex-start;
 			   justify-content: justify;
 			}
+			&::placeholder {
+				color:red;
+			}
 		`,
 		expected:
 			`.user input.red::-webkit-input-placeholder,.user input.error::-webkit-input-placeholder {color:red;}`+
@@ -239,7 +242,11 @@ var tests = {
 			'-webkit-box-pack: start;-webkit-justify-content: flex-start;-ms-flex-pack: start;justify-content: flex-start;'+
 			'-webkit-box-pack: justify;-webkit-justify-content: justify;-ms-flex-pack: justify;justify-content: justify;'+
 
-			`}`
+			`}` +
+			`.user::-webkit-input-placeholder {color:red;}`+
+			`.user::-moz-placeholder {color:red;}`+
+			`.user:-ms-input-placeholder {color:red;}`+
+			`.user::placeholder {color:red;}`
 	},
 	'animations': {
 		name: 'animations',
