@@ -223,6 +223,16 @@ var tests = {
 			&::placeholder {
 				color:red;
 			}
+			& {
+				&::placeholder {
+					color:red;
+				}
+			}
+			input {
+				&::placeholder {
+					color:red;
+				}
+			}
 		`,
 		expected:
 			`.user input.red::-webkit-input-placeholder,.user input.error::-webkit-input-placeholder {color:red;}`+
@@ -246,7 +256,17 @@ var tests = {
 			`.user::-webkit-input-placeholder {color:red;}`+
 			`.user::-moz-placeholder {color:red;}`+
 			`.user:-ms-input-placeholder {color:red;}`+
-			`.user::placeholder {color:red;}`
+			`.user::placeholder {color:red;}` +
+
+			`.user::-webkit-input-placeholder {color:red;}`+
+			`.user::-moz-placeholder {color:red;}`+
+			`.user:-ms-input-placeholder {color:red;}`+
+			`.user::placeholder {color:red;}`+
+
+			`.user input::-webkit-input-placeholder {color:red;}`+
+			`.user input::-moz-placeholder {color:red;}`+
+			`.user input:-ms-input-placeholder {color:red;}`+
+			`.user input::placeholder {color:red;}`
 	},
 	'animations': {
 		name: 'animations',

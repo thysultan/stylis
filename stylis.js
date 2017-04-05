@@ -495,6 +495,11 @@
 						}
 						// top-level selector
 						else if (special === 0 || type === 2) {
+							// register block with placeholder selector
+							if (isplace === 0 && buff.indexOf('::place') !== -1) {
+								isplace = 1;
+							}
+
 							selectors = buff.split(splitPattern);
 
 							// current selector
@@ -589,11 +594,6 @@
 									else if (globs === 0) {
 										selector = prefix + ' ' + selector;
 									}
-								}
-
-								// register block with placeholder selector
-								if (selector.indexOf('::place') !== -1) {
-									isplace = 1;
 								}
 
 								// middleware, post-processed selector context

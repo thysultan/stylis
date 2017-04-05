@@ -1,3 +1,7 @@
+## 2.0.1 April 05, 2016)
+
+- patch nested `::placeholder` vendor prefixing
+
 ## 2.0.0 April 01, 2016)
 
 - add vendor prefix for `::placeholder`
