@@ -522,11 +522,6 @@
 									// after: ${prefix} { / ${prefix}${prefix}...
 								}
 								else {
-									// register block with placeholder selector
-									if (selector.indexOf('::place') !== -1) {
-										isplace = 1;
-									}
-
 									// default to :global if & exists outside of the first non-space character
 									if ((indexOf = selector.indexOf(' &')) > 0) {
 										// before: html & {
@@ -594,6 +589,11 @@
 									else if (globs === 0) {
 										selector = prefix + ' ' + selector;
 									}
+								}
+
+								// register block with placeholder selector
+								if (selector.indexOf('::place') !== -1) {
+									isplace = 1;
 								}
 
 								// middleware, post-processed selector context
