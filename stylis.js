@@ -56,35 +56,43 @@
 
 		var prefix = '';
 		var namespace = '';
-
-		var type = selector.charCodeAt(0);
-
 		var char;
-		var character;
 		var attr;
 		var animns;
 
-		// [ attr selector
-		if (type === 91) {
-			// `[data-id=namespace]` -> ['data-id', 'namespace']
-			attr = selector.substring(1, selector.length - 1).split('=');
-			char = (namespace = attr[1]).charCodeAt(0);
+		var type = selector.charCodeAt(0);
 
-			// [data-id="namespace"]/[data-id='namespace']
-			// --> "namespace"/'namspace' --> namespace
-			if (char === 34 || char === 39) {
-				namespace = namespace.substring(1, namespace.length - 1);
+		// ` selector` -> `selector`
+		if (type < 33) {
+			type = (selector = selector.trim()).charCodeAt(0);
+		}
+
+		switch (type) {
+			// `#` `.` id and class selectors
+			case 35:
+			case 46: {
+				namespace = (prefix = selector).substring(1);
+				break;
 			}
+			// [ attr selector
+			case 91: {
+				// `[data-id=namespace]` -> ['data-id', 'namespace']
+				attr = selector.substring(1, selector.length - 1).split('=');
+				char = (namespace = attr[1]).charCodeAt(0);
 
-			prefix = '['+ attr[0] + '="' + namespace +'"]';
-		}
-		// `#` `.` `>` id class and descendant selectors
-		else if (type === 35 || type === 46 || type === 62) {
-			namespace = (prefix = selector).substring(1);
-		}
-		// element selector
-		else {
-			namespace = prefix = selector;
+				// [data-id="namespace"]/[data-id='namespace']
+				// --> "namespace"/'namspace' --> namespace
+				if (char === 34 || char === 39) {
+					namespace = namespace.substring(1, namespace.length - 1);
+				}
+
+				prefix = '['+ attr[0] + '="' + namespace +'"]';
+				break;
+			}
+			// element selector
+			default: {
+				namespace = prefix = selector;
+			}
 		}
 
 		// reset type signature
@@ -138,6 +146,7 @@
 		}
 
 		// declare
+		var character;
 		var colon;
 		var inner;
 		var selectors;

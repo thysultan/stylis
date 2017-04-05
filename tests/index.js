@@ -598,8 +598,8 @@ var tests = {
 		`background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
 		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
 	},
-	'semicolon omission': {
-		name: 'semicolon omission',
+	'last semicolon omission': {
+		name: 'last semicolon omission',
 		sample: `
 			.content {
 				display: none
@@ -620,7 +620,25 @@ var tests = {
 			}
 		`,
 		expected: `.user h1:matches(.a, .b, :not(.c)) {display: none}`
-	}
+	},
+	'class namespace': {
+		name: 'class namespace',
+		selector: ' .foo',
+		sample: `h1 {animation: slide 1s;}`,
+		expected: `.foo h1 {-webkit-animation:fooslide 1s;animation:fooslide 1s;}`
+	},
+	'id namespace': {
+		name: 'id namespace',
+		selector: '#foo',
+		sample: `h1 {animation: slide 1s;}`,
+		expected: `#foo h1 {-webkit-animation:fooslide 1s;animation:fooslide 1s;}`
+	},
+	'attribute namespace': {
+		name: 'attribute namespace',
+		selector: '[title=foo]',
+		sample: `h1 {animation: slide 1s;}`,
+		expected: `[title="foo"] h1 {-webkit-animation:fooslide 1s;animation:fooslide 1s;}`
+	},
 };
 
 
@@ -659,7 +677,7 @@ function run (tests) {
 		stylis.p.length = 0;
 
 		var result = stylis(
-			'.user',
+			test.selector || '.user',
 			sample,
 			options.animations,
 			options.compact === void 0 ? true : options.compact,

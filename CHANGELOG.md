@@ -1,3 +1,7 @@
+## 2.0.2 April 05, 2016)
+
+- patch whitespace found in a selector namespace ` .class` -> `.class`
+
 ## 2.0.1 April 05, 2016)
 
 - patch nested `::placeholder` vendor prefixing
