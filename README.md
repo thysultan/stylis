@@ -314,9 +314,9 @@ If we had used `darken(#FFF, #CCC)` in our css the two arguments would have been
 The same can be done with `stylis.use` to register middleware individually, and `stylis.plugins.length = 0` to flush all middleware.
 
 
-## Intergration
+## Integration
 
-You can use stylis to build an abstraction ontop of, for example imagine we want to build an abstract that makes the following React Component possible
+You can use stylis to build an abstraction on top of, for example imagine we want to build an abstract that makes the following React Component possible
 
 ```javascript
 class Heading extends React.Component {
@@ -399,5 +399,5 @@ class Heading extends React.Component {
 
 One will add it to the head another will render it in place with the component.
 
-If you want a better picture into what can be done, there is an abstraction i created
+If you want a better picture into what can be done, there is an abstraction I created
 for [dio.js](https://github.com/thysultan/dio.js) that does away with the above boilerplate entirely [http://jsbin.com/mozefe/1/edit?js,output](http://jsbin.com/mozefe/1/edit?js,output)
