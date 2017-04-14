@@ -1,3 +1,7 @@
+## 2.0.3 April 14, 2016)
+
+- vendor prefix `text-size-adjust`
+
 ## 2.0.2 April 05, 2016)
 
 - patch whitespace found in a selector namespace ` .class` -> `.class`

@@ -799,7 +799,14 @@
 							}
 						}
 						// transforms & transitions: t, r, a
-						else if (first === 116 && second === 114 && third === 97) {
+						// text-size-adjust: t, e, x
+						else if (
+							first === 116 &&
+							(
+								(second === 114 && third === 97) ||
+								(second === 101 && third === 120)
+							)
+						) {
 							// vendor prefix -webkit- and -ms- if transform
 							buff = (
 								webkit + buff +

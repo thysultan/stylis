@@ -205,6 +205,9 @@ var tests = {
 	'prefixer': {
 		name: 'prefixer',
 		sample: `
+			html {
+			  text-size-adjust: none;
+			}
 			input.red::placeholder,
 			input.error::placeholder {
 		  		color:red;
@@ -235,6 +238,7 @@ var tests = {
 			}
 		`,
 		expected:
+			`.user html {-webkit-text-size-adjust: none;text-size-adjust: none;}`+
 			`.user input.red::-webkit-input-placeholder,.user input.error::-webkit-input-placeholder {color:red;}`+
 			`.user input.red::-moz-placeholder,.user input.error::-moz-placeholder {color:red;}`+
 			`.user input.red:-ms-input-placeholder,.user input.error:-ms-input-placeholder {color:red;}`+
