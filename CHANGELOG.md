@@ -1,3 +1,7 @@
+## 2.0.4 April 23, 2016)
+
+- patch `@supports`
+
 ## 2.0.3 April 14, 2016)
 
 - vendor prefix `text-size-adjust`

@@ -294,8 +294,14 @@
 							buff = '@' + webkit + blob;
 							type = 1;
 						}
-						// @media `m` character, @global `g` character
-						else if ((second === 109 && third === 101) || (second === 103)) {
+						// @media `m`, `e` characters,
+						// @supports `s` `u` characters,
+						// @global `g` character
+						else if (
+							(second === 109 && third === 101) ||
+							(second === 115 && third === 117) ||
+							(second === 103)
+						) {
 							// nested
 							if (depth !== 0) {
 								// discard first character {
@@ -374,7 +380,7 @@
 					// flag special, i.e @keyframes, @font-face ...
 					if (type !== 4 && code !== 59 && second !== 105) {
 						// k, m
-						if (second !== 107 && second !== 109 && second !== 103) {
+						if (second !== 107 && second !== 109 && second !== 115 && second !== 103) {
 							type = 5;
 						}
 
@@ -941,7 +947,7 @@
 						}
 					}
 
-					// @@keyframes
+					// @keyframes
 					if (special !== 0) {
 						// }, find closing tag
 						if (code === 125) {
