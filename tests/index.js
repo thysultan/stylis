@@ -141,9 +141,21 @@ var tests = {
 		`,
 		expected: '.user:before{color: blue;}'
 	},
-	'@media': {
-		name: '@media',
+	'@media & @supports': {
+		name: '@media & @supports',
 		sample: `
+			@supports (display: block) {
+				color: red;
+				h1 {
+					color: red;
+
+					h2 {
+						color: blue;
+					}
+				}
+				display: none;
+			}
+
 			@media (max-width: 600px) {
 				color: red;
 				h1 {
@@ -169,7 +181,14 @@ var tests = {
 				}
 			}
 		`,
-		expected: `@media (max-width: 600px) {`+
+		expected:
+		`@supports (display: block) {`+
+		`.user {color: red;}`+
+		`.user h1 {color: red;}`+
+		`.user h1 h2 {color: blue;}`+
+		`.user {display: none;}`+`}`+
+
+		`@media (max-width: 600px) {`+
 		`.user {color: red;}`+
 		`.user h1 {color: red;}`+
 		`.user h1 h2 {color: blue;}`+
