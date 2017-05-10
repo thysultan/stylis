@@ -180,7 +180,13 @@ var tests = {
 					}
 				}
 			}
-		`,
+
+			@supports (display: block) {@media (min-width: 10px) {
+			  	background-color: seagreen;
+				}
+			}
+		`
+		,
 		expected:
 		`@supports (display: block) {`+
 		`.user {color: red;}`+
@@ -197,6 +203,12 @@ var tests = {
 		`@media (min-width: 576px) {`+
 		`.user.card-deck .card:not(:first-child) {margin-left: 15px;}`+
 		`.user.card-deck .card:not(:last-child) {margin-right: 15px;}`+
+		`}`+
+
+		`@supports (display: block) {`+
+		`@media (min-width: 10px) {`+
+		`.user {background-color: seagreen;}`+
+		`}`+
 		`}`
 	},
 	'@font-face': {
@@ -532,8 +544,8 @@ var tests = {
 		expected: `div h2 {color: red;}div h2 h3 {color: blue;}`+
 		`.foo .user {width: 1px;}.foo .user:hover {color: black;}.foo .user li {color: white;}`+
 		'.user h1,.user div {color: red;color: blue;}'+
-		'@media {.user h1 {color: red;}.user div {color: red;}}'+
-		`@media {.user h1 {color: blue;}.user div {color: blue;}}`+
+		'@media {.user h1,.user div {color: red;}}'+
+		`@media {.user h1,.user div {color: blue;}}`+
 		'.user h1 h2,.user h1:before,.user div h2,'+
 		'.user div:before {color: red;}.user h1 header,.user div header {font-size: 12px;}'+
 		'.user.foo.bar {color: yesplease}'+
@@ -705,14 +717,16 @@ function run (tests) {
 			options.animations,
 			options.compact === void 0 ? true : options.compact,
 			options.middleware
-		);
-
-		(result === expected ? passed : failed).push(name);
+		).trim().replace(/\u200B/g, '');
 
 		if (result !== expected) {
 			// log why it failed
-			console.log('failed: \n'+name+'\n'+ result);
-			console.log('expected: '+'\n'+ expected);
+			console.log('failed: '+ name, '\n\n', result)
+			console.log('expected: ', '\n\n', expected, '\n\n---------------\n\n')
+
+			failed.push(name);
+		} else {
+			passed.push(name);
 		}
 	}
 

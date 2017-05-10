@@ -31,7 +31,7 @@
 
 	// regular expressions
 	var andPattern = /&/g;
-	var splitPattern = /,\f/g;
+	var splitPattern = /,\u200B/g;
 	var globalPattern = /:global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
 	var globalsPattern = /(?:&| ):global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
 
@@ -151,7 +151,6 @@
 		var inner;
 		var selectors;
 		var build;
-		var media;
 		var temp;
 		var prev;
 		var indexOf;
@@ -161,9 +160,9 @@
 		var sel;
 		var blob;
 		var nest;
-		var query;
 		var str;
 		var regex;
+		var media;
 
 		// buffers
 		var buff = '';
@@ -175,19 +174,18 @@
 		var nextcode;
 
 		// context signatures
+		var medias = 0;
 		var special = 0;
 		var close = 0;
 		var closed = 0;
 		var nested = 0;
 		var func = 0;
-		var medias = 0;
 		var strings = 0;
 		var globs = 0;
 		var isplace = 0;
 
 		// context(flat) signatures
 		var levels = 0;
-		var level = 0;
 
 		// comments
 		var comment = 0;
@@ -220,14 +218,16 @@
 			code = styles.charCodeAt(caret);
 
 			// {, }, ; characters, parse line by line
-			if (strings === 0 && func === 0 && comment === 0 &&
+			if (
+				(medias === 1 && caret === eof - 1) ||
 				(
-					// {, }, ;
-					(code === 123 || code === 125 || code === 59)
-					||
-					// eof buffer
+					strings === 0 && func === 0 && comment === 0 &&
 					(
-						(caret === eof - 1) && buff.length !== 0
+						// {, }, ;
+						(code === 123 || code === 125 || code === 59)
+						||
+						// eof buffer
+						(caret === eof - 1 && buff.length !== 0)
 					)
 				)
 			) {
@@ -302,74 +302,72 @@
 							(second === 115 && third === 117) ||
 							(second === 103)
 						) {
-							// nested
-							if (depth !== 0) {
-								// discard first character {
-								caret++;
-								column++;
+							caret++;
+							column++;
 
-								if (media === undefined) {
-									media = '';
-								}
-
-								temp = '';
-								inner = '';
-								selectors = prev.split(splitPattern);
-
-								// keep track of opening `{` and `}` occurrences
-								closed = 1;
-
-								// travel to the end of the block
-								while (caret < eof) {
-									char = styles.charCodeAt(caret);
-
-									// {, }, nested blocks may have nested blocks
-									if (char === 123) {
-										closed++;
-									}
-									else if (char === 125) {
-										closed--;
-									}
-
-									// break when the nested block has ended
-									if (closed === 0) {
-										break;
-									}
-
-									// build content of nested block
-									inner += styles.charAt(caret++);
-
-									// move column and line position
-									column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
-								}
-
-								length = selectors.length;
-
-								for (var i = 0; i < length; i++) {
-									selector = selectors[i];
-
-									// build media block
-									temp += stylis(
-										// remove { on last selector
-										(i === length - 1 ? selector.substring(0, selector.length - 1) :  selector).trim(),
-										inner,
-										animations,
-										compact,
-										middleware
-									);
-								}
-
-								media += buff + temp + '}';
-								buff = '';
-								medias = 1;
-								type = 4;
+							if (media === undefined) {
+								media = '';
 							}
-							// top-level
-							else {
-								type = 2;
-								query = buff;
-								buff = '';
+
+							inner = '';
+
+							// keep track of opening `{` and `}` occurrences
+							closed = 1;
+
+							// travel to the end of the block
+							while (caret < eof) {
+								char = styles.charCodeAt(caret);
+
+								// {, }, nested blocks may have nested blocks
+								if (char === 123) {
+									closed++;
+								}
+								else if (char === 125) {
+									closed--;
+								}
+
+								// break when the nested block has ended
+								if (closed === 0) {
+									caret++;
+									break;
+								}
+
+								// build content of nested block
+								inner += styles.charAt(caret++);
+
+								// move column and line position
+								column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
 							}
+
+							selector = depth === 0 ? prefix : prev.substring(0, prev.length-1).trim();
+
+							// build block
+							media += (buff + stylis(
+								selector,
+								inner.trim(),
+								animations,
+								compact,
+								middleware
+							).trim() + '}');
+
+							// middleware, block context
+							if (uses === true) {
+								temp = middleware(3, media, line, column, prefix, output.length);
+
+								if (temp != null) {
+									media = temp;
+								}
+							}
+
+							buff = '';
+							medias = 1;
+
+							if (caret === eof) {
+								output += ' ';
+								eof++;
+							}
+
+							continue;
 						}
 						// unknown
 						else {
@@ -378,7 +376,7 @@
 					}
 
 					// flag special, i.e @keyframes, @font-face ...
-					if (type !== 4 && code !== 59 && second !== 105) {
+					if (code !== 59 && second !== 105) {
 						// k, m
 						if (second !== 107 && second !== 109 && second !== 115 && second !== 103) {
 							type = 5;
@@ -628,7 +626,7 @@
 								}
 
 								// if first selector do not prefix with `,`
-								prev += (j !== 0 ? ',\f' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
+								prev += (j !== 0 ? ',\u200B' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
 								build += j !== 0 ? ',' + selector : selector;
 
 								// reset :global flag
@@ -958,13 +956,6 @@
 							close--;
 						}
 
-						// append flat @media css
-						if (level === 1 && (code === 123 || close === 0) && flat.length !== 0) {
-							level = 0;
-							buff = prefix + ' {'+flat+'}' + buff;
-							flat = '';
-						}
-
 						// closing tag
 						if (close === 0) {
 							// @keyframes
@@ -985,19 +976,6 @@
 						else if (type === 1) {
 							blob += buff;
 						}
-						// @media flat context
-						else if (type === 2 && depth === 0) {
-							if (code !== 125) {
-								if (level === 0) {
-									flat = '';
-								}
-
-								flat += buff;
-								buff = '';
-							}
-
-							level = 1;
-						}
 					}
 					// flat context
 					else if (depth === 0 && code !== 125) {
@@ -1011,21 +989,19 @@
 				blck += buff;
 
 				// add blck buffer to output
-				if (code === 125 && (type === 0 || type === 2 || type === 4)) {
+				if ((code === 125 && type === 0) || medias === 1) {
 					char = blck.charCodeAt(blck.length - 2);
 
-					if (type === 4) {
-						type = 0;
-					}
-
-					if (media !== undefined && media.length !== 0) {
+					if (medias === 1) {
 						blck = char === 123 ? media : blck + media;
+						medias = 0;
+						char = 0;
 						media = '';
-						char = blck.charCodeAt(blck.length - 2);
 					}
 
 					// {, @
 					if (char !== 123) {
+
 						// middleware, block context
 						if (uses === true) {
 							temp = middleware(3, blck, line, column, prefix, output.length);
@@ -1036,7 +1012,9 @@
 						}
 
 						if (isplace === 1) {
-							regex = /::place/g;
+							if (regex === void 0) {
+								regex = /::place/g;
+							}
 							isplace = 0;
 							temp = 'input-place';
 
@@ -1048,19 +1026,8 @@
 							);
 						}
 
-						if (query !== undefined) {
-							query += blck;
-
-							// }
-							if (query.charCodeAt(query.length - 2) === 125) {
-								output += query;
-								query = undefined;
-							}
-						}
-						else {
-							// append blck buffer
-							output += blck;
-						}
+						// append blck buffer
+						output += blck;
 					}
 
 					// reset blck buffer
@@ -1111,7 +1078,7 @@
 							// ,
 							case 44: {
 								if (strings === 0 && comment === 0 && func === 0) {
-									buff += '\f';
+									buff += '\u200B';
 								}
 								break;
 							}

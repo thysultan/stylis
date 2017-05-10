@@ -1,3 +1,7 @@
+## 2.0.5 May 10, 2016)
+
+- patch `@supports nesting`
+
 ## 2.0.4 April 23, 2016)
 
 - patch `@supports`
