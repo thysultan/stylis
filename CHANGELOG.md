@@ -1,3 +1,7 @@
+## 2.0.7 May 11, 2016)
+
+- patch `regression output @media order`
+
 ## 2.0.6 May 11, 2016)
 
 - patch `regression @media parsing`

@@ -988,17 +988,22 @@
 				blck += buff;
 
 				// add blck buffer to output
-				if (
-					(code === 125 && (type === 0 || medias === 1))
-					||
-					(medias === 1 && caret === eof - 1)
-				) {
+				if ((code === 125 && type === 0) || medias === 1) {
 					char = blck.charCodeAt(blck.length - 2);
 
 					if (medias === 1) {
-						blck = char === 123 ? media : blck + media;
+						if (char === 123) {
+							blck = media;
+							char = 0;
+						} else {
+							if (code === 123) {
+								blck = media + blck;
+							} else {
+								blck = blck + media;
+							}
+						}
+
 						medias = 0;
-						char = 0;
 						media = '';
 					}
 

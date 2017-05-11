@@ -196,7 +196,6 @@ var tests = {
 		`
 		,
 		expected:
-		`.user:hover {color: orange}`+
 		`@supports (display: block) {`+
 		`.user {color: red;}`+
 		`.user h1 {color: red;}`+
@@ -219,7 +218,8 @@ var tests = {
 		`.user {background-color: seagreen;}`+
 		`}`+
 		`}`+
-		'@media (max-width: 600px) {.user {color: red}}'
+		'@media (max-width: 600px) {.user {color: red}}'+
+		`.user:hover {color: orange}`
 	},
 	'@font-face': {
 		name: '@font-face',

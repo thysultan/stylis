@@ -31,7 +31,7 @@ stylis is a feature-rich css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@2.0.6/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@2.0.7/stylis.min.js></script>
 ```
 
 #### npm
