@@ -1,3 +1,7 @@
+## 2.0.6 May 11, 2016)
+
+- patch `regression @media parsing`
+
 ## 2.0.5 May 10, 2016)
 
 - patch `@supports nesting`

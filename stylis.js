@@ -363,7 +363,6 @@
 							medias = 1;
 
 							if (caret === eof) {
-								output += ' ';
 								eof++;
 							}
 
@@ -989,7 +988,11 @@
 				blck += buff;
 
 				// add blck buffer to output
-				if ((code === 125 && type === 0) || medias === 1) {
+				if (
+					(code === 125 && (type === 0 || medias === 1))
+					||
+					(medias === 1 && caret === eof - 1)
+				) {
 					char = blck.charCodeAt(blck.length - 2);
 
 					if (medias === 1) {
