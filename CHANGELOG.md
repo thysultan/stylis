@@ -1,3 +1,7 @@
+## 2.0.8 May 11, 2016)
+
+- patch regression in selector parsing
+
 ## 2.0.7 May 11, 2016)
 
 - patch `regression output @media order`

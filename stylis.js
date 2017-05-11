@@ -31,9 +31,16 @@
 
 	// regular expressions
 	var andPattern = /&/g;
-	var splitPattern = /,\u200B/g;
+	var andSpacePattern = / +&/;
+	var splitPattern = /,\n/g;
 	var globalPattern = /:global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
 	var globalsPattern = /(?:&| ):global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
+	var hostPattern = /:host\((.*)\)/g;
+	var hostContextPattern = /:host-context\((.*)\)/g;
+	var newLinePattern = /\n/g;
+	var placeholderPattern = /::place/g;
+	var colonPattern = /: +/g;
+	var animationPattern = /[ .#~+><\d]+/g;
 
 	// prefixes
 	var moz = '-moz-';
@@ -48,12 +55,13 @@
 	 * @param  {String}   styles     - css string
 	 * @param  {Boolean=} animations - prefix animations and keyframes, true by default
 	 * @param  {Boolean=} compact    - enable additional shadow dom features(:host, :host-context)
-	 * @param  {Function} middleware
+	 * @param  {Function|Array} middlewares
 	 * @return {string}
 	 */
-	function stylis (selector, styles, animations, compact, middleware) {
+	function stylis (selector, styles, animations, compact, middlewares) {
 		selector += '';
 
+		var middleware = middlewares;
 		var prefix = '';
 		var namespace = '';
 		var char;
@@ -99,9 +107,9 @@
 		type = 0;
 
 		// animation and keyframe namespace
-		if (animations == undefined || animations === true) {
+		if (animations === true || animations == undefined) {
 			animations = true;
-			animns = namespace;
+			animns = namespace.replace(animationPattern, '-');
 		}
 		else {
 			animns = '';
@@ -116,7 +124,7 @@
 		if (uses === true) {
 			has = (typeof middleware).charCodeAt(0);
 
-			// o, object/array
+			// o, array
 			if (has === 111) {
 				use(middleware);
 			}
@@ -130,17 +138,7 @@
 		}
 
 		if (length !== 0) {
-			middleware = length === 1 ? plugins[0] : function (ctx, str, line, col, prefix, length) {
-				var output = str;
-
-				for (var i = 0, l = plugins.length; i < l; i++) {
-					output = plugins[i](ctx, output, line, col, prefix, length) || output;
-				}
-
-				if (output !== str) {
-					return output;
-				}
-			};
+			middleware = length === 1 ? plugins[0] : proxy;
 
 			uses = true;
 		}
@@ -339,7 +337,7 @@
 								column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
 							}
 
-							selector = depth === 0 ? prefix : prev.substring(0, prev.length-1).trim();
+							selector = depth === 0 ? prefix : prev.substring(0, prev.length-1).replace(newLinePattern, '').trim();
 
 							// build block
 							media += (buff + stylis(
@@ -347,7 +345,7 @@
 								inner.trim(),
 								animations,
 								compact,
-								middleware
+								null
 							).trim() + '}');
 
 							// middleware, block context
@@ -481,7 +479,7 @@
 										selector = selector + ' ' + sel;
 									}
 
-									prevSelector[j] += selector.replace(/ +&/, '').trim() + (k === l - 1  ? '' : ',');
+									prevSelector[j] += selector.replace(andSpacePattern, '').trim() + (k === l - 1  ? '' : ',');
 								}
 							}
 
@@ -559,7 +557,7 @@
 												selector = (
 													prefix + (
 														selector
-															.replace(/:host\((.*)\)/g, '$1')
+															.replace(hostPattern, '$1')
 															.replace(andPattern, prefix)
 													)
 												);
@@ -569,7 +567,7 @@
 											else if (nextcode === 45) {
 												// before: `-context(selector)`
 												selector = selector
-													.replace(/:host-context\((.*)\)/g, '$1 ' + prefix)
+													.replace(hostContextPattern, '$1 ' + prefix)
 													.replace(andPattern, prefix)
 												// after: selector ${prefix} {
 											}
@@ -625,7 +623,7 @@
 								}
 
 								// if first selector do not prefix with `,`
-								prev += (j !== 0 ? ',\u200B' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
+								prev += (j !== 0 ? ',\n' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
 								build += j !== 0 ? ',' + selector : selector;
 
 								// reset :global flag
@@ -896,8 +894,8 @@
 						// cursor, c, u, r
 						else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
 							buff = (
-								buff.replace(/: +/g, ': ' + webkit) +
-								buff.replace(/: +/g, ': ' + moz) +
+								buff.replace(colonPattern, ': ' + webkit) +
+								buff.replace(colonPattern, ': ' + moz) +
 								buff
 							);
 						}
@@ -1021,7 +1019,7 @@
 
 						if (isplace === 1) {
 							if (regex === void 0) {
-								regex = /::place/g;
+								regex = placeholderPattern;
 							}
 							isplace = 0;
 							temp = 'input-place';
@@ -1086,7 +1084,7 @@
 							// ,
 							case 44: {
 								if (strings === 0 && comment === 0 && func === 0) {
-									buff += '\u200B';
+									buff += '\n';
 								}
 								break;
 							}
@@ -1216,6 +1214,29 @@
 
 		return stylis;
 	};
+
+	/**
+	 * Middleware Proxy
+	 *
+	 * @param  {Number} ctx
+	 * @param  {String} str
+	 * @param  {Number} line
+	 * @param  {Number} col
+	 * @param  {String} prefix
+	 * @param  {Number} length
+	 * @return {String?}
+	 */
+	function proxy (ctx, str, line, col, prefix, length) {
+		var output = str;
+
+		for (var i = 0, l = plugins.length; i < l; i++) {
+			output = plugins[i](ctx, output, line, col, prefix, length) || output;
+		}
+
+		if (output !== str) {
+			return output;
+		}
+	}
 
 	stylis.use = use;
 

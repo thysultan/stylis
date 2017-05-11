@@ -727,9 +727,9 @@ function run (tests) {
 			options.animations,
 			options.compact === void 0 ? true : options.compact,
 			options.middleware
-		).trim().replace(/\u200B/g, '');
+		);
 
-		if (result !== expected) {
+		if (result !== expected || /\n/g.test(result)) {
 			// log why it failed
 			console.log('failed: '+ name, '\n\n', result)
 			console.log('expected: ', '\n\n', expected, '\n\n---------------\n\n')
