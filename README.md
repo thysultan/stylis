@@ -45,7 +45,6 @@ npm install stylis --save
 - web component emulation of `:host`, `:host()` and `:host-context()`
 - namespacing
 - inline global injection via `:global(selector)`
-- block level global injection via `@global {}`
 - nesting `a { &:hover {} }`
 - prefixer (flex-box, etc...)
 - flat css `color: red; h1 { color: red; }`
