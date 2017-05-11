@@ -107,7 +107,7 @@
 		type = 0;
 
 		// animation and keyframe namespace
-		if (animations === true || animations == undefined) {
+		if (animations === true || animations === undefined || animations === null) {
 			animations = true;
 			animns = namespace.replace(animationPattern, '-');
 		}
@@ -118,7 +118,7 @@
 
 		// middleware
 		var has;
-		var uses = middleware != null;
+		var uses = middleware !== void 0 && middleware !== null;
 		var length = plugins.length;
 
 		if (uses === true) {
@@ -139,7 +139,6 @@
 
 		if (length !== 0) {
 			middleware = length === 1 ? plugins[0] : proxy;
-
 			uses = true;
 		}
 
