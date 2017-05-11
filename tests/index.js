@@ -185,9 +185,18 @@ var tests = {
 			  	background-color: seagreen;
 				}
 			}
+
+			@media (max-width: 600px) {
+		   	& { color: red }
+		 	}
+
+		 	&:hover {
+		   	color: orange
+		 	}
 		`
 		,
 		expected:
+		`.user:hover {color: orange}`+
 		`@supports (display: block) {`+
 		`.user {color: red;}`+
 		`.user h1 {color: red;}`+
@@ -209,7 +218,8 @@ var tests = {
 		`@media (min-width: 10px) {`+
 		`.user {background-color: seagreen;}`+
 		`}`+
-		`}`
+		`}`+
+		'@media (max-width: 600px) {.user {color: red}}'
 	},
 	'@font-face': {
 		name: '@font-face',
