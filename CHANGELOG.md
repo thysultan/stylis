@@ -1,3 +1,7 @@
+## 2.0.10 May 13, 2016)
+
+- patch middleware `@media` block context
+
 ## 2.0.9 May 13, 2016)
 
 - patch `:placeholder` in relation to `@media` order

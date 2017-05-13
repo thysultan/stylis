@@ -1018,6 +1018,15 @@
 				}
 
 				if (medias === 1) {
+					// middleware, block context
+					if (uses === true) {
+						temp = middleware(3, blck, line, column, prefix, output.length);
+
+						if (temp != null) {
+							media = temp;
+						}
+					}
+
 					output += media;
 					medias = 0;
 					media = '';
