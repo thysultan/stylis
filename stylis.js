@@ -158,7 +158,6 @@
 		var blob;
 		var nest;
 		var str;
-		var regex;
 		var media;
 
 		// buffers
@@ -985,28 +984,11 @@
 				blck += buff;
 
 				// add blck buffer to output
-				if ((code === 125 && type === 0) || medias === 1) {
+				if (code === 125 && type === 0) {
 					char = blck.charCodeAt(blck.length - 2);
-
-					if (medias === 1) {
-						if (char === 123) {
-							blck = media;
-							char = 0;
-						} else {
-							if (code === 123) {
-								blck = media + blck;
-							} else {
-								blck = blck + media;
-							}
-						}
-
-						medias = 0;
-						media = '';
-					}
 
 					// {, @
 					if (char !== 123) {
-
 						// middleware, block context
 						if (uses === true) {
 							temp = middleware(3, blck, line, column, prefix, output.length);
@@ -1017,16 +999,12 @@
 						}
 
 						if (isplace === 1) {
-							if (regex === void 0) {
-								regex = placeholderPattern;
-							}
 							isplace = 0;
-							temp = 'input-place';
 
 							blck = (
-								blck.replace(regex, '::'+webkit+temp) +
-								blck.replace(regex, '::'+moz+'place') +
-								blck.replace(regex, ':'+ms+temp) +
+								blck.replace(placeholderPattern, '::'+webkit+'input-place') +
+								blck.replace(placeholderPattern, '::'+moz+'place') +
+								blck.replace(placeholderPattern, ':'+ms+'input-place') +
 								blck
 							);
 						}
@@ -1037,6 +1015,12 @@
 
 					// reset blck buffer
 					blck = '';
+				}
+
+				if (medias === 1) {
+					output += media;
+					medias = 0;
+					media = '';
 				}
 
 				// reset line buffer

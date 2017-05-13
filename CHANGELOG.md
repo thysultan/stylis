@@ -1,3 +1,7 @@
+## 2.0.9 May 13, 2016)
+
+- patch `:placeholder` in relation to `@media` order
+
 ## 2.0.8 May 11, 2016)
 
 - patch regression in selector parsing
