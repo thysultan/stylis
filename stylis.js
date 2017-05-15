@@ -86,7 +86,7 @@
 			case 91: {
 				// `[data-id=namespace]` -> ['data-id', 'namespace']
 				attr = selector.substring(1, selector.length - 1).split('=');
-				char = (namespace = attr[1]).charCodeAt(0);
+				char = (namespace = attr[1] || attr[0]).charCodeAt(0);
 
 				// [data-id="namespace"]/[data-id='namespace']
 				// --> "namespace"/'namspace' --> namespace
@@ -94,7 +94,7 @@
 					namespace = namespace.substring(1, namespace.length - 1);
 				}
 
-				prefix = '['+ attr[0] + '="' + namespace +'"]';
+				prefix = '['+ attr[0] + (attr.length > 1 ? ('="' + namespace +'"]') : ']')
 				break;
 			}
 			// element selector

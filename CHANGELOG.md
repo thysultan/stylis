@@ -1,3 +1,7 @@
+## 2.0.11 May 15, 2016)
+
+- support attribute selectors without values ex. `[attribute]`.
+
 ## 2.0.10 May 13, 2016)
 
 - patch middleware `@media` block context
