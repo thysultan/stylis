@@ -41,6 +41,7 @@
 	var placeholderPattern = /::place/g;
 	var colonPattern = /: +/g;
 	var animationPattern = /[ .#~+><\d]+/g;
+	var transformPattern = / +(transform)/g;
 
 	// prefixes
 	var moz = '-moz-';
@@ -179,6 +180,7 @@
 		var strings = 0;
 		var globs = 0;
 		var isplace = 0;
+		var join = 0;
 
 		// context(flat) signatures
 		var levels = 0;
@@ -636,6 +638,10 @@
 					}
 					// not single `}`
 					else if ((code === 125 && buff.length === 1) === false) {
+						if (join === 1) {
+							buff = buff.replace(newLinePattern, '');
+						}
+
 						// ;
 						if (code !== 59) {
 							buff = (code === 125 ? buff.substring(0, buff.length - 1) : buff.trim()) + ';';
@@ -812,6 +818,10 @@
 								(buff.charCodeAt(5) === 102 ? ms + buff : '') +
 								buff
 							);
+
+							if (second + third === 211 && buff.charCodeAt(12) === 115 && buff.indexOf(' transform') > -1) {
+								buff = buff.substring(0, buff.indexOf(';')+1).replace(transformPattern, ' '+webkit+'$1') + buff;
+							}
 						}
 						// hyphens: h, y, p
 						// user-select: u, s, e
@@ -1032,6 +1042,8 @@
 					media = '';
 				}
 
+				join = 0
+
 				// reset line buffer
 				buff = '';
 			}
@@ -1076,6 +1088,7 @@
 							// ,
 							case 44: {
 								if (strings === 0 && comment === 0 && func === 0) {
+									join = 1;
 									buff += '\n';
 								}
 								break;

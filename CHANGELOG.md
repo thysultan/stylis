@@ -1,3 +1,7 @@
+## 2.0.12 May 18, 2016
+
+- support older webkit vendor prefix `transform` when used in `transition`
+
 ## 2.0.11 May 15, 2016)
 
 - support attribute selectors without values ex. `[attribute]`.

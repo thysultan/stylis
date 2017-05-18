@@ -165,6 +165,8 @@ stylis.set(options: {
 	cascade: true|false // activate aggressive cascade isolation
 	keyframes: true|false // namespace keyframes + animations
 	prefix: true|false // (de)active vendor prefixing
+	compress: true|false // enables aggressive minification
+	context: 1-6 // enable/disable specific plugin context
 })
 ```
 #### Prefix
@@ -175,23 +177,34 @@ stylis.prefix(false) // deactivates vendor prefixing
 
 ## Plugins
 
-The optional middleware function accepts four arguments `ctx, str, line, column, id, length`, the middleware is executed at 8 stages.
+The optional middleware function accepts four arguments `context, string, line, column, id, length`.
+The middleware is executed in stages and passed a interger value that identifies at what stage it is in.
 
-1. before the compiler starts `ctx = 0`, you can use this to do any linting/transforms before compiling
-2. at every selector declaration pre-processed `ctx = 1` i.e `.class` / `.foo, .bar`
-3. at every selector post-processed `ctx = 1.5` i.e `.prefix.foo`
-4. at every property declaration `ctx = 2` i.e `color: red;`
-5. before a block of compiled css is added to the output string `ctx = 3`, i.e `.class {color:red;}`
-6. before a block of flat compiled css is added to the output string `ctx = 4`, i.e `color:blue;`
-8. before the compiled css output is returned `ctx = 6`
-9. after every new line that does not end with a token `ctx = 7`
+```
+0 /* preparation context signature */
+1 /* selector context signature */
+2 /* rule context signature */
+3 /* property context signature */
+4 /* flat context signature */
+5 /* block context signature */
+6 /* post-process context signature */
+```
+
+1. `0` preparation context, before the compiler starts
+2. `1` on a selector declaration ex. `.foo, .bar`
+3. `2` on a rule declaration ex. `.foo`
+4. `3` on a property declaration ex. `color: red;`
+6. `4` after a section of flat css has been processed ex. `color:blue;`
+5. `5` after a block of css has been processed i.e `.foo {color:red;}`
+8. `6` before the compiled css output is returned
+9. `7` after every un-token'ed new line (mainly to use for linting)
 
 If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
 
 ```javascript
 stylis.use((context, value) => {
 	switch (context) {
-		case 2: return str.replace(/random\(\)/g, Math.random())
+		case 3: return str.replace(/random\(\)/g, Math.random())
 	}
 })
 
