@@ -41,7 +41,7 @@
 	var placeholderPattern = /::place/g;
 	var colonPattern = /: +/g;
 	var animationPattern = /[ .#~+><\d]+/g;
-	var transformPattern = / +(transform)/g;
+	var transformPattern = / *(transform)/g;
 
 	// prefixes
 	var moz = '-moz-';

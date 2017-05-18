@@ -52,7 +52,7 @@
 	var pescape = /[-\/\\^$*+?.()|[\]{}]/g /*	escapes regex when liniting */
 	var pglobal = /:global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(..) */
 	var pcascade = / +\s*(?![^([]*[)\]])/gm /* aggressive cascade mode */
-	var ptransform = / +(transform)/g /* vendor transform for older webkit */
+	var ptransform = / *(transform)/g /* vendor transform for older webkit */
 	var pminibefore = /\s*(?=[{\];=:](?!.*'))/g /* rm \s before characters outside of strings */
 	var pminiafter = /([[}])\s*(?!.*')/g /* rm \s after characters outside of strings */
 
