@@ -107,6 +107,7 @@
 	var FLATCTX = 4 /* flat context signature */
 	var BLCKCTX = 5 /* block context signature */
 	var POSTCTX = 6 /* post-process context signature */
+	var UNKNCTX = 7 /* unknown context signture */
 
 	var prepctx = 1 /* on/off preparation context */
 	var selectx = 1 /* on/off selector context */
@@ -115,6 +116,7 @@
 	var flatctx = 1 /* on/off flat context */
 	var blckctx = 1 /* on/off block context */
 	var postctx = 1 /* on/off post-process context */
+	var unknctx = 0 /* on/off unknown context signture */
 
 	/**
 	 * Compiler
@@ -372,7 +374,7 @@
 
 								// plugin, selector context
 								if (plugged > 0 && rulectx > 0)
-									switch(cache = plugin(RULECTX, current, line, cols, id, output.length)) {
+									switch (cache = plugin(RULECTX, current, line, cols, id, output.length)) {
 										case null: case void 0: break; default: selector = cache
 									}
 
@@ -588,14 +590,15 @@
 				switch (code) {
 					case NEWLINE:
 					case CARRIAGE:
-						if (plugged > 0 && com === 0 && (unknown = unknown.trim()).length > 0) {
+						if (plugged > 0 && unknctx > 0 && com === 0 && (unknown = unknown.trim()).length > 0) {
 							switch (frame.length) {
 								case 0: break
-								default: switch(cache = plugin(7, unknown, line, cols, id, output.length)) {
-									case null: case void 0: break;
-									default:
-										frame = frame.replace(new RegExp(unknown.replace(pescape, '\\$&')+'$'), cache).trim()
-								}
+								default:
+									switch (cache = plugin(UNKNCTX, unknown, line, cols, id, output.length)) {
+										case null: case void 0: break;
+										default:
+											frame = frame.replace(new RegExp(unknown.replace(pescape, '\\$&')+'$'), cache).trim()
+									}
 							}
 
 							unknown = empty

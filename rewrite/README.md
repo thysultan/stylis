@@ -166,7 +166,7 @@ stylis.set(options: {
 	keyframes: true|false // namespace keyframes + animations
 	prefix: true|false // (de)active vendor prefixing
 	compress: true|false // enables aggressive minification
-	context: 1-6 // enable/disable specific plugin context
+	context: 0-7 // enable/disable specific plugin context
 })
 ```
 #### Prefix
@@ -188,16 +188,17 @@ The middleware is executed in stages and passed a interger value that identifies
 4 /* flat context signature */
 5 /* block context signature */
 6 /* post-process context signature */
+7 /* unknown context signture */
 ```
 
-1. `0` preparation context, before the compiler starts
-2. `1` on a selector declaration ex. `.foo, .bar`
-3. `2` on a rule declaration ex. `.foo`
-4. `3` on a property declaration ex. `color: red;`
-6. `4` after a section of flat css has been processed ex. `color:blue;`
-5. `5` after a block of css has been processed i.e `.foo {color:red;}`
-8. `6` before the compiled css output is returned
-9. `7` after every un-token'ed new line (mainly to use for linting)
+- `0` preparation context, before the compiler starts
+- `1` on a selector declaration ex. `.foo, .bar`
+- `2` on a rule declaration ex. `.foo`
+- `3` on a property declaration ex. `color: red;`
+- `4` after a section of flat css has been processed ex. `color:blue;`
+- `5` after a block of css has been processed i.e `.foo {color:red;}`
+- `6` before the compiled css output is returned
+- `7` after every un-token'ed new line (to be used by linting plugins)
 
 If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
 
