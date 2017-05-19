@@ -467,9 +467,8 @@
 															}
 													}
 
-													if (namescope === 1) {
+													if (namescope === 1)
 														cache = namespace + space + cache
-													}
 
 													collection[index] = cache
 												}
