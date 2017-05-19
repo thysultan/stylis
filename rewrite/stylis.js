@@ -436,25 +436,32 @@
 													cache = collection[index]
 
 													switch (cache.charCodeAt(0)) {
+														// [...]
 														case LBRACKET:
 															cache = cache.replace(punique, space) + id
 															break
+														// >, +
 														case 43:
 														case 62:
 															continue
+														// :
 														case COLON:
 															switch (cache.charCodeAt(1)) {
+																// :global
 																case 103:
 																	cache = cache.replace(pglobal, capture).replace(pand, id).replace(punique, space)
 																	break
+																// :psuedo
 																default:
 																	cache = id + cache
 															}
 															break
 														default:
 															switch (cache.indexOf(colon)) {
+																// selector
 																case -1:
 																	switch (cache.charCodeAt(cache.length-1)) {
+																		// selector)
 																		case RPAREN:
 																			cache = cache.substring(0, cache.length-1) + id + ')'
 																			break
@@ -462,19 +469,20 @@
 																			cache += id
 																	}
 																	break
+																// selector:psuedo
 																default:
 																	cache = cache.replace(ppsuedo, id+capture)
 															}
 													}
 
+													// nested
 													if (namescope === 1)
 														cache = namespace + space + cache
 
 													collection[index] = cache
 												}
 
-												current = collection.join(space)
-												selectors[i] = current
+												selectors[i] = current = collection.join(space)
 											}
 										}
 
