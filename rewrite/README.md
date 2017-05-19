@@ -59,10 +59,6 @@ npm install stylis --save
 stylis('#id', `
 font-size: 2em;
 
-:host {color:red}
-:host(.fancy) {color:red}
-:host-context(body) {color:red}
-
 // line comments
 /* block comments */
 
@@ -101,12 +97,8 @@ h1 {
 
 ## Output
 
-```scss
+```css
 #id {font-size: 2em;}
-
-:host {color:red}
-:host(.fancy) {color:red}
-:host-context(body) {color:red}
 
 body {background:red}
 h1 h2 h3 {content: 'nesting'}
@@ -148,31 +140,27 @@ h1 h2 h3 {content: 'nesting'}
 #### Stylis
 
 ```javascript
-stylis(selector: {string}, css: {string})
+stylis(selector: {String}, css: {String})
 ```
 
 #### Use
 
 ```javascript
-stylis.use(plugin: {function|function[]})
+stylis.use(plugin: {Function|Array<Function>})
 ```
 
 #### Set
 
 ```javascript
 stylis.set(options: {
-	global: true // active :global selectors
-	cascade: true|false // activate aggressive cascade isolation
-	keyframes: true|false // namespace keyframes + animations
-	prefix: true|false // (de)active vendor prefixing
-	compress: true|false // enables aggressive minification
-	context: 0-7 // enable/disable specific plugin context
+	global: {Boolean} // active :global selectors
+	cascade: {Boolean} // activate aggressive cascade isolation
+	keyframes: {Boolean} // namespace keyframes + animations
+	prefix: {Boolean} // (de)active vendor prefixing
+	compress: {Boolean} // enables aggressive minification
+	context: {Number} // enable/disable specific plugin context
+	plugins: {Array<Function>|Function}
 })
-```
-#### Prefix
-
-```javascript
-stylis.prefix(false) // deactivates vendor prefixing
 ```
 
 ## Plugins
@@ -185,20 +173,18 @@ The middleware is executed in stages and passed a interger value that identifies
 1 /* selector context signature */
 2 /* rule context signature */
 3 /* property context signature */
-4 /* flat context signature */
-5 /* block context signature */
-6 /* post-process context signature */
-7 /* unknown context signture */
+4 /* block context signature */
+5 /* post-process context signature */
+6 /* unknown context signture */
 ```
 
 - `0` preparation context, before the compiler starts
 - `1` on a selector declaration ex. `.foo, .bar`
 - `2` on a rule declaration ex. `.foo`
 - `3` on a property declaration ex. `color: red;`
-- `4` after a section of flat css has been processed ex. `color:blue;`
-- `5` after a block of css has been processed i.e `.foo {color:red;}`
-- `6` before the compiled css output is returned
-- `7` after every un-token'ed new line (to be used by linting plugins)
+- `4` after a block of css has been processed i.e `.foo {color:red;}`
+- `5` before the compiled css output is returned
+- `6` after every un-token'ed new line (to be used by linting plugins)
 
 If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
 
