@@ -25,7 +25,7 @@
 	var lbraces = '{'
 	var colon = ':'
 	var semi = ';'
-	var unique = '§'
+	var formfeed = '\f'
 	var capture = '$1'
 	var webkit = '-webkit-'
 	var moz = '-moz-'
@@ -42,6 +42,7 @@
 	var array = [empty]
 	var plugins = []
 
+	var pformfeed = /\f/g
 	var pand = /&/g /* finds all & characters */
 	var pnewline = /\n/g /* finds newlines */
 	var psplit = /,\n/g /* splits selectors */
@@ -60,8 +61,7 @@
 	var pminifyafter = /([[}=:])\s+/g /* rm \s after characters outside of strings */
 	var pminifytail = /(\{[^{]+?);(?=\})/g
 	var ppsuedo = /(:+) */g
-	var punique = /§/g
-	var pstrings = /['"`][^'"`]*?['"`]/g
+	var pformat = /(['"`]).*?\1|\s+=\s*|\s*=\s+/g
 	var pspace = / /g;
 
 	/* settings */
@@ -429,8 +429,8 @@
 											}
 											case 0: {
 												// aggressive cascade isolation
-												current = current.replace(pstrings, format).replace(pglobal, format)
-												collection = current.split(' ')
+												current = current.replace(pformat, format).replace(pglobal, format)
+												collection = current.split(space)
 
 												for (index = 0, size = collection.length; index < size; index++) {
 													cache = collection[index]
@@ -438,7 +438,7 @@
 													switch (cache.charCodeAt(0)) {
 														// [...]
 														case LBRACKET:
-															cache = cache.replace(punique, space) + id
+															cache = cache.replace(pformfeed, space) + id
 															break
 														// >, +
 														case 43:
@@ -449,7 +449,7 @@
 															switch (cache.charCodeAt(1)) {
 																// :global
 																case 103:
-																	cache = cache.replace(pglobal, capture).replace(pand, id).replace(punique, space)
+																	cache = cache.replace(pglobal, capture).replace(pand, id).replace(pformfeed, space)
 																	break
 																// :psuedo
 																default:
@@ -868,7 +868,7 @@
 	 * @return {String}
 	 */
 	function format (match) {
-		return match.replace(pspace, unique)
+		return match.replace(pspace, formfeed)
 	}
 
 	/**
