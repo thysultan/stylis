@@ -369,7 +369,7 @@ var spec = {
 	'animations': {
 		sample: `
 			h2 {
-				animation: initial inherit unset;
+				animation: initial inherit unset --invalid;
 			}
 			span {
 				animation: _name_ -name %name 1name __name;
@@ -426,9 +426,9 @@ var spec = {
 			the animation-name in a grouped animation: property
 		*/
 		`.user h2{`+
-		`-webkit-animation:initial inherit unset;animation:initial inherit unset;}`+
-		`.user span{-webkit-animation:_name_-user -name-user %name 1name __name;`+
-		`animation:_name_-user -name-user %name 1name __name;}`+
+		`-webkit-animation:initial inherit unset --invalid;animation:initial inherit unset --invalid;}`+
+		`.user span{-webkit-animation:_name_-user -name-user %name 1name __name-user;`+
+		`animation:_name_-user -name-user %name 1name __name-user;}`+
 		`.user div{-webkit-animation-name:bounce-user;animation-name:bounce-user;}`+
 		`.user h1{-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
 		`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1, 2, 4) `+
@@ -682,7 +682,7 @@ var spec = {
 			}
 		`,
 		expected: `a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`+
-		`.root.user > *:not(header.user){color: red;}`
+		`.root.user > *:not(header.user){color: red;}`+
 		`a:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover {color:red;}`
 	}
 };

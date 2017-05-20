@@ -106,6 +106,7 @@
 	var LBRACKET = 91
 	var RBRACKET = 93
 	var DASH = 45
+	var UNDERSCORE = 95
 
 	var ID = 35
 	var CLASS = 46
@@ -146,13 +147,14 @@
 	/**
 	 * Compile
 	 *
-	 * @param {String} select
+	 * @param {String} selection
 	 * @param {String} input
 	 * @return {String}
 	 */
-	function compile (select, input) {
-		var sel = select
-		var hash = select
+	function compile (selection, input) {
+		var selector = selection
+		var id = selection
+
 		var eol = input.length
 		var eof = eol + 1
 
@@ -199,33 +201,34 @@
 		var selectors = array
 		var collection = array
 
-		switch (select.constructor) {
-			case Number: sel += empty
+		switch (selection.constructor) {
+			case Number:
+				selector += empty
 				break
 			case Array:
-				sel = select.join(empty)
+				selector = selection.join(empty)
 
-				if ((type = select.length) > 1 || cascade === 0) {
-					hash = unique
+				if ((type = selection.length) > 1 || cascade === 0) {
+					id = unique
 				} else {
-					hash = sel
+					id = selector
 				}
 
 				break
 		}
 
-		if ((code = sel.charCodeAt(0)) < 33) {
-			code = (sel = sel.trim()).charCodeAt(0)
-			hash = hash.trim()
+		if ((code = selector.charCodeAt(0)) < 33) {
+			code = (selector = selector.trim()).charCodeAt(0)
+			id = id.trim()
 		}
 
 		if (scope === 1) {
 			switch (code) {
 				// id/class
-				case DOT: case HASH: key = sel.substring(1); break
+				case DOT: case HASH: key = selector.substring(1); break
 				case LBRACKET:
 					// `[data-id=$]` -> ['data-id', '$']
-					properties = sel.substring(1, sel.length - 1).split('=')
+					properties = selector.substring(1, selector.length - 1).split('=')
 					size = properties.length
 					key = key = size > 1 ? properties[1] : properties[0]
 
@@ -234,9 +237,9 @@
 						case DQUOTE: case SQUOTE: key = key.substring(1, key.length-1)
 					}
 
-					sel = '['+ properties[0] + (size > 1 ? ('=' + key +']') : ']')
+					selector = '['+ properties[0] + (size > 1 ? ('=' + key +']') : ']')
 					break
-				default: key = sel
+				default: key = selector
 			}
 
 			var key = key.replace(pscope, dash)
@@ -247,7 +250,7 @@
 			var plugin = plugged > 1 ? proxy : plugins[0]
 
 			if (recurse === 0) {
-				switch (cache = plugin(PREPCTX, input, line, cols, hash, 0)) {
+				switch (cache = plugin(PREPCTX, input, line, cols, id, 0)) {
 					case null:
 					case void 0: break;
 					default:
@@ -305,10 +308,10 @@
 				if (plugged > 0 && code !== RBRACE && operation === 0) {
 					if (selectx > 0 && code === LBRACE) {
 						// plugin selector context
-						cache = plugin(SELECTX, frame.substring(0, frame.length-1).trim(), line, cols, hash, output.length)
+						cache = plugin(SELECTX, frame.substring(0, frame.length-1).trim(), line, cols, id, output.length)
 					} else if (propctx > 0) {
 						// plugin property context
-						cache = plugin(PROPCTX, frame, line, cols, hash, output.length)
+						cache = plugin(PROPCTX, frame, line, cols, id, output.length)
 					}
 
 					if (propctx + selectx > 0) {
@@ -328,9 +331,7 @@
 					}
 				}
 
-				size = frame.length
-
-				if (size > 0) {
+				if ((size = frame.length) > 0) {
 					second = frame.charCodeAt(1)
 					third = frame.charCodeAt(2)
 
@@ -387,7 +388,7 @@
 												body = body.trim();
 												break
 											default:
-												body = frame + body.trim() + rbraces
+												body = frame + body + rbraces
 										}
 
 										switch (operation) {
@@ -397,8 +398,8 @@
 
 												if (previous === array && previous[0].length === 0) {
 													switch (type) {
-														case 0: previous[0] = hash; break
-														case 1: previous[0] = hash[0]; break
+														case 0: previous[0] = id; break
+														case 1: previous[0] = id[0]; break
 													}
 												}
 										}
@@ -436,24 +437,24 @@
 												case 1: {
 													switch (tail) {
 														case AND:
-															current = hash + current.substring(1).replace(pand, hash);
+															current = id + current.substring(1).replace(pand, id);
 															break
 														default:
 															if (tail === COLON) {
 																switch (current.charCodeAt(1)) {
 																	case 103:
 																		if (globals > 0) {
-																			current = current.replace(pglobal, capture).replace(pand, hash).trim()
+																			current = current.replace(pglobal, capture).replace(pand, id).trim()
 																		}
 																		break
 																	default:
-																		current = hash + current
+																		current = id + current
 																}
 															} else if (current.indexOf(space+'&') > 0) {
 																// html &
-																current = current.replace(pand, hash).trim()
+																current = current.replace(pand, id).trim()
 															} else {
-																current = hash + space + current
+																current = id + space + current
 															}
 													}
 													break
@@ -472,16 +473,16 @@
 																switch (cache.charCodeAt(1)) {
 																	// :global
 																	case 103:
-																		cache = cache.replace(pglobal, capture).replace(pand, hash).replace(pformfeed, space)
+																		cache = cache.replace(pglobal, capture).replace(pand, id).replace(pformfeed, space)
 																		break
 																	// :pseudo
 																	default:
-																		cache = hash + cache
+																		cache = id + cache
 																}
 																break
 															// [
 															case ATTRIBUTE:
-																cache = cache.replace(pformfeed, space) + hash
+																cache = cache.replace(pformfeed, space) + id
 																break
 															// >, +, ~, ., #
 															case ID:
@@ -500,20 +501,18 @@
 																			// selector)
 																			case RPAREN:
 																				if (cache.length > 1) {
-																					cache = cache.substring(0, cache.length-1) + hash + ')'
+																					cache = cache.substring(0, cache.length-1) + id + ')'
 																				}
 																				break
 																			default:
-																				cache += hash
+																				cache += id
 																		}
 																		break
 																	// selector:pseudo
 																	default:
-																		cache = cache.replace(ppseudo, hash + capture)
+																		cache = cache.replace(ppseudo, id + capture)
 																}
 														}
-
-														// console.log(0, cache, cache[cache.length-1]);
 
 														// nested
 														if (namescope === 1) {
@@ -529,7 +528,7 @@
 
 											// plugin, selector context
 											if (plugged > 0 && rulectx > 0) {
-												switch (cache = plugin(RULECTX, current, line, cols, hash, output.length)) {
+												switch (cache = plugin(RULECTX, current, line, cols, id, output.length)) {
 													case null:
 													case void 0:
 														break
@@ -546,7 +545,7 @@
 										previous = selectors
 
 										if (type > 0) {
-											selectors = nest(select, selectors, length, type)
+											selectors = nest(selection, selectors, length, type)
 										}
 
 										frame = selectors.join(comma) + lbraces
@@ -592,11 +591,9 @@
 
 											if (scope === 1 && (
 												// letters
-												(peak > AT && peak < 90) || (peak > 96 && peak < 122) ||
-												// exceptions `_, -`
-												peak === DASH ||
-												// unless there are two in sequence
-												peak === 95 && current.charCodeAt(1) !== 95
+												(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
+												// dash but not in sequence ex. --
+												(peak === DASH && current.charCodeAt(1) !== DASH)
 											)) {
 												switch (isNaN(parseFloat(current)) + (current.indexOf('(') !== -1)) {
 													case 1: {
@@ -636,70 +633,98 @@
 									frame += rbraces
 								}
 							} else if (prefix === 1) {
-								if (first === 97 && second === 112 && third === 112) {
+								switch (first*2 + second*3 + third*4) {
 									// appearance: a, p, p
-									frame = webkit + frame + moz + frame + frame
-								} else if (first === 100 && second === 105 && third === 115) {
-									// display: d, i, s
-									// flex/inline-flex
-									if ((index = frame.indexOf(flex)) !== -1) {
-										// e, inline-flex
-										cache = frame.charCodeAt(index-2) === 101 ? 'inline'+dash : empty
-										frame = frame.indexOf(important) !== -1 ? important : empty
-										frame = (
-											display + webkit + cache + box + frame + semi +
-											display + webkit + cache + flex + frame + semi +
-											display + ms + flex + box + frame + semi +
-											display + cache + flex + frame + semi
-										)
+									case 97*2 + 112*3 + 112*4: {
+										frame = webkit + frame + moz + frame + frame
+										break
 									}
-								} else if (first === 116 && ((second === 114 && third === 97) || (second === 101 && third === 120))) {
-									// transform, transition: t, r, a
-									// text-size-adjust: t, e, x
-									frame = webkit + frame + (frame.charCodeAt(5) === 102 ? ms + frame : empty) + frame
-									// transitions
-									if (second + third === 211 && frame.charCodeAt(12) === 115 && frame.indexOf(space+'transform') > -1)
-										frame = frame.substring(0, frame.indexOf(semi)+1).replace(ptransform, webkit+capture) + frame
-								} else if ((first === 104 && second === 121 && third === 112) ||
-									(first === 117 && second === 115 && third === 101)) {
 									// hyphens: h, y, p
 									// user-select: u, s, e
-									frame = webkit + frame + moz + frame + ms + frame + frame
-								} else if (first === 102 && second === 108 && third === 101) {
-									// flex: f, l, e
-									frame = webkit + frame + ms + frame + frame
-								} else if (first === 111 && second === 114 && third === 100) {
-									// order: o, r, d
-									frame = webkit + frame + ms + flex+ dash + frame + frame
-								} else if (first === 97 && second === 108 && third === 105 && frame.charCodeAt(5) === DASH) {
-									// align-items, align-center, align-self: a, l, i, -
-									switch (frame.charCodeAt(6)) {
-										// align-items, i
-										case 105:
-											cache = frame.replace(dash+'items', empty)
-											frame = webkit + frame + webkit + box + dash + cache + ms + flex + dash + cache + frame
-											break
-										// align-self, s
-										case 115:
-											frame = ms + flex + dash + 'item' + dash + frame.replace(dash+'self', empty) + frame;
-											break
-										// align-content
-										default:
-											frame = ms + flex+dash+'line'+dash+'pack' + frame.replace('align'+dash+'content', empty) + frame;
-											break
+									case 104*2 + 121*3 + 112*4:
+									case 117*2 + 115*3 + 101*4: {
+										frame = webkit + frame + moz + frame + ms + frame + frame
+										break
 									}
-								} else if (first === 106 && second === 117 && third === 115) {
+									// flex: f, l, e
+									case 102*2 + 108*3 + 101*4: {
+										frame = webkit + frame + ms + frame + frame
+										break
+									}
+									case 111*2 + 114*3 + 100*4: {
+										// order: o, r, d
+										frame = webkit + frame + ms + flex+ dash + frame + frame
+										break
+									}
 									// justify-content, j, u, s
-									index = frame.indexOf(colon)
-									cache = frame.substring(index).replace(flex + dash, empty)
-									frame = webkit + box + dash + 'pack' + cache + webkit + frame + ms + flex + dash + 'pack' + cache + frame
-								} else if (first === 99 && second === 117 && third === 114 && pcursor.exec(frame) !== null) {
+									case 106*2 + 117*3 + 115*4: {
+										cache = frame.substring(frame.indexOf(colon)).replace(flex + dash, empty)
+										frame = webkit + box + dash + 'pack' + cache + webkit + frame + ms + flex + dash + 'pack' + cache + frame
+										break
+									}
+									// display(flex/inline-flex): d, i, s
+									case 100*2 + 105*3 + 115*4: {
+										if ((index = frame.indexOf(flex)) !== -1) {
+											// e, inline-flex
+											cache = frame.charCodeAt(index-2) === 101 ? 'inline' + dash : empty
+											frame = frame.indexOf(important) !== -1 ? important : empty
+											frame = (
+												display + webkit + cache + box + frame + semi +
+												display + webkit + cache + flex + frame + semi +
+												display + ms + flex + box + frame + semi +
+												display + cache + flex + frame + semi
+											)
+										}
+										break
+									}
+									// align-items, align-center, align-self: a, l, i, -
+									case 97*2 + 108*3 + 105*4: {
+										if (frame.charCodeAt(5) === DASH) {
+											switch (frame.charCodeAt(6)) {
+												// align-items, i
+												case 105:
+													cache = frame.replace(dash+'items', empty)
+													frame = webkit + frame + webkit + box + dash + cache + ms + flex + dash + cache + frame
+													break
+												// align-self, s
+												case 115:
+													frame = ms + flex + dash + 'item' + dash + frame.replace(dash+'self', empty) + frame;
+													break
+												// align-content
+												default:
+													frame = ms + flex+dash+'line'+dash+'pack' + frame.replace('align'+dash+'content', empty) + frame;
+													break
+											}
+										}
+										break
+									}
 									// cursor, c, u, r
-									frame = frame.replace(pcolon, colon+space+webkit) + frame.replace(pcolon, colon+space+moz) + frame
-								} else if (first === 119 && second === 105 && third === 100 && (index = frame.indexOf(cont)) !== -1) {
+									case 99*2 + 117*3 + 114*4: {
+										if (pcursor.test(frame)) {
+											frame = frame.replace(pcolon, colon+space+webkit) + frame.replace(pcolon, colon+space+moz) + frame
+										}
+										break
+									}
 									// width: min-content / width: max-content
-									cache = frame.substring(index - 3)
-									frame = width + webkit + cache + width + moz + cache + width + cache
+									case 119*2 + 105*3 + 100*4: {
+										if ((index = frame.indexOf(cont)) !== -1) {
+											// width: min-content / width: max-content
+											cache = frame.substring(index - 3)
+											frame = width + webkit + cache + width + moz + cache + width + cache
+										}
+										break
+									}
+									// transform, transition: t, r, a
+									// text-size-adjust: t, e, x
+									case 116*2 + 114*3 + 97*4:
+									case 116*2 + 101*3 + 120*4: {
+										frame = webkit + frame + (frame.charCodeAt(5) === 102 ? ms + frame : empty) + frame
+										// transitions
+										if (second + third === 211 && frame.charCodeAt(12) === 115 && frame.indexOf(space+'transform') > -1) {
+											frame = frame.substring(0, frame.indexOf(semi)+1).replace(ptransform, webkit+capture) + frame
+										}
+										break
+									}
 								}
 							}
 
@@ -707,8 +732,9 @@
 							if (code !== SEMICOLON) {
 								frame = frame.substring(0, (size = frame.length) - 1)
 
-								if (code === RBRACE)
+								if (code === RBRACE) {
 									frame += rbraces
+								}
 							}
 
 							// flat context
@@ -741,14 +767,14 @@
 					}
 
 					if (type > 1) {
-						flat = nest(select, [hash], 1, type).join(comma) + lbraces + flat + rbraces
+						flat = nest(selection, [id], 1, type).join(comma) + lbraces + flat + rbraces
 					} else {
-						flat = hash + lbraces + flat + rbraces
+						flat = id + lbraces + flat + rbraces
 					}
 
 					// plugin, block context
 					if (plugged > 0 && blckctx > 0) {
-						switch (cache = plugin(BLCKCTX, flat, line, cols, hash, output.length)) {
+						switch (cache = plugin(BLCKCTX, flat, line, cols, id, output.length)) {
 							case null:
 							case void 0:
 								break
@@ -818,7 +844,7 @@
 
 					// plugin, block context
 					if (plugged > 0 && blckctx > 0)
-						switch (cache = plugin(BLCKCTX, stack, line, cols, hash, output.length)) {
+						switch (cache = plugin(BLCKCTX, stack, line, cols, id, output.length)) {
 							case null:
 							case void 0:
 								break
@@ -858,7 +884,7 @@
 								case 0:
 									break
 								default:
-									switch (cache = plugin(UNKNCTX, unknown, line, cols, hash, output.length)) {
+									switch (cache = plugin(UNKNCTX, unknown, line, cols, id, output.length)) {
 										case null:
 										case void 0:
 											break
@@ -936,7 +962,7 @@
 			// plugin, post context
 			if (plugged > 0) {
 				if (postctx > 0) {
-					switch (cache = plugin(POSTCTX, output, line, cols, hash, output.length)) {
+					switch (cache = plugin(POSTCTX, output, line, cols, id, output.length)) {
 						case null:
 						case void 0:
 							break
@@ -999,13 +1025,13 @@
 	 * @param {String} input
 	 * @param {Number} line
 	 * @param {Number} cols
-	 * @param {String} hash
+	 * @param {String} id
 	 * @param {Number} length
 	 * @return {String?|void}
 	 */
-	function proxy (context, input, line, cols, hash, length) {
+	function proxy (context, input, line, cols, id, length) {
 		for (var i = 0, output = input; i < plugged; i++) {
-			output = plugins[i](context, output, line, cols, hash, length) || output
+			output = plugins[i](context, output, line, cols, id, length) || output
 		}
 
 		if (output !== input) {
