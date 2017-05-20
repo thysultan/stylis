@@ -4,7 +4,6 @@
  */
 var spec = {
 	'flat': {
-		name: 'flat',
 		sample: `
 			color: 20px;
 			font-size: 20px;
@@ -13,7 +12,6 @@ var spec = {
 		expected: `.user{color: 20px;font-size: 20px;-webkit-transition: all;transition: all}`
 	},
 	'namespace': {
-		name: 'namespace',
 		sample: `
 			{
 				color: blue;
@@ -22,7 +20,6 @@ var spec = {
 		expected: `.user {color: blue;}`
 	},
 	':global()': {
-		name: ':global()',
 		sample: `
 			h1, :global(h2) {
 				color: red;
@@ -61,7 +58,6 @@ var spec = {
 		`html .user{color: red;}`
 	},
 	'comments': {
-		name: 'comments',
 		sample: `
 			// line comment
 
@@ -90,7 +86,6 @@ var spec = {
 		expected: '.user button{color: blue;}.user button{color: red;}'
 	},
 	'&': {
-		name: '&',
 		sample: `
 			& {
 				color: blue;
@@ -107,7 +102,6 @@ var spec = {
 		expected: '.user{color: blue;}.user.user.user{color: red;}.user + .user{color: red;}'
 	},
 	'&:before': {
-		name: '&:before',
 		sample: `
 			&:before{
 				color: blue;
@@ -116,7 +110,6 @@ var spec = {
 		expected: '.user:before{color: blue;}'
 	},
 	'@media & @supports': {
-		name: '@media & @supports',
 		sample: `
 			@supports (display: block) {
 				color: red;
@@ -198,7 +191,6 @@ var spec = {
 		`.user:hover{color: orange}`
 	},
 	'@font-face': {
-		name: '@font-face',
 		sample: `
 			@font-face {
 				font-family: Pangolin;
@@ -208,7 +200,6 @@ var spec = {
 		expected: `@font-face {font-family: Pangolin;src: url('Pangolin-Regular.ttf') format('truetype');}`
 	},
 	'multiple selectors': {
-		name: 'multiple selectors',
 		sample: `
 			span, h1 {
 				color:red;
@@ -219,9 +210,7 @@ var spec = {
 		`,
 		expected: `.user span,.user h1{color:red;}.user h1,.user:after,.user:before{color:red;}`
 	},
-
 	'[title="a,b"] and :matches(a,b)': {
-		name: '[title="a,b"] and :matches(a,b)',
 		sample: `
 			.test:matches(a, b, c), .test {
 				color: blue;
@@ -246,7 +235,6 @@ var spec = {
 		`.user [title="a"],.user [title="b"]{color: red;}`
 	},
 	'strings': {
-		name: 'strings',
 		sample: `
 			.foo:before {
 		  		content: ".hello {world}";
@@ -259,7 +247,6 @@ var spec = {
 		`content: '.hello {world} " ';}`
 	},
 	'remove empty css': {
-		name: 'remove empty css',
 		sample: `
 			& {
 
@@ -268,7 +255,6 @@ var spec = {
 		expected: ``
 	},
 	'urls': {
-		name: 'urls',
 		sample: `
 			background: url(http://url.com/});
 
@@ -282,7 +268,6 @@ var spec = {
 		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
 	},
 	'last semicolon omission': {
-		name: 'last semicolon omission',
 		sample: `
 			.content {
 				display: none
@@ -296,7 +281,6 @@ var spec = {
 		`.user .content{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex}`
 	},
 	':matches(:not())': {
-		name: ':matches(:not())',
 		sample: `
 			h1:matches(.a, .b, :not(.c)) {
 				display: none
@@ -304,11 +288,7 @@ var spec = {
 		`,
 		expected: `.user h1:matches(.a, .b, :not(.c)){display: none}`
 	},
-
-
-
 	'prefixer': {
-		name: 'prefixer',
 		sample: `
 			html {
 			  text-size-adjust: none;
@@ -387,7 +367,6 @@ var spec = {
 			`}`
 	},
 	'animations': {
-		name: 'animations',
 		sample: `
 			h2 {
 				animation: initial inherit unset;
@@ -467,11 +446,10 @@ var spec = {
 		`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
 		`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}`
 	},
-	'animations disabled prefix': {
+	'animations disabled namespace': {
 		options: {
-			animations: false
+			keyframes: false
 		},
-		name: 'animations disable namespace',
 		sample: `
 			span {
   			animation-duration: 0.6s;
@@ -483,7 +461,6 @@ var spec = {
 			`animation-name:slidein;-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;}`
 	},
 	'keyframes': {
-		name: 'keyframes',
 		sample: `
 			&{
 				animation: slidein 3s ease infinite;
@@ -502,9 +479,8 @@ var spec = {
 	},
 	'keyframes disable namespace': {
 		options: {
-			animations: false
+			keyframes: false
 		},
-		name: 'keyframes disable namespace',
 		sample: `
 			&{
 				animation: slidein 3s ease infinite;
@@ -522,7 +498,6 @@ var spec = {
 			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
 	'nested': {
-		name: 'nested',
 		sample: `
 			:global(div) {
 				h2 {
@@ -597,25 +572,21 @@ var spec = {
 		`.user.foo.bar.barbar{color: orange}`
 	},
 	'class namespace': {
-		name: 'class namespace',
 		selector: ' .foo',
 		sample: `h1 {animation: slide 1s;}`,
 		expected: `.foo h1{-webkit-animation:slide-foo 1s;animation:slide-foo 1s;}`
 	},
 	'id namespace': {
-		name: 'id namespace',
 		selector: '#foo',
 		sample: `h1 {animation: slide 1s;}`,
 		expected: `#foo h1{-webkit-animation:slide-foo 1s;animation:slide-foo 1s;}`
 	},
 	'attribute namespace': {
-		name: 'attribute namespace',
 		selector: '[title=foo]',
 		sample: `h1 {animation: slide 1s;}`,
 		expected: `[title=foo] h1{-webkit-animation:slide-foo 1s;animation:slide-foo 1s;}`
 	},
 	'edge cases': {
-		 name: 'edge cases',
 		 sample: `
 				@media (min-width: 537px) {
 				  border-bottom: 4px solid red;
@@ -633,9 +604,8 @@ var spec = {
 		 	`.user::placeholder{color: pink;}`
 	},
 	'middleware contexts': {
-		name: 'middleware contexts',
 		options: {
-			middleware: function (ctx, str, line, col) {
+			plugins: function (ctx, str, line, col) {
 				switch (ctx) {
 					case 0: return 'width: 10px;'+str
 					case 1: return str+'/* selector */';
@@ -651,6 +621,69 @@ var spec = {
 		`,
 		expected: '.user{width: 10px;/* property */color: blue;/* property */}/* block */'+
 		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
+	},
+	'cascade isolation simple': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			p {
+				color: red;
+			}
+
+			p a {
+				color: red;
+			}
+
+			p:hover {
+			  color: red;
+			}
+
+			p::before {
+			  color: red;
+			}
+
+			:hover {
+			  color: red;
+			}
+
+			::before {
+			  color: red;
+			}
+
+			:hover p {
+			  color: red;
+			}
+		`,
+		expected: `p.user{color: red;}`+
+		`p.user a.user{color: red;}`+
+		`p.user:hover{color: red;}`+
+		`p.user::before{color: red;}`+
+		`.user:hover{color: red;}`+
+		`.user::before{color: red;}`+
+		`.user:hover p.user{color: red;}`
+	},
+
+	'cascade isolation complex': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			a:not( a +b foo:hover :global(marquee) a) > :hover {
+			  color: red;
+			}
+
+			.root > :global(*):not(header) {
+			  color: red;
+			}
+
+			a:not( a +b foo:hover :global(marquee) a) > :hover {
+			  color: red;
+			}
+		`,
+		expected: `a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`+
+		`.root.user > *:not(header.user){color: red;}`
+		`a:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover {color:red;}`
 	}
 };
 

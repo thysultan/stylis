@@ -39,14 +39,15 @@
 	var width = 'width:'
 	var keyframes = 'keyframes'
 	var unknown = empty
-	var unique = '%-%'
+	var unique = '%%'
 
 	var array = [empty]
 	var plugins = []
 
-	var pformfeed = /\f/g
-	var pand = /&/g /* finds all & characters */
-	var pnewline = /\n/g /* finds newlines */
+	var pformfeed = /\f/g /* match form feed characters */
+	var pspace = / /g /* match space characters */
+	var pand = /&/g /* match all & characters */
+	var pnewline = /\n/g /* match newline characters */
 	var psplit = /,\n/g /* splits selectors */
 	var pplace = /::place/g /* asserts ::placeholder varient */
 	var pcolon = /: */g /* splits animation rules into propert: declaration */
@@ -57,15 +58,15 @@
 	var pcursor = /zoo|gra/ /* asserts the cursor varient */
 	var pescape = /[-\/\\^$*+?.()|[\]{}]/g /*	escapes regex when liniting */
 	var pglobal = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(..) */
-	var pcascade = /\f/g /* aggressive cascade mode splitter */
 	var ptransform = / *(transform)/g /* vendor prefix transform for older webkit */
 	var pminifybefore = /\s+(?=[{\];=:])/g /* rm \s before characters outside of strings */
 	var pminifyafter = /([[}=:])\s+/g /* rm \s after characters outside of strings */
-	var pminifytail = /(\{[^{]+?);(?=\})/g
-	var ppsuedo = /(:+) */g
+	var pminifytail = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
+	var ppseudo = /(:+) */g /* capture :pseudo selectors */
 	var pformat = /(['"`]).*?\1|\s+=\s*|\s*=\s+/g
-	var pspace = / /g
-	var punique = /%-%/g
+	var punique = /%%/g
+	var ppatch = /([^[#.>~+\s])%%/g
+	var ptype = /^[^[#.>~+\s]+/
 
 	/* settings */
 	var prefix = 1
@@ -105,6 +106,13 @@
 	var LBRACKET = 91
 	var RBRACKET = 93
 	var DASH = 45
+
+	var ID = 35
+	var CLASS = 46
+	var SIBLING = 126
+	var CHILD = 62
+	var ADJACENT = 43
+	var ATTRIBUTE = LBRACKET
 
 	var KEYFRAME = 107
 	var MEDIA = 109
@@ -195,13 +203,14 @@
 			case Number: sel += empty
 				break
 			case Array:
-				if ((type = select.length) > 1) {
+				sel = select.join(empty)
+
+				if ((type = select.length) > 1 || cascade === 0) {
 					hash = unique
 				} else {
-					hash = hash[0]
+					hash = sel
 				}
 
-				sel = select.join(empty)
 				break
 		}
 
@@ -458,14 +467,6 @@
 														cache = collection[index]
 
 														switch (cache.charCodeAt(0)) {
-															// [...]
-															case LBRACKET:
-																cache = cache.replace(pformfeed, space) + hash
-																break
-															// >, +
-															case 43:
-															case 62:
-																continue
 															// :
 															case COLON:
 																switch (cache.charCodeAt(1)) {
@@ -473,11 +474,24 @@
 																	case 103:
 																		cache = cache.replace(pglobal, capture).replace(pand, hash).replace(pformfeed, space)
 																		break
-																	// :psuedo
+																	// :pseudo
 																	default:
 																		cache = hash + cache
 																}
 																break
+															// [
+															case ATTRIBUTE:
+																cache = cache.replace(pformfeed, space) + hash
+																break
+															// >, +, ~, ., #
+															case ID:
+															case CLASS:
+															case SIBLING:
+															case CHILD:
+															case ADJACENT:
+																if (cache.length === 1) {
+																	continue
+																}
 															default:
 																switch (cache.indexOf(colon)) {
 																	// selector
@@ -485,17 +499,21 @@
 																		switch (cache.charCodeAt(cache.length-1)) {
 																			// selector)
 																			case RPAREN:
-																				cache = cache.substring(0, cache.length-1) + hash + ')'
+																				if (cache.length > 1) {
+																					cache = cache.substring(0, cache.length-1) + hash + ')'
+																				}
 																				break
 																			default:
 																				cache += hash
 																		}
 																		break
-																	// selector:psuedo
+																	// selector:pseudo
 																	default:
-																		cache = cache.replace(ppsuedo, hash + capture)
+																		cache = cache.replace(ppseudo, hash + capture)
 																}
 														}
+
+														// console.log(0, cache, cache[cache.length-1]);
 
 														// nested
 														if (namescope === 1) {
@@ -941,16 +959,33 @@
 	/**
 	 * Nest
 	 *
-	 * @param {Array<String>} parent
+	 * @param {Array<String>} parents
 	 * @param {Array<String>} current
 	 * @param {Number} length
 	 * @param {Number} size
 	 * @return {Array<String>}
 	 */
-	function nest (parent, current, length, size) {
+	function nest (parents, rules, length, size) {
 		for (var i = 0, idx = 0, selectors = []; i < length; i++) {
 			for (var index = 0; index < size; index++) {
-				selectors[idx++] = current[i].replace(punique, parent[index])
+				var parent = parents[index]
+				var rule = rules[i]
+
+				if (cascade === 0) {
+					switch (parent.charCodeAt(0)) {
+						case ID:
+						case CLASS:
+						case SIBLING:
+						case CHILD:
+						case ADJACENT:
+						case ATTRIBUTE:
+							break
+						default:
+							rule = rule.replace(ppatch, '$1'+parent.replace(ptype, empty))
+					}
+				}
+
+				selectors[idx++] = rule.replace(punique, parent)
 			}
 		}
 

@@ -52,19 +52,22 @@ function run (tests, fn) {
 	for (var name in tests) {
 		var test = tests[name];
 
-		var name = test.name.trim();
 		var sample = test.sample.trim();
 		var expected = test.expected.trim();
 		var options = test.options || {};
 
 		fn.use(null);
 
-		if (options.middleware) {
-			fn.use(options.middleware);
+		if (options.plugins) {
+			fn.use(options.plugins);
 		}
 
-		if (options.animations !== void 0) {
-			fn.set({keyframes: options.animations})
+		if (options.keyframes !== void 0) {
+			fn.set({keyframes: options.keyframes})
+		}
+
+		if (options.cascade !== void 0) {
+			fn.set({cascade: options.cascade})
 		}
 
 		var result = fn(
@@ -72,8 +75,12 @@ function run (tests, fn) {
 			sample
 		);
 
-		if (options.animations !== void 0) {
-			fn.set({keyframes: !options.animations})
+		if (options.cascade !== void 0) {
+			fn.set({cascade: !options.cascade})
+		}
+
+		if (options.keyframes !== void 0) {
+			fn.set({keyframes: !options.keyframes})
 		}
 
 		if (result !== expected || /\n/g.test(result)) {
