@@ -663,7 +663,6 @@ var spec = {
 		`.user::before{color: red;}`+
 		`.user:hover p.user{color: red;}`
 	},
-
 	'cascade isolation complex': {
 		options: {
 			cascade: false
@@ -684,7 +683,44 @@ var spec = {
 		expected: `a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`+
 		`.root.user > *:not(header.user){color: red;}`+
 		`a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`
-	}
+	},
+	'cascade isolation nesting': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			color: red;
+
+			h1 {
+				:global(section) {
+					color: red
+				}
+			}
+
+			h1 {
+				h2 {
+					color: red
+				}
+			}
+
+			div, span {
+				h1 {
+					color: red
+				}
+			}
+
+			span {
+				&:hover {
+					color: red
+				}
+			}
+		`,
+		expected: `.user{color: red;}`+
+		`h1.user section{color: red}`+
+		`h1.user h2.user{color: red}`+
+		`div.user h1.user,span.user h1.user{color: red}`+
+		`span.user:hover{color: red}`
+	},
 };
 
 if (typeof module === 'object') {

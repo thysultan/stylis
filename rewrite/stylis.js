@@ -401,6 +401,11 @@
 												break
 											default:
 												body = frame + body + rbraces
+
+												if (cascade === 0) {
+													namescope = 1
+													namespace = unique
+												}
 										}
 
 										switch (operation) {
@@ -417,21 +422,17 @@
 											}
 										}
 
-										if (cascade === 0) {
-											namescope = 1
-											namespace = unique
-										}
-
+										recurse = 1
 										block += compile(previous, body).trim()
-
-										if (cascade === 0) {
-											namescope = 0
-											namespace = empty
-										}
 
 										recurse = 0
 										nested = 1
 										frame = empty
+
+										if (namescope === 1) {
+											namescope = 0
+											namespace = empty
+										}
 									} else if (operation === 0) {
 										// :placeholder
 										if (place === 0 && frame.indexOf(colon+colon+'place') !== -1) {
@@ -501,7 +502,13 @@
 																break
 															case COLON:
 																switch (cache.charCodeAt(1)) {
-																	case GLOBAL: cache = cache.substring(8); break
+																	case GLOBAL: {
+																		cache = (
+																			cache.substring(8, count-1) +
+																			(tail === SPACE ? cache.substring(cache.lastIndexOf(')')+1) : empty)
+																		);
+																		break
+																	}
 																	// :global(...):not
 																	case 110: break
 																	default: cache = id + cache
@@ -522,6 +529,12 @@
 													}
 
 													current = collection.join(carriage).replace(pcarriage, empty)
+
+													if (namescope === 1) {
+														if (current.indexOf(unique) !== 0) {
+															current = namespace + space + current
+														}
+													}
 												}
 											}
 
@@ -980,7 +993,7 @@
 										} else {
 											switch (code) {
 												case LPAREN: globals = ++count; break
-												case RPAREN: if ((globals = --count) === 0) char = carriage; break
+												case RPAREN: if ((globals = --count) === 0) char += carriage; break
 											}
 										}
 										break
