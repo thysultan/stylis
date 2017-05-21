@@ -683,7 +683,7 @@ var spec = {
 		`,
 		expected: `a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`+
 		`.root.user > *:not(header.user){color: red;}`+
-		`a:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover {color:red;}`
+		`a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`
 	}
 };
 
