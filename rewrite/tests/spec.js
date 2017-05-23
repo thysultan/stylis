@@ -298,7 +298,7 @@ var spec = {
 			& {
 				width: max-content;
 				width: min-content;
-				display: flex !important;
+				display: flex!important;
 			  transform: rotate(30deg);
 			  cursor: grab;
 
@@ -320,8 +320,8 @@ var spec = {
 			`.user{`+
 			`width:-webkit-max-content;width:-moz-max-content;width:max-content;`+
 			`width:-webkit-min-content;width:-moz-min-content;width:min-content;`+
-			`display:-webkit-box !important;display:-webkit-flex !important;`+
-			`display:-ms-flexbox !important;display:flex !important;`+
+			`display:-webkit-box!important;display:-webkit-flex!important;`+
+			`display:-ms-flexbox!important;display:flex!important;`+
 			`-webkit-transform: rotate(30deg);-ms-transform: rotate(30deg);transform: rotate(30deg);`+
 			`cursor: -webkit-grab;cursor: -moz-grab;cursor: grab;`+
 
@@ -674,13 +674,10 @@ var spec = {
 	},
 	'middleware contexts': {
 		options: {
-			plugins: function (ctx, str, line, col) {
+			plugins: function (ctx, sel, str) {
 				switch (ctx) {
-					case 0: return 'width: 10px;'+str
-					case 1: return str+'/* selector */';
-					case 3: return str+'/* property */';
-					case 4: return str+'/* block */';
-					case 5: return str+'/* output */';
+					case 1: return str+'/* property */';
+					case 2: return str+'/* block */';
 				}
 			}
 		},
@@ -688,8 +685,7 @@ var spec = {
 			color: blue;
 			h1 { color: red; }
 		`,
-		expected: '.user{width: 10px;/* property */color: blue;/* property */}/* block */'+
-		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
+		expected: `.user{color: blue/* property */;/* block */}.user h1{color: red/* property */;/* block */}`
 	},
 };
 

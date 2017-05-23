@@ -152,14 +152,13 @@ stylis.use(plugin: {Function|Array<Function>})
 #### Set
 
 ```javascript
+// all options are enabled by default
 stylis.set(options: {
-	global: {Boolean} // active :global selectors
-	cascade: {Boolean} // activate aggressive cascade isolation
-	keyframes: {Boolean} // namespace keyframes + animations
-	prefix: {Boolean} // (de)active vendor prefixing
-	compress: {Boolean} // enables aggressive minification
-	context: {Number} // enable/disable specific plugin context
-	plugins: {Array<Function>|Function}
+	global: {Boolean} // (dis)enable :global selectors
+	cascade: {Boolean} // (dis)enable aggressive cascade isolation
+	keyframes: {Boolean} // (dis)enable namespace keyframes + animations
+	prefix: {Boolean} // (dis)enable vendor prefixing
+	compress: {Boolean} // (dis)enable aggressive minification
 })
 ```
 
@@ -169,33 +168,35 @@ The optional middleware function accepts four arguments `context, string, line, 
 The middleware is executed in stages and passed a interger value that identifies at what stage it is in.
 
 ```
-0 /* preparation context signature */
-1 /* selector context signature */
-2 /* rule context signature */
-3 /* property context signature */
-4 /* block context signature */
-5 /* post-process context signature */
-6 /* unknown context signture */
+-1 /* preparation context signature */
+-2 /* post-process context signature */
+0  /* newline context signture */
+1  /* property context signature */
+2  /* block context signature */
 ```
 
-- `0` preparation context, before the compiler starts
-- `1` on a selector declaration ex. `.foo, .bar`
-- `2` on a rule declaration ex. `.foo`
-- `3` on a property declaration ex. `color: red;`
-- `4` after a block of css has been processed i.e `.foo {color:red;}`
-- `5` before the compiled css output is returned
-- `6` after every un-token'ed new line (to be used by linting plugins)
+- `-1` preparation context, before the compiler starts
+- `-2` before the compiled css output is returned
+- `0` after every newline
+- `1` on a property declaration ex. `color: red;`
+- `2` after a block of css has been processed i.e `.foo {color:red;}`
 
-If at any context point the middleware returns a non-falsey value the token or block of css will be replaced with the return value. For example we can add a feature `random()` that when used prints a random number.
+If at any context greater than 0 that the middleware returns a different string the property or block of css will be replaced with the return value.
+
+For example we can add a feature `random()` that when used prints a random number.
 
 ```javascript
-stylis.use((context, value) => {
+stylis.use((context, selector, content, line, column, length) => {
 	switch (context) {
-		case 3: return str.replace(/random\(\)/g, Math.random())
+		case 1: return content.replace(/random\(\)/g, Math.random())
 	}
 })
 
 stylis(``, `h1 { width: calc(random()*10); }`)
 ```
 
-Will replace all instances of `random()` with a random number.
+This will replace all instances of `random()` with a random number.
+
+This works because before stylis processes the `calc(random()*10);` property it would pass the propery to the plugin, if in turn the plugin returns something different from what it received stylis will replace the content of the property with the return value and continue processing that.
+
+The same can be said for a selector block, in both contexts a paramter `selector` the is the current array of selectors that the block of css/property stylis is working on. If you wanted to changed a blocks selector on the fly you could mutate this array to represent the selector pattern you require.

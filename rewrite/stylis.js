@@ -71,13 +71,6 @@
 	var moz = '-moz-'
 	var ms = '-ms-'
 
-	/* common strings */
-	var important = ' !important'
-	var display = 'display:'
-	var flex = 'flex'
-	var box = 'box'
-	var width = 'width:'
-
 	/* character codes */
 	var SEMICOLON = 59
 	var CLOSEBRACES = 125
@@ -103,7 +96,6 @@
 	var DOUBLEQUOTE = 34
 	var FOWARDSLASH = 47
 	var GREATERTHAN = 62
-	var LESSTHAN = 60
 	var PLUS = 43
 	var TILDE = 126
 	var NULL = 0
@@ -151,23 +143,25 @@
 	var plugged = 0
 
 	/* plugin context */
-	var PREPS = 0
-	var PROPS = 0
-	var BLOCK = 0
-	var POSTS = 0
+	var POSTS = -1
+	var PREPS = -2
+	var UNKWN = 0
+	var PROPS = 1
+	var BLCKS = 2
 
-	var preps = 0
-	var props = 0
-	var blcks = 0
-	var posts = 0
+	var preps = 1
+	var props = 1
+	var blcks = 1
+	var posts = 1
+	var unkwn = 0
 
 	/* keyframe animation */
 	var keyed = 1
 	var key = ''
 
 	/* selector namespace */
-	var ns = ''
 	var nsalt = ''
+	var ns = ''
 
 	/**
 	 * Compile
@@ -181,7 +175,6 @@
 		var first = 0
 		var second = 0
 		var third = 0
-		var length = 0
 		var counter = 0
 		var context = 0
 
@@ -199,6 +192,8 @@
 		var out = ''
 		var block = ''
 		var children = ''
+		var flat = ''
+		var res = ''
 
 		// ...build body
 		while (caret < eof) {
@@ -207,7 +202,7 @@
 			if (cmt + str + fnq + brq === 0) {
 				// auto semicolon insertion
 				if (semicolon === 1) {
-					// false flags if current character is a comma
+					// false flags, comma character
 					if (code !== COMMA) {
 						caret--
 						code = SEMICOLON
@@ -297,7 +292,19 @@
 						break
 					}
 					case SEMICOLON: {
+						if (format === 1) {
+							chars = chars.replace(formatptn, '')
+						}
+
 						chars = chars.trim()
+
+						// execute plugin, property context
+						if (plugged > 0 && props > 0) {
+							if (res = proxy(PROPS, current, chars, line, column, out.length)) {
+								chars = res.trim()
+							}
+						}
+
 						first = chars.charCodeAt(0)
 						second = chars.charCodeAt(1)
 						third = chars.charCodeAt(2)
@@ -305,11 +312,11 @@
 						switch (first + second) {
 							case IMPORT:
 							case CHARSET: {
-								children += chars + body.charAt(caret)
+								flat += chars + body.charAt(caret)
 								break
 							}
 							default: {
-								out += property(chars, first, second, third, format)
+								out += property(chars, first, second, third)
 							}
 						}
 
@@ -533,8 +540,17 @@
 		}
 
 		if (out.length > 0) {
-			if (cascade < 1) {
+			if (cascade === 0) {
 				isolate(current, format)
+			}
+
+			// execute plugin, block context
+			if (plugged > 0 && blcks > 0) {
+				if (res = proxy(BLCKS, current, out, line, column, out.length)) {
+					if ((out = res.trim()).length === 0) {
+						return out
+					}
+				}
 			}
 
 			out = current.join(',').trim() + '{' + out + '}'
@@ -556,7 +572,7 @@
 		}
 
 		if (children.length > 0) {
-			return out + children
+			return flat + out + children
 		}
 
 		return out
@@ -651,11 +667,10 @@
 	 * @param {number} first
 	 * @param {number} second
 	 * @param {number} third
-	 * @param {number} format
 	 * @return {string}
 	 */
-	function property (input, first, second, third, format) {
-		var out = (format === 0 ? input : input.replace(formatptn, '').trim()) + ';'
+	function property (input, first, second, third) {
+		var out = input + ';'
 		var index = 0
 		var cache = ''
 
@@ -698,13 +713,13 @@
 					if ((index = out.indexOf('flex', 8)) > 0) {
 						// e, inline-flex
 						cache = out.charCodeAt(index - 2) === 101 ? 'inline-' : ''
-						out = out.indexOf(important, 8) > 0 ? important : ''
+						out = out.indexOf('!important', 8) > 0 ? '!important' : ''
 
 						out = (
-							display + webkit + cache + 'box' + out + ';' +
-							display + webkit + cache + 'flex' + out + ';' +
-							display + ms + 'flexbox' + out + ';' +
-							display + cache + 'flex' + out + ';'
+							'display:' + webkit + cache + 'box' + out + ';' +
+							'display:' + webkit + cache + 'flex' + out + ';' +
+							'display:' + ms + 'flexbox' + out + ';' +
+							'display:' + cache + 'flex' + out + ';'
 						)
 					}
 					break
@@ -742,7 +757,7 @@
 					if ((index = out.indexOf('-content', 9)) > 0) {
 						// width: min-content / width: max-content
 						cache = out.substring(index - 3)
-						out = width + webkit + cache + width + moz + cache + width + cache
+						out = 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
 					}
 					break
 				}
@@ -784,9 +799,9 @@
 
 			for (i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
 				var value = list[i]
-				var props = value.split(propertiesbtn)
+				var items = value.split(propertiesbtn)
 
-				while (value = props[index]) {
+				while (value = items[index]) {
 					var peak = value.charCodeAt(0)
 
 					if (keyed === 1 && (
@@ -811,10 +826,10 @@
 						}
 					}
 
-					props[index++] = value
+					items[index++] = value
 				}
 
-				out += (i === 0 ? '' : ',') + props.join(' ')
+				out += (i === 0 ? '' : ',') + items.join(' ')
 			}
 		} else {
 			if (input.charCodeAt(10) === 110) {
@@ -827,95 +842,6 @@
 		out = declare + out + ';'
 
 		return vendor === 1 ? webkit + out + out : out
-	}
-
-	/**
-	 * Proxy
-	 *
-	 * @param {number} context
-	 * @param {string} blob
-	 * @param {string} ns
-	 * @param {number} length
-	 * @return {(string|void)}
-	 */
-	function proxy (context, blob, ns, length) {
-		for (var i = 0, out = blob; i < plugged; i++) {
-			out = plugins[i](context, out, line, cols, ns, length) || out
-		}
-
-		if (out !== blob) {
-			return out
-		}
-	}
-
-	/**
-	 * Use
-	 *
-	 * @param {(Array<function(...?)>|function(...?)|void)?} plugin
-	 */
-	function use (plugin) {
-		switch (plugin) {
-			case void 0:
-			case null: {
-				plugged = plugins.length = 0;
-				break
-			}
-			default: {
-				switch (plugin.constructor) {
-					case Array: {
-						for (var i = 0, l = plugin.length; i < l; i++) {
-							use(plugin[i++])
-						}
-						break
-					}
-					default: {
-						plugins[plugged++] = plugin
-					}
-				}
-			}
- 		}
-	}
-
-	/**
-	 * Set
-	 *
-	 * @param {Object} options
-	 */
-	function set (options) {
-		for (var name in options) {
-			var value = options[name]
-			switch (name) {
-				case 'keyframes': keyed = value|0; break
-				case 'global': escade = value|0; break
-				case 'cascade': cascade = !!value|0; break
-				case 'compress': compress = value|0; break
-				case 'prefix': vendor = value|0; break
-				case 'plugins': use(value); break
-				case 'context': {
-					for (var i = 0, condition; i < value.length; i++)
-						switch (condition = value[i]) {
-							case PREPS: preps = condition|0; break
-							case PROPS: props = condition|0; break
-							case BLOCK: blcks = condition|0; break
-							case POSTS: posts = condition|0; break
-						}
-					break
-				}
-			}
-		}
-	}
-
-	/**
-	 * Minify
-	 *
-	 * @param {string} input
-	 * @return {string}
-	 */
-	function minify (input) {
-		return input
-			.replace(minifybeforeptn, '')
-			.replace(minifyafterptn, '$1')
-			.replace(minifytailptn, '$1')
 	}
 
 	/**
@@ -1008,13 +934,12 @@
 	 * Stylis
 	 *
 	 * @param {string} namespace
-	 * @param {string} stylesheet
+	 * @param {string} input
 	 * @return {string}
 	 */
-	function stylis (namespace, stylesheet) {
+	function stylis (namespace, input) {
 		// setup
 		var code = namespace.charCodeAt(0)
-		var output = ''
 
 		if (code < 33) {
 			code = (namespace = namespace.trim()).charCodeAt(0)
@@ -1050,17 +975,119 @@
 			}
 		}
 
+		var selectors = [ns]
+
+		if (plugged > 0 && preps > 0) {
+			proxy(PREPS, selectors, input, line, column, 0)
+		}
+
 		// build
-		output = compile(array, [ns], stylesheet)
+		var output = compile(array, selectors, input)
+
+		if (plugged > 0 && posts > 0) {
+			proxy(POSTS, selectors, output, line, column, output.length)
+		}
 
 		// destroy
 		key = ''
 		ns = ''
 		nsalt = ''
-		column = 0
 		line = 0
+		column = 0
 
 		return compress === 0 ? output : minify(output)
+	}
+
+	/**
+	 * Proxy
+	 *
+	 * @param {number} context
+	 * @param {Array<string>} selectors
+	 * @param {string} content
+	 * @param {number} line
+	 * @param {number} column
+	 * @param {number} length
+	 * @return {(string|void)}
+	 */
+	function proxy (context, selectors, content, line, column, length) {
+		for (var i = 0, out = content; i < plugged; i++) {
+			out = plugins[i](context, selectors, content, line, column, length) || out
+		}
+
+		if (out !== content) {
+			return out + ''
+		}
+	}
+
+	/**
+	 * Use
+	 *
+	 * @param {(Array<function(...?)>|function(...?)|number|void)?} plugin
+	 */
+	function use (plugin) {
+		switch (plugin) {
+			case void 0:
+			case null: {
+				plugged = plugins.length = 0;
+				break
+			}
+			default: {
+				switch (plugin.constructor) {
+					case Array: {
+						for (var i = 0, length = plugin.length; i < length; i++) {
+							use(plugin[i])
+						}
+						break
+					}
+					case Number: {
+						switch (plugin) {
+							case PREPS: preps = preps === 0 ? 1 : 0; break
+							case PROPS: props = props === 0 ? 1 : 0; break
+							case BLCKS: blcks = blcks === 0 ? 1 : 0; break
+							case POSTS: posts = posts === 0 ? 1 : 0; break
+							case UNKWN: unkwn = unkwn === 0 ? 1 : 0; break
+						}
+						break
+					}
+					default: {
+						plugins[plugged++] = plugin
+					}
+				}
+			}
+ 		}
+
+ 		return use
+	}
+
+	/**
+	 * Set
+	 *
+	 * @param {Object} options
+	 */
+	function set (options) {
+		for (var name in options) {
+			var value = options[name]
+			switch (name) {
+				case 'keyframes': keyed = value|0; break
+				case 'global': escade = value|0; break
+				case 'cascade': cascade = !!value|0; break
+				case 'compress': compress = value|0; break
+				case 'prefix': vendor = value|0; break
+			}
+		}
+	}
+
+	/**
+	 * Minify
+	 *
+	 * @param {string} output
+	 * @return {string}
+	 */
+	function minify (output) {
+		return output
+			.replace(minifybeforeptn, '')
+			.replace(minifyafterptn, '$1')
+			.replace(minifytailptn, '$1')
 	}
 
 	stylis['use'] = use
