@@ -44,25 +44,27 @@
 	 * to evaluate one condition in a switch statement
 	 * than three regardless of the added math
 	 *
-	 * This allows the property parser to be small and fast.
+	 * This allows the property parser to in theory be both small and fast.
 	 */
 
-	var formatptn = /[\r\n]/g /* matches new lines */
+	var formatptn = /[\0\r]/g /* matches new lines and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
 	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
-	var propertiesbtn = / +\s*(?![^(]*[)])/g
-	var selectorptn = /,\n+/g /* splits selectors */
+	var propertiesbtn = / +\s*(?![^(]*[)])/g /* animation properties */
+	var elementptn = / *[\0] */g /* selector elements */
+	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
 	var attributeptn = /\[.+\=['"`]?(.*)['"`]?\]/g /* matches attribute values [id=match] */
 	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(\w+)\s+(\S+)\s*/ /* matches @keyframes $1 */
 	var placeptn = /::?(place)/g /* match ::placeholder varient */
-	var minifybeforeptn = /[\r\n\t ]+(?=[{\];=:])/g /* rm \s before ] ; = : */
-	var minifyafterptn = /([[}=:])[\r\n\t ]+/g /* rm \s after characters [ } = : */
+	var minifybeforeptn = /\s+(?=[{\];=:])/g /* rm \s before ] ; = : */
+	var minifyafterptn = /([[}=:])\s+/g /* rm \s after characters [ } = : */
 	var minifytailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
+	var pseudoptn = /(:+) */g /* pseudo element */
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -165,6 +167,7 @@
 
 	/* selector namespace */
 	var ns = ''
+	var nsalt = ''
 
 	/**
 	 * Compile
@@ -284,6 +287,7 @@
 						// reset
 						context = 0
 						pseudo = 0
+						format = 0
 						chars = ''
 
 						block = chars
@@ -314,6 +318,7 @@
 						// reset
 						context = 0
 						pseudo = 0
+						format = 0
 						chars = ''
 
 						break
@@ -395,7 +400,8 @@
 						// selectors
 						case COMMA: {
 							if (cmt + fnq + str + brq === 0) {
-								format = 1, char += '\n'
+								format = 1
+								char += '\r'
 							}
 							break
 						}
@@ -437,7 +443,7 @@
 						}
 						case OPENPARENTHESES: {
 							if (str + cmt + brq === 0) {
-								fnq = pseudo - (caret-6) === 0 ? (counter = 0, context = 1) : 1
+								fnq = pseudo - (caret - 7) === 0 ? (counter = 0, context = 1) : 1
 							}
 							break
 						}
@@ -458,7 +464,7 @@
 
 							char = ''
 
-							switch (body.charCodeAt(caret+1)) {
+							switch (body.charCodeAt(caret + 1)) {
 								case FOWARDSLASH: {
 									cmt = code === FOWARDSLASH ? LINECOMMENT : 0; break
 								}
@@ -477,6 +483,7 @@
 						// including selectors in :not function but excluding selectors in :global function
 						if (cascade + str + brq === 0) {
 							switch ((format = 1, code)) {
+								case COMMA:
 								case ID:
 								case CLASS:
 								case SIBLING:
@@ -485,18 +492,30 @@
 								case CLOSEPARENTHESES:
 								case OPENPARENTHESES: {
 									if (context === 0) {
-										char = tail === SPACE ? char + '\r' : '\r' + char + '\r';
+										if (tail === SPACE) {
+											char = char + '\0'
+										} else {
+											char = '\0' + char + '\0'
+										}
 									} else {
 										switch (code) {
-											case LPAREN: context = ++counter; break
-											case RPAREN: if ((context = --counter) === 0) char += '\r'; break
+											case OPENPARENTHESES: {
+												context = ++counter
+												break
+											}
+											case CLOSEPARENTHESES: {
+												if ((context = --counter) === 0) {
+													char += '\0'
+												}
+												break
+											}
 										}
 									}
 									break
 								}
 								case SPACE: {
 									if (context === 0 && tail !== SPACE) {
-										char += '\r';
+										char += '\0'
 									}
 									break
 								}
@@ -514,8 +533,8 @@
 		}
 
 		if (out.length > 0) {
-			if (cascade > 0) {
-
+			if (cascade < 1) {
+				isolate(current, format)
 			}
 
 			out = current.join(',').trim() + '{' + out + '}'
@@ -554,23 +573,18 @@
 		var selectors = current.trim().split(selectorptn)
 		var out = selectors
 
-		var item = ''
-		var child = ''
-		var code = 0
 		var length = out.length
 		var l = parent.length
 
 		if (l > 0) {
 			for (var i = 0, j = 0, out = []; i < length; i++) {
 				for (var k = 0; k < l; k++) {
-					out[j++] = scope(selectors[i], parent[k] + ' ')
+					out[j++] = scope(selectors[i], parent[k] + ' ').trim()
 				}
 			}
-
-			length = out.length
 		} else {
 			for (var i = 0; i < length; i++) {
-				out[i] = scope(out[i], '')
+				out[i] = scope(out[i], '').trim()
 			}
 		}
 
@@ -590,14 +604,15 @@
 		var code = selector.charCodeAt(0)
 
 		switch (code) {
+			case NULL:
+				selector = selector.substring(1)
 			case NEWLINE:
 			case SPACE: {
 				code = (selector = selector.trim()).charCodeAt(0)
 			}
 		}
 
-		if (cascade > 0) {
-			switch (code) {
+		switch (code) {
 				// &
 				case AND: {
 					return selector.replace(andptn, prefix.trim())
@@ -607,7 +622,7 @@
 					switch (selector.charCodeAt(1)) {
 						// :global
 						case ESCAPE: {
-							if (escape > 0) {
+							if (escape > 0 && cascade > 0) {
 								return selector.replace(escapeptn, '$1').replace(andptn, ns).trim()
 							}
 							break
@@ -624,7 +639,6 @@
 						case AND: return selector.replace(andptn, ns)
 					}
 				}
-			}
 		}
 
 		return prefix + selector
@@ -641,8 +655,7 @@
 	 * @return {string}
 	 */
 	function property (input, first, second, third, format) {
-		var out = (format === 0 ? input : input.replace(formatptn, '')) + ';'
-		var length = out.length
+		var out = (format === 0 ? input : input.replace(formatptn, '').trim()) + ';'
 		var index = 0
 		var cache = ''
 
@@ -676,16 +689,16 @@
 				}
 				// justify-content, j, u, s
 				case 1023: {
-					cache = out.substring(out.indexOf(':')).replace('flex-', '')
+					cache = out.substring(out.indexOf(':', 15)).replace('flex-', '')
 					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
 					break
 				}
 				// display(flex/inline-flex): d, i, s
 				case 975: {
-					if ((index = out.indexOf('flex')) > -1) {
+					if ((index = out.indexOf('flex', 8)) > 0) {
 						// e, inline-flex
 						cache = out.charCodeAt(index - 2) === 101 ? 'inline-' : ''
-						out = out.indexOf(important) !== -1 ? important : ''
+						out = out.indexOf(important, 8) > 0 ? important : ''
 
 						out = (
 							display + webkit + cache + 'box' + out + ';' +
@@ -726,7 +739,7 @@
 				}
 				// width: min-content / width: max-content
 				case 953: {
-					if ((index = out.indexOf('-content')) > -1) {
+					if ((index = out.indexOf('-content', 9)) > 0) {
 						// width: min-content / width: max-content
 						cache = out.substring(index - 3)
 						out = width + webkit + cache + width + moz + cache + width + cache
@@ -738,10 +751,12 @@
 				case 962:
 				case 1015: {
 					out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out
+
 					// transitions
-					if (second + third === 211 && out.charCodeAt(12) === 115 && out.indexOf(' transform') > -1) {
-						out = out.substring(0, out.indexOf(';') + 1).replace(transformptn, webkit + '$1') + out
+					if (second + third === 211 && out.charCodeAt(13) === 105 && out.indexOf('transform', 10) > 0) {
+						out = out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, webkit + '$1') + out
 					}
+
 					break
 				}
 			}
@@ -757,11 +772,11 @@
 	 * @return {string}
 	 */
 	function animation (input) {
-		var out = ''
 		var length = input.length
 		var index = input.indexOf(':', 9) + 1
 		var declare = input.substring(0, index).trim()
 		var body = input.substring(index, length - 1).trim()
+		var out = ''
 
 		// shorthand
 		if (input.charCodeAt(9) !== DASH) {
@@ -904,6 +919,92 @@
 	}
 
 	/**
+	 * Isolate
+	 *
+	 * @param {Array<string>} selectors
+	 * @param {number} format
+	 */
+	function isolate (selectors, format) {
+		for (var i = 0, length = selectors.length, prefix, element; i < length; i++) {
+			var elements = selectors[i].split(elementptn)
+			var out = ''
+
+			for (var j = size = ctx = tail = code = 0, l = elements.length; j < l; j++) {
+				if ((size = (element = elements[j]).length) === 0 && l > 1) {
+					continue
+				}
+
+				prefix = ' '
+				tail = out.charCodeAt(out.length-1)
+				code = element.charCodeAt(0)
+
+				if (j === 0) {
+					prefix = ''
+				} else {
+					switch (tail) {
+						case ID:
+						case CLASS:
+						case SIBLING:
+						case CHILD:
+						case ADJACENT:
+						case SPACE:
+						case OPENPARENTHESES:  {
+							prefix = ''
+						}
+					}
+				}
+
+				switch (code) {
+					case ID:
+					case CLASS:
+					case SIBLING:
+					case CHILD:
+					case ADJACENT:
+					case SPACE:
+					case CLOSEPARENTHESES:
+					case OPENPARENTHESES: {
+						break
+					}
+					case OPENBRACKET: {
+						element = prefix + element + nsalt
+						ctx = 1
+						break
+					}
+					case COLON: {
+						switch (element.charCodeAt(1)) {
+							case ESCAPE: {
+								element = prefix + element.substring(8, size - 1)
+								break
+							}
+							// :global(...):not
+							case 110: {
+								break
+							}
+							default: {
+								element = (ctx === 2 ? '' : prefix + nsalt) + element
+							}
+						}
+						break
+					}
+					default: {
+						if (size > 1 && element.indexOf(':') > 0) {
+							element = prefix + element.replace(pseudoptn, nsalt + '$1')
+						} else {
+							element = prefix + element + nsalt
+							ctx = 1
+						}
+					}
+				}
+
+				ctx = ctx === 1 ? 2 : (ctx === 2 ? 0 : ctx)
+				out += element
+			}
+
+			selectors[i] = format > 0 ? out.replace(formatptn, '').trim() : out;
+		}
+	}
+
+	/**
 	 * Stylis
 	 *
 	 * @param {string} namespace
@@ -938,12 +1039,24 @@
 			key = '-' + key.replace(keyptn, '-')
 		}
 
+		switch (cascade) {
+			case 0: {
+				nsalt = namespace
+				break
+			}
+			case 1: {
+				ns = namespace
+				break
+			}
+		}
+
 		// build
-		output = compile(array, [ns = namespace], stylesheet)
+		output = compile(array, [ns], stylesheet)
 
 		// destroy
 		key = ''
 		ns = ''
+		nsalt = ''
 		column = 0
 		line = 0
 

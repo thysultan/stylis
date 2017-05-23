@@ -573,25 +573,6 @@ var spec = {
 		 	`.user:-ms-input-placeholder{color: pink;}`+
 		 	`.user::placeholder{color: pink;}`
 	},
-	'middleware contexts': {
-		options: {
-			plugins: function (ctx, str, line, col) {
-				switch (ctx) {
-					case 0: return 'width: 10px;'+str
-					case 1: return str+'/* selector */';
-					case 3: return str+'/* property */';
-					case 4: return str+'/* block */';
-					case 5: return str+'/* output */';
-				}
-			}
-		},
-		sample: `
-			color: blue;
-			h1 { color: red; }
-		`,
-		expected: '.user{width: 10px;/* property */color: blue;/* property */}/* block */'+
-		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
-	},
 	'cascade isolation simple': {
 		options: {
 			cascade: false
@@ -650,9 +631,9 @@ var spec = {
 			  color: red;
 			}
 		`,
-		expected: `a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`+
-		`.root.user > *:not(header.user){color: red;}`+
-		`a.user:not( a.user +b.user foo.user:hover marquee a.user) > .user:hover{color: red;}`
+		expected: `a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`+
+		`.root.user>*:not(header.user){color: red;}`+
+		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`
 	},
 	'cascade isolation nesting': {
 		options: {
@@ -686,10 +667,29 @@ var spec = {
 			}
 		`,
 		expected: `.user{color: red;}`+
-		`h1.user section{color: red}`+
-		`h1.user h2.user{color: red}`+
-		`div.user h1.user,span.user h1.user{color: red}`+
-		`span.user:hover{color: red}`
+		`h1.user section{color: red;}`+
+		`h1.user h2.user{color: red;}`+
+		`div.user h1.user,span.user h1.user{color: red;}`+
+		`span.user:hover{color: red;}`
+	},
+	'middleware contexts': {
+		options: {
+			plugins: function (ctx, str, line, col) {
+				switch (ctx) {
+					case 0: return 'width: 10px;'+str
+					case 1: return str+'/* selector */';
+					case 3: return str+'/* property */';
+					case 4: return str+'/* block */';
+					case 5: return str+'/* output */';
+				}
+			}
+		},
+		sample: `
+			color: blue;
+			h1 { color: red; }
+		`,
+		expected: '.user{width: 10px;/* property */color: blue;/* property */}/* block */'+
+		'.user h1/* selector */{color: red;/* property */}/* block *//* output */'
 	},
 };
 

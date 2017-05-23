@@ -83,7 +83,7 @@ function run (tests, fn) {
 			fn.set({keyframes: !options.keyframes})
 		}
 
-		if (result !== expected || /\n/g.test(result)) {
+		if (result !== expected || /[\0\r\n]/g.test(result)) {
 			// log why it failed
 			console.log(result.length, 'failed: ', name, '\n\n', result)
 			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
