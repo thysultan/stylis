@@ -6,1172 +6,952 @@
  * /____/\__/\__, /_/_/____/
  *          /____/
  *
- * stylis is a light – weight css preprocessor @licence MIT
+ * light – weight css preprocessor @licence MIT
  */
 /* eslint-disable */
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module.exports = factory()) :
 		typeof define === 'function' && define.amd ? define(factory()) :
-			(window.stylis = factory(window))
+			(window['stylis'] = factory())
 }(function () {
 
 	/**
 	 * Notes
 	 *
-	 * int + int + int === int [faster]
+	 * int + int + int === n4 [faster]
 	 *
 	 * vs
 	 *
-	 * int === int && int === int
+	 * int === n1 && int === n2 && int === n3
 	 *
-	 * operating on interger values is faster than a second condtion statement
+	 * ----
 	 *
 	 * switch (int) { case ints...} [faster]
 	 *
 	 * vs
 	 *
-	 * if (int == 1 && int === 1 ...)
+	 * if (int == 1 && int === 2 ...)
 	 *
+	 * ----
+	 *
+	 * The (first*n1 + second*n2 + third*n3) format used in the property parser
+	 * is a simple way to hash the sequence of characters
+	 * taking into account the index they occur in
+	 * since any number of 3 character sequences could produce duplicates.
+	 *
+	 * On the other hand sequences that are directly tied to the index of the character
+	 * resolve a far more accurate measure, it's also faster
+	 * to evaluate one condition in a switch statement
+	 * than three regardless of the added math
+	 *
+	 * This allows the property parser to be small and fast.
 	 */
 
-	'use strict'
+	var formatptn = /[\r\n]/g /* matches new lines */
+	var colonptn = /: */g /* splits animation rules */
+	var cursorptn = /zoo|gra/ /* assert cursor varient */
+	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
+	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
+	var propertiesbtn = / +\s*(?![^(]*[)])/g
+	var selectorptn = /,\n+/g /* splits selectors */
+	var andptn = /&/g /* match & */
+	var attributeptn = /\[.+\=['"`]?(.*)['"`]?\]/g /* matches attribute values [id=match] */
+	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
+	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
+	var keyframeptn = /@(\w+)\s+(\S+)\s*/ /* matches @keyframes $1 */
+	var placeptn = /::?(place)/g /* match ::placeholder varient */
+	var minifybeforeptn = /[\r\n\t ]+(?=[{\];=:])/g /* rm \s before ] ; = : */
+	var minifyafterptn = /([[}=:])[\r\n\t ]+/g /* rm \s after characters [ } = : */
+	var minifytailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
 
-	/* reusable string varients */
-	var empty = ''
-	var space = ' '
-	var comma = ','
-	var rbraces = '}'
-	var lbraces = '{'
-	var colon = ':'
-	var semi = ';'
-	var carriage = '\r'
-	var newline = '\n'
-	var dash = '-'
-	var capture = '$1'
+	/* vendors */
 	var webkit = '-webkit-'
 	var moz = '-moz-'
 	var ms = '-ms-'
-	var cont = '-content'
-	var important = space+'!important'
+
+	/* common strings */
+	var important = ' !important'
 	var display = 'display:'
 	var flex = 'flex'
 	var box = 'box'
 	var width = 'width:'
-	var keyframes = 'keyframes'
-	var unique = '%%'
-	var unknown = empty
-
-	var array = [empty]
-	var plugins = []
-
-	var pcarriage = /\r/g /* match carriage characters */
-	var pspace = / /g /* match space characters */
-	var pand = /&/g /* match all & characters */
-	var pnewline = /\n/g /* match newline characters */
-	var psplit = /,\n/g /* splits selectors */
-	var pplace = /::place/g /* asserts ::placeholder varient */
-	var pcolon = /: */g /* splits animation rules into propert: declaration */
-	var pscope = /[ .#~+>]+|^\d/g /* removes invalid characters in keyframe scoped name */
-	var pprops = / +\s*(?![^(]*[)])/g
-	var panimation = /,+\s*(?![^(]*[)])/g /* splits multiple animations in shorthand */
-	var pkeyrames = /keyframes\s+([^\s{]*)\s*/ /* findes the name of a keyframe */
-	var pcursor = /zoo|gra/ /* asserts the cursor varient */
-	var pescape = /[-\/\\^$*+?.()|[\]{}]/g /*	escapes regex when liniting */
-	var pglobal = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(..) */
-	var ptransform = / *(transform)/g /* vendor prefix transform for older webkit */
-	var pminifybefore = /\s+(?=[{\];=:])/g /* rm \s before characters outside of strings */
-	var pminifyafter = /([[}=:])\s+/g /* rm \s after characters outside of strings */
-	var pminifytail = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
-	var ppseudo = /(:+) */g /* capture :pseudo selectors */
-	var punique = /%%/g
-	var ppatch = /([^[#.>~+\s])%%/g
-	var ptype = /^[^[#.>~+\s]+/
-
-	/* settings */
-	var prefix = 1
-	var scope = 1
-	var cascade = 1
-	var global = 1
-	var compress = 0
-	var plugged = 0
-	var recurse = 0
-
-	/* aggressive cascade isolation */
-	var namescope = 0
-	var namespace = empty
 
 	/* character codes */
+	var SEMICOLON = 59
+	var CLOSEBRACES = 125
+	var OPENBRACES = 123
+	var OPENPARENTHESES = 40
+	var CLOSEPARENTHESES = 41
+	var OPENBRACKET = 91
+	var CLOSEBRACKET = 93
 	var NEWLINE = 10
 	var CARRIAGE = 13
 	var TAB = 9
-	var SEMICOLON = 59
-	var COLON = 58
-	var LBRACE = 123
-	var RBRACE = 125
-	var COMMA = 44
-	var DQUOTE = 34
-	var SQUOTE = 39
-	var LPAREN = 40
-	var RPAREN = 41
-	var FSLASH = 47
-	var STAR = 42
-	var LINECOMMENT = 1
-	var BLOCKCOMMENT = 2
 	var AT = 64
 	var SPACE = 32
 	var AND = 38
 	var HASH = 35
 	var DOT = 46
-	var LBRACKET = 91
-	var RBRACKET = 93
 	var DASH = 45
 	var UNDERSCORE = 95
+	var STAR = 42
+	var COMMA = 44
+	var COLON = 58
+	var SINGLEQUOTE = 39
+	var DOUBLEQUOTE = 34
+	var FOWARDSLASH = 47
+	var GREATERTHAN = 62
+	var LESSTHAN = 60
+	var PLUS = 43
+	var TILDE = 126
+	var NULL = 0
 
-	var ID = 35
-	var CLASS = 46
-	var SIBLING = 126
-	var CHILD = 62
-	var ADJACENT = 43
-	var ATTRIBUTE = LBRACKET
+	/* selector codes */
+	var ID = HASH
+	var CLASS = DOT
+	var ATTRIBUTE = OPENBRACKET
+	var CHILD = GREATERTHAN
+	var ADJACENT = PLUS
+	var SIBLING = TILDE
 
-	var KEYFRAME = 107
-	var MEDIA = 109
-	var SUPPORTS = 115
-	var IMPORT = 105
-	var CHARSET = 99
-	var GLOBAL = 103
+	/* special identifiers */
+	var KEYFRAME = 107 /* k */
+	var MEDIA = 109 /* m */
+	var SUPPORTS = 115 /* s */
+	var IMPORT = 169 /* i */
+	var CHARSET = 163 /* c */
+	var ESCAPE = 103 /* g */
+	var FONT = 102 /* f */
+	var PLACEHOLDER = 112 /* p */
 
-	var NEST = 1
-	var BLOCK = 2
-	var UNKNOWN = 3
-	var FLAT = 4
+	var LINECOMMENT = FOWARDSLASH
+	var BLOCKCOMMENT = STAR
 
-	/* context signatures */
-	var PREPCTX = 0 /* preparation */
-	var SELECTX = 1 /* selector */
-	var RULECTX = 2 /* rule */
-	var PROPCTX = 3 /* property */
-	var BLCKCTX = 4 /* block */
-	var POSTCTX = 5 /* post-process */
-	var UNKNCTX = 6 /* unknown */
+	var brq = 0 /* brackets [] */
+	var cmt = 0 /* comments /* // */
+	var fnq = 0 /* functions () */
+	var str = 0 /* strings '', "", `` */
 
-	/* context settings */
-	var prepctx = 1 /* on/off preparation */
-	var selectx = 1 /* on/off selector */
-	var rulectx = 1 /* on/off rule */
-	var propctx = 1 /* on/off property */
-	var blckctx = 1 /* on/off block */
-	var postctx = 1 /* on/off post-process */
-	var unknctx = 0 /* on/off unknown */
+	var column = 0 /* current column */
+	var line = 0 /* current line numebr */
+	var pattern = 0 /* :pattern */
+
+	var cascade = 1 /* #id h1 h2 vs h1#id h2#id  */
+	var vendor = 1 /* vendor prefix */
+	var escape = 1 /* escape :global pattern */
+	var compress = 0 /* compress output */
+
+	/* empty reference objects */
+	var array = []
+
+	/* plugins */
+	var plugins = []
+	var plugged = 0
+
+	/* plugin context */
+	var PREPS = 0
+	var PROPS = 0
+	var BLOCK = 0
+	var POSTS = 0
+
+	var preps = 0
+	var props = 0
+	var blcks = 0
+	var posts = 0
+
+	/* keyframe animation */
+	var keyed = 1
+	var key = ''
+
+	/* selector namespace */
+	var ns = ''
 
 	/**
 	 * Compile
 	 *
-	 * @param {String} selection
-	 * @param {String} input
-	 * @return {String}
+	 * @param  {Array<string>} parent
+	 * @param  {Array<string>} current
+	 * @param  {string} body
+	 * @return {string}
 	 */
-	function compile (selection, input) {
-		var selector = selection
-		var id = selection
-
-		var eol = input.length
-		var eof = eol + 1
-
-		var line = 1
-		var caret = 0
-		var depth = 0
-		var cols = 0
-
-		var type = 0
-		var flatten = 0
-		var nested = 0
-		var token = 0
-		var place = 0
-		var com = 0
-		var fun = 0
-		var str = 0
-		var attr = 0
-		var peak = 0
+	function compile (parent, current, body) {
 		var first = 0
 		var second = 0
 		var third = 0
-		var size = 0
-		var index = 0
-		var operation = 0
-		var count = 0
-		var i = 0
 		var length = 0
-		var tail = 0
-		var join = 0
-		var rune = 0
+		var counter = 0
+		var context = 0
+
 		var pseudo = 0
-		var globals = 0
-		var format = 0
-		var skip = 0
+		var caret = 0
 		var code = 0
+		var tail = 0
+		var format = 0
+		var semicolon = 0
+		var eof = body.length
+		var eol = eof - 1
 
-		var current = empty
-		var output = empty
-		var char = empty
-		var frame = empty
-		var cache = empty
-		var stack = empty
-		var body = empty
-		var flat = empty
-		var block = empty
-		var key = empty
+		var char = ''
+		var chars = ''
+		var out = ''
+		var block = ''
+		var children = ''
 
-		var properties = array
-		var previous = array
-		var selectors = array
-		var collection = array
+		// ...build body
+		while (caret < eof) {
+			code = body.charCodeAt(caret)
 
-		switch (selection.constructor) {
-			case Number:
-				selector += empty
-				break
-			case Array:
-				selector = selection.join(empty)
-
-				if ((type = selection.length) > 1 || cascade === 0) {
-					id = unique
-				} else {
-					id = selector
-				}
-
-				break
-		}
-
-		if ((code = selector.charCodeAt(0)) < 33) {
-			code = (selector = selector.trim()).charCodeAt(0)
-			id = id.trim()
-		}
-
-		if (scope === 1) {
-			switch (code) {
-				// id/class
-				case DOT: case HASH: key = selector.substring(1); break
-				case LBRACKET:
-					// `[data-id=$]` -> ['data-id', '$']
-					properties = selector.substring(1, selector.length - 1).split('=')
-					size = properties.length
-					key = key = size > 1 ? properties[1] : properties[0]
-
-					// [data-id="$"]/[data-id='$'] --> "$"/'$' --> $
-					switch (key.charCodeAt(0)) {
-						case DQUOTE: case SQUOTE: key = key.substring(1, key.length-1)
+			if (cmt + str + fnq + brq === 0) {
+				// auto semicolon insertion
+				if (semicolon === 1) {
+					// false flags if current character is a comma
+					if (code !== COMMA) {
+						caret--
+						code = SEMICOLON
 					}
 
-					selector = '['+ properties[0] + (size > 1 ? ('=' + key +']') : ']')
-					break
-				default: key = selector
-			}
-
-			var key = key.replace(pscope, dash)
-		}
-
-		// plugin, pre context
-		if (plugged > 0 && propctx > 0) {
-			var plugin = plugged > 1 ? proxy : plugins[0]
-
-			if (recurse === 0) {
-				switch (cache = plugin(PREPCTX, input, line, cols, id, 0)) {
-					case null:
-					case void 0: break;
-					default:
-						eol = (input = cache).length
-						eof = eol + 1
+					semicolon = 0
 				}
-			}
-		}
 
-		main: while (caret < eof) {
-			switch (code = input.charCodeAt(caret)) {
-				case SEMICOLON: if (caret === eol) flatten = 1, code = SEMICOLON
-				case LBRACE: case RBRACE: token = 1; break
-				default: token = caret === eol ? 1 : 0
-			}
-
-			if (token === 1 && com + fun + str + attr === 0) {
-				cols++
-				frame += (input.charAt(caret))
-
-				// trim leading whitespace
-				switch (first = frame.charCodeAt(0)) {
-					case SPACE:
-					case TAB:
-					case NEWLINE:
-						first = (frame = frame.trim()).charCodeAt(0)
-
-						if (caret === eol && frame.length === 0) {
-							switch (stack.length) {
-								case 0:
-									if (flat.length === 0) {
-										break main
-									}
+				// eof varient
+				switch (caret) {
+					case eol: {
+						if ((chars = chars.trim()).length > 0) {
+							switch (code) {
+								case SPACE:
+								case TAB:
+								case CARRIAGE:
+								case SEMICOLON:
+								case NEWLINE: {
 									break
-								default:
-									code = RBRACE
-							}
-						}
-				}
-
-				if (plugged > 0 && code !== RBRACE && operation === 0) {
-					if (selectx > 0 && code === LBRACE) {
-						// plugin selector context
-						cache = plugin(SELECTX, frame.substring(0, frame.length-1).trim(), line, cols, id, output.length)
-					} else if (propctx > 0) {
-						// plugin property context
-						cache = plugin(PROPCTX, frame, line, cols, id, output.length)
-					}
-
-					if (propctx + selectx > 0) {
-						switch (cache) {
-							case null:
-							case void 0:
-								break
-							default:
-								if (code === LBRACE) {
-									frame = cache + space + lbraces
-								} else {
-									frame = cache
 								}
-
-								first = frame.charCodeAt(0)
-						}
-					}
-				}
-
-				if ((size = frame.length) > 0) {
-					second = frame.charCodeAt(1)
-					third = frame.charCodeAt(2)
-
-					if (first === AT) {
-						switch (second) {
-							case SUPPORTS:
-							case MEDIA:
-								operation = BLOCK
-								if (depth === 0) {
-									depth++
-								}
-								break
-							case CHARSET:
-							case IMPORT:
-								operation = FLAT
-								break
-							case KEYFRAME:
-								operation = KEYFRAME
-								break
-							default:
-								operation = UNKNOWN
-						}
-					}
-
-					switch (code) {
-						case LBRACE: {
-							depth++
-
-							switch (operation) {
-								case KEYFRAME:
-								case UNKNOWN: break
 								default: {
-									if (depth > 1) {
-										depth--
-										caret++
-										count = 1
-										body = empty
-
-										while (caret < eof) {
-											switch (input.charCodeAt(caret)) {
-												case LBRACE: count++; break
-												case RBRACE: count--; break
-											}
-
-											if (count === 0) {
-												break
-											}
-
-											body += input.charAt(caret++)
-										}
-
-										switch (first) {
-											case AT:
-												body = body.trim();
-												break
-											default:
-												body = frame + body + rbraces
-
-												if (cascade === 0) {
-													namescope = 1
-													namespace = unique
-												}
-										}
-
-										switch (operation) {
-											case BLOCK: {
-												code = RBRACE
-												block += frame
-
-												if (previous === array && previous[0].length === 0) {
-													switch (type) {
-														case 0: previous[0] = id; break
-														case 1: previous[0] = id[0]; break
-													}
-												}
-											}
-										}
-
-										recurse = 1
-										block += compile(previous, body).trim()
-
-										recurse = 0
-										nested = 1
-										frame = empty
-
-										if (namescope === 1) {
-											namescope = 0
-											namespace = empty
-										}
-									} else if (operation === 0) {
-										// :placeholder
-										if (place === 0 && frame.indexOf(colon+colon+'place') !== -1) {
-											place = 1
-										}
-
-										selectors = frame.substring(0, size-1).trim().split(psplit)
-										length = selectors.length
-
-										for (i = 0; i < length; i++) {
-											if ((rune = (current = selectors[i]).charCodeAt(0)) === SPACE) {
-												rune = (current = current.trim()).charCodeAt(0)
-											}
-
-											switch (cascade) {
-												case 1: {
-													switch (rune) {
-														case AND:
-															current = id + current.substring(1).replace(pand, id);
-															break
-														default:
-															if (rune === COLON) {
-																switch (current.charCodeAt(1)) {
-																	case GLOBAL:
-																		if (global > 0) {
-																			current = current.replace(pglobal, capture).replace(pand, id).trim()
-																		}
-																		break
-																	default:
-																		current = id + current
-																}
-															} else if (current.indexOf(space+'&') > 0) {
-																// html &
-																current = current.replace(pand, id).trim()
-															} else {
-																current = id + space + current
-															}
-													}
-													break
-												}
-												case 0: {
-													// aggressive cascade isolation
-													collection = current.split(pcarriage)
-													size = collection.length
-
-													for (index = 0; index < size; index++) {
-														rune = (cache = collection[index]).charCodeAt(0);
-														tail = cache.charCodeAt((count = cache.length) - 1)
-
-														if (rune === SPACE && count > 1) {
-															rune = (cache = cache.trim()).charCodeAt(0)
-															count = cache.length
-														}
-
-														switch (rune) {
-															case SPACE:
-															case ID:
-															case CLASS:
-															case SIBLING:
-															case CHILD:
-															case ADJACENT:
-															case RPAREN:
-															case LPAREN:
-																break
-															case AND:
-																cache = cache.replace(pand, id)
-																break
-															case COLON:
-																switch (cache.charCodeAt(1)) {
-																	case GLOBAL: {
-																		cache = (
-																			cache.substring(8, count-1) +
-																			(tail === SPACE ? cache.substring(cache.lastIndexOf(')')+1) : empty)
-																		);
-																		break
-																	}
-																	// :global(...):not
-																	case 110: break
-																	default: cache = id + cache
-																}
-																break
-															case LBRACKET:
-																cache = tail === SPACE ? cache.trim() + id + space : cache + id
-																break
-															default:
-																if (count > 1 && cache.indexOf(colon) > 0) {
-																	cache = cache.replace(ppseudo, id + capture)
-																} else if (count > 0) {
-																	cache = tail === SPACE ? cache.trim() + id + space : cache + id
-																}
-														}
-
-														collection[index] = cache
-													}
-
-													current = collection.join(carriage).replace(pcarriage, empty)
-
-													if (namescope === 1) {
-														if (current.indexOf(unique) !== 0) {
-															current = namespace + space + current
-														}
-													}
-												}
-											}
-
-											// plugin, selector context
-											if (plugged > 0 && rulectx > 0) {
-												switch (cache = plugin(RULECTX, current, line, cols, id, output.length)) {
-													case null:
-													case void 0:
-														break
-													default:
-														current = cache
-												}
-											}
-
-											selectors[i] = current
-										}
-
-										previous = selectors
-
-										if (type > 0) {
-											selectors = nest(selection, selectors, length, type)
-										}
-
-										frame = selectors.join(comma) + lbraces
-									}
+									chars += body.charAt(caret)
 								}
 							}
-
-							break
-						}
-						case RBRACE: {
-							if (size < 2) {
-								break
-							}
-						}
-						default: {
-							if (join === 1) {
-								frame = frame.replace(pnewline, empty)
-							}
-
-							// semicolon insertion
-							if (code !== SEMICOLON) {
-								frame = (code === RBRACE ? frame.substring(0, size - 1) : frame).trim() + semi
-							}
-
-							// animations
-							if (first === 97 && second === 110 && third === 105) {
-								// animation: a, n, i characters
-								frame = frame.substring(0, size-1)
-								index = frame.indexOf(colon)+1
-								cache = frame.substring(0, index)
-								body = frame.substring(index).trim()
-
-								// shorthand
-								if (frame.charCodeAt(9) !== DASH) {
-									length = (collection = body.split(panimation)).length
-
-									for (i = 0, index = 0; i < length; index = 0, i++) {
-										current = collection[i]
-										properties = current.split(pprops)
-
-										while (current = properties[index]) {
-											peak = current.charCodeAt(0)
-
-											if (scope === 1 && (
-												// letters
-												(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
-												// dash but not in sequence ex. --
-												(peak === DASH && current.charCodeAt(1) !== DASH)
-											)) {
-												switch (isNaN(parseFloat(current)) + (current.indexOf('(') !== -1)) {
-													case 1: {
-														switch (current) {
-															case 'infinite': case 'alternate': case 'backwards': case 'running':
-															case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
-															case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
-															case 'paused': case 'reversed': case 'alternate-reverse': case 'inherit':
-															case 'initial': case 'unset': case 'step-start': case 'step-end':
-																break
-															default:
-																current += dash + key
-														}
-													}
-												}
-											}
-
-											properties[index++] = current
-										}
-
-										cache += (i === 0 ? empty : comma) + properties.join(space)
-									}
-								} else {
-									switch (frame.charCodeAt(10)) {
-										case 110:
-											cache += body + (scope === 1 ? dash + key : empty)
-											break
-										default:
-											cache += body
-									}
-								}
-
-								cache += semi
-								frame = prefix === 1 ? webkit + cache + cache : cache
-
-								if (code === RBRACE) {
-									frame += rbraces
-								}
-							} else if (prefix === 1) {
-								// vendor prefixer
-								switch (first*2 + second*3 + third*4) {
-									// appearance: a, p, p
-									case 978: {
-										frame = webkit + frame + moz + frame + frame
-										break
-									}
-									// hyphens: h, y, p
-									// user-select: u, s, e
-									case 1019:
-									case 983: {
-										frame = webkit + frame + moz + frame + ms + frame + frame
-										break
-									}
-									// flex: f, l, e
-									case 932: {
-										frame = webkit + frame + ms + frame + frame
-										break
-									}
-									case 964: {
-										// order: o, r, d
-										frame = webkit + frame + ms + flex+ dash + frame + frame
-										break
-									}
-									// justify-content, j, u, s
-									case 1023: {
-										cache = frame.substring(frame.indexOf(colon)).replace(flex + dash, empty)
-										frame = webkit + box + dash + 'pack' + cache + webkit + frame + ms + flex + dash + 'pack' + cache + frame
-										break
-									}
-									// display(flex/inline-flex): d, i, s
-									case 975: {
-										if ((index = frame.indexOf(flex)) !== -1) {
-											// e, inline-flex
-											cache = frame.charCodeAt(index-2) === 101 ? 'inline' + dash : empty
-											frame = frame.indexOf(important) !== -1 ? important : empty
-											frame = (
-												display + webkit + cache + box + frame + semi +
-												display + webkit + cache + flex + frame + semi +
-												display + ms + flex + box + frame + semi +
-												display + cache + flex + frame + semi
-											)
-										}
-										break
-									}
-									// align-items, align-center, align-self: a, l, i, -
-									case 938: {
-										if (frame.charCodeAt(5) === DASH) {
-											switch (frame.charCodeAt(6)) {
-												// align-items, i
-												case 105:
-													cache = frame.replace(dash+'items', empty)
-													frame = webkit + frame + webkit + box + dash + cache + ms + flex + dash + cache + frame
-													break
-												// align-self, s
-												case 115:
-													frame = ms + flex + dash + 'item' + dash + frame.replace(dash+'self', empty) + frame;
-													break
-												// align-content
-												default:
-													frame = ms + flex+dash+'line'+dash+'pack' + frame.replace('align'+dash+'content', empty) + frame;
-													break
-											}
-										}
-										break
-									}
-									// cursor, c, u, r
-									case 1005: {
-										if (pcursor.test(frame)) {
-											frame = frame.replace(pcolon, colon+space+webkit) + frame.replace(pcolon, colon+space+moz) + frame
-										}
-										break
-									}
-									// width: min-content / width: max-content
-									case 953: {
-										if ((index = frame.indexOf(cont)) !== -1) {
-											// width: min-content / width: max-content
-											cache = frame.substring(index - 3)
-											frame = width + webkit + cache + width + moz + cache + width + cache
-										}
-										break
-									}
-									// transform, transition: t, r, a
-									// text-size-adjust: t, e, x
-									case 962:
-									case 1015: {
-										frame = webkit + frame + (frame.charCodeAt(5) === 102 ? ms + frame : empty) + frame
-										// transitions
-										if (second + third === 211 && frame.charCodeAt(12) === 115 && frame.indexOf(space+'transform') > -1) {
-											frame = frame.substring(0, frame.indexOf(semi)+1).replace(ptransform, webkit+capture) + frame
-										}
-										break
-									}
-								}
-							}
-
-							// semicolon insertion
-							if (code !== SEMICOLON) {
-								frame = frame.substring(0, (size = frame.length) - 1)
-
-								if (code === RBRACE) {
-									frame += rbraces
-								}
-							}
-
-							// build flat
-							if (depth === 0 && code === SEMICOLON) {
-								switch (operation) {
-									case FLAT:
-										stack += frame
-										break
-									default:
-										flatten = 1
-										flat += frame
-								}
-
-								frame = empty
-								caret++
-								continue
-							}
-
-							break
+							code = SEMICOLON
 						}
 					}
-
-					stack += frame
 				}
 
-				// push flat css
-				if (flatten === 1 && code !== SEMICOLON) {
-					if (caret === eol) {
-						flat += frame
-						frame = empty
-					}
-
-					if (type > 1) {
-						flat = nest(selection, [id], 1, type).join(comma) + lbraces + flat + rbraces
-					} else {
-						flat = id + lbraces + flat + rbraces
-					}
-
-					// plugin, block context
-					if (plugged > 0 && blckctx > 0) {
-						switch (cache = plugin(BLCKCTX, flat, line, cols, id, output.length)) {
-							case null:
-							case void 0:
-								break
-							default:
-								flat = cache
-						}
-					}
-
-					output += flat
-					flatten = 0
-					flat = empty
-				}
-
-				// push block
-				if (code === RBRACE) {
-					size = stack.length
-
-					if (previous !== array) {
-						previous = array
-					}
-
-					if (depth > 0) {
-						depth--
-					}
-
-					if (place === 1) {
-						// :placeholder
-						place = 0
-						stack = (stack.replace(pplace, colon+colon+webkit+'input'+dash+'place') +
-							stack.replace(pplace, colon+colon+moz+'place') +
-							stack.replace(pplace, colon+ms+'input'+dash+'place') + stack)
-					} else if (operation === KEYFRAME) {
-						stack = stack.substring(1)
-
-						if (scope === 1) {
-							stack = keyframes + space + stack.replace(pkeyrames, capture+dash+key).trim()
-						}
-
-						switch (prefix) {
-							case 1: stack = webkit + stack + rbraces + '@' + stack
-							default: stack = '@' + stack
-						}
-					} else if (nested === 1) {
-						switch (operation) {
-							case BLOCK:
-								if (size === 0 || stack.charCodeAt(size-1) === LBRACE) {
-									stack = block
-								} else {
-									stack += rbraces + block
-								}
-
-								stack += rbraces
-								break
-							default: {
-								switch (stack.charCodeAt(stack.length-2)) {
-									case LBRACE:
-										stack = empty
-									default:
-										stack += block
-								}
-							}
-						}
-
-						block = empty
-						nested = 0
-					}
-
-					// plugin, block context
-					if (plugged > 0 && blckctx > 0)
-						switch (cache = plugin(BLCKCTX, stack, line, cols, id, output.length)) {
-							case null:
-							case void 0:
-								break
-							default:
-								size = (stack = cache).length
-						}
-
-					// empty block
-					if ((size = stack.length) > 0) {
-						switch (size) {
-							case 1:
-								switch (output.charCodeAt(output.length-2)) {
-									case RBRACE: stack = empty
-								}
-								break
-							default:
-								switch (stack.charCodeAt(size-2)) {
-									case LBRACE: stack = empty
-								}
-						}
-					}
-
-					output += stack;
-					operation = 0
-					stack = empty
-				}
-
-				// reset
-				pseudo = 0
-				globals = 0
-				join = 0
-				format = 0
-				frame = empty
-			} else {
-				// stack frame by frame
+				// token varient
 				switch (code) {
-					case NEWLINE:
-					case CARRIAGE: {
-						// linter plugin
-						if (plugged > 0 && unknctx > 0 && com === 0 && (unknown = unknown.trim()).length > 0) {
-							switch (frame.length) {
-								case 0:
-									break
-								default:
-									switch (cache = plugin(UNKNCTX, unknown, line, cols, id, output.length)) {
-										case null:
-										case void 0:
-											break
-										default:
-											frame = frame.replace(new RegExp(unknown.replace(pescape, '\\$&') + '$'), cache).trim()
-									}
+					case OPENBRACES: {
+						chars = chars.trim()
+						counter = 1
+						caret++
+
+						while (caret < eof) {
+							code = body.charCodeAt(caret)
+
+							switch (code) {
+								case OPENBRACES: counter++; break
+								case CLOSEBRACES: counter--; break
 							}
 
-							unknown = empty
+							if (counter === 0) {
+								break
+							}
+
+							block += body.charAt(caret++)
 						}
 
-						// terminate line comment
-						if (com === LINECOMMENT) {
-							com = 0
+						if (chars.charCodeAt(0) === AT) {
+							switch (chars.charCodeAt(1)) {
+								case MEDIA:
+								case SUPPORTS: {
+									block = chars + '{' + compile(current, current, block) + '}'
+									break
+								}
+								case FONT: {
+									block = chars + compile(current, array, block)
+									break
+								}
+								case KEYFRAME: {
+									chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
+									block = chars + '{' + compile(current, array, block) + '}'
+									block = '@' + (vendor > 0 ? webkit + block + '@' + block : block)
+									break
+								}
+							}
+						} else {
+							block = compile(current, selector(current, chars), block)
 						}
 
-						// next line, reset column position
-						cols = 0
-						line++
+						children += block
+						caret++
+
+						// reset
+						context = 0
+						pseudo = 0
+						chars = ''
+
+						block = chars
+						prefix = chars
+						suffix = chars
 
 						break
 					}
-					default: {
-						// increment column position
-						cols++
+					case SEMICOLON: {
+						chars = chars.trim()
+						first = chars.charCodeAt(0)
+						second = chars.charCodeAt(1)
+						third = chars.charCodeAt(2)
 
-						// ignore tabs
-						if (code === TAB) {
+						switch (first + second) {
+							case IMPORT:
+							case CHARSET: {
+								children += chars + body.charAt(caret)
+								break
+							}
+							default: {
+								out += property(chars, first, second, third, format)
+							}
+						}
+
+						caret++
+
+						// reset
+						context = 0
+						pseudo = 0
+						chars = ''
+
+						break
+					}
+				}
+			}
+
+			// parse characters
+			switch (code) {
+				case NEWLINE:
+				case CARRIAGE: {
+					// terminate line comment
+					if (cmt === LINECOMMENT) {
+						cmt = 0
+					}
+
+					// auto insert semicolon
+					if (cmt + str + fnq + brq === 0) {
+						// ruling out valid characters that
+						// may precede a newline
+						switch (tail) {
+							case COMMA:
+							case NULL:
+							case TAB:
+							case CARRIAGE:
+							case NEWLINE:
+							case SPACE:
+							case SEMICOLON:
+							case OPENBRACES:
+							case CLOSEBRACES: {
+								break
+							}
+							default: {
+								// colon : present
+								if (pseudo > 1) {
+									semicolon = 1
+								}
+							}
+						}
+					}
+
+					// next line, reset column position
+					column = 0
+					line++
+
+					break
+				}
+				default: {
+					// increment column position
+					column++
+
+					// ignore tabs
+					if (code === TAB) {
+						break
+					}
+
+					char = body.charAt(caret)
+
+					// remove comments, escade functions, strings, attributes and prepare selectors
+					switch (code) {
+						// :global
+						// :placeholder
+						case PLACEHOLDER:
+						case ESCAPE: {
+							if (str + cmt + brq === 0 && pseudo > 0 && caret - pseudo === 1) {
+								pattern = code
+							}
 							break
 						}
 
-						char = input.charAt(caret)
+						// :pattern
+						case COLON: {
+							if (str + cmt + brq === 0) {
+								pseudo = caret
+							}
+							break
+						}
 
-						// remove comments, escade functions, strings, attributes and prepare selectors
-						switch (code) {
-							// identify :global( pattern
-							case GLOBAL: if (str + com + attr === 0 && caret - pseudo === 1) pseudo++; break;
-							case COLON: if (str + com + attr === 0) pseudo = caret; break
+						// selectors
+						case COMMA: {
+							if (cmt + fnq + str + brq === 0) {
+								format = 1, char += '\n'
+							}
+							break
+						}
 
-							// selectors
-							case COMMA: if (com + fun + str + attr === 0) join = 1, char += newline; break
+						// qoutes
+						case DOUBLEQUOTE: {
+							if (cmt === 0) {
+								str = str === DOUBLEQUOTE ? 0 : (str === 0 ? DOUBLEQUOTE : str)
+							}
+							break
+						}
+						case SINGLEQUOTE: {
+							if (cmt === 0) {
+								str = str === SINGLEQUOTE ? 0 : (str === 0 ? SINGLEQUOTE : str)
+							}
+							break
+						}
 
-							// strings
-							case DQUOTE: if (com === 0) str = str === DQUOTE ? 0 : (str === 0 ? DQUOTE : str); break
-							case SQUOTE: if (com === 0) str = str === SQUOTE ? 0 : (str === 0 ? SQUOTE : str); break
+						// attributes
+						case OPENBRACKET: {
+							if (str + cmt + fnq === 0) {
+								brq = 1
+							}
+							break
+						}
+						case CLOSEBRACKET: {
+							if (str + cmt + fnq === 0) {
+								brq = 0
+							}
+							break
+						}
 
-							// attributes
-							case LBRACKET: if (str + com + fun === 0) attr = 1; break
-							case RBRACKET: if (str + com + fun === 0) attr = 0; break
+						// functions
+						case CLOSEPARENTHESES: {
+							if (str + cmt + brq === 0) {
+								fnq = 0
+							}
+							break
+						}
+						case OPENPARENTHESES: {
+							if (str + cmt + brq === 0) {
+								fnq = pseudo - (caret-6) === 0 ? (counter = 0, context = 1) : 1
+							}
+							break
+						}
 
-							// functions
-							case RPAREN: if (str + com + attr === 0) fun = 0; break
-							case LPAREN: if (str + com + attr === 0) fun = pseudo - (caret-6) === 0 ? (count = 0, globals = 1) : 1; break
-
-							// comments line/block
-							case FSLASH: if (com === BLOCKCOMMENT) break
-							case STAR: {
-								// break if in line comment or escape sequence
-								if (str + attr + fun !== 0 || com === LINECOMMENT) {
-									break
-								}
-
-								char = empty
-
-								switch (input.charCodeAt(caret+1)) {
-									case FSLASH: com = code === FSLASH ? LINECOMMENT : 0; break
-									case STAR: com = code === FSLASH ? BLOCKCOMMENT : com; break
-								}
-
+						// line comments
+						case FOWARDSLASH: {
+							if (cmt === BLOCKCOMMENT) {
 								break
 							}
 						}
 
-						// ignore comment blocks
-						if (com === 0) {
-							// aggressive isolation mode, divide each individual selector
-							// including selectors in :not function but excluding selectors in :global function
-							if (cascade + str + attr === 0) {
-								switch ((format = 1, code)) {
-									case ID:
-									case CLASS:
-									case SIBLING:
-									case CHILD:
-									case ADJACENT:
-									case RPAREN:
-									case LPAREN:
-										if (globals === 0) {
-											char = tail === SPACE ? char + carriage : carriage + char + carriage;
-										} else {
-											switch (code) {
-												case LPAREN: globals = ++count; break
-												case RPAREN: if ((globals = --count) === 0) char += carriage; break
-											}
-										}
-										break
-									case SPACE:
-										if (globals === 0 && tail !== SPACE) {
-											char += carriage;
-										}
-										break
+						// block comments
+						case STAR: {
+							// break if in line comment or escape sequence
+							if (str + brq + fnq !== 0 || cmt === LINECOMMENT) {
+								break
+							}
+
+							char = ''
+
+							switch (body.charCodeAt(caret+1)) {
+								case FOWARDSLASH: {
+									cmt = code === FOWARDSLASH ? LINECOMMENT : 0; break
+								}
+								case STAR: {
+									cmt = code === FOWARDSLASH ? BLOCKCOMMENT : cmt; break
 								}
 							}
 
-							frame += char
-						} else if (plugged > 0 && unknctx > 0) {
-							// linter plugin
-							unknown += char
+							break
 						}
 					}
+
+					// ignore comment blocks
+					if (cmt === 0) {
+						// aggressive isolation mode, divide each individual selector
+						// including selectors in :not function but excluding selectors in :global function
+						if (cascade + str + brq === 0) {
+							switch ((format = 1, code)) {
+								case ID:
+								case CLASS:
+								case SIBLING:
+								case CHILD:
+								case ADJACENT:
+								case CLOSEPARENTHESES:
+								case OPENPARENTHESES: {
+									if (context === 0) {
+										char = tail === SPACE ? char + '\r' : '\r' + char + '\r';
+									} else {
+										switch (code) {
+											case LPAREN: context = ++counter; break
+											case RPAREN: if ((context = --counter) === 0) char += '\r'; break
+										}
+									}
+									break
+								}
+								case SPACE: {
+									if (context === 0 && tail !== SPACE) {
+										char += '\r';
+									}
+									break
+								}
+							}
+						}
+
+						chars += char
+					}
+
+					tail = code
 				}
 			}
 
-			tail = code
 			caret++
 		}
 
-		if (recurse === 0) {
-			// plugin, post context
-			if (plugged > 0) {
-				if (postctx > 0) {
-					switch (cache = plugin(POSTCTX, output, line, cols, id, output.length)) {
-						case null:
-						case void 0:
-							break
-						default:
-							output = cache
-					}
-				}
+		if (out.length > 0) {
+			if (cascade > 0) {
 
-				if (unknctx > 0) {
-					unknown = empty
-				}
 			}
 
-			if (compress === 1) {
-				output = minify(output)
+			out = current.join(',').trim() + '{' + out + '}'
+
+			switch (pattern) {
+				case 0: {
+					break
+				}
+				case PLACEHOLDER: {
+					// :placeholder
+					out = (out.replace(placeptn, '::' + webkit + 'input-$1') +
+						out.replace(placeptn, '::' + moz + '$1') +
+						out.replace(placeptn, ':' + ms + 'input-$1') + out)
+				}
+				default: {
+					pattern = 0
+				}
 			}
 		}
 
-		return operation === 1 ? output : output.replace(pcarriage, empty)
+		if (children.length > 0) {
+			return out + children
+		}
+
+		return out
 	}
 
 	/**
-	 * Nest
+	 * Selector
 	 *
-	 * @param {Array<String>} parents
-	 * @param {Array<String>} current
-	 * @param {Number} length
-	 * @param {Number} size
-	 * @return {Array<String>}
+	 * @param {Array<string>} parent
+	 * @param {string} current
+	 * @return {Array<string>}
 	 */
-	function nest (parents, rules, length, size) {
-		for (var i = 0, index = 0, selectors = []; i < length; i++) {
-			for (var j = 0; j < size; j++) {
-				var parent = parents[j]
-				var rule = rules[i]
+	function selector (parent, current) {
+		var selectors = current.trim().split(selectorptn)
+		var out = selectors
 
-				if (cascade === 0) {
-					switch (parent.charCodeAt(0)) {
-						case ID:
-						case CLASS:
-						case SIBLING:
-						case CHILD:
-						case ADJACENT:
-						case ATTRIBUTE:
-							break
-						default:
-							rule = rule.replace(ppatch, capture+parent.replace(ptype, empty))
-					}
+		var item = ''
+		var child = ''
+		var code = 0
+		var length = out.length
+		var l = parent.length
+
+		if (l > 0) {
+			for (var i = 0, j = 0, out = []; i < length; i++) {
+				for (var k = 0; k < l; k++) {
+					out[j++] = scope(selectors[i], parent[k] + ' ')
 				}
+			}
 
-				selectors[index++] = rule.replace(punique, parent)
+			length = out.length
+		} else {
+			for (var i = 0; i < length; i++) {
+				out[i] = scope(out[i], '')
 			}
 		}
 
-		return selectors
+		return out
+	}
+
+	/**
+	 * Scope
+	 *
+	 * @param {string} input
+	 * @param {string} parent
+	 * @return {string}
+	 */
+	function scope (input, parent) {
+		var selector = input
+		var prefix = parent
+		var code = selector.charCodeAt(0)
+
+		switch (code) {
+			case NEWLINE:
+			case SPACE: {
+				code = (selector = selector.trim()).charCodeAt(0)
+			}
+		}
+
+		if (cascade > 0) {
+			switch (code) {
+				// &
+				case AND: {
+					return selector.replace(andptn, prefix.trim())
+				}
+				// :
+				case COLON: {
+					switch (selector.charCodeAt(1)) {
+						// :global
+						case ESCAPE: {
+							if (escape > 0) {
+								return selector.replace(escapeptn, '$1').replace(andptn, ns).trim()
+							}
+							break
+						}
+						default: {
+							// :hover
+							return prefix.trim() + selector
+						}
+					}
+				}
+				default: {
+					switch (selector.charCodeAt(selector.length-1)) {
+						// html &
+						case AND: return selector.replace(andptn, ns)
+					}
+				}
+			}
+		}
+
+		return prefix + selector
+	}
+
+	/**
+	 * Property
+	 *
+	 * @param {string} input
+	 * @param {number} first
+	 * @param {number} second
+	 * @param {number} third
+	 * @param {number} format
+	 * @return {string}
+	 */
+	function property (input, first, second, third, format) {
+		var out = (format === 0 ? input : input.replace(formatptn, '')) + ';'
+		var length = out.length
+		var index = 0
+		var cache = ''
+
+		// animation: a, n, i characters
+		if (first*2 + second*3 + third*4 === 944) {
+			out = animation(out)
+		} else if (vendor === 1) {
+			// vendor prefix
+			switch (first*2 + second*3 + third*4) {
+				// appearance: a, p, p
+				case 978: {
+					out = webkit + out + moz + out + out
+					break
+				}
+				// hyphens: h, y, p
+				// user-select: u, s, e
+				case 1019:
+				case 983: {
+					out = webkit + out + moz + out + ms + out + out
+					break
+				}
+				// flex: f, l, e
+				case 932: {
+					out = webkit + out + ms + out + out
+					break
+				}
+				case 964: {
+					// order: o, r, d
+					out = webkit + out + ms + flex + '-' + out + out
+					break
+				}
+				// justify-content, j, u, s
+				case 1023: {
+					cache = out.substring(out.indexOf(':')).replace('flex-', '')
+					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
+					break
+				}
+				// display(flex/inline-flex): d, i, s
+				case 975: {
+					if ((index = out.indexOf('flex')) > -1) {
+						// e, inline-flex
+						cache = out.charCodeAt(index - 2) === 101 ? 'inline-' : ''
+						out = out.indexOf(important) !== -1 ? important : ''
+
+						out = (
+							display + webkit + cache + 'box' + out + ';' +
+							display + webkit + cache + 'flex' + out + ';' +
+							display + ms + 'flexbox' + out + ';' +
+							display + cache + 'flex' + out + ';'
+						)
+					}
+					break
+				}
+				// align-items, align-center, align-self: a, l, i, -
+				case 938: {
+					if (out.charCodeAt(5) === DASH) {
+						switch (out.charCodeAt(6)) {
+							// align-items, i
+							case 105:
+								cache = out.replace('-items', '')
+								out = webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
+								break
+							// align-self, s
+							case 115:
+								out = ms + 'flex-item-' + out.replace('-self', '') + out;
+								break
+							// align-content
+							default:
+								out = ms + 'flex-line-pack' + out.replace('align-content', '') + out;
+								break
+						}
+					}
+					break
+				}
+				// cursor, c, u, r
+				case 1005: {
+					if (cursorptn.test(out)) {
+						out = out.replace(colonptn, ': ' + webkit) + out.replace(colonptn, ': ' + moz) + out
+					}
+					break
+				}
+				// width: min-content / width: max-content
+				case 953: {
+					if ((index = out.indexOf('-content')) > -1) {
+						// width: min-content / width: max-content
+						cache = out.substring(index - 3)
+						out = width + webkit + cache + width + moz + cache + width + cache
+					}
+					break
+				}
+				// transform, transition: t, r, a
+				// text-size-adjust: t, e, x
+				case 962:
+				case 1015: {
+					out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out
+					// transitions
+					if (second + third === 211 && out.charCodeAt(12) === 115 && out.indexOf(' transform') > -1) {
+						out = out.substring(0, out.indexOf(';') + 1).replace(transformptn, webkit + '$1') + out
+					}
+					break
+				}
+			}
+		}
+
+		return out
+	}
+
+	/**
+	 * Animation
+	 *
+	 * @param {string} input
+	 * @return {string}
+	 */
+	function animation (input) {
+		var out = ''
+		var length = input.length
+		var index = input.indexOf(':', 9) + 1
+		var declare = input.substring(0, index).trim()
+		var body = input.substring(index, length - 1).trim()
+
+		// shorthand
+		if (input.charCodeAt(9) !== DASH) {
+			var list = body.split(animationptn)
+
+			for (i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
+				var value = list[i]
+				var props = value.split(propertiesbtn)
+
+				while (value = props[index]) {
+					var peak = value.charCodeAt(0)
+
+					if (keyed === 1 && (
+						// letters
+						(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
+						// dash but not in sequence ex. --
+						(peak === DASH && value.charCodeAt(1) !== DASH)
+					)) {
+						switch (isNaN(parseFloat(value)) + (value.indexOf('(') !== -1)) {
+							case 1: {
+								switch (value) {
+									case 'infinite': case 'alternate': case 'backwards': case 'running':
+									case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
+									case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
+									case 'paused': case 'reversed': case 'alternate-reverse': case 'inherit':
+									case 'initial': case 'unset': case 'step-start': case 'step-end':
+										break
+									default:
+										value += key
+								}
+							}
+						}
+					}
+
+					props[index++] = value
+				}
+
+				out += (i === 0 ? '' : ',') + props.join(' ')
+			}
+		} else {
+			if (input.charCodeAt(10) === 110) {
+				out += body + (keyed === 1 ? key : '')
+			} else {
+				out += body
+			}
+		}
+
+		out = declare + out + ';'
+
+		return vendor === 1 ? webkit + out + out : out
 	}
 
 	/**
 	 * Proxy
 	 *
-	 * @param {Number} context
-	 * @param {String} input
-	 * @param {Number} line
-	 * @param {Number} cols
-	 * @param {String} id
-	 * @param {Number} length
-	 * @return {String?|void}
+	 * @param {number} context
+	 * @param {string} blob
+	 * @param {string} ns
+	 * @param {number} length
+	 * @return {(string|void)}
 	 */
-	function proxy (context, input, line, cols, id, length) {
-		for (var i = 0, output = input; i < plugged; i++) {
-			output = plugins[i](context, output, line, cols, id, length) || output
+	function proxy (context, blob, ns, length) {
+		for (var i = 0, out = blob; i < plugged; i++) {
+			out = plugins[i](context, out, line, cols, ns, length) || out
 		}
 
-		if (output !== input) {
-			return output
+		if (out !== blob) {
+			return out
+		}
+	}
+
+	/**
+	 * Use
+	 *
+	 * @param {(Array<function(...?)>|function(...?)|void)?} plugin
+	 */
+	function use (plugin) {
+		switch (plugin) {
+			case void 0:
+			case null: {
+				plugged = plugins.length = 0;
+				break
+			}
+			default: {
+				switch (plugin.constructor) {
+					case Array: {
+						for (var i = 0, l = plugin.length; i < l; i++) {
+							use(plugin[i++])
+						}
+						break
+					}
+					default: {
+						plugins[plugged++] = plugin
+					}
+				}
+			}
+ 		}
+	}
+
+	/**
+	 * Set
+	 *
+	 * @param {Object} options
+	 */
+	function set (options) {
+		for (var name in options) {
+			var value = options[name]
+			switch (name) {
+				case 'keyframes': keyed = value|0; break
+				case 'global': escade = value|0; break
+				case 'cascade': cascade = !!value|0; break
+				case 'compress': compress = value|0; break
+				case 'prefix': vendor = value|0; break
+				case 'plugins': use(value); break
+				case 'context': {
+					for (var i = 0, condition; i < value.length; i++)
+						switch (condition = value[i]) {
+							case PREPS: preps = condition|0; break
+							case PROPS: props = condition|0; break
+							case BLOCK: blcks = condition|0; break
+							case POSTS: posts = condition|0; break
+						}
+					break
+				}
+			}
 		}
 	}
 
 	/**
 	 * Minify
 	 *
-	 * @param {String} output
-	 * @return {String}
+	 * @param {string} input
+	 * @return {string}
 	 */
-	function minify (output) {
-		// remove spaces before `}=:` characters,
-		// spaces after `{];=:` characters,
-		// trailing `;` character
-		return output
-			.replace(pminifybefore, empty)
-			.replace(pminifyafter, capture)
-			.replace(pminifytail, capture)
+	function minify (input) {
+		return input
+			.replace(minifybeforeptn, '')
+			.replace(minifyafterptn, '$1')
+			.replace(minifytailptn, '$1')
 	}
 
 	/**
-	 * Use
+	 * Stylis
 	 *
-	 * @param {Array<Function>|Function} plugin
+	 * @param {string} namespace
+	 * @param {string} stylesheet
+	 * @return {string}
 	 */
-	function use (plugin) {
-		switch (plugin) {
-			case void 0: break;
-			case null:
-				plugged = plugins.length = 0;
-				break
-			default:
-				switch (plugin.constructor) {
-					case Array:
-						for (var i = 0, l = plugin.length; i < l; i++) {
-							use(plugin[i++])
-						}
-						break
-					default: plugins[plugged++] = plugin
-				}
+	function stylis (namespace, stylesheet) {
+		// setup
+		var code = namespace.charCodeAt(0)
+		var output = ''
+
+		if (code < 33) {
+			code = (namespace = namespace.trim()).charCodeAt(0)
 		}
-	}
 
-	/**
-	 * Set
-	 *
-	 * @param {Object?} options
-	 */
-	function set (options) {
-		for (var name in options) {
-			var value = options[name]
-			switch (name) {
-				case keyframes: scope = value|0; break
-				case 'global': global = value|0; break
-				case 'cascade': cascade = !!value|0; break
-				case 'compress': compress = value|0; break
-				case 'prefix': prefix = value|0; break
-				case 'plugins': use(value); break
-				case 'context':
-					for (var i = 0, condition; i < value.length; i++)
-						switch (condition = value[i]) {
-							case PREPCTX: prepctx = condition|0; break
-							case SELECTX: selectx = condition|0; break
-							case RULECTX: rulectx = condition|0; break
-							case PROPCTX: propctx = condition|0; break
-							case BLCKCTX: blckctx = condition|0; break
-							case POSTCTX: postctx = condition|0; break
-						}
+		if (keyed > 0) {
+			key = namespace
+
+			switch (code) {
+				// id/class
+				case ID:
+				case CLASS: {
+					key = key.substring(1)
 					break
+				}
+				// attribute
+				case ATTRIBUTE: {
+					key = key.replace(attributeptn, '$1')
+				}
 			}
+
+			key = '-' + key.replace(keyptn, '-')
 		}
+
+		// build
+		output = compile(array, [ns = namespace], stylesheet)
+
+		// destroy
+		key = ''
+		ns = ''
+		column = 0
+		line = 0
+
+		return compress === 0 ? output : minify(output)
 	}
 
-	compile.use = use
-	compile.set = set
+	stylis['use'] = use
+	stylis['set'] = set
 
-	return compile
+	return stylis
 }))

@@ -9,7 +9,7 @@ var spec = {
 			font-size: 20px;
 			transition: all
 		`,
-		expected: `.user{color: 20px;font-size: 20px;-webkit-transition: all;transition: all}`
+		expected: `.user{color: 20px;font-size: 20px;-webkit-transition: all;transition: all;}`
 	},
 	'namespace': {
 		sample: `
@@ -17,7 +17,7 @@ var spec = {
 				color: blue;
 			}
 		`,
-		expected: `.user {color: blue;}`
+		expected: `.user{color: blue;}`
 	},
 	':global()': {
 		sample: `
@@ -165,30 +165,29 @@ var spec = {
 		`
 		,
 		expected:
-		`@supports (display: block) {`+
-		`.user{color: red;}`+
+		`@supports (display: block){`+
+		`.user{color: red;display: none;}`+
 		`.user h1{color: red;}`+
 		`.user h1 h2{color: blue;}`+
-		`.user{display: none;}`+`}`+
+		`}`+
 
-		`@media (max-width: 600px) {`+
-		`.user{color: red;}`+
+		`@media (max-width: 600px){`+
+		`.user{color: red;display: none;}`+
 		`.user h1{color: red;}`+
 		`.user h1 h2{color: blue;}`+
-		`.user{display: none;}`+`}`+
+		`}`+
 
-		`@media (min-width: 576px) {`+
+		`@media (min-width: 576px){`+
 		`.user.card-deck .card:not(:first-child){margin-left: 15px;}`+
 		`.user.card-deck .card:not(:last-child){margin-right: 15px;}`+
 		`}`+
 
-		`@supports (display: block) {`+
-		`@media (min-width: 10px) {`+
+		`@supports (display: block){`+
+		`@media (min-width: 10px){`+
 		`.user{background-color: seagreen;}`+
-		`}`+
-		`}`+
-		'@media (max-width: 600px) {.user{color: red}}'+
-		`.user:hover{color: orange}`
+		`}}`+
+		'@media (max-width: 600px){.user{color: red;}}'+
+		`.user:hover{color: orange;}`
 	},
 	'@font-face': {
 		sample: `
@@ -197,7 +196,7 @@ var spec = {
 				src: url('Pangolin-Regular.ttf') format('truetype');
 			}
 		`,
-		expected: `@font-face {font-family: Pangolin;src: url('Pangolin-Regular.ttf') format('truetype');}`
+		expected: `@font-face{font-family: Pangolin;src: url('Pangolin-Regular.ttf') format('truetype');}`
 	},
 	'multiple selectors': {
 		sample: `
@@ -231,7 +230,7 @@ var spec = {
 		`,
 		expected: `.user .test:matches(a, b, c),.user .test{color: blue;}`+
 		`.user .test[title=","]{color: red;}`+
-		`.user [title="a,b,c, something"],.user h1,.user [title="a,b,c"]{color: red}`+
+		`.user [title="a,b,c, something"],.user h1,.user [title="a,b,c"]{color: red;}`+
 		`.user [title="a"],.user [title="b"]{color: red;}`
 	},
 	'strings': {
@@ -277,8 +276,8 @@ var spec = {
 				display: flex
 			}
 		`,
-		expected: `.user .content{display: none}`+
-		`.user .content{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex}`
+		expected: `.user .content{display: none;}`+
+		`.user .content{display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;}`
 	},
 	':matches(:not())': {
 		sample: `
@@ -286,16 +285,15 @@ var spec = {
 				display: none
 			}
 		`,
-		expected: `.user h1:matches(.a, .b, :not(.c)){display: none}`
+		expected: `.user h1:matches(.a, .b, :not(.c)){display: none;}`
 	},
 	'prefixer': {
 		sample: `
 			html {
 			  text-size-adjust: none;
 			}
-			input.red::placeholder,
-			input.error::placeholder {
-		  		color:red;
+			input.red::placeholder {
+		  	color:red;
 			}
 			& {
 				width: max-content;
@@ -308,29 +306,16 @@ var spec = {
 			  justify-content: flex-start;
 			  justify-content: justify;
 			}
-			&::placeholder {
-				color:red;
-			}
-			& {
-				&::placeholder {
-					color:red;
-				}
-			}
-			input {
-				&::placeholder {
-					color:red;
-				}
-			}
 			& {
 				transition: transform 1s, all 400ms;
 			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust: none;text-size-adjust: none;}`+
-			`.user input.red::-webkit-input-placeholder,.user input.error::-webkit-input-placeholder{color:red;}`+
-			`.user input.red::-moz-placeholder,.user input.error::-moz-placeholder{color:red;}`+
-			`.user input.red:-ms-input-placeholder,.user input.error:-ms-input-placeholder{color:red;}`+
-			`.user input.red::placeholder,.user input.error::placeholder{color:red;}`+
+			`.user input.red::-webkit-input-placeholder{color:red;}`+
+			`.user input.red::-moz-placeholder{color:red;}`+
+			`.user input.red:-ms-input-placeholder{color:red;}`+
+			`.user input.red::placeholder{color:red;}`+
 
 			`.user{`+
 			`width:-webkit-max-content;width:-moz-max-content;width:max-content;`+
@@ -345,20 +330,6 @@ var spec = {
 			'-webkit-box-pack: justify;-webkit-justify-content: justify;-ms-flex-pack: justify;justify-content: justify;'+
 
 			`}` +
-			`.user::-webkit-input-placeholder{color:red;}`+
-			`.user::-moz-placeholder{color:red;}`+
-			`.user:-ms-input-placeholder{color:red;}`+
-			`.user::placeholder{color:red;}` +
-
-			`.user::-webkit-input-placeholder{color:red;}`+
-			`.user::-moz-placeholder{color:red;}`+
-			`.user:-ms-input-placeholder{color:red;}`+
-			`.user::placeholder{color:red;}`+
-
-			`.user input::-webkit-input-placeholder{color:red;}`+
-			`.user input::-moz-placeholder{color:red;}`+
-			`.user input:-ms-input-placeholder{color:red;}`+
-			`.user input::placeholder{color:red;}`+
 
 			`.user{`+
 			`-webkit-transition:-webkit-transform 1s, all 400ms;`+
@@ -470,12 +441,11 @@ var spec = {
 			}
 		`,
 		expected: `.user{-webkit-animation:slidein-user 3s ease infinite;animation:slidein-user 3s ease infinite;}`+
-
 			`@-webkit-keyframes slidein-user`+
-			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`+
+			`{to{-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`+
 
 			`@keyframes slidein-user`+
-			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
+			`{to{-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
 	'keyframes disable namespace': {
 		options: {
@@ -491,11 +461,11 @@ var spec = {
 		`,
 		expected: `.user{-webkit-animation:slidein 3s ease infinite;animation:slidein 3s ease infinite;}`+
 
-			`@-webkit-keyframes slidein `+
-			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`+
+			`@-webkit-keyframes slidein`+
+			`{to{-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`+
 
-			`@keyframes slidein `+
-			`{to {-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
+			`@keyframes slidein`+
+			`{to{-webkit-transform: translate(20px);-ms-transform: translate(20px);transform: translate(20px);}}`
 	},
 	'nested': {
 		sample: `
@@ -566,10 +536,10 @@ var spec = {
 		`.user h1,.user div{color: red;color: blue;}`+
 		`.user h1 h2,.user div h2,.user h1:before,.user div:before{color: red;}`+
 		`.user h1 header,.user div header{font-size: 12px;}`+
-		`@media {.user h1,.user div{color: red;}}`+
-		`@media {.user{color: blue;}}`+
-		`.user.foo.bar{color: orange}`+
-		`.user.foo.bar.barbar{color: orange}`
+		`@media{.user h1,.user div{color: red;}}`+
+		`@media{.user h1,.user div{color: blue;}}`+
+		`.user.foo.bar{color: orange;}`+
+		`.user.foo.bar.barbar{color: orange;}`
 	},
 	'class namespace': {
 		selector: ' .foo',
@@ -596,7 +566,7 @@ var spec = {
 				  color: pink;
 				}
 		 `,
-		 expected: `@media (min-width: 537px) {`+
+		 expected: `@media (min-width: 537px){`+
 		 	`.user{border-bottom: 4px solid red;}}`+
 		 	`.user::-webkit-input-placeholder{color: pink;}`+
 		 	`.user::-moz-placeholder{color: pink;}`+
