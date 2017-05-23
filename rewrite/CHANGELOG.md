@@ -1,6 +1,6 @@
 ## 3.0.0 May 24, 2016
 
-- smaller file size (3.2kb –> ~2.9kb)
+- smaller file size (3.2kb –> ~2.8kb)
 - supports no semi colons
 - simpler plugin support
 - smaller output

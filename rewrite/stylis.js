@@ -344,7 +344,7 @@
 
 					// auto insert semicolon
 					if (cmt + str + fnq + brq === 0) {
-						// ruling out valid characters that
+						// valid characters that
 						// may precede a newline
 						switch (tail) {
 							case COMMA:
@@ -359,12 +359,17 @@
 								break
 							}
 							default: {
-								// colon : present
+								// colon : present, no semi colon, auto insert
 								if (pseudo > 1) {
 									semicolon = 1
 								}
 							}
 						}
+					}
+
+					// execute plugin, newline context
+					if (plugged > 0 && unkwn > 0) {
+						proxy(UNKWN, current, chars, line, column, out.length)
 					}
 
 					// next line, reset column position
@@ -1040,13 +1045,7 @@
 						break
 					}
 					case Number: {
-						switch (plugin) {
-							case PREPS: preps = preps === 0 ? 1 : 0; break
-							case PROPS: props = props === 0 ? 1 : 0; break
-							case BLCKS: blcks = blcks === 0 ? 1 : 0; break
-							case POSTS: posts = posts === 0 ? 1 : 0; break
-							case UNKWN: unkwn = unkwn === 0 ? 1 : 0; break
-						}
+						unkwn = !!plugin|0
 						break
 					}
 					default: {
