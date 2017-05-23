@@ -160,8 +160,8 @@
 	var key = ''
 
 	/* selector namespace */
-	var nsalt = ''
-	var ns = ''
+	var namescopealt = ''
+	var namescope = ''
 
 	/**
 	 * Compile
@@ -449,13 +449,17 @@
 						// functions
 						case CLOSEPARENTHESES: {
 							if (str + cmt + brq === 0) {
-								fnq = 0
+								fnq--
 							}
 							break
 						}
 						case OPENPARENTHESES: {
 							if (str + cmt + brq === 0) {
-								fnq = pseudo - (caret - 7) === 0 ? (counter = 0, context = 1) : 1
+								if (pseudo - (caret - 7) === 0) {
+									counter = 0
+									context = 1
+								}
+								fnq++
 							}
 							break
 						}
@@ -634,32 +638,32 @@
 		}
 
 		switch (code) {
-				// &
-				case AND: {
-					return selector.replace(andptn, prefix.trim())
-				}
-				// :
-				case COLON: {
-					switch (selector.charCodeAt(1)) {
-						// :global
-						case ESCAPE: {
-							if (escape > 0 && cascade > 0) {
-								return selector.replace(escapeptn, '$1').replace(andptn, ns).trim()
-							}
-							break
+			// &
+			case AND: {
+				return selector.replace(andptn, prefix.trim())
+			}
+			// :
+			case COLON: {
+				switch (selector.charCodeAt(1)) {
+					// :global
+					case ESCAPE: {
+						if (escape > 0 && cascade > 0) {
+							return selector.replace(escapeptn, '$1').replace(andptn, namescope).trim()
 						}
-						default: {
-							// :hover
-							return prefix.trim() + selector
-						}
+						break
+					}
+					default: {
+						// :hover
+						return prefix.trim() + selector
 					}
 				}
-				default: {
-					switch (selector.charCodeAt(selector.length-1)) {
-						// html &
-						case AND: return selector.replace(andptn, ns)
-					}
+			}
+			default: {
+				switch (selector.charCodeAt(selector.length-1)) {
+					// html &
+					case AND: return selector.replace(andptn, namescope)
 				}
+			}
 		}
 
 		return prefix + selector
@@ -897,7 +901,7 @@
 						break
 					}
 					case OPENBRACKET: {
-						element = prefix + element + nsalt
+						element = prefix + element + namescopealt
 						ctx = 1
 						break
 					}
@@ -912,16 +916,16 @@
 								break
 							}
 							default: {
-								element = (ctx === 2 ? '' : prefix + nsalt) + element
+								element = (ctx === 2 ? '' : prefix + namescopealt) + element
 							}
 						}
 						break
 					}
 					default: {
 						if (size > 1 && element.indexOf(':') > 0) {
-							element = prefix + element.replace(pseudoptn, nsalt + '$1')
+							element = prefix + element.replace(pseudoptn, namescopealt + '$1')
 						} else {
-							element = prefix + element + nsalt
+							element = prefix + element + namescopealt
 							ctx = 1
 						}
 					}
@@ -971,16 +975,16 @@
 
 		switch (cascade) {
 			case 0: {
-				nsalt = namespace
+				namescopealt = namespace
 				break
 			}
 			case 1: {
-				ns = namespace
+				namescope = namespace
 				break
 			}
 		}
 
-		var selectors = [ns]
+		var selectors = [namescope]
 
 		if (plugged > 0 && preps > 0) {
 			proxy(PREPS, selectors, input, line, column, 0)
@@ -995,8 +999,8 @@
 
 		// destroy
 		key = ''
-		ns = ''
-		nsalt = ''
+		namescope = ''
+		namescopealt = ''
 		line = 0
 		column = 0
 

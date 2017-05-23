@@ -189,6 +189,53 @@ var spec = {
 		'@media (max-width: 600px){.user{color: red;}}'+
 		`.user:hover{color: orange;}`
 	},
+	'@media specifity': {
+		sample: `
+		> #box-not-working {
+		  background: red;
+		  padding-left: 8px;
+
+		  width: 10px;
+
+		  @media only screen and (min-width: 10px) {
+				width: calc(
+					10px + 90px *
+					(100vw - 10px) / 90
+				);
+		  }
+
+		  @media only screen and (min-width: 90px) {
+				width: 90px;
+		  }
+
+		  height: 10px;
+
+		  @media only screen and (min-width: 10px) {
+				height: calc(
+					10px + 90px *
+					(100vw - 10px) / 90
+				);
+		  }
+
+		  @media only screen and (min-width: 90px) {
+		    height: 90px;
+		  }
+		}`,
+		expected: ``+
+		`.user > #box-not-working{background: red;padding-left: 8px;width: 10px;height: 10px;}`+
+		`@media only screen and (min-width: 10px){`+
+		`.user > #box-not-working{width: calc(10px + 90px *(100vw - 10px) / 90);}`+
+		`}`+
+		`@media only screen and (min-width: 90px){`+
+		`.user > #box-not-working{width: 90px;}`+
+		`}`+
+		`@media only screen and (min-width: 10px){`+
+		`.user > #box-not-working{height: calc(10px + 90px *(100vw - 10px) / 90);}`+
+		`}`+
+		`@media only screen and (min-width: 90px){`+
+		`.user > #box-not-working{height: 90px;}`+
+		`}`
+	},
 	'@font-face': {
 		sample: `
 			@font-face {
