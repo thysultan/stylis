@@ -88,11 +88,11 @@ function run (tests, fn) {
 			console.log(result.length, 'failed: ', name, '\n\n', result)
 			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
 
+			failed.push(name);
+
 			if (browser) {
 				break;
 			}
-
-			failed.push(name);
 		} else {
 			passed.push(name);
 		}

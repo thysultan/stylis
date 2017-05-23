@@ -61,8 +61,8 @@
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(\w+)\s+(\S+)\s*/ /* matches @keyframes $1 */
 	var placeptn = /::?(place)/g /* match ::placeholder varient */
-	var minifybeforeptn = /\s+(?=[{\];=:])/g /* rm \s before ] ; = : */
-	var minifyafterptn = /([[}=:])\s+/g /* rm \s after characters [ } = : */
+	var minifybeforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
+	var minifyafterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
 	var minifytailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
 	var pseudoptn = /(:+) */g /* pseudo element */
 

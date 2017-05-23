@@ -619,6 +619,30 @@ var spec = {
 			cascade: false
 		},
 		sample: `
+			.List :global(>) :global(*) {
+			  margin-top: 10px;
+			}
+
+			.List :global(*) :global(+) :global(*) {
+			  margin-top: 10px;
+			}
+
+			.List :global(> *) {
+			  margin-top: 10px;
+			}
+
+			.List :global(* + *) {
+			  margin-top: 10px;
+			}
+
+			:global(.foo #bar > baz) {
+				color: red;
+			}
+
+			div :global(.react-select .some-child-of-react-select) {
+				color:red;
+			}
+
 			a:not( a +b foo:hover :global(marquee) a) > :hover {
 			  color: red;
 			}
@@ -631,7 +655,14 @@ var spec = {
 			  color: red;
 			}
 		`,
-		expected: `a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`+
+		expected: ``+
+		`.List.user >*{margin-top: 10px;}`+
+		`.List.user * +*{margin-top: 10px;}`+
+		`.List.user > *{margin-top: 10px;}`+
+		`.List.user * + *{margin-top: 10px;}`+
+		`.foo #bar > baz{color: red;}`+
+		`div.user .react-select .some-child-of-react-select{color:red;}`+
+		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`+
 		`.root.user>*:not(header.user){color: red;}`+
 		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`
 	},
