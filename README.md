@@ -42,7 +42,6 @@ npm install stylis --save
 
 ## Features
 
-- web component emulation of `:host`, `:host()` and `:host-context()`
 - selector namespacing/isolcation
 - inline global injection ex. `:global(selector)`
 - nesting `a { &:hover {} }`
@@ -146,7 +145,7 @@ stylis(selector: {String}, css: {String})
 #### Set
 
 ```javascript
-// all options are enabled by default
+// all options except compress and cascade are enabled by default
 stylis.set(options: {
 	global: {Boolean} // (dis/en)able :global selectors
 	cascade: {Boolean} // (dis/en)able aggressive cascade isolation
