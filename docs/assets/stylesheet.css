@@ -1,0 +1,123 @@
+* {
+	box-sizing: border-box; 
+	margin: 0; 
+	padding: 0;
+}
+
+body {
+	background: #F1F1F1;
+	font-family: 'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.container > .welcome > *:not(pre):not(div),
+.wrap { 
+	max-width: 600px; 
+	width: 100%;
+	margin: 0 auto;
+	padding:0 20px;
+}
+
+.header { 
+	padding-top: 30px;
+	padding-bottom: 14px;
+	min-height: 160px;
+	text-align: center;
+}
+
+.logo {
+	margin-bottom: 20px;
+	display: block;
+}
+
+.logo a {
+	display: inline-block;
+	width: 194px;
+	height: 76px;
+	cursor: pointer;
+}
+
+.nav {
+	display: inline-block;
+	font-weight: bold;
+}
+
+.nav li {
+	display: inline-block;
+}
+
+.nav li:not(:last-child) a {
+	margin-right: 16px;
+}
+
+a {
+	color: #332E22;
+	font-size: 19px;
+	text-decoration: none;
+}
+
+a[title=github] {
+	font-weight: bold;
+}
+
+p {
+	color: #535353;
+	line-height: 38px;
+	font-size: 17px;
+	text-align: center;
+}
+
+.code {
+	padding: 0 20px;
+	position: relative;
+	max-width: 100%;
+	display: block;
+	margin: 30px auto 20px;
+}
+
+.code > div {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+
+	-webkit-flex-direction: row;
+	-ms-flex-direction: row;
+	flex-direction: row;
+
+	box-shadow:0px 1px 4px rgba(216,211,206,0.3);
+	border: 1px solid #DDDDDD;
+	background: rgb(236,236,236);
+	overflow: auto;
+	tab-size: 4;
+	min-height: 300px;
+}
+
+.code pre {
+	font: 12px/1.8em menlo,monospace;
+	flex: auto;
+	width: 50%;
+	padding: 26px 30px;
+	outline: none;
+}
+
+#editor {
+	background-color: #F6F6F6;
+}
+
+#output {
+	cursor: default;
+}
+
+span.selector {
+	color: #AA0C91;
+}
+
+span.value {
+	color: #C41913;
+}
+
+span.string {
+	color: #007400;
+}
