@@ -54,18 +54,28 @@ div {
 }
 </pre>
 <pre id=output>
-h1 {
-   font-size: 22px;
+h1,html .component-x {
+	font-size: 22px;
 }
 
-.scope div {
-    display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
+.component-x div {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
 }
 
-.scope div h1 {
+div h1 .component-x {
+	color: red;
+}
+
+.component-x div {
+	-webkit-transform: translateZ(0);
+	-ms-transform: translateZ(0);
+	transform: translateZ(0);
+}
+
+.component-x div h1 {
 	color: red;
 }
 </pre>
