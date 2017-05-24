@@ -6,1266 +6,1167 @@
  * /____/\__/\__, /_/_/____/
  *          /____/
  *
- * stylis is a feature-rich css preprocessor
- *
- * @licence MIT
+ * light – weight css preprocessor @licence MIT
  */
+/* eslint-disable */
 (function (factory) {
-	if (typeof exports === 'object' && typeof module !== 'undefined') {
-		module.exports = factory(global);
-	}
-	else if (typeof define === 'function' && define.amd) {
-		define(factory(window));
-	}
-	else {
-		window.stylis = factory(window);
-	}
-}(function (window) {
-
-
-	'use strict';
-
-
-	// plugins
-	var plugins = [];
-
-	// regular expressions
-	var andPattern = /&/g;
-	var andSpacePattern = / +&/;
-	var splitPattern = /,\n/g;
-	var globalPattern = /:global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
-	var globalsPattern = /(?:&| ):global\(%?((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g;
-	var hostPattern = /:host\((.*)\)/g;
-	var hostContextPattern = /:host-context\((.*)\)/g;
-	var newLinePattern = /\n/g;
-	var placeholderPattern = /::place/g;
-	var colonPattern = /: +/g;
-	var animationPattern = /[ .#~+><\d]+/g;
-	var transformPattern = / *(transform)/g;
-
-	// prefixes
-	var moz = '-moz-';
-	var ms = '-ms-';
-	var webkit = '-webkit-';
-
+	typeof exports === 'object' && typeof module !== 'undefined' ? (module.exports = factory()) :
+		typeof define === 'function' && define.amd ? define(factory()) :
+			(window['stylis'] = factory())
+}(function () {
 
 	/**
-	 * css preprocessor
+	 * Notes
 	 *
-	 * @param  {String}   selector   - i.e `.class` or `#id` or `[attr=id]`
-	 * @param  {String}   styles     - css string
-	 * @param  {Boolean=} animations - prefix animations and keyframes, true by default
-	 * @param  {Boolean=} compact    - enable additional shadow dom features(:host, :host-context)
-	 * @param  {Function|Array} middlewares
+	 * int + int + int === n4 [faster]
+	 *
+	 * vs
+	 *
+	 * int === n1 && int === n2 && int === n3
+	 *
+	 * ----
+	 *
+	 * switch (int) { case ints...} [faster]
+	 *
+	 * vs
+	 *
+	 * if (int == 1 && int === 2 ...)
+	 *
+	 * ----
+	 *
+	 * The (first*n1 + second*n2 + third*n3) format used in the property parser
+	 * is a simple way to hash the sequence of characters
+	 * taking into account the index they occur in
+	 * since any number of 3 character sequences could produce duplicates.
+	 *
+	 * On the other hand sequences that are directly tied to the index of the character
+	 * resolve a far more accurate measure, it's also faster
+	 * to evaluate one condition in a switch statement
+	 * than three regardless of the added math
+	 *
+	 * This allows the property parser to in theory be both small and fast.
+	 */
+
+	var formatptn = /[\0\r]/g /* matches new lines and null characters */
+	var colonptn = /: */g /* splits animation rules */
+	var cursorptn = /zoo|gra/ /* assert cursor varient */
+	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
+	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
+	var propertiesbtn = / +\s*(?![^(]*[)])/g /* animation properties */
+	var elementptn = / *[\0] */g /* selector elements */
+	var selectorptn = /,\r+?/g /* splits selectors */
+	var andptn = /&/g /* match & */
+	var attributeptn = /\[.+\=['"`]?(.*)['"`]?\]/g /* matches attribute values [id=match] */
+	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
+	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
+	var keyframeptn = /@(\w+)\s+(\S+)\s*/ /* matches @keyframes $1 */
+	var placeptn = /::?(place)/g /* match ::placeholder varient */
+	var minifybeforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
+	var minifyafterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
+	var minifytailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
+	var pseudoptn = /(:+) */g /* pseudo element */
+
+	/* vendors */
+	var webkit = '-webkit-'
+	var moz = '-moz-'
+	var ms = '-ms-'
+
+	/* character codes */
+	var SEMICOLON = 59
+	var CLOSEBRACES = 125
+	var OPENBRACES = 123
+	var OPENPARENTHESES = 40
+	var CLOSEPARENTHESES = 41
+	var OPENBRACKET = 91
+	var CLOSEBRACKET = 93
+	var NEWLINE = 10
+	var CARRIAGE = 13
+	var TAB = 9
+	var AT = 64
+	var SPACE = 32
+	var AND = 38
+	var HASH = 35
+	var DOT = 46
+	var DASH = 45
+	var UNDERSCORE = 95
+	var STAR = 42
+	var COMMA = 44
+	var COLON = 58
+	var SINGLEQUOTE = 39
+	var DOUBLEQUOTE = 34
+	var FOWARDSLASH = 47
+	var GREATERTHAN = 62
+	var PLUS = 43
+	var TILDE = 126
+	var NULL = 0
+
+	/* selector codes */
+	var ID = HASH
+	var CLASS = DOT
+	var ATTRIBUTE = OPENBRACKET
+	var CHILD = GREATERTHAN
+	var ADJACENT = PLUS
+	var SIBLING = TILDE
+
+	/* special identifiers */
+	var KEYFRAME = 107 /* k */
+	var MEDIA = 109 /* m */
+	var SUPPORTS = 115 /* s */
+	var IMPORT = 169 /* i */
+	var CHARSET = 163 /* c */
+	var ESCAPE = 103 /* g */
+	var FONT = 102 /* f */
+	var PLACEHOLDER = 112 /* p */
+
+	var LINECOMMENT = FOWARDSLASH
+	var BLOCKCOMMENT = STAR
+
+	var column = 0 /* current column */
+	var line = 0 /* current line numebr */
+	var pattern = 0 /* :pattern */
+
+	var cascade = 1 /* #id h1 h2 vs h1#id h2#id  */
+	var vendor = 1 /* vendor prefix */
+	var escape = 1 /* escape :global pattern */
+	var compress = 0 /* compress output */
+	var semicolon = 0 /* no/semicolon option */
+
+	/* empty reference objects */
+	var array = []
+
+	/* plugins */
+	var plugins = []
+	var plugged = 0
+
+	/* plugin context */
+	var POSTS = -1
+	var PREPS = -2
+	var UNKWN = 0
+	var PROPS = 1
+	var BLCKS = 2
+	var ATRUL = 3
+
+	var unkwn = 0
+
+	/* keyframe animation */
+	var keyed = 1
+	var key = ''
+
+	/* selector namespace */
+	var namescopealt = ''
+	var namescope = ''
+
+	/**
+	 * Compile
+	 *
+	 * @param {Array<string>} parent
+	 * @param {Array<string>} current
+	 * @param {string} body
 	 * @return {string}
 	 */
-	function stylis (selector, styles, animations, compact, middlewares) {
-		selector += '';
+	function compile (parent, current, body) {
+		var brq = 0 /* brackets [] */
+		var cmt = 0 /* comments /* // */
+		var fnq = 0 /* functions () */
+		var str = 0 /* quotes '', "" */
 
-		var middleware = middlewares;
-		var prefix = '';
-		var namespace = '';
-		var char;
-		var attr;
-		var animns;
+		var first = 0
+		var second = 0
+		var third = 0
+		var counter = 0
+		var context = 0
 
-		var type = selector.charCodeAt(0);
+		var pseudo = 0
+		var caret = 0
+		var code = 0
+		var tail = 0
+		var trail = 0
+		var format = 0
+		var insert = 0
+		var length = 0
+		var eof = body.length
+		var eol = eof - 1
 
-		// ` selector` -> `selector`
-		if (type < 33) {
-			type = (selector = selector.trim()).charCodeAt(0);
-		}
+		var char = ''
+		var chars = ''
+		var out = ''
+		var block = ''
+		var children = ''
+		var flat = ''
 
-		switch (type) {
-			// `#` `.` id and class selectors
-			case 35:
-			case 46: {
-				namespace = (prefix = selector).substring(1);
-				break;
-			}
-			// [ attr selector
-			case 91: {
-				// `[data-id=namespace]` -> ['data-id', 'namespace']
-				attr = selector.substring(1, selector.length - 1).split('=');
-				char = (namespace = attr[1] || attr[0]).charCodeAt(0);
+		var ref
+		var res
 
-				// [data-id="namespace"]/[data-id='namespace']
-				// --> "namespace"/'namspace' --> namespace
-				if (char === 34 || char === 39) {
-					namespace = namespace.substring(1, namespace.length - 1);
-				}
-
-				prefix = '['+ attr[0] + (attr.length > 1 ? ('="' + namespace +'"]') : ']')
-				break;
-			}
-			// element selector
-			default: {
-				namespace = prefix = selector;
-			}
-		}
-
-		// reset type signature
-		type = 0;
-
-		// animation and keyframe namespace
-		if (animations === true || animations === undefined || animations === null) {
-			animations = true;
-			animns = namespace.replace(animationPattern, '-');
-		}
-		else {
-			animns = '';
-			animations = false;
-		}
-
-		// middleware
-		var has;
-		var uses = middleware !== void 0 && middleware !== null;
-		var length = plugins.length;
-
-		if (uses === true) {
-			has = (typeof middleware).charCodeAt(0);
-
-			// o, array
-			if (has === 111) {
-				use(middleware);
-			}
-			// f, function
-			else if (has === 102) {
-				plugins[length++] = middleware;
-			}
-			else {
-				uses = false;
-			}
-		}
-
-		if (length !== 0) {
-			middleware = length === 1 ? plugins[0] : proxy;
-			uses = true;
-		}
-
-		// declare
-		var character;
-		var colon;
-		var inner;
-		var selectors;
-		var build;
-		var temp;
-		var prev;
-		var indexOf;
-		var first;
-		var second;
-		var third;
-		var sel;
-		var blob;
-		var nest;
-		var str;
-		var media;
-
-		// buffers
-		var buff = '';
-		var blck = '';
-		var flat = '';
-
-		// character code
-		var code = 0;
-		var nextcode;
-
-		// context signatures
-		var medias = 0;
-		var special = 0;
-		var close = 0;
-		var closed = 0;
-		var nested = 0;
-		var func = 0;
-		var strings = 0;
-		var globs = 0;
-		var isplace = 0;
-		var join = 0;
-
-		// context(flat) signatures
-		var levels = 0;
-
-		// comments
-		var comment = 0;
-		var comblck = 0;
-		var comline = 0;
-
-		// pre-process
-		if (uses === true) {
-			temp = middleware(0, styles, line, column, prefix, 0);
-
-			if (temp != null) {
-				styles = temp;
-			}
-
-			str = '';
-		}
-
-		// positions
-		var caret = 0;
-		var depth = 0;
-		var column = 0;
-		var line = 1;
-		var eof = styles.length;
-
-		// compiled output
-		var output = '';
-
-		// parse + compile
+		// ...build body
 		while (caret < eof) {
-			code = styles.charCodeAt(caret);
+			code = body.charCodeAt(caret)
 
-			// {, }, ; characters, parse line by line
-			if (
-				(medias === 1 && caret === eof - 1) ||
-				(
-					strings === 0 && func === 0 && comment === 0 &&
-					(
-						// {, }, ;
-						(code === 123 || code === 125 || code === 59)
-						||
-						// eof buffer
-						(caret === eof - 1 && buff.length !== 0)
-					)
-				)
-			) {
-				buff += styles.charAt(caret);
-
-				// middleware, selector/property context, }
-				if (uses === true && code !== 125) {
-					// { pre-processed selector context
-					if (code === 123) {
-						temp = middleware(
-							1,
-							buff.substring(0, buff.length - 1).trim(),
-							line,
-							column,
-							prefix,
-							output.length
-						);
-					}
-					// ; property context
-					else {
-						temp = middleware(2, buff, line, column, prefix, output.length);
-					}
-
-					if (temp != null) {
-						buff = code === 123 ? temp + ' {' : temp;
+			if (cmt + str + fnq + brq === 0) {
+				// auto semicolon insertion
+				if (insert === 1) {
+					// false flags, comma character
+					switch (code) {
+						case COMMA: {
+							insert = 0
+							break
+						}
+						default: {
+							caret--
+							code = SEMICOLON
+						}
 					}
 				}
 
-				first = buff.charCodeAt(0);
-
-				// only trim when the first character is a space ` `
-				if (first === 32) {
-					first = (buff = buff.trim()).charCodeAt(0);
-				}
-
-				second = buff.charCodeAt(1);
-				third = buff.charCodeAt(2);
-
-				// @, special block
-				if (first === 64) {
-					// push flat css
-					if (levels === 1 && flat.length !== 0) {
-						levels = 0;
-						flat = prefix + ' {' + flat + '}';
-
-						// middleware, flat context
-						if (uses === true) {
-							temp = middleware(4, flat, line, column, prefix, output.length);
-
-							if (temp != null) {
-								flat = temp;
-							}
-						}
-
-						output += flat;
-						flat = '';
-					}
-
-					// ;
-					if (code !== 59) {
-						// @keyframe, `k`
-						if (second === 107) {
-							blob = buff.substring(1, 11) + animns + buff.substring(11);
-							buff = '@' + webkit + blob;
-							type = 1;
-						}
-						// @media `m`, `e` characters,
-						// @supports `s` `u` characters,
-						// @global `g` character
-						else if (
-							(second === 109 && third === 101) ||
-							(second === 115 && third === 117) ||
-							(second === 103)
-						) {
-							caret++;
-							column++;
-
-							if (media === undefined) {
-								media = '';
-							}
-
-							inner = '';
-
-							// keep track of opening `{` and `}` occurrences
-							closed = 1;
-
-							// travel to the end of the block
-							while (caret < eof) {
-								char = styles.charCodeAt(caret);
-
-								// {, }, nested blocks may have nested blocks
-								if (char === 123) {
-									closed++;
+				// eof varient
+				switch (caret) {
+					case eol: {
+						if ((chars = chars.trim()).length > 0) {
+							switch (code) {
+								case SPACE:
+								case TAB:
+								case SEMICOLON:
+								case CARRIAGE:
+								case NEWLINE: {
+									break
 								}
-								else if (char === 125) {
-									closed--;
-								}
-
-								// break when the nested block has ended
-								if (closed === 0) {
-									caret++;
-									break;
-								}
-
-								// build content of nested block
-								inner += styles.charAt(caret++);
-
-								// move column and line position
-								column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
-							}
-
-							selector = depth === 0 ? prefix : prev.substring(0, prev.length-1).replace(newLinePattern, '').trim();
-
-							// build block
-							media += (buff + stylis(
-								selector,
-								inner.trim(),
-								animations,
-								compact,
-								null
-							).trim() + '}');
-
-							// middleware, block context
-							if (uses === true) {
-								temp = middleware(3, media, line, column, prefix, output.length);
-
-								if (temp != null) {
-									media = temp;
-								}
-							}
-
-							buff = '';
-							medias = 1;
-
-							if (caret === eof) {
-								eof++;
-							}
-
-							continue;
-						}
-						// unknown
-						else {
-							type = 6;
-						}
-					}
-
-					// flag special, i.e @keyframes, @font-face ...
-					if (code !== 59 && second !== 105) {
-						// k, m
-						if (second !== 107 && second !== 109 && second !== 115 && second !== 103) {
-							type = 5;
-						}
-
-						close = -1;
-						special++;
-					}
-				}
-				// property/selector
-				else {
-					// { character, selector declaration
-					if (code === 123) {
-						depth++;
-
-						// push flat css
-						if (levels === 1 && flat.length !== 0) {
-							levels = 0;
-							flat = prefix + ' {' + flat + '}';
-
-							// middleware, flat context
-							if (uses === true) {
-								temp = middleware(4, flat, line, column, prefix, output.length);
-
-								if (temp != null) {
-									flat = temp;
-								}
-							}
-
-							output += flat;
-							flat = '';
-						}
-
-						// nested selector
-						if (depth === 2) {
-							// discard first character {
-							caret++;
-							column++;
-
-							// inner content of block
-							inner = '';
-
-							var nestSelector = buff.substring(0, buff.length - 1).split(splitPattern);
-							var prevSelector = prev.substring(0, prev.length - 1).split(splitPattern);
-
-							// keep track of opening `{` and `}` occurrences
-							closed = 1;
-
-							// travel to the end of the block
-							while (caret < eof) {
-								char = styles.charCodeAt(caret);
-
-								// {, nested blocks may have nested blocks
-								if (char === 123) {
-									closed++;
-								}
-								// },
-								else if (char === 125) {
-									closed--;
-								}
-
-								// break when the nested block has ended
-								if (closed === 0) {
-									break;
-								}
-
-								// build content of nested block
-								inner += styles.charAt(caret++);
-
-								// move column and line position
-								column = (char === 13 || char === 10) ? (line++, 0) : column + 1;
-							}
-
-							// handle multiple selectors: h1, h2 { div, h4 {} } should generate
-							// -> h1 div, h2 div, h2 h4, h2 div {}
-							length = prevSelector.length;
-
-							for (var j = 0; j < length; j++) {
-								// extract value, prep index for reuse
-								temp = prevSelector[j];
-								indexOf = temp.indexOf(prefix);
-
-								prevSelector[j] = '';
-
-								// since there could also be multiple nested selectors
-								for (var k = 0, l = nestSelector.length; k < l; k++) {
-									if (indexOf > 0) {
-										selector = ':global(%)' + temp.trim();
-									}
-									else {
-										selector = temp.replace(prefix, '&').trim();
-									}
-
-									sel = nestSelector[k].trim();
-
-									if (sel.indexOf(' &') > 0) {
-										selector = sel.replace('&', '').trim() + ' ' + selector;
-									}
-									else if (globalPattern.exec(sel) !== null) {
-										selector = sel;
-									}
-									else {
-										selector = selector + ' ' + sel;
-									}
-
-									prevSelector[j] += selector.replace(andSpacePattern, '').trim() + (k === l - 1  ? '' : ',');
-								}
-							}
-
-							if (nest === undefined) {
-								nest = '';
-							}
-
-							// concat nest
-							nest += (
-								'\n' +
-								prevSelector.join(',').replace(globalsPattern, ' $1') +
-								' {'+inner+'}'
-							);
-
-							// signature
-							nested = 1;
-
-							// clear current line, to avoid adding nested blocks to the normal flow
-							buff = '';
-
-							// decreament depth
-							depth--;
-						}
-						// top-level selector
-						else if (special === 0 || type === 2) {
-							// register block with placeholder selector
-							if (isplace === 0 && buff.indexOf('::place') !== -1) {
-								isplace = 1;
-							}
-
-							selectors = buff.split(splitPattern);
-
-							// current selector
-							build = '';
-
-							// previous selector
-							prev = '';
-
-							length = selectors.length;
-
-							// prefix multiple selectors with namesapces
-							// @example h1, h2, h3 --> [namespace] h1, [namespace] h1, ....
-							for (var j = 0; j < length; j++) {
-								char = (selector = selectors[j]).charCodeAt(0);
-
-								// ` `, trim if first character is a space
-								if (char === 32) {
-									char = (selector = selector.trim()).charCodeAt(0);
-								}
-
-								// &
-								if (char === 38) {
-									// before: & { / &&... {
-									selector = prefix + selector.substring(1).replace(andPattern, prefix);
-									// after: ${prefix} { / ${prefix}${prefix}...
-								}
-								else {
-									// default to :global if & exists outside of the first non-space character
-									if ((indexOf = selector.indexOf(' &')) > 0) {
-										// before: html & {
-										selector = selector.replace(andPattern, prefix).trim();
-										// after: html ${prefix} {
-									}
-									// :
-									else if (char === 58) {
-										nextcode = selector.charCodeAt(1);
-
-										// h, t, :host
-										if (compact === true && nextcode === 104 && selector.charCodeAt(4) === 116) {
-											nextcode = selector.charCodeAt(5);
-
-											// (, :host(selector)
-											if (nextcode === 40) {
-												// before: `(selector)`
-												selector = (
-													prefix + (
-														selector
-															.replace(hostPattern, '$1')
-															.replace(andPattern, prefix)
-													)
-												);
-												// after: ${prefx} selector {
-											}
-											// -, :host-context(selector)
-											else if (nextcode === 45) {
-												// before: `-context(selector)`
-												selector = selector
-													.replace(hostContextPattern, '$1 ' + prefix)
-													.replace(andPattern, prefix)
-												// after: selector ${prefix} {
-											}
-											// :host
-											else {
-												selector = prefix + selector.substring(5);
-											}
-										}
-										// g, :global(selector)
-										else if (
-											nextcode === 103 &&
-											(
-												compact === true
-												||
-												((nextcode = selector.charCodeAt(8)) === 37)
-											)
-										) {
-											globs = 1;
-
-											// before: `:global(selector)`
-											selector = (
-												selector
-													.replace(globalPattern, '$1')
-													.replace(andPattern, prefix).trim()
-											);
-											// after: selector
-										}
-										// :hover, :active, :focus, etc...
-										else {
-											selector = prefix + selector;
-										}
-									}
-									// non-pseudo selectors
-									else if (globs === 0) {
-										selector = prefix + ' ' + selector;
-									}
-								}
-
-								// middleware, post-processed selector context
-								if (uses === true) {
-									temp = middleware(
-										1.5,
-										j === length - 1 ? selector.substring(0, selector.length - 1).trim() : selector,
-										line,
-										column,
-										prefix,
-										output.length
-									);
-
-									if (temp != null) {
-										selector = j === length - 1 ? temp + ' {' : temp;
-									}
-								}
-
-								// if first selector do not prefix with `,`
-								prev += (j !== 0 ? ',\n' : '') + (globs !== 1 ? selector : ':global(%)' + selector);
-								build += j !== 0 ? ',' + selector : selector;
-
-								// reset :global flag
-								globs = 0;
-							}
-
-							buff = build;
-						}
-						else {
-							prev = buff;
-						}
-					}
-					// not single `}`
-					else if ((code === 125 && buff.length === 1) === false) {
-						if (join === 1) {
-							buff = buff.replace(newLinePattern, '');
-						}
-
-						// ;
-						if (code !== 59) {
-							buff = (code === 125 ? buff.substring(0, buff.length - 1) : buff.trim()) + ';';
-						}
-
-						// animation: a, n, i characters
-						if (first === 97 && second === 110 && third === 105) {
-							// removes ;
-							buff = buff.substring(0, buff.length - 1);
-
-							// position of :
-							colon = buff.indexOf(':')+1;
-
-							// left hand side everything before `:`
-							build = buff.substring(0, colon);
-
-							// short hand animation syntax
-							if (animations === true && buff.charCodeAt(9) !== 45) {
-								var anims = buff.substring(colon).trim().split(',');
-
-								length = anims.length;
-
-								// because we can have multiple animations `animation: slide 4s, slideOut 2s`
-								for (var j = 0; j < length; j++) {
-									var anim = anims[j];
-									var props = anim.split(' ');
-
-									// since we can't be sure of the position of the name of the animation we have to find it
-									for (var k = 0, l = props.length; k < l; k++) {
-										var prop = props[k].trim();
-										var frst = prop.charCodeAt(0);
-										var thrd = prop.charCodeAt(2);
-										var len = prop.length;
-										var last = prop.charCodeAt(len - 1);
-
-										// animation name parser
-										if (
-											// first character
-											(
-											    // letters
-											    (frst > 64 && frst < 90) ||
-											    (frst > 96 && frst < 122) ||
-											    // the exception `underscores or dashes`
-											    frst === 45 ||
-											    // but two dashes at the beginning are forbidden
-											    (frst === 95 && prop.charCodeAt(1) !== 95)
-											) &&
-
-											// cubic-bezier()/steps(), )
-											last !== 41 && len !== 0 &&
-
-											!(
-												frst === 105 &&
-												(
-													// infinite, i, f, e
-													(thrd === 102 && last === 101 && len === 8) ||
-													// initial
-													(thrd === 105 && last === 108 && len === 7) ||
-													// inherit
-													(thrd === 104 && last === 116 && len === 7)
-												)
-											) &&
-
-											// unset
-											!(frst === 117 && thrd === 115 && last === 116 && len === 5) &&
-
-											// linear, l, n, r
-											!(frst === 108 && thrd === 110 && last === 114 && len === 6) &&
-
-											// alternate/alternate-reverse, a, t, e
-											!(frst === 97 && thrd === 116 && last === 101 && (len === 9 || len === 17)) &&
-
-											// normal, n, r, l
-											!(frst === 110 && thrd === 114 && last === 108 && len === 6) &&
-
-											// backwards, b, c, s
-											!(frst === 98 && thrd === 99 && last === 115 && len === 9) &&
-
-											// forwards, f, r, s
-											!(frst === 102 && thrd === 114 && last === 115 && len === 8) &&
-
-											// both, b, t, h
-											!(frst === 98 && thrd === 116 && last === 104 && len === 4) &&
-
-											// none, n, n, e
-											!(frst === 110 && thrd === 110 && last === 101 && len === 4)&&
-
-											// running, r, n, g
-											!(frst === 114 && thrd === 110 && last === 103 && len === 7) &&
-
-											// paused, p, u, d
-											!(frst === 112 && thrd === 117 && last === 100 && len === 6) &&
-
-											// reversed, r, v, d
-											!(frst === 114 && thrd === 118 && last === 100 && len === 8) &&
-
-											// step-start/step-end, s, e, (t/d)
-											!(
-												frst === 115 && thrd === 101 &&
-												((last === 116 && len === 10) || (last === 100 && len === 8))
-											) &&
-
-											// ease/ease-in/ease-out/ease-in-out, e, s, e
-											!(
-												frst === 101 && thrd === 115 &&
-												(
-													(last === 101 && len === 4) ||
-													(len === 11 || len === 7 || len === 8) && prop.charCodeAt(4) === 45
-												)
-											) &&
-
-											// durations, 0.4ms, .4s, 400ms ...
-											isNaN(parseFloat(prop)) &&
-
-											// handle spaces in cubic-bezier()/steps() functions
-											prop.indexOf('(') === -1
-										) {
-											props[k] = animns + prop;
-										}
-									}
-
-									build += (j === 0 ? '' : ',') + props.join(' ').trim();
-								}
-							}
-							// explicit syntax, anims array should have only one element
-							else {
-								build += (
-									(buff.charCodeAt(10) !== 110 ? '' : animns) +
-									buff.substring(colon).trim().trim()
-								);
-							}
-
-							// vendor prefix
-							buff = webkit + build + ';' + build + (code === 125 ? ';}' : ';');
-						}
-						// appearance: a, p, p
-						else if (first === 97 && second === 112 && third === 112) {
-							// vendor prefix -webkit- and -moz-
-							buff = (
-								webkit + buff +
-								moz + buff +
-								buff
-							);
-						}
-						// display: d, i, s
-						else if (first === 100 && second === 105 && third === 115) {
-							// flex/inline-flex
-							if ((indexOf = buff.indexOf('flex')) !== -1) {
-								// e, inline-flex
-								temp = buff.charCodeAt(indexOf-2) === 101 ? 'inline-' : '';
-								buff = buff.indexOf(' !important') !== -1 ? ' !important' : '';
-
-								// vendor prefix
-								buff = (
-									'display: ' + webkit + temp + 'box' + buff + ';' +
-									'display: ' + webkit + temp + 'flex' + buff + ';' +
-									'display: ' + ms + 'flexbox' + buff + ';' +
-									'display: ' + temp + 'flex' + buff + ';'
-								);
-							}
-						}
-						// transforms & transitions: t, r, a
-						// text-size-adjust: t, e, x
-						else if (
-							first === 116 &&
-							(
-								(second === 114 && third === 97) ||
-								(second === 101 && third === 120)
-							)
-						) {
-							// vendor prefix -webkit- and -ms- if transform
-							buff = (
-								webkit + buff +
-								(buff.charCodeAt(5) === 102 ? ms + buff : '') +
-								buff
-							);
-
-							if (second + third === 211 && buff.charCodeAt(12) === 115 && buff.indexOf(' transform') > -1) {
-								buff = buff.substring(0, buff.indexOf(';')+1).replace(transformPattern, ' '+webkit+'$1') + buff;
-							}
-						}
-						// hyphens: h, y, p
-						// user-select: u, s, e
-						else if (
-							(first === 104 && second === 121 && third === 112) ||
-							(first === 117 && second === 115 && third === 101)
-						) {
-							// vendor prefix all
-							buff = (
-								webkit + buff +
-								moz + buff +
-								ms + buff +
-								buff
-							);
-						}
-						// flex: f, l, e
-						else if (first === 102 && second === 108 && third === 101) {
-							// vendor prefix all but moz
-							buff = (
-								webkit + buff +
-								ms + buff +
-								buff
-							);
-						}
-						// order: o, r, d
-						else if (first === 111 && second === 114 && third === 100) {
-							// vendor prefix all but moz
-							buff = (
-								webkit + buff +
-								ms + 'flex-' + buff +
-								buff
-							);
-						}
-						// align-items, align-center, align-self: a, l, i, -
-						else if (first === 97 && second === 108 && third === 105 && buff.charCodeAt(5) === 45) {
-							switch (buff.charCodeAt(6)) {
-								// align-items, i
-								case 105: {
-									temp = buff.replace('-items', '');
-									buff = (
-										webkit + buff +
-										webkit + 'box-' + temp +
-										ms + 'flex-'+ temp +
-										buff
-									);
-									break;
-								}
-								// align-self, s
-								case 115: {
-									buff = (
-										ms + 'flex-item-' + buff.replace('-self', '') +
-										buff
-									);
-									break;
-								}
-								// align-content
 								default: {
-									buff = (
-										ms + 'flex-line-pack' + buff.replace('align-content', '') +
-										buff
-									);
-									break;
+									chars += body.charAt(caret)
 								}
 							}
+							code = SEMICOLON
 						}
-						// justify-content, j, u, s
-						else if (first === 106 && second === 117 && third === 115) {
-							colon = buff.indexOf(':');
-							temp = buff.substring(colon).replace('flex-', '')
-
-							buff = (
-								webkit + 'box-pack' + temp +
-								webkit + buff +
-								ms + 'flex-pack' + temp +
-								buff
-							);
-						}
-						// cursor, c, u, r
-						else if (first === 99 && second === 117 && third === 114 && /zoo|gra/.exec(buff) !== null) {
-							buff = (
-								buff.replace(colonPattern, ': ' + webkit) +
-								buff.replace(colonPattern, ': ' + moz) +
-								buff
-							);
-						}
-						// width: min-content / width: max-content
-						else if (first === 119 && second === 105 && third === 100 && (indexOf = buff.indexOf('-content')) !== -1) {
-							temp = buff.substring(indexOf - 3);
-
-							// vendor prefix
-							buff = (
-								'width: ' + webkit + temp +
-								'width: ' + moz + temp +
-								'width: ' + temp
-							);
-						}
-
-						if (code !== 59) {
-							buff = buff.substring(0, buff.length - 1);
-
-							// }
-							if (code === 125) {
-								buff += '}';
-							}
-						}
-					}
-
-					// } character
-					if (code === 125) {
-						if (depth !== 0) {
-							depth--;
-						}
-
-						// concat nested css
-						if (depth === 0 && nested === 1) {
-							styles = styles.substring(0, caret + 1) + nest + styles.substring(caret + 1);
-							eof += nest.length;
-							nest = '';
-							nested = 0;
-							close++;
-						}
-
-						// }, ` ` whitespace
-						if (first !== 125 && buff.charCodeAt(buff.length - 2) === 32) {
-							buff = buff.substring(0, buff.length-1).trim() + '}';
-						}
-					}
-
-					// @keyframes
-					if (special !== 0) {
-						// }, find closing tag
-						if (code === 125) {
-							close++;
-						}
-						// {
-						else if (code === 123 && close !== 0) {
-							close--;
-						}
-
-						// closing tag
-						if (close === 0) {
-							// @keyframes
-							if (type === 1) {
-								// vendor prefix
-								buff = '}@'+blob+'}';
-
-								// reset
-								blob = '';
-							}
-
-							// reset signatures
-							type = 0;
-							close--;
-							special--;
-						}
-						// @keyframes
-						else if (type === 1) {
-							blob += buff;
-						}
-					}
-					// flat context
-					else if (depth === 0 && code !== 125) {
-						levels = 1;
-						flat = flat === undefined ? buff : flat + buff;
-						buff = '';
 					}
 				}
 
-				// append line to blck buffer
-				blck += buff;
+				// token varient
+				switch (code) {
+					case OPENBRACES: {
+						chars = chars.trim()
+						counter = 1
+						caret++
 
-				// add blck buffer to output
-				if (code === 125 && type === 0) {
-					char = blck.charCodeAt(blck.length - 2);
+						while (caret < eof) {
+							code = body.charCodeAt(caret)
 
-					// {, @
-					if (char !== 123) {
-						// middleware, block context
-						if (uses === true) {
-							temp = middleware(3, blck, line, column, prefix, output.length);
-
-							if (temp != null) {
-								blck = temp;
+							switch (code) {
+								case OPENBRACES: {
+									counter++
+									break
+								}
+								case CLOSEBRACES: {
+									counter--
+									break
+								}
 							}
+
+							if (counter === 0) {
+								break
+							}
+
+							block += body.charAt(caret++)
 						}
 
-						if (isplace === 1) {
-							isplace = 0;
+						switch (chars.charCodeAt(0)) {
+							// @at-rule
+							case AT: {
+								second = chars.charCodeAt(1)
+								block = compile(current, second > 108 ? current : array, block)
 
-							blck = (
-								blck.replace(placeholderPattern, '::'+webkit+'input-place') +
-								blck.replace(placeholderPattern, '::'+moz+'place') +
-								blck.replace(placeholderPattern, ':'+ms+'input-place') +
-								blck
-							);
-						}
+								// execute plugins, @at-rule context
+								if (plugged > 0) {
+									ref = selector(array, chars)
+									res = proxy(ATRUL, block, ref, current, line, column, out.length)
+									chars = ref.join('')
 
-						// append blck buffer
-						output += blck;
-					}
-
-					// reset blck buffer
-					blck = '';
-				}
-
-				if (medias === 1) {
-					// middleware, block context
-					if (uses === true) {
-						temp = middleware(3, blck, line, column, prefix, output.length);
-
-						if (temp != null) {
-							media = temp;
-						}
-					}
-
-					output += media;
-					medias = 0;
-					media = '';
-				}
-
-				join = 0
-
-				// reset line buffer
-				buff = '';
-			}
-			// build line by line
-			else {
-				// \r, \n, new lines
-				if (code === 13 || code === 10) {
-					if (comline === 1) {
-						comment = comline = 0;
-						buff = buff.substring(0, buff.indexOf('//')).trim();
-					}
-					// /
-					else if (uses === true && comment === 0 && (length = (str = str.trim()).length) !== 0 && str.charCodeAt(0) !== 47) {
-						if (buff.length !== 0) {
-							temp = middleware(7, str, line, column, prefix, output.length);
-
-							if (temp != null) {
-								buff = buff.replace(new RegExp(str+'$'), temp).trim();
-							}
-						}
-
-						str = '';
-					}
-
-					column = 0;
-					line++;
-				}
-				else {
-					// not `\t` tab character
-					if (code !== 9) {
-						character = styles.charAt(caret);
-
-						// build line buffer
-						if (uses === true && comment === 0) {
-							str += character;
-						}
-
-						// build character buffer
-						buff += character;
-
-						switch (code) {
-							// ,
-							case 44: {
-								if (strings === 0 && comment === 0 && func === 0) {
-									join = 1;
-									buff += '\n';
-								}
-								break;
-							}
-							// " character
-							case 34: {
-								if (comment === 0) {
-									// exit string " context / enter string context
-									strings = strings === 34 ? 0 : (strings === 39 ? 39 : 34);
-								}
-								break;
-							}
-							// ' character
-							case 39: {
-								if (comment === 0) {
-									// exit string ' context / enter string context
-									strings = strings === 39 ? 0 : (strings === 34 ? 34 : 39);
-								}
-								break;
-							}
-							// ( character
-							case 40: {
-								if (strings === 0 && comment === 0) {
-									func = 1;
-								}
-								break;
-							}
-							// ) character
-							case 41: {
-								if (strings === 0 && comment === 0) {
-									func = 0;
-								}
-								break;
-							}
-							// / character
-							case 47: {
-								if (strings === 0 && func === 0) {
-									char = styles.charCodeAt(caret - 1);
-
-									// /, begin line comment
-									if (comblck === 0 && char === 47) {
-										comment = comline = 1;
-									}
-									// *, end block comment
-									else if (char === 42) {
-										comment = comblck = 0;
-										buff = buff.substring(0, buff.indexOf('/*')).trim();
+									if (res !== void 0) {
+										block = res
 									}
 								}
 
-								break;
-							}
-							// * character
-							case 42: {
-								if (strings === 0 && func === 0 && comline === 0 && comblck === 0) {
-									// /, begin block comment
-									if (styles.charCodeAt(caret - 1) === 47) {
-										comment = comblck = 1;
+								switch (second) {
+									case MEDIA:
+									case SUPPORTS: {
+										block = chars + '{' + block + '}'
+										break
+									}
+									case FONT: {
+										block = chars + block
+										break
+									}
+									case KEYFRAME: {
+										chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
+										block = chars + '{' + block + '}'
+										block = '@' + (vendor > 0 ? webkit + block + '@' + block : block)
+										break
 									}
 								}
+								break
+							}
+							// selector
+							default: {
+								block = compile(current, selector(current, chars), block)
+							}
+						}
 
-								break;
+						children += block
+						caret++
+
+						// reset
+						context = 0
+						pseudo = 0
+						format = 0
+						chars = ''
+
+						block = chars
+						prefix = chars
+						suffix = chars
+
+						break
+					}
+					case SEMICOLON: {
+						if (insert === 1) {
+							insert = 0
+						}
+
+						if (format === 1) {
+							chars = chars.replace(formatptn, '')
+						}
+
+						chars = chars.trim()
+
+						// execute plugins, property context
+						if (plugged > 0) {
+							if ((res = proxy(PROPS, chars, current, parent, line, column, out.length)) !== void 0) {
+								chars = res.trim()
+							}
+						}
+
+						first = chars.charCodeAt(0)
+						second = chars.charCodeAt(1)
+						third = chars.charCodeAt(2)
+
+						switch (first + second) {
+							case IMPORT:
+							case CHARSET: {
+								flat += chars + body.charAt(caret)
+								break
+							}
+							default: {
+								out += property(chars, first, second, third)
+							}
+						}
+
+						caret++
+
+						// reset
+						context = 0
+						pseudo = 0
+						format = 0
+						chars = ''
+
+						break
+					}
+				}
+			}
+
+			// parse characters
+			switch (code) {
+				case CARRIAGE:
+				case NEWLINE: {
+					// auto insert semicolon
+					if (cmt + str + fnq + brq + semicolon === 0) {
+						// valid characters that
+						// may precede a newline
+						switch (tail) {
+							case COMMA:
+							case NULL:
+							case TAB:
+							case CARRIAGE:
+							case NEWLINE:
+							case SPACE:
+							case SEMICOLON:
+							case OPENBRACES:
+							case CLOSEBRACES: {
+								break
+							}
+							default: {
+								// colon : present? register for auto semicolon insertion
+								if (pseudo > 2) {
+									insert = 1
+								}
 							}
 						}
 					}
 
-					// move column position
-					column++;
+					// terminate line comment
+					if (cmt === LINECOMMENT) {
+						cmt = 0
+					}
+
+					// execute plugins, newline context
+					if (plugged * unkwn > 0) {
+						proxy(UNKWN, chars, current, parent, line, column, out.length)
+					}
+
+					// next line, reset column position
+					column = 0
+					line++
+
+					break
+				}
+				default: {
+					// increment column position
+					column++
+
+					// ignore tabs
+					if (code === TAB) {
+						break
+					}
+
+					// current character
+					char = body.charAt(caret)
+
+					// remove comments, escade functions, strings, attributes and prepare selectors
+					switch (code) {
+						// :global
+						// :placeholder
+						case PLACEHOLDER:
+						case ESCAPE: {
+							if (str + cmt + brq === 0 && pseudo > 0 && caret - pseudo === 1) {
+								pattern = code
+							}
+							break
+						}
+						// :pattern
+						case COLON: {
+							if (str + cmt + brq === 0) {
+								pseudo = caret
+							}
+							break
+						}
+						// selectors
+						case COMMA: {
+							if (cmt + fnq + str + brq === 0) {
+								format = 1
+								char += '\r'
+							}
+							break
+						}
+						// qoutes
+						case DOUBLEQUOTE: {
+							if (cmt === 0) {
+								str = str === DOUBLEQUOTE ? 0 : (str === 0 ? DOUBLEQUOTE : str)
+							}
+							break
+						}
+						case SINGLEQUOTE: {
+							if (cmt === 0) {
+								str = str === SINGLEQUOTE ? 0 : (str === 0 ? SINGLEQUOTE : str)
+							}
+							break
+						}
+						// attributes
+						case OPENBRACKET: {
+							if (str + cmt + fnq === 0) {
+								brq = 1
+							}
+							break
+						}
+						case CLOSEBRACKET: {
+							if (str + cmt + fnq === 0) {
+								brq = 0
+							}
+							break
+						}
+						// functions
+						case CLOSEPARENTHESES: {
+							if (str + cmt + brq === 0) {
+								fnq--
+							}
+							break
+						}
+						case OPENPARENTHESES: {
+							if (str + cmt + brq === 0) {
+								if (pseudo - (caret - 7) === 0) {
+									counter = 0
+									context = 1
+								}
+								fnq++
+							}
+							break
+						}
+						// line comments
+						case FOWARDSLASH: {
+							if (cmt === BLOCKCOMMENT) {
+								break
+							}
+						}
+						// block comments
+						case STAR: {
+							// break if in line comment or escape sequence
+							if (str + brq + fnq !== 0 || cmt === LINECOMMENT) {
+								break
+							}
+
+							char = ''
+
+							// peak next character
+							switch (body.charCodeAt(caret + 1)) {
+								// // pattern
+								case FOWARDSLASH: {
+									cmt = code === FOWARDSLASH ? LINECOMMENT : 0
+									break
+								}
+								// /* pattern
+								case STAR: {
+									cmt = code === FOWARDSLASH ? BLOCKCOMMENT : cmt
+									break
+								}
+							}
+
+							break
+						}
+					}
+
+					// ignore comment blocks
+					if (cmt === 0) {
+						// aggressive isolation mode, divide each individual selector
+						// including selectors in :not function but excluding selectors in :global function
+						if (cascade + str + brq === 0) {
+							switch ((format = 1, code)) {
+								case COMMA:
+								case ID:
+								case CLASS:
+								case SIBLING:
+								case CHILD:
+								case ADJACENT:
+								case CLOSEPARENTHESES:
+								case OPENPARENTHESES: {
+									if (context === 0) {
+										switch (tail) {
+											case TAB:
+											case SPACE:
+											case NEWLINE:
+											case CARRIAGE: {
+												char = char + '\0'
+												break
+											}
+											default: {
+												char = '\0' + char + '\0'
+											}
+										}
+									} else {
+										switch (code) {
+											case OPENPARENTHESES: {
+												context = ++counter
+												break
+											}
+											case CLOSEPARENTHESES: {
+												if ((context = --counter) === 0) {
+													char += '\0'
+												}
+												break
+											}
+										}
+									}
+									break
+								}
+								case SPACE: {
+									switch (tail) {
+										case TAB:
+										case SPACE:
+										case NEWLINE:
+										case CARRIAGE: {
+											break
+										}
+										default: {
+											if (context === 0) {
+												char += '\0'
+											}
+										}
+									}
+								}
+							}
+						}
+
+						// concat buffer of characters
+						chars += char
+					}
 				}
 			}
 
-			// move caret position
-			caret++;
+			// tail character
+			tail = code
+
+			// visit every character
+			caret++
 		}
 
-		// trailing flat css
-		if (flat !== undefined && flat.length !== 0) {
-			flat = prefix + ' {' + flat + '}';
+		length = out.length
 
-			// middleware, flat context
-			if (uses === true) {
-				temp = middleware(4, flat, line, column, prefix, output.length);
+		// execute plugins, block context
+		if (length > 0 && plugged > 0) {
+			res = proxy(BLCKS, out, current, parent, line, column, length)
 
-				if (temp != null) {
-					flat = temp;
+			if (res !== void 0) {
+				length = (out = res).length
+			}
+		}
+
+		if (length > 0) {
+			if (cascade === 0) {
+				isolate(current)
+			}
+
+			out = current.join(',').trim() + '{' + out + '}'
+
+			switch (pattern) {
+				case 0: {
+					break
+				}
+				case PLACEHOLDER: {
+					// :placeholder
+					out = (out.replace(placeptn, '::' + webkit + 'input-$1') +
+						out.replace(placeptn, '::' + moz + '$1') +
+						out.replace(placeptn, ':' + ms + 'input-$1') + out)
+				}
+				default: {
+					pattern = 0
 				}
 			}
-
-			// append flat css
-			output += flat;
 		}
 
-		// middleware, output context
-		if (uses === true) {
-			temp = middleware(6, output, line, column, prefix, output.length);
-
-			if (temp != null) {
-				output = temp;
-			}
-		}
-
-		return output;
+		return children.length > 0 ? flat + out + children : flat + out
 	}
 
+	/**
+	 * Selector
+	 *
+	 * @param {Array<string>} parent
+	 * @param {string} current
+	 * @return {Array<string>}
+	 */
+	function selector (parent, current) {
+		var selectors = current.trim().split(selectorptn)
+		var out = selectors
+
+		var length = out.length
+		var l = parent.length
+
+		switch (l) {
+			case 0: {
+				for (var i = 0; i < length; i++) {
+					out[i] = scope(out[i], '').trim()
+				}
+				break
+			}
+			// nested
+			default: {
+				for (var i = 0, j = 0, out = []; i < length; i++) {
+					for (var k = 0; k < l; k++) {
+						out[j++] = scope(selectors[i], parent[k] + ' ').trim()
+					}
+				}
+			}
+		}
+
+		return out
+	}
 
 	/**
-	 * use plugin
+	 * Scope
 	 *
-	 * @param  {string|function|function[]} key
-	 * @param  {function?} plugin
-	 * @return {Object} {plugins}
+	 * @param {string} input
+	 * @param {string} parent
+	 * @return {string}
+	 */
+	function scope (input, parent) {
+		var selector = input
+		var prefix = parent
+		var code = selector.charCodeAt(0)
+
+		switch (code) {
+			case NULL: {
+				selector = selector.substring(1)
+			}
+			case CARRIAGE:
+			case NEWLINE:
+			case SPACE: {
+				code = (selector = selector.trim()).charCodeAt(0)
+			}
+		}
+
+		switch (code) {
+			// &
+			case AND: {
+				return selector.replace(andptn, prefix.trim())
+			}
+			// :
+			case COLON: {
+				switch (selector.charCodeAt(1)) {
+					// :global
+					case ESCAPE: {
+						if (escape > 0 && cascade > 0) {
+							return selector.replace(escapeptn, '$1').replace(andptn, namescope)
+						}
+						break
+					}
+					default: {
+						// :hover
+						return prefix.trim() + selector
+					}
+				}
+			}
+			default: {
+				switch (selector.charCodeAt(selector.length-1)) {
+					// html &
+					case AND: {
+						return prefix.replace(namescope, '').trim() + ' ' + selector.replace(andptn, namescope)
+					}
+				}
+			}
+		}
+
+		return prefix + selector
+	}
+
+	/**
+	 * Property
+	 *
+	 * @param {string} input
+	 * @param {number} first
+	 * @param {number} second
+	 * @param {number} third
+	 * @return {string}
+	 */
+	function property (input, first, second, third) {
+		var out = input + ';'
+		var index = 0
+		var hash = first*2 + second*3 + third*4
+		var cache
+
+		// animation: a, n, i characters
+		if (hash === 944) {
+			out = animation(out)
+		} else if (vendor > 0) {
+			// vendor prefix
+			switch (hash) {
+				// appearance: a, p, p
+				case 978: {
+					out = webkit + out + moz + out + out
+					break
+				}
+				// hyphens: h, y, p
+				// user-select: u, s, e
+				case 1019:
+				case 983: {
+					out = webkit + out + moz + out + ms + out + out
+					break
+				}
+				// flex: f, l, e
+				case 932: {
+					out = webkit + out + ms + out + out
+					break
+				}
+				case 964: {
+					// order: o, r, d
+					out = webkit + out + ms + flex + '-' + out + out
+					break
+				}
+				// justify-content, j, u, s
+				case 1023: {
+					cache = out.substring(out.indexOf(':', 15)).replace('flex-', '')
+					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
+					break
+				}
+				// display(flex/inline-flex): d, i, s
+				case 975: {
+					if ((index = out.indexOf('flex', 8)) > 0) {
+						// e, inline-flex
+						cache = out.charCodeAt(index - 2) === 101 ? 'inline-' : ''
+						out = out.indexOf('!important', 8) > 0 ? '!important' : ''
+
+						out = (
+							'display:' + webkit + cache + 'box' + out + ';' +
+							'display:' + webkit + cache + 'flex' + out + ';' +
+							'display:' + ms + 'flexbox' + out + ';' +
+							'display:' + cache + 'flex' + out + ';'
+						)
+					}
+					break
+				}
+				// align-items, align-center, align-self: a, l, i, -
+				case 938: {
+					if (out.charCodeAt(5) === DASH) {
+						switch (out.charCodeAt(6)) {
+							// align-items, i
+							case 105:
+								cache = out.replace('-items', '')
+								out = webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
+								break
+							// align-self, s
+							case 115:
+								out = ms + 'flex-item-' + out.replace('-self', '') + out;
+								break
+							// align-content
+							default:
+								out = ms + 'flex-line-pack' + out.replace('align-content', '') + out;
+								break
+						}
+					}
+					break
+				}
+				// cursor, c, u, r
+				case 1005: {
+					if (cursorptn.test(out)) {
+						out = out.replace(colonptn, ': ' + webkit) + out.replace(colonptn, ': ' + moz) + out
+					}
+					break
+				}
+				// width: min-content / width: max-content
+				case 953: {
+					if ((index = out.indexOf('-content', 9)) > 0) {
+						// width: min-content / width: max-content
+						cache = out.substring(index - 3)
+						out = 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
+					}
+					break
+				}
+				// transform, transition: t, r, a
+				// text-size-adjust: t, e, x
+				case 962:
+				case 1015: {
+					out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out
+
+					// transitions
+					if (second + third === 211 && out.charCodeAt(13) === 105 && out.indexOf('transform', 10) > 0) {
+						out = out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, webkit + '$1') + out
+					}
+
+					break
+				}
+			}
+		}
+
+		return out
+	}
+
+	/**
+	 * Animation
+	 *
+	 * @param {string} input
+	 * @return {string}
+	 */
+	function animation (input) {
+		var length = input.length
+		var index = input.indexOf(':', 9) + 1
+		var declare = input.substring(0, index).trim()
+		var body = input.substring(index, length - 1).trim()
+		var out = ''
+
+		// shorthand
+		if (input.charCodeAt(9) !== DASH) {
+			var list = body.split(animationptn)
+
+			for (i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
+				var value = list[i]
+				var items = value.split(propertiesbtn)
+
+				while (value = items[index]) {
+					var peak = value.charCodeAt(0)
+
+					if (keyed === 1 && (
+						// letters
+						(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
+						// dash but not in sequence ex. --
+						(peak === DASH && value.charCodeAt(1) !== DASH)
+					)) {
+						// not a number/function
+						switch (isNaN(parseFloat(value)) + (value.indexOf('(') !== -1)) {
+							case 1: {
+								switch (value) {
+									case 'infinite': case 'alternate': case 'backwards': case 'running':
+									case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
+									case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
+									case 'paused': case 'reversed': case 'alternate-reverse': case 'inherit':
+									case 'initial': case 'unset': case 'step-start': case 'step-end': {
+										break
+									}
+									default: {
+										value += key
+									}
+								}
+							}
+						}
+					}
+
+					items[index++] = value
+				}
+
+				out += (i === 0 ? '' : ',') + items.join(' ')
+			}
+		} else {
+			out += input.charCodeAt(10) === 110 ? body + (keyed === 1 ? key : '') : body
+		}
+
+		out = declare + out + ';'
+
+		return vendor > 0 ? webkit + out + out : out
+	}
+
+	/**
+	 * Isolate
+	 *
+	 * @param {Array<string>} selectors
+	 */
+	function isolate (selectors) {
+		for (var i = 0, length = selectors.length, prefix, element; i < length; i++) {
+			var elements = selectors[i].split(elementptn)
+			var out = ''
+
+			for (var j = size = ctx = tail = code = 0, l = elements.length; j < l; j++) {
+				if ((size = (element = elements[j]).length) === 0 && l > 1) {
+					continue
+				}
+
+				prefix = ' '
+				tail = out.charCodeAt(out.length-1)
+				code = element.charCodeAt(0)
+
+				if (j === 0) {
+					prefix = ''
+				} else {
+					switch (tail) {
+						case ID:
+						case CLASS:
+						case SIBLING:
+						case CHILD:
+						case ADJACENT:
+						case SPACE:
+						case OPENPARENTHESES:  {
+							prefix = ''
+						}
+					}
+				}
+
+				switch (code) {
+					case ID:
+					case CLASS:
+					case SIBLING:
+					case CHILD:
+					case ADJACENT:
+					case SPACE:
+					case CLOSEPARENTHESES:
+					case OPENPARENTHESES: {
+						break
+					}
+					case OPENBRACKET: {
+						element = (ctx = 1, prefix + element + namescopealt)
+						break
+					}
+					case COLON: {
+						switch (element.charCodeAt(1)) {
+							case ESCAPE: {
+								element = prefix + element.substring(8, size - 1)
+								break
+							}
+							// :global(...):not
+							case 110: {
+								break
+							}
+							default: {
+								element = (ctx === 2 ? '' : prefix + namescopealt) + element
+							}
+						}
+						break
+					}
+					default: {
+						if (size > 1 && element.indexOf(':') > 0) {
+							element = prefix + element.replace(pseudoptn, namescopealt + '$1')
+						} else {
+							element = (ctx = 1, prefix + element + namescopealt)
+						}
+					}
+				}
+
+				ctx = ctx === 1 ? 2 : (ctx === 2 ? 0 : ctx)
+				out += element
+			}
+
+			selectors[i] = out.replace(formatptn, '').trim();
+		}
+	}
+
+	/**
+	 * Stylis
+	 *
+	 * @param {string} namespace
+	 * @param {string} input
+	 * @return {string}
+	 */
+	function stylis (namespace, input) {
+		// setup
+		var code = namespace.charCodeAt(0)
+
+		if (code < 33) {
+			code = (namespace = namespace.trim()).charCodeAt(0)
+		}
+
+		if (keyed > 0) {
+			key = namespace
+
+			switch (code) {
+				// id/class
+				case ID:
+				case CLASS: {
+					key = key.substring(1)
+					break
+				}
+				// attribute
+				case ATTRIBUTE: {
+					key = key.replace(attributeptn, '$1')
+				}
+			}
+
+			key = '-' + key.replace(keyptn, '-')
+		}
+
+		switch (cascade) {
+			case 0: {
+				namescopealt = namespace
+				break
+			}
+			case 1: {
+				namescope = namespace
+				break
+			}
+		}
+
+		var selectors = [namescope]
+
+		// execute plugins, pre-process context
+		if (plugged > 0) {
+			proxy(PREPS, input, selectors, selectors, line, column, 0)
+		}
+
+		// build
+		var output = compile(array, selectors, input)
+
+		// execute plugins, post-process context
+		if (plugged > 0) {
+			proxy(POSTS, output, selectors, selectors, line, column, output.length)
+		}
+
+		// destroy
+		key = ''
+		namescope = ''
+		namescopealt = ''
+		line = 0
+		column = 0
+		pattern = 0
+
+		return compress === 0 ? output : minify(output)
+	}
+
+	/**
+	 * Proxy
+	 *
+	 * @param {number} context
+	 * @param {string} content
+	 * @param {Array<string>} selectors
+	 * @param {Array<string>} parents
+	 * @param {number} line
+	 * @param {number} column
+	 * @param {number} length
+	 * @return {(string|void)}
+	 */
+	function proxy (context, content, selectors, parents, line, column, length) {
+		for (var i = 0, out = content; i < plugged; i++) {
+			out = plugins[i](context, out, selectors, parents, line, column, length)
+		}
+
+		switch (out) {
+			case null:
+			case void 0:
+			case content: {
+				break
+			}
+			default: {
+				return out + ''
+			}
+		}
+	}
+
+	/**
+	 * Use
+	 *
+	 * @param {(Array<function(...?)>|function(...?)|number|void)?} plugin
 	 */
 	function use (plugin) {
-		var length = plugins.length;
-
-		if (plugin != null) {
-			// array of plugins
-			if (plugin.constructor === Array) {
-				for (var i = 0, l = plugin.length; i < l; i++) {
-					plugins[length++] = plugin[i];
+		switch (plugin) {
+			case void 0:
+			case null: {
+				plugged = plugins.length = 0;
+				break
+			}
+			default: {
+				switch (plugin.constructor) {
+					case Array: {
+						for (var i = 0, length = plugin.length; i < length; i++) {
+							use(plugin[i])
+						}
+						break
+					}
+					case Function: {
+						plugins[plugged++] = plugin
+						break
+					}
+					case Boolean: {
+						unkwn = !!plugin|0
+					}
 				}
 			}
-			// single un-keyed plugin
-			else {
-				plugins[length] = plugin;
+ 		}
+
+ 		return use
+	}
+
+	/**
+	 * Set
+	 *
+	 * @param {Object} options
+	 */
+	function set (options) {
+		for (var name in options) {
+			var value = options[name]
+			switch (name) {
+				case 'keyframe': keyed = value|0; break
+				case 'global': escade = value|0; break
+				case 'cascade': cascade = value|0; break
+				case 'compress': compress = value|0; break
+				case 'prefix': vendor = value|0; break
+				case 'semicolon': semicolon = value|0; break
 			}
 		}
 
-		return stylis;
-	};
-
-	/**
-	 * Middleware Proxy
-	 *
-	 * @param  {Number} ctx
-	 * @param  {String} str
-	 * @param  {Number} line
-	 * @param  {Number} col
-	 * @param  {String} prefix
-	 * @param  {Number} length
-	 * @return {String?}
-	 */
-	function proxy (ctx, str, line, col, prefix, length) {
-		var output = str;
-
-		for (var i = 0, l = plugins.length; i < l; i++) {
-			output = plugins[i](ctx, output, line, col, prefix, length) || output;
-		}
-
-		if (output !== str) {
-			return output;
-		}
+		return set
 	}
 
-	stylis.use = use;
-
-
 	/**
-	 * plugin store
+	 * Minify
 	 *
-	 * @type {Function[]}
+	 * @param {string} output
+	 * @return {string}
 	 */
-	stylis.p = plugins;
+	function minify (output) {
+		return output
+			.replace(minifybeforeptn, '')
+			.replace(minifyafterptn, '$1')
+			.replace(minifytailptn, '$1')
+	}
 
+	stylis['use'] = use
+	stylis['set'] = set
 
-	/**
-	 * regular expresions
-	 *
-	 * @type {Object<string, RegExp>}
-	 */
-	stylis.r = {
-		a: andPattern,
-		s: splitPattern,
-		g: globalPattern,
-		n: globalsPattern
-	};
-
-
-	return stylis;
-}));
+	return stylis
+}))

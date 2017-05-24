@@ -200,12 +200,13 @@
 				margin: 60px 0;
 			}
 		`;
-		var middleware = (ctx, str, line, col) => str;
+		var middleware = (ctx, sel, str, line, col) => str;
 		var start = performance.now();
 
-		var output = stylis(ns, css, true, true, middleware);
+		var output = stylis(ns, css);
 
-		console.log((performance.now()-start) + 'ms - 230 LOC \n\nusing ever feature including nesting and middleware');
+		console.log((performance.now()-start) + 'ms - 230LOC, produced ' + output.length + ' characters'+
+			'\n\nusing every feature including nesting and middleware');
 	</script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<meta name="description" content="stylis is a feature-rich css preprocessor">
+		<meta name="description" content="light – weight css preprocessor">
 
 		<title>stylis</title>
 
@@ -27,18 +27,26 @@
 		</div>
 		<div class="container">
 			<div class="welcome">
-				<p>stylis is a feature-rich css preprocessor</p>
+				<p>light – weight css preprocessor</p>
 				<div class="code">
 					<div spellcheck=false>
 <pre contenteditable id=editor>
-/* @namespace .user */
+/* @scope .component-x */
 
-:global(h1) {
+:global(h1), html &amp; {
 	font-size: 22px;
 }
 
 div {
 	display: flex;
+
+	h1 &amp; {
+		color: red;
+	}
+}
+
+div {
+	transform: translateZ(0);
 
 	h1 {
 		color: red;
@@ -50,14 +58,14 @@ h1 {
    font-size: 22px;
 }
 
-#namespace div {
+.scope div {
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
 }
 
-#namespace div h1 {
+.scope div h1 {
 	color: red;
 }
 </pre>
@@ -66,7 +74,7 @@ h1 {
 			</div>
 		</div>
 
-		<script src="https://unpkg.com/stylis@2.0.12/stylis.min.js"></script>
+		<script src="https://unpkg.com/stylis@3.0.0/stylis.min.js"></script>
 		<script src="assets/editor.js"></script>
 	</body>
 </html>

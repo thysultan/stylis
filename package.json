@@ -1,8 +1,9 @@
 {
 	"name": "stylis",
 	"main": "stylis.js",
-	"description": "stylis is a feature-rich css preprocessor",
-	"version": "2.0.12",
+	"types": "dio.d.ts",
+	"description": "light – weight css preprocessor",
+	"version": "3.0.0",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {
@@ -10,12 +11,8 @@
 		"email": "sultantarimo@me.com"
 	},
 	"keywords": [
-		"preprocessor",
-		"parser",
-		"prefixer",
 		"css",
-		"node",
-		"browser"
+		"preprocessor"
 	],
 	"repository": {
 		"type": "git",

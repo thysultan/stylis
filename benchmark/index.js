@@ -30,7 +30,7 @@ function benchPostCSS () {
 }
 
 function benchStylis () {
-	return stylis('', test, true, false);
+	return stylis('', test);
 }
 
 function benchCSSTree () {

@@ -1,3 +1,38 @@
+## 3.0.0 May 24, 2016
+
+- slightly smaller file size (3.3kb –> ~2.9kb)
+- support no semi colons (on by default)
+- improved plugin support
+- smaller output
+- improves on settings options
+- added cascade isolation mode (off by default)
+- added aggressive compression mode (off by default)
+- added an option to disable vendor prefixing
+
+#### API
+
+##### Plugins
+
+Registering plugins has changed slightly and is solely through.
+
+```js
+stylis.use(Function|Array<Function>|null)
+```
+
+##### Options
+
+Setting options has moved from arguments passed to `stylis(selector, css, opts...)` to
+a dedicated setter.
+
+```js
+stylis.set({
+	global: false,
+	keyframe: false
+	...
+})
+```
+
+
 ## 2.0.12 May 18, 2016
 
 - support older webkit vendor prefix `transform` when used in `transition`
@@ -300,3 +335,4 @@
 ## 0.6.2 (December 04, 2016)
 
 - patch flat css `stylis('#id', 'color:red;')` to act as a block `stylis('#id', '&{color:red;}')`
+

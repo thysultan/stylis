@@ -43,15 +43,15 @@
          return;
 		}
 
-		var namespace = '#namespace';
+		var namespace = '.scope';
 		var raw = editor.textContent;
-		var pragma = /\/\* @namespace (.*?) \*\//g.exec(raw);
+		var pragma = /\/\* @scope (.*?) \*\//g.exec(raw);
 
 		if (pragma != null) {
 			namespace = pragma[1].trim();
 		}
 
-		var processed = stylis(namespace, raw, true, true, null);
+		var processed = stylis(namespace, raw);
 
 		// apply formatting
 		processed = processed.replace(/(;|\})/g, format.newlines);

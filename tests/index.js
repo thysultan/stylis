@@ -52,27 +52,55 @@ function run (tests, fn) {
 	for (var name in tests) {
 		var test = tests[name];
 
-		var name = test.name.trim();
 		var sample = test.sample.trim();
 		var expected = test.expected.trim();
 		var options = test.options || {};
 
-		fn.p.length = 0;
+		fn.use(null);
+
+		if (options.plugins) {
+			fn.use(options.plugins);
+		}
+
+		if (options.keyframe !== void 0) {
+			fn.set({keyframe: options.keyframe})
+		}
+
+		if (options.cascade !== void 0) {
+			fn.set({cascade: options.cascade})
+		}
+
+		if (options.semicolon !== void 0) {
+			fn.set({semicolon: options.semicolon})
+		}
 
 		var result = fn(
 			test.selector || '.user',
-			sample,
-			options.animations,
-			options.compact === void 0 ? true : options.compact,
-			options.middleware
+			sample
 		);
 
-		if (result !== expected || /\n/g.test(result)) {
+		if (options.cascade !== void 0) {
+			fn.set({cascade: !options.cascade})
+		}
+
+		if (options.keyframe !== void 0) {
+			fn.set({keyframe: !options.keyframe})
+		}
+
+		if (options.semicolon !== void 0) {
+			fn.set({semicolon: !options.semicolon})
+		}
+
+		if (result !== expected || /[\0\r\n]/g.test(result)) {
 			// log why it failed
-			console.log(result.length, 'failed: '+ name, '\n\n' + result)
-			console.log(expected.length, 'expected: ', '\n\n' + expected, '\n\n---------------\n\n')
+			console.log(result.length, 'failed: ', name, '\n\n', result)
+			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
 
 			failed.push(name);
+
+			if (browser) {
+				break;
+			}
 		} else {
 			passed.push(name);
 		}
