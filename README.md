@@ -31,7 +31,7 @@ light – weight css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@3.0.0/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@3.0.1/stylis.min.js></script>
 ```
 
 #### npm
@@ -147,12 +147,25 @@ stylis(selector: {String}, css: {String})
 ```javascript
 // all options except compress and cascade are enabled by default
 stylis.set(options: {
-	global: {Boolean} // (dis/en)able :global selectors
-	cascade: {Boolean} // (dis/en)able aggressive cascade isolation
-	keyframe: {Boolean} // (dis/en)able namespace keyframes + animations
-	prefix: {Boolean} // (dis/en)able vendor prefixing
-	compress: {Boolean} // (dis/en)able aggressive minification
-	semicolon: {Boolean} // (dis/en)able (no)semicolon support
+	// (dis/en)able :global selectors
+	global: {Boolean} 
+
+	// (dis/en)able aggressive cascade isolation
+	// true for normal cascade(default) false for no cascading
+	cascade: {Boolean} 
+
+	// (dis/en)able namespace keyframes + animations
+	keyframe: {Boolean} 
+
+	// (dis/en)able vendor prefixing
+	prefix: {Boolean} 
+
+	// (dis/en)able aggressive minification
+	compress: {Boolean} 
+
+	// (dis/en)able (no)semicolon support
+	// false to enable no-semicolons (default)
+	semicolon: {Boolean} 
 })
 ```
 

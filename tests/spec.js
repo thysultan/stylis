@@ -3,6 +3,25 @@
  * @type {Object}
  */
 var spec = {
+	'whitespace cacade true': {
+		sample: `
+			html {
+				width: 0;  	     
+			}
+		`,
+		expected: `.user html{width: 0;}`
+	},
+	'whitespace cascade false': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			html{
+				width: 0;  	  
+			}   
+		`,
+		expected: `html.user{width: 0;}`
+	},
 	'flat': {
 		sample: `
 			color: 20px;
@@ -368,6 +387,12 @@ var spec = {
 			& {
 				transition: transform 1s, all 400ms;
 			}
+
+			div {
+				align-items: value;
+				align-self: value;
+				align-content: value;
+			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust: none;text-size-adjust: none;}`+
@@ -394,6 +419,12 @@ var spec = {
 			`-webkit-transition:-webkit-transform 1s, all 400ms;`+
 			`-webkit-transition: transform 1s, all 400ms;`+
 			`transition: transform 1s, all 400ms;`+
+			`}`+
+
+			`.user div{`+
+			`-webkit-align-items: value;-webkit-box-align: value;-ms-flex-align: value;align-items: value;`+
+			`-webkit-align-self: value;-ms-flex-item-align: value;align-self: value;`+
+			`-webkit-align-content: value;-ms-flex-line-pack: value;align-content: value;`+
 			`}`
 	},
 	'animations': {

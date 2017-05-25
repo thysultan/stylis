@@ -80,15 +80,15 @@ function run (tests, fn) {
 		);
 
 		if (options.cascade !== void 0) {
-			fn.set({cascade: !options.cascade})
+			fn.set({cascade: true})
 		}
 
 		if (options.keyframe !== void 0) {
-			fn.set({keyframe: !options.keyframe})
+			fn.set({keyframe: true})
 		}
 
 		if (options.semicolon !== void 0) {
-			fn.set({semicolon: !options.semicolon})
+			fn.set({semicolon: false})
 		}
 
 		if (result !== expected || /[\0\r\n]/g.test(result)) {

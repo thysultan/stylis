@@ -59,7 +59,7 @@
 	var attributeptn = /\[.+\=['"`]?(.*)['"`]?\]/g /* matches attribute values [id=match] */
 	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
-	var keyframeptn = /@(\w+)\s+(\S+)\s*/ /* matches @keyframes $1 */
+	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var placeptn = /::?(place)/g /* match ::placeholder varient */
 	var minifybeforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
 	var minifyafterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
@@ -220,6 +220,10 @@
 				// eof varient
 				switch (caret) {
 					case eol: {
+						if (format === 1) {
+							chars = chars.replace(formatptn, '')
+						}
+
 						if ((chars = chars.trim()).length > 0) {
 							switch (code) {
 								case SPACE:
@@ -233,6 +237,7 @@
 									chars += body.charAt(caret)
 								}
 							}
+
 							code = SEMICOLON
 						}
 					}
@@ -532,7 +537,7 @@
 					if (cmt === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq === 0) {
+						if (cascade + str + brq === 0) {							
 							switch ((format = 1, code)) {
 								case COMMA:
 								case ID:
@@ -600,6 +605,10 @@
 
 			// visit every character
 			caret++
+		}
+
+		if (format === 1) {
+			out = out.replace(formatptn, '')
 		}
 
 		length = out.length
@@ -742,7 +751,7 @@
 	function property (input, first, second, third) {
 		var out = input + ';'
 		var index = 0
-		var hash = first*2 + second*3 + third*4
+		var hash = (first*2) + (second*3) + (third*4)
 		var cache
 
 		// animation: a, n, i characters
@@ -800,18 +809,20 @@
 					if (out.charCodeAt(5) === DASH) {
 						switch (out.charCodeAt(6)) {
 							// align-items, i
-							case 105:
+							case 105: {
 								cache = out.replace('-items', '')
 								out = webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
 								break
+							}
 							// align-self, s
-							case 115:
-								out = ms + 'flex-item-' + out.replace('-self', '') + out;
+							case 115: {
+								out = webkit + out + ms + 'flex-item-' + out.replace('-self', '') + out;
 								break
+							}
 							// align-content
-							default:
-								out = ms + 'flex-line-pack' + out.replace('align-content', '') + out;
-								break
+							default: {
+								out = webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out;
+							}
 						}
 					}
 					break

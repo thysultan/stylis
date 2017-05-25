@@ -1,3 +1,9 @@
+## 3.0.1 May 25, 2016
+
+- patch `mangling` keyframes without a name/correct whitespace
+- patch duplicate `;` in cascade-less mode
+- patch `webkit` vendor prefix for `align-self`
+
 ## 3.0.0 May 24, 2016
 
 - slightly smaller file size (3.3kb –> ~2.9kb)
