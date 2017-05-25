@@ -56,7 +56,7 @@
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
-	var attributeptn = /\[.+\=['"`]?(.*)['"`]?\]/g /* matches attribute values [id=match] */
+	var attributeptn = /\[.+\=['"`]?(.*?)['"`]?\]/g /* matches attribute values [id=match] */
 	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
@@ -162,9 +162,10 @@
 	 * @param {Array<string>} parent
 	 * @param {Array<string>} current
 	 * @param {string} body
+	 * @param {number} from
 	 * @return {string}
 	 */
-	function compile (parent, current, body) {
+	function compile (parent, current, body, from) {
 		var brq = 0 /* brackets [] */
 		var cmt = 0 /* comments /* // */
 		var fnq = 0 /* functions () */
@@ -207,7 +208,6 @@
 					// false flags, comma character
 					switch (code) {
 						case COMMA: {
-							insert = 0
 							break
 						}
 						default: {
@@ -215,6 +215,8 @@
 							code = SEMICOLON
 						}
 					}
+
+					insert = 0
 				}
 
 				// eof varient
@@ -274,8 +276,12 @@
 						switch (chars.charCodeAt(0)) {
 							// @at-rule
 							case AT: {
+								if (format === 1) {
+									chars = chars.replace(formatptn, '')
+								}
+
 								second = chars.charCodeAt(1)
-								block = compile(current, second > 108 ? current : array, block)
+								block = compile(current, second > 108 ? current : array, block, second)
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
@@ -309,7 +315,7 @@
 							}
 							// selector
 							default: {
-								block = compile(current, selector(current, chars), block)
+								block = compile(current, selector(current, chars), block, from)
 							}
 						}
 
@@ -329,10 +335,6 @@
 						break
 					}
 					case SEMICOLON: {
-						if (insert === 1) {
-							insert = 0
-						}
-
 						if (format === 1) {
 							chars = chars.replace(formatptn, '')
 						}
@@ -536,7 +538,7 @@
 					if (cmt === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq === 0) {							
+						if (cascade + str + brq === 0 && from !== KEYFRAME) {	
 							switch ((format = 1, code)) {
 								case COMMA:
 								case ID:
@@ -623,7 +625,7 @@
 		}
 
 		if (length > 0) {
-			if (cascade === 0) {
+			if (cascade === 0 && from !== KEYFRAME) {
 				isolate(current)
 			}
 
@@ -1065,7 +1067,7 @@
 		}
 
 		// build
-		var output = compile(array, selectors, input)
+		var output = compile(array, selectors, input, 0)
 
 		// execute plugins, post-process context
 		if (plugged > 0) {

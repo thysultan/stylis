@@ -810,6 +810,11 @@ var spec = {
 					color: red
 				}
 			}
+
+			@keyframes hahaha {
+			  from { top: 0 }
+			  to { top: 100 }
+			}
 		`,
 		expected: ``+
 		`.user{color: red;}`+
@@ -817,7 +822,9 @@ var spec = {
 		`h1.user h2.user{color: red;}`+
 		`div.user h1.user,span.user h1.user{color: red;}`+
 		`span.user:hover{color: red;}`+
-		`[data-id=foo].user:hover{color: red;}`
+		`[data-id=foo].user:hover{color: red;}`+
+		`@-webkit-keyframes hahaha-user{from{top: 0;}to{top: 100;}}`+
+		`@keyframes hahaha-user{from{top: 0;}to{top: 100;}}`
 	},
 	'no semi-colons': {
 		sample: `

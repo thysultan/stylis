@@ -1,3 +1,7 @@
+## 3.0.3 May 25, 2016
+
+- patch css isolation mode `@keyframes`
+
 ## 3.0.2 May 25, 2016
 
 - improve `::placeholder` prefixing to patch mispatching cases ex. `:papaya`
