@@ -31,7 +31,7 @@ light – weight css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@3.0.1/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@3.0.2/stylis.min.js></script>
 ```
 
 #### npm
