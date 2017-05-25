@@ -25,7 +25,7 @@
 
 
 var browser = this.window;
-var stylis = browser ? this.stylis : require('../stylis.js');
+var stylis = browser ? this.stylis : require('../stylis.min.js');
 var spec = browser ? this.spec : require('./spec.js');
 
 /**

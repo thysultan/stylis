@@ -2,6 +2,7 @@
 
 - improve `::placeholder` prefixing to patch mispatching cases ex. `:papaya`
 - patch parsing cascade isolation orphaned `&` operator
+- patch issue with closure minification
 
 ## 3.0.1 May 25, 2016
 
