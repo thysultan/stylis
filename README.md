@@ -42,7 +42,7 @@ npm install stylis --save
 
 ## Features
 
-- selector namespacing/isolcation
+- selector namespacing/isolation
 - inline global injection ex. `:global(selector)`
 - nesting `a { &:hover {} }`
 - vendor prefixing (flex-box, etc...)
