@@ -393,6 +393,10 @@ var spec = {
 				align-self: value;
 				align-content: value;
 			}
+
+			div {
+				color:papayawhip;
+			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust: none;text-size-adjust: none;}`+
@@ -425,7 +429,10 @@ var spec = {
 			`-webkit-align-items: value;-webkit-box-align: value;-ms-flex-align: value;align-items: value;`+
 			`-webkit-align-self: value;-ms-flex-item-align: value;align-self: value;`+
 			`-webkit-align-content: value;-ms-flex-line-pack: value;align-content: value;`+
-			`}`
+			`}`+
+			'.user div{'+
+			'color:papayawhip;'+
+			'}'
 	},
 	'animations': {
 		sample: `
@@ -699,6 +706,10 @@ var spec = {
 			:hover p {
 			  color: red;
 			}
+
+			html.something & {
+				color: red;
+			}
 		`,
 		expected: ``+
 		`[data-id=foo].user{color: red;}`+
@@ -708,7 +719,8 @@ var spec = {
 		`p.user::before{color: red;}`+
 		`.user:hover{color: red;}`+
 		`.user::before{color: red;}`+
-		`.user:hover p.user{color: red;}`
+		`.user:hover p.user{color: red;}`+
+		'html.user.something.user.user{color: red;}'
 	},
 	'cascade isolation complex': {
 		options: {

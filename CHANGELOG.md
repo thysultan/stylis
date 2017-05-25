@@ -1,3 +1,8 @@
+## 3.0.2 May 25, 2016
+
+- improve `::placeholder` prefixing to patch mispatching cases ex. `:papaya`
+- patch parsing cascade isolation orphaned `&` operator
+
 ## 3.0.1 May 25, 2016
 
 - patch `mangling` keyframes without a name/correct whitespace

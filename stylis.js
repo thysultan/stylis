@@ -47,7 +47,7 @@
 	 * This allows the property parser to in theory be both small and fast.
 	 */
 
-	var formatptn = /[\0\r]/g /* matches new lines and null characters */
+	var formatptn = /[\0\r\n]/g /* matches new lines and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
@@ -433,12 +433,11 @@
 
 					// remove comments, escade functions, strings, attributes and prepare selectors
 					switch (code) {
-						// :global
-						// :placeholder
-						case PLACEHOLDER:
-						case ESCAPE: {
-							if (str + cmt + brq === 0 && pseudo > 0 && caret - pseudo === 1) {
-								pattern = code
+						// :p<l>aceholder
+						// :g<l>obal
+						case 108: {
+							if (str + cmt + brq + pattern === 0 && pseudo > 0 && caret - pseudo === 2) {
+								pattern = tail
 							}
 							break
 						}
@@ -600,7 +599,8 @@
 				}
 			}
 
-			// tail character
+			// tail characters
+			trail = tail
 			tail = code
 
 			// visit every character
@@ -971,6 +971,10 @@
 					case OPENPARENTHESES: {
 						break
 					}
+					case AND: {
+						element = namescopealt
+						break
+					}
 					case OPENBRACKET: {
 						element = (ctx = 1, prefix + element + namescopealt)
 						break
@@ -1171,6 +1175,7 @@
 	 */
 	function minify (output) {
 		return output
+			.replace(formatptn, '')
 			.replace(minifybeforeptn, '')
 			.replace(minifyafterptn, '$1')
 			.replace(minifytailptn, '$1')
