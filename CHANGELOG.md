@@ -1,3 +1,7 @@
+## 3.0.4 May 25, 2016
+
+- improve `@keyframes` scoping to support `number` identifiers
+
 ## 3.0.3 May 25, 2016
 
 - patch css isolation mode `@keyframes`

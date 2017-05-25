@@ -57,7 +57,7 @@
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
 	var attributeptn = /\[.+\=['"`]?(.*?)['"`]?\]/g /* matches attribute values [id=match] */
-	var keyptn = /[ .#~+>]+|^\d/g /* removes invalid characters from key */
+	var keyptn = /[ .#~+>]+/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var placeptn = /::?(place)/g /* match ::placeholder varient */
