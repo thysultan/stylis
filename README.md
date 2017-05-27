@@ -182,7 +182,7 @@ The use function is chainable ex. `stylis.use()()()`
 The optional middleware function accepts four arguments
 
 ```js
-(context, content, selectors, parent, line, column, length)
+(context, selectors, parent, content, line, column, length)
 ```
 
 Plugins are executed in stages identified by an `context` interger value.
