@@ -172,7 +172,7 @@ stylis.set(options: {
 #### Use
 
 ```javascript
-stylis.use(plugin: {Function|Array<Function>})
+stylis.use(plugin: {Function|Array<Function>|null})
 ```
 
 The use function is chainable ex. `stylis.use()()()`
@@ -208,6 +208,13 @@ Plugins are executed in stages identified by an `context` interger value.
 
 If at any context greater than 0 that the middleware returns a different string the content of css will be replaced with the return value.
 
+To remove all plugins just call `.use` with null/no arguments.
+
+```js
+// removes all previously added plugins, then adds one
+stylis.use(null)(ctx => {})
+```
+
 For example we can add a feature `random()` to our css that when used prints a random number.
 
 ```javascript
@@ -233,6 +240,7 @@ const plugin = (context, content, selectors, parent, line, column, length) => {
  * use
  *
  * @param {(Array<function>|function|null|boolean)} plugin
+ * @return {Function} use
  */
 stylis.use(plugin)
 
