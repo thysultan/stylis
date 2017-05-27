@@ -182,7 +182,7 @@ The use function is chainable ex. `stylis.use()()()`
 The optional middleware function accepts four arguments
 
 ```js
-(context, selectors, parent, content, line, column, length)
+(context, content, selectors, parent, line, column, length)
 ```
 
 Plugins are executed in stages identified by an `context` interger value.
@@ -223,7 +223,7 @@ For example we can add a feature `random()` to our css that when used prints a r
  * @param  {number} length
  * @return {(string|void)?}
  */
-const plugin = (context, selector, parent, content, line, column, length) => {
+const plugin = (context, content, selectors, parent, line, column, length) => {
 	switch (context) {
 		case 1: return content.replace(/random\(\)/g, Math.random())
 	}
