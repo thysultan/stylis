@@ -1,3 +1,10 @@
+## 3.0.5 May 28, 2016
+
+- patch isolation mode `#id` and `.class` children
+- patch one character properties with no-semicolon mode ex. `x: value`
+- patch removal of universal selector `*`
+- improve no-semicolon detection when the last character is a `)`
+
 ## 3.0.4 May 25, 2016
 
 - improve `@keyframes` scoping to support `number` identifiers

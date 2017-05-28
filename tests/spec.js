@@ -22,6 +22,14 @@ var spec = {
 		`,
 		expected: `html.user{width: 0;}`
 	},
+	'universal selector': {
+		sample: `
+		* {
+			color: red;
+		}
+		`,
+		expected: `.user *{color: red;}`
+	},
 	'flat': {
 		sample: `
 			color: 20px;
@@ -710,6 +718,18 @@ var spec = {
 			html.something & {
 				color: red;
 			}
+
+			.class #id {
+				color: red;
+			}
+
+			& {
+				color: red
+			}
+
+			.a.b .c {
+				color: red;
+			}
 		`,
 		expected: ``+
 		`[data-id=foo].user{color: red;}`+
@@ -720,7 +740,10 @@ var spec = {
 		`.user:hover{color: red;}`+
 		`.user::before{color: red;}`+
 		`.user:hover p.user{color: red;}`+
-		'html.user.something.user.user{color: red;}'
+		'html.something.user .user{color: red;}'+
+		`.class.user #id.user{color: red;}`+
+		`.user{color: red;}`+
+		`.a.b.user .c.user{color: red;}`
 	},
 	'cascade isolation complex': {
 		options: {

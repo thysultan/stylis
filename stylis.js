@@ -398,7 +398,7 @@
 							}
 							default: {
 								// colon : present? register for auto semicolon insertion
-								if (pseudo > 2) {
+								if (pseudo > 0) {
 									insert = 1
 								}
 							}
@@ -488,6 +488,12 @@
 						case CLOSEPARENTHESES: {
 							if (str + cmt + brq === 0) {
 								fnq--
+								
+								// `... ()[eof]`
+								if (caret === eol) {
+									body += ';'
+									eof++
+								}
 							}
 							break
 						}
@@ -501,36 +507,36 @@
 							}
 							break
 						}
-						// line comments
+						// block/line comments
+						case STAR:
 						case FOWARDSLASH: {
-							if (cmt === BLOCKCOMMENT) {
-								break
-							}
-						}
-						// block comments
-						case STAR: {
-							// break if in line comment or escape sequence
-							if (str + brq + fnq !== 0 || cmt === LINECOMMENT) {
+							if (str + brq + fnq > 0) {
 								break
 							}
 
-							char = ''
-
-							// peak next character
-							switch (body.charCodeAt(caret + 1)) {
-								// // pattern
-								case FOWARDSLASH: {
-									cmt = code === FOWARDSLASH ? LINECOMMENT : 0
+							switch (cmt) {
+								case 0: {
+									switch (code*2 + body.charCodeAt(caret+1)*3) {
+										// //
+										case 235: {
+											cmt = LINECOMMENT
+											break
+										}
+										// /*
+										case 220: {
+											cmt = BLOCKCOMMENT
+											break
+										}
+									}
 									break
 								}
-								// /* pattern
-								case STAR: {
-									cmt = code === FOWARDSLASH ? BLOCKCOMMENT : cmt
-									break
+								case BLOCKCOMMENT: {
+									if (code === FOWARDSLASH && tail === STAR) {
+										char = ''
+										cmt = 0
+									}
 								}
 							}
-
-							break
 						}
 					}
 
@@ -538,11 +544,9 @@
 					if (cmt === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq === 0 && from !== KEYFRAME) {	
+						if (cascade + str + brq === 0 && from !== KEYFRAME) {
 							switch ((format = 1, code)) {
 								case COMMA:
-								case ID:
-								case CLASS:
 								case SIBLING:
 								case CHILD:
 								case ADJACENT:
@@ -665,9 +669,10 @@
 		var l = parent.length
 
 		switch (l) {
-			case 0: {
-				for (var i = 0; i < length; i++) {
-					out[i] = scope(out[i], '').trim()
+			case 0:
+			case 1: {
+				for (var i = 0, ref = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
+					out[i] = scope(out[i], ref, l).trim()
 				}
 				break
 			}
@@ -675,7 +680,7 @@
 			default: {
 				for (var i = 0, j = 0, out = []; i < length; i++) {
 					for (var k = 0; k < l; k++) {
-						out[j++] = scope(selectors[i], parent[k] + ' ').trim()
+						out[j++] = scope(selectors[i], parent[k] + ' ', l).trim()
 					}
 				}
 			}
@@ -689,9 +694,10 @@
 	 *
 	 * @param {string} input
 	 * @param {string} parent
+	 * @param {number} level
 	 * @return {string}
 	 */
-	function scope (input, parent) {
+	function scope (input, parent, level) {
 		var selector = input
 		var prefix = parent
 		var code = selector.charCodeAt(0)
@@ -710,7 +716,18 @@
 		switch (code) {
 			// &
 			case AND: {
-				return selector.replace(andptn, prefix.trim())
+				switch (cascade + level) {
+					case 0:
+					case 1: {
+						if (parent.trim().length === 0) {
+							break
+						}
+					}
+					default: {
+						return selector.replace(andptn, prefix.trim())
+					}
+				}
+				break
 			}
 			// :
 			case COLON: {
@@ -950,8 +967,6 @@
 					prefix = ''
 				} else {
 					switch (tail) {
-						case ID:
-						case CLASS:
 						case SIBLING:
 						case CHILD:
 						case ADJACENT:
@@ -963,18 +978,19 @@
 				}
 
 				switch (code) {
+					case AND: {
+						element = ''
+					}
 					case ID:
-					case CLASS:
+					case CLASS: {
+						element = prefix + element + namescopealt
+					}
 					case SIBLING:
 					case CHILD:
 					case ADJACENT:
 					case SPACE:
 					case CLOSEPARENTHESES:
 					case OPENPARENTHESES: {
-						break
-					}
-					case AND: {
-						element = namescopealt
 						break
 					}
 					case OPENBRACKET: {

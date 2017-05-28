@@ -96,6 +96,8 @@ function run (tests, fn) {
 			console.log(result.length, 'failed: ', name, '\n\n', result)
 			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
 
+			console.log(expected.indexOf('\r'))
+
 			failed.push(name);
 
 			if (browser) {
