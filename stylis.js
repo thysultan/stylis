@@ -6,7 +6,7 @@
  * /____/\__/\__, /_/_/____/
  *          /____/
  *
- * light – weight css preprocessor @licence MIT
+ * light - weight css preprocessor @licence MIT
  */
 /* eslint-disable */
 (function (factory) {
