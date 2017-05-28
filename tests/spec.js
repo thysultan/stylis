@@ -43,8 +43,12 @@ var spec = {
 			{
 				color: blue;
 			}
+
+			& {
+				color: red;
+			}
 		`,
-		expected: `.user{color: blue;}`
+		expected: `.user{color: blue;}.user{color: red;}`
 	},
 	':global()': {
 		sample: `
@@ -147,6 +151,10 @@ var spec = {
 			}
 		`,
 		expected: '.user:before{color: blue;}'
+	},
+	'@import': {
+		sample: `@import url('http://example.com')`,
+		expected: `@import url('http://example.com');`
 	},
 	'@media & @supports': {
 		sample: `
