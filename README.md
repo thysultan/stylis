@@ -254,3 +254,62 @@ Internally Before stylis processes `calc(random()*10);` it passes it to the plug
 The same can be said for a selector block, in both contexts an argument `selector` is passed that contains the current array of selectors that the block of css/property stylis is working on.
 
 This array of selectors is mutable and will reflect the output of selectors if changed.
+
+## Benchmark
+
+Stylis is fast, and though it does not generate an AST you can with a plugin create an AST out of the resulting input, this and other aspects allow it to be very small(3KB).
+
+The benchmark results are using [https://github.com/postcss/benchmark](https://github.com/postcss/benchmark)
+
+> Note that the benchmark is not a one-2-one comparison because each library was developed for different goals and different set of features.
+
+Stylis appears in all the benchmarks because by default stylis both parsers, processes and auto prefixes in one pass.
+
+#### Parsers
+
+```
+Stylis       x 54.28 ops/sec ±4.45% (58 runs sampled)
+CSSTree      x 39.73 ops/sec ±9.18% (56 runs sampled)
+PostCSS      x 21.11 ops/sec ±8.46% (57 runs sampled)
+CSSOM        x 19.20 ops/sec ±6.53% (36 runs sampled)
+Mensch       x 17.85 ops/sec ±13.39% (37 runs sampled)
+Rework       x 12.80 ops/sec ±4.42% (36 runs sampled)
+PostCSS Full x 8.15 ops/sec ±7.79% (45 runs sampled)
+Gonzales     x 5.21 ops/sec ±7.75% (18 runs sampled)
+Gonzales PE  x 3.99 ops/sec ±10.37% (15 runs sampled)
+Stylecow     x 3.97 ops/sec ±9.48% (15 runs sampled)
+ParserLib    x 1.79 ops/sec ±8.58% (9 runs sampled)
+
+Fastest test is Stylis at 1.37x faster than CSSTree
+```
+
+---
+
+#### Preprocessors
+
+```
+Stylis    x 26.26 ops/sec ±5.95% (49 runs sampled)
+PostCSS   x 16.23 ops/sec ±11.21% (47 runs sampled)
+Rework    x 10.65 ops/sec ±3.86% (55 runs sampled)
+libsass   x 6.83 ops/sec ±2.29% (22 runs sampled)
+Less      x 4.75 ops/sec ±9.14% (29 runs sampled)
+Stylus    x 3.67 ops/sec ±28.12% (25 runs sampled)
+Stylecow  x 2.15 ops/sec ±6.36% (15 runs sampled)
+Ruby Sass x 0.31 ops/sec ±8.12% (6 runs sampled)
+
+Fastest test is Stylis at 1.62x faster than PostCSS
+```
+
+---
+
+#### Prefixers
+
+```
+Stylis       x 45.52 ops/sec ±14.61% (77 runs sampled)
+Autoprefixer x 13.32 ops/sec ±6.51% (67 runs sampled)
+Stylecow     x 2.28 ops/sec ±5.97% (16 runs sampled)
+nib          x 1.79 ops/sec ±25.32% (15 runs sampled)
+Compass      x 0.15 ops/sec ±9.34% (5 runs sampled)
+
+Fastest test is Stylis at 3.4x faster than Autoprefixer
+```
