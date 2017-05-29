@@ -3,7 +3,7 @@
  * @type {Object}
  */
 var spec = {
-	'whitespace cacade true': {
+	'whitespace cascade true': {
 		sample: `
 			html {
 				width: 0;  	     
