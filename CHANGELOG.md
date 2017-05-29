@@ -1,3 +1,7 @@
+## 3.0.6 May 29, 2016
+
+- patch `@media` rule namespacing in cascade isolation mode
+
 ## 3.0.5 May 28, 2016
 
 - patch isolation mode `#id` and `.class` children

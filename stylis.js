@@ -47,7 +47,8 @@
 	 * This allows the property parser to in theory be both small and fast.
 	 */
 
-	var formatptn = /[\0\r\n]/g /* matches new lines and null characters */
+	var nulptn = /^\0+/g
+	var fmtptn = /[\0\r]/g /* matches new lines and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
@@ -61,9 +62,9 @@
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var placeptn = /::?(place)/g /* match ::placeholder varient */
-	var minifybeforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
-	var minifyafterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
-	var minifytailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
+	var beforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
+	var afterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
+	var tailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
 	var pseudoptn = /(:+) */g /* pseudo element */
 
 	/* vendors */
@@ -176,13 +177,15 @@
 		var third = 0
 		var counter = 0
 		var context = 0
+		var atrule = 0
 
 		var pseudo = 0
 		var caret = 0
 		var code = 0
 		var tail = 0
 		var trail = 0
-		var format = 0
+		var fmt = 0
+		var esc = 0
 		var insert = 0
 		var length = 0
 		var eof = body.length
@@ -222,8 +225,8 @@
 				// eof varient
 				switch (caret) {
 					case eol: {
-						if (format === 1) {
-							chars = chars.replace(formatptn, '')
+						if (fmt > 0) {
+							chars = chars.replace(fmtptn, '')
 						}
 
 						if ((chars = chars.trim()).length > 0) {
@@ -249,6 +252,7 @@
 				switch (code) {
 					case OPENBRACES: {
 						chars = chars.trim()
+						first = chars.charCodeAt(0)
 						counter = 1
 						caret++
 
@@ -273,11 +277,15 @@
 							block += body.charAt(caret++)
 						}
 
-						switch (chars.charCodeAt(0)) {
+						if (first === NULL) {
+							first = (chars = chars.replace(nulptn, '').trim()).charCodeAt(0)
+						}
+
+						switch (first) {
 							// @at-rule
 							case AT: {
-								if (format === 1) {
-									chars = chars.replace(formatptn, '')
+								if (fmt > 0) {
+									chars = chars.replace(fmtptn, '')
 								}
 
 								second = chars.charCodeAt(1)
@@ -325,7 +333,8 @@
 						// reset
 						context = 0
 						pseudo = 0
-						format = 0
+						fmt = 0
+						atrule = 0
 						chars = ''
 
 						block = chars
@@ -335,8 +344,8 @@
 						break
 					}
 					case SEMICOLON: {
-						if (format === 1) {
-							chars = chars.replace(formatptn, '')
+						if (fmt > 0) {
+							chars = chars.replace(fmtptn, '')
 						}
 
 						chars = chars.trim()
@@ -368,7 +377,7 @@
 						// reset
 						context = 0
 						pseudo = 0
-						format = 0
+						fmt = 0
 						chars = ''
 
 						break
@@ -453,7 +462,7 @@
 						// selectors
 						case COMMA: {
 							if (cmt + fnq + str + brq === 0) {
-								format = 1
+								fmt = 1
 								char += '\r'
 							}
 							break
@@ -488,12 +497,6 @@
 						case CLOSEPARENTHESES: {
 							if (str + cmt + brq === 0) {
 								fnq--
-								
-								// `... ()[eof]`
-								if (caret === eol) {
-									body += ';'
-									eof++
-								}
 							}
 							break
 						}
@@ -504,6 +507,12 @@
 									context = 1
 								}
 								fnq++
+							}
+							break
+						}
+						case AT: {
+							if (cmt + fnq + str + brq + pseudo + atrule === 0) {
+								atrule = 1
 							}
 							break
 						}
@@ -544,8 +553,8 @@
 					if (cmt === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq === 0 && from !== KEYFRAME) {
-							switch ((format = 1, code)) {
+						if (cascade + str + brq + atrule === 0 && from !== KEYFRAME) {
+							switch ((fmt = 1, code)) {
 								case COMMA:
 								case SIBLING:
 								case CHILD:
@@ -613,8 +622,8 @@
 			caret++
 		}
 
-		if (format === 1) {
-			out = out.replace(formatptn, '')
+		if (fmt > 0) {
+			out = out.replace(fmtptn, '')
 		}
 
 		length = out.length
@@ -629,7 +638,7 @@
 		}
 
 		if (length > 0) {
-			if (cascade === 0 && from !== KEYFRAME) {
+			if (cascade + atrule === 0 && from !== KEYFRAME) {
 				isolate(current)
 			}
 
@@ -1026,7 +1035,7 @@
 				out += element
 			}
 
-			selectors[i] = out.replace(formatptn, '').trim();
+			selectors[i] = out.replace(fmtptn, '').trim();
 		}
 	}
 
@@ -1193,10 +1202,10 @@
 	 */
 	function minify (output) {
 		return output
-			.replace(formatptn, '')
-			.replace(minifybeforeptn, '')
-			.replace(minifyafterptn, '$1')
-			.replace(minifytailptn, '$1')
+			.replace(fmtptn, '')
+			.replace(beforeptn, '')
+			.replace(afterptn, '$1')
+			.replace(tailptn, '$1')
 	}
 
 	stylis['use'] = use

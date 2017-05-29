@@ -3,25 +3,6 @@
  * @type {Object}
  */
 var spec = {
-	'whitespace cascade true': {
-		sample: `
-			html {
-				width: 0;  	     
-			}
-		`,
-		expected: `.user html{width: 0;}`
-	},
-	'whitespace cascade false': {
-		options: {
-			cascade: false
-		},
-		sample: `
-			html{
-				width: 0;  	  
-			}   
-		`,
-		expected: `html.user{width: 0;}`
-	},
 	'universal selector': {
 		sample: `
 		* {
@@ -153,7 +134,7 @@ var spec = {
 		expected: '.user:before{color: blue;}'
 	},
 	'@import': {
-		sample: `@import url('http://example.com')`,
+		sample: `@import url('http://example.com');`,
 		expected: `@import url('http://example.com');`
 	},
 	'@media & @supports': {
@@ -686,6 +667,27 @@ var spec = {
 		 	`.user:-ms-input-placeholder{color: pink;}`+
 		 	`.user::placeholder{color: pink;}`
 	},
+	// note the spaces after ;
+	'whitespace cascade true': {
+		sample: `
+			html {
+				width: 0;  	     
+			}
+		`,
+		expected: `.user html{width: 0;}`
+	},
+	// note the spaces after ;
+	'whitespace cascade false': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			html{
+				width: 0;  	  
+			}   
+		`,
+		expected: `html.user{width: 0;}`
+	},
 	'cascade isolation simple': {
 		options: {
 			cascade: false
@@ -805,6 +807,24 @@ var spec = {
 		`.root.user>*:not(header.user){color: red;}`+
 		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`
 	},
+	'cascade isolation @at-rules': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			@keyframes hahaha {
+			  from { top: 0 }
+			  to { top: 100 }
+			}
+
+			span {}
+			      @media (min-width: 480px) { div { color: red } }
+		`,
+		expected: ``+
+		`@-webkit-keyframes hahaha-user{from{top: 0;}to{top: 100;}}`+
+		`@keyframes hahaha-user{from{top: 0;}to{top: 100;}}`+
+		`@media (min-width: 480px){div.user{color: red;}}`
+	},
 	'cascade isolation nesting': {
 		options: {
 			cascade: false
@@ -841,11 +861,6 @@ var spec = {
 					color: red
 				}
 			}
-
-			@keyframes hahaha {
-			  from { top: 0 }
-			  to { top: 100 }
-			}
 		`,
 		expected: ``+
 		`.user{color: red;}`+
@@ -853,9 +868,7 @@ var spec = {
 		`h1.user h2.user{color: red;}`+
 		`div.user h1.user,span.user h1.user{color: red;}`+
 		`span.user:hover{color: red;}`+
-		`[data-id=foo].user:hover{color: red;}`+
-		`@-webkit-keyframes hahaha-user{from{top: 0;}to{top: 100;}}`+
-		`@keyframes hahaha-user{from{top: 0;}to{top: 100;}}`
+		`[data-id=foo].user:hover{color: red;}`
 	},
 	'no semi-colons': {
 		sample: `

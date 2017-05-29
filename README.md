@@ -31,7 +31,7 @@ light – weight css preprocessor
 
 
 ```html
-<script src=https://unpkg.com/stylis@3.0.5/stylis.min.js></script>
+<script src=https://unpkg.com/stylis@3.0.6/stylis.min.js></script>
 ```
 
 #### npm
@@ -194,7 +194,7 @@ Plugins are executed in stages identified by an `context` interger value.
 
 1  /* property context */
 2  /* selector block context */
-3  /* @at-rule block context
+3  /* @at-rule block context */
 ```
 
 > Note: Since the newline context is intended for source-map/linting plugins by default stylis will not execute plugins in this context unless enabled, this can be done through `stylis.use(true)` or disabled after that through `stylis.use(false)`.

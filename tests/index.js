@@ -95,8 +95,7 @@ function run (tests, fn) {
 			// log why it failed
 			console.log(result.length, 'failed: ', name, '\n\n', result)
 			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
-
-			console.log(expected.indexOf('\r'))
+			console.log(result.indexOf('\0'))
 
 			failed.push(name);
 
