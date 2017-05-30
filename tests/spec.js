@@ -754,6 +754,12 @@ var spec = {
 			.a.b .c {
 				color: red;
 			}
+
+			:nth-child(2n),
+			:nth-last-child(2n),
+			:nth-of-type(2n) {
+				color: red;
+			}
 		`,
 		expected: ``+
 		`[data-id=foo].user{color: red;}`+
@@ -767,7 +773,8 @@ var spec = {
 		'html.something.user .user{color: red;}'+
 		`.class.user #id.user{color: red;}`+
 		`.user{color: red;}`+
-		`.a.b.user .c.user{color: red;}`
+		`.a.b.user .c.user{color: red;}`+
+		`.user:nth-child(2n),.user:nth-last-child(2n),.user:nth-of-type(2n){color: red;}`
 	},
 	'cascade isolation complex': {
 		options: {

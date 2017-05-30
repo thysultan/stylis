@@ -1,3 +1,7 @@
+## 3.0.10 May 30, 2016
+
+- patch isolation mode prefixing `nth-child()` functions
+
 ## 3.0.9 May 30, 2016
 
 - improve invalid keyframe namespace characters

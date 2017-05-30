@@ -106,7 +106,6 @@
 	var SUPPORTS = 115 /* s */
 	var IMPORT = 169 /* i */
 	var CHARSET = 163 /* c */
-	var ESCAPE = 103 /* g */
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
 
@@ -490,9 +489,18 @@
 						}
 						case OPENPARENTHESES: {
 							if (str + cmt + brq === 0) {
-								if (pseudo - (caret - 7) === 0) {
-									counter = 0
-									context = 1
+								if (context === 0) {
+									switch (tail*2 + trail*3) {
+										// :not
+										case 565: {
+											break
+										}
+										// global, nth-child etc...
+										default: {
+											counter = 0
+											context = 1
+										}
+									}
 								}
 								fnq++
 							}
@@ -729,8 +737,8 @@
 			// :
 			case COLON: {
 				switch (selector.charCodeAt(1)) {
-					// :global
-					case ESCAPE: {
+					// g in :global
+					case 103: {
 						if (escape > 0 && cascade > 0) {
 							return selector.replace(escapeptn, '$1').replace(andptn, nscope)
 						}
@@ -995,15 +1003,16 @@
 						break
 					}
 					case COLON: {
-						switch (element.charCodeAt(1)) {
-							case ESCAPE: {
+						switch (element.charCodeAt(1)*2 + element.charCodeAt(2)*3) {
+							// :global
+							case 530: {
 								element = prefix + element.substring(8, size - 1)
+							}
+							// :not
+							case 553: {
 								break
 							}
-							// :global(...):not
-							case 110: {
-								break
-							}
+							// :hover, :nth-child(), ...
 							default: {
 								element = (ctx === 2 ? '' : prefix + nscopealt) + element
 							}
