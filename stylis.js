@@ -57,8 +57,7 @@
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
-	var attrptn = /\[.+\=['"`]?(.*?)['"`]?\]/g /* matches attribute values [id=match] */
-	var keyptn = /^\d+|[\s.#~+>@]+/g /* removes invalid characters from key */
+	var keyptn = /[\s.[\]='"`#~+>*@]+/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
@@ -833,12 +832,12 @@
 							}
 							// align-self, s
 							case 115: {
-								out = webkit + out + ms + 'flex-item-' + out.replace('-self', '') + out;
+								out = webkit + out + ms + 'flex-item-' + out.replace('-self', '') + out
 								break
 							}
 							// align-content
 							default: {
-								out = webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out;
+								out = webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out
 							}
 						}
 					}
@@ -1024,7 +1023,7 @@
 				out += element
 			}
 
-			selectors[i] = out.replace(fmtptn, '').trim();
+			selectors[i] = out.replace(fmtptn, '').trim()
 		}
 	}
 
@@ -1040,14 +1039,17 @@
 		var ns = selector
 		var code = ns.charCodeAt(0)
 
+		// leading whitespace
 		if (code < 33) {
 			code = (ns = ns.trim()).charCodeAt(0)
 		}
 
+		// keyframe/animation namespace
 		if (keyed > 0) {
-			key = (code === OPENBRACKET ? ns.replace(attrptn, '$1') : ns).replace(keyptn, '-')
+			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
 		}
 
+		// cascade/isolate
 		if (cascade === 1) {
 			nscope = ns
 		} else {
@@ -1118,7 +1120,7 @@
 		switch (plugin) {
 			case void 0:
 			case null: {
-				plugged = plugins.length = 0;
+				plugged = plugins.length = 0
 				break
 			}
 			default: {

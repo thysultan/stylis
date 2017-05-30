@@ -648,7 +648,7 @@ var spec = {
 	'attribute namespace': {
 		selector: '[title=foo]',
 		sample: `h1 {animation: slide 1s;}`,
-		expected: `[title=foo] h1{-webkit-animation:slidefoo 1s;animation:slidefoo 1s;}`
+		expected: `[title=foo] h1{-webkit-animation:slidetitlefoo 1s;animation:slidetitlefoo 1s;}`
 	},
 	'empty namespace': {
 		selector: '',
