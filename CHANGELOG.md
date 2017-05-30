@@ -1,3 +1,7 @@
+## 3.0.7 May 30, 2016
+
+- patch keyframe namespacing to not include extra characters with valid namespaces
+
 ## 3.0.6 May 29, 2016
 
 - patch `@media` rule namespacing in cascade isolation mode

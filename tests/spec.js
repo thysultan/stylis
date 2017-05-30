@@ -648,7 +648,21 @@ var spec = {
 	'attribute namespace': {
 		selector: '[title=foo]',
 		sample: `h1 {animation: slide 1s;}`,
-		expected: `[title=foo] h1{-webkit-animation:slide-foo 1s;animation:slide-foo 1s;}`
+		expected: `[title=foo] h1{-webkit-animation:slidefoo 1s;animation:slidefoo 1s;}`
+	},
+	'empty namespace': {
+		selector: '',
+		sample: `
+		h1 {animation: slide 1s;}
+		@keyframes name {
+			0: {
+				top: 0
+			}
+		}
+		`,
+		expected: ``+
+		`h1{-webkit-animation:slide 1s;animation:slide 1s;}`+
+		`@-webkit-keyframes name{0:{top: 0;}}@keyframes name{0:{top: 0;}}`
 	},
 	'edge cases': {
 		 sample: `
@@ -932,6 +946,54 @@ var spec = {
 		`.user h1{color: red/* property */;/* block */}`+
 		`@media{.user{color: red/* property */;/* block */}/* at-rule */}`
 	},
+	'nesting selector multiple levels': {
+		sample: `
+			a {
+				a {
+					a {
+						a {
+							a {
+								a {
+									a {
+										a {
+											a{
+												a{
+													a{
+														a{
+															color: red;
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		`,
+		expected: `.user a a a a a a a a a a a a{color: red;}`
+	},
+	'nesting @media multiple levels': {
+		sample: `
+			div {
+				@media {
+					a {
+						color: red;
+
+						@media {
+							h1 {
+								color: red;
+							}
+						}
+					}
+				}
+			}
+		`,
+		expected: `@media{.user div a{color: red;}@media{.user div a h1{color: red;}}}`
+	}
 };
 
 if (typeof module === 'object') {

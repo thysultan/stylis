@@ -47,7 +47,7 @@
 	 * This allows the property parser to in theory be both small and fast.
 	 */
 
-	var nulptn = /^\0+/g
+	var nulptn = /^\0+/g /* matches leading null characters */
 	var fmtptn = /[\0\r]/g /* matches new lines and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
@@ -57,11 +57,11 @@
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
-	var attributeptn = /\[.+\=['"`]?(.*?)['"`]?\]/g /* matches attribute values [id=match] */
-	var keyptn = /[ .#~+>]+/g /* removes invalid characters from key */
+	var attrptn = /\[.+\=['"`]?(.*?)['"`]?\]/g /* matches attribute values [id=match] */
+	var keyptn = /^\d+|[\s.#~+>@]+/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
-	var placeptn = /::?(place)/g /* match ::placeholder varient */
+	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
 	var beforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
 	var afterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
 	var tailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
@@ -73,41 +73,33 @@
 	var ms = '-ms-'
 
 	/* character codes */
-	var SEMICOLON = 59
-	var CLOSEBRACES = 125
-	var OPENBRACES = 123
-	var OPENPARENTHESES = 40
-	var CLOSEPARENTHESES = 41
-	var OPENBRACKET = 91
-	var CLOSEBRACKET = 93
-	var NEWLINE = 10
-	var CARRIAGE = 13
-	var TAB = 9
-	var AT = 64
-	var SPACE = 32
-	var AND = 38
-	var HASH = 35
-	var DOT = 46
-	var DASH = 45
-	var UNDERSCORE = 95
-	var STAR = 42
-	var COMMA = 44
-	var COLON = 58
-	var SINGLEQUOTE = 39
-	var DOUBLEQUOTE = 34
-	var FOWARDSLASH = 47
-	var GREATERTHAN = 62
-	var PLUS = 43
-	var TILDE = 126
-	var NULL = 0
-
-	/* selector codes */
-	var ID = HASH
-	var CLASS = DOT
-	var ATTRIBUTE = OPENBRACKET
-	var CHILD = GREATERTHAN
-	var ADJACENT = PLUS
-	var SIBLING = TILDE
+	var SEMICOLON = 59 /* ; */
+	var CLOSEBRACES = 125 /* } */
+	var OPENBRACES = 123 /* { */
+	var OPENPARENTHESES = 40 /* ( */
+	var CLOSEPARENTHESES = 41 /* ) */
+	var OPENBRACKET = 91 /* [ */
+	var CLOSEBRACKET = 93 /* ] */
+	var NEWLINE = 10 /* \n */
+	var CARRIAGE = 13 /* \r */
+	var TAB = 9 /* \t */
+	var AT = 64 /* @ */
+	var SPACE = 32 /*   */
+	var AND = 38 /* & */
+	var HASH = 35 /* # */
+	var DOT = 46 /* . */
+	var DASH = 45 /* - */
+	var UNDERSCORE = 95 /* _ */
+	var STAR = 42 /* * */
+	var COMMA = 44 /* , */
+	var COLON = 58 /* : */
+	var SINGLEQUOTE = 39 /* ' */
+	var DOUBLEQUOTE = 34 /* " */
+	var FOWARDSLASH = 47 /* / */
+	var GREATERTHAN = 62 /* > */
+	var PLUS = 43 /* + */
+	var TILDE = 126 /* ~ */
+	var NULL = 0 /* \0 */
 
 	/* special identifiers */
 	var KEYFRAME = 107 /* k */
@@ -119,20 +111,17 @@
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
 
-	var LINECOMMENT = FOWARDSLASH
-	var BLOCKCOMMENT = STAR
-
 	var column = 0 /* current column */
 	var line = 0 /* current line numebr */
 	var pattern = 0 /* :pattern */
 
 	var cascade = 1 /* #id h1 h2 vs h1#id h2#id  */
 	var vendor = 1 /* vendor prefix */
-	var escape = 1 /* escape :global pattern */
+	var escape = 1 /* escape :global() pattern */
 	var compress = 0 /* compress output */
 	var semicolon = 0 /* no/semicolon option */
 
-	/* empty reference objects */
+	/* empty reference */
 	var array = []
 
 	/* plugins */
@@ -154,8 +143,8 @@
 	var key = ''
 
 	/* selector namespace */
-	var namescopealt = ''
-	var namescope = ''
+	var nscopealt = ''
+	var nscope = ''
 
 	/**
 	 * Compile
@@ -168,7 +157,7 @@
 	 */
 	function compile (parent, current, body, from) {
 		var brq = 0 /* brackets [] */
-		var cmt = 0 /* comments /* // */
+		var cmt = 0 /* comments /* // or /* */
 		var fnq = 0 /* functions () */
 		var str = 0 /* quotes '', "" */
 
@@ -293,7 +282,7 @@
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
-									ref = selector(array, chars)
+									ref = select(array, chars)
 									res = proxy(ATRUL, block, ref, current, line, column, out.length)
 									chars = ref.join('')
 
@@ -323,7 +312,7 @@
 							}
 							// selector
 							default: {
-								block = compile(current, selector(current, chars), block, from)
+								block = compile(current, select(current, chars), block, from)
 							}
 						}
 
@@ -415,7 +404,7 @@
 					}
 
 					// terminate line comment
-					if (cmt === LINECOMMENT) {
+					if (cmt === FOWARDSLASH) {
 						cmt = 0
 					}
 
@@ -528,18 +517,18 @@
 									switch (code*2 + body.charCodeAt(caret+1)*3) {
 										// //
 										case 235: {
-											cmt = LINECOMMENT
+											cmt = FOWARDSLASH
 											break
 										}
 										// /*
 										case 220: {
-											cmt = BLOCKCOMMENT
+											cmt = STAR
 											break
 										}
 									}
 									break
 								}
-								case BLOCKCOMMENT: {
+								case STAR: {
 									if (code === FOWARDSLASH && tail === STAR) {
 										char = ''
 										cmt = 0
@@ -556,9 +545,9 @@
 						if (cascade + str + brq + atrule === 0 && from !== KEYFRAME) {
 							switch ((fmt = 1, code)) {
 								case COMMA:
-								case SIBLING:
-								case CHILD:
-								case ADJACENT:
+								case TILDE:
+								case GREATERTHAN:
+								case PLUS:
 								case CLOSEPARENTHESES:
 								case OPENPARENTHESES: {
 									if (context === 0) {
@@ -638,7 +627,7 @@
 		}
 
 		if (length > 0) {
-			if (cascade + atrule === 0 && from !== KEYFRAME) {
+			if (cascade === 0 && from !== KEYFRAME) {
 				isolate(current)
 			}
 
@@ -650,9 +639,9 @@
 				}
 				case PLACEHOLDER: {
 					// :placeholder
-					out = (out.replace(placeptn, '::' + webkit + 'input-$1') +
-						out.replace(placeptn, '::' + moz + '$1') +
-						out.replace(placeptn, ':' + ms + 'input-$1') + out)
+					out = (out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
+						out.replace(plcholdrptn, '::' + moz + '$1') +
+						out.replace(plcholdrptn, ':' + ms + 'input-$1') + out)
 				}
 				default: {
 					pattern = 0
@@ -660,17 +649,17 @@
 			}
 		}
 
-		return children.length > 0 ? flat + out + children : flat + out
+		return flat + out + children
 	}
 
 	/**
-	 * Selector
+	 * Select
 	 *
 	 * @param {Array<string>} parent
 	 * @param {string} current
 	 * @return {Array<string>}
 	 */
-	function selector (parent, current) {
+	function select (parent, current) {
 		var selectors = current.trim().split(selectorptn)
 		var out = selectors
 
@@ -713,7 +702,7 @@
 
 		switch (code) {
 			case NULL: {
-				selector = selector.substring(1)
+				selector = selector.replace(nulptn, '')
 			}
 			case CARRIAGE:
 			case NEWLINE:
@@ -744,7 +733,7 @@
 					// :global
 					case ESCAPE: {
 						if (escape > 0 && cascade > 0) {
-							return selector.replace(escapeptn, '$1').replace(andptn, namescope)
+							return selector.replace(escapeptn, '$1').replace(andptn, nscope)
 						}
 						break
 					}
@@ -758,7 +747,7 @@
 				switch (selector.charCodeAt(selector.length-1)) {
 					// html &
 					case AND: {
-						return prefix.replace(namescope, '').trim() + ' ' + selector.replace(andptn, namescope)
+						return prefix.replace(nscope, '').trim() + ' ' + selector.replace(andptn, nscope)
 					}
 				}
 			}
@@ -976,9 +965,9 @@
 					prefix = ''
 				} else {
 					switch (tail) {
-						case SIBLING:
-						case CHILD:
-						case ADJACENT:
+						case TILDE:
+						case GREATERTHAN:
+						case PLUS:
 						case SPACE:
 						case OPENPARENTHESES:  {
 							prefix = ''
@@ -990,20 +979,20 @@
 					case AND: {
 						element = ''
 					}
-					case ID:
-					case CLASS: {
-						element = prefix + element + namescopealt
+					case HASH:
+					case DOT: {
+						element = prefix + element + nscopealt
 					}
-					case SIBLING:
-					case CHILD:
-					case ADJACENT:
+					case TILDE:
+					case GREATERTHAN:
+					case PLUS:
 					case SPACE:
 					case CLOSEPARENTHESES:
 					case OPENPARENTHESES: {
 						break
 					}
 					case OPENBRACKET: {
-						element = (ctx = 1, prefix + element + namescopealt)
+						element = (ctx = 1, prefix + element + nscopealt)
 						break
 					}
 					case COLON: {
@@ -1017,16 +1006,16 @@
 								break
 							}
 							default: {
-								element = (ctx === 2 ? '' : prefix + namescopealt) + element
+								element = (ctx === 2 ? '' : prefix + nscopealt) + element
 							}
 						}
 						break
 					}
 					default: {
 						if (size > 1 && element.indexOf(':') > 0) {
-							element = prefix + element.replace(pseudoptn, namescopealt + '$1')
+							element = prefix + element.replace(pseudoptn, nscopealt + '$1')
 						} else {
-							element = (ctx = 1, prefix + element + namescopealt)
+							element = (ctx = 1, prefix + element + nscopealt)
 						}
 					}
 				}
@@ -1042,49 +1031,30 @@
 	/**
 	 * Stylis
 	 *
-	 * @param {string} namespace
+	 * @param {string} selector
 	 * @param {string} input
 	 * @return {string}
 	 */
-	function stylis (namespace, input) {
+	function stylis (selector, input) {
 		// setup
-		var code = namespace.charCodeAt(0)
+		var ns = selector
+		var code = ns.charCodeAt(0)
 
 		if (code < 33) {
-			code = (namespace = namespace.trim()).charCodeAt(0)
+			code = (ns = ns.trim()).charCodeAt(0)
 		}
 
 		if (keyed > 0) {
-			key = namespace
-
-			switch (code) {
-				// id/class
-				case ID:
-				case CLASS: {
-					key = key.substring(1)
-					break
-				}
-				// attribute
-				case ATTRIBUTE: {
-					key = key.replace(attributeptn, '$1')
-				}
-			}
-
-			key = '-' + key.replace(keyptn, '-')
+			key = (code === OPENBRACKET ? ns.replace(attrptn, '$1') : ns).replace(keyptn, '-')
 		}
 
-		switch (cascade) {
-			case 0: {
-				namescopealt = namespace
-				break
-			}
-			case 1: {
-				namescope = namespace
-				break
-			}
+		if (cascade === 1) {
+			nscope = ns
+		} else {
+			nscopealt = ns
 		}
 
-		var selectors = [namescope]
+		var selectors = [nscope]
 
 		// execute plugins, pre-process context
 		if (plugged > 0) {
@@ -1101,8 +1071,8 @@
 
 		// destroy
 		key = ''
-		namescope = ''
-		namescopealt = ''
+		nscope = ''
+		nscopealt = ''
 		line = 0
 		column = 0
 		pattern = 0

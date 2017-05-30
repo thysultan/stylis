@@ -75,7 +75,7 @@ function run (tests, fn) {
 		}
 
 		var result = fn(
-			test.selector || '.user',
+			test.selector !== void 0 ? test.selector : '.user',
 			sample
 		);
 
