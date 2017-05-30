@@ -1,3 +1,7 @@
+## 3.0.9 May 30, 2016
+
+- improve invalid keyframe namespace characters
+
 ## 3.0.8 May 30, 2016
 
 - patch keyframe namespacing to handle more generic attribute expressions

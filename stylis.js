@@ -57,7 +57,7 @@
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
-	var keyptn = /[\s.[\]='"`#~+>*@]+/g /* removes invalid characters from key */
+	var keyptn = /\W+/g /* removes invalid characters from key */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
