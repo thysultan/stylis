@@ -49,6 +49,7 @@ npm install stylis --save
 - flat stylesheets `color: red; h1 { color: red; }`
 - keyframe and animation namespacing
 - plugins
+- minification
 
 ---
 
