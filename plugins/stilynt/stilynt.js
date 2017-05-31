@@ -7,11 +7,50 @@
 	var BLOCK = 2
 	var ATRULE = 3
 
+	// regex padding, margin
+	var r_pm = /^(?:\d|\.\d|auto)/
+
 	var properties = {
-		color: {
-			'': {
-				type: 'Invalid',
-				pattern: /^(?:[a-zA-Z]|#)/
+		"color": {
+			"": {
+				"type": "Invalid",
+				"pattern": /^(?:[a-zA-Z]|#)/
+			}
+		},
+		"margin": {
+			"": {
+				"type": "Invalid",
+				"pattern": r_pm
+			}
+		},
+		"margin-left": {
+			"": {
+				"type": "Invalid",
+				"pattern": r_pm
+			}
+		},
+		"margin-right": {
+			"": {
+				"type": "Invalid",
+				"pattern": r_pm
+			}
+		},
+		"margin-top": {
+			"": {
+				"type": "Invalid",
+				"pattern": r_pm
+			}
+		},
+		"margin-bottom": {
+			"": {
+				"type": "Invalid",
+				"pattern": r_pm
+			}
+		},
+		"font-size": {
+			"": {
+				"type": "Invalid",
+				"pattern": /^(?:\d|\.\d|larger|smaller|xx-large|x-large|large|medium|small|x-small|xx-small)/
 			}
 		}
 	}
@@ -31,8 +70,15 @@
 			var pttn = rule.pattern
 			var type = rule.type 
 
-			if (pttn.test(value) === false) {
-				report(column, line, 'Unexpected '+name+' `'+value+'`', type)
+			switch (value) {
+				case 'inherit':
+				case 'unset':
+				case 'initial': break
+				default: {
+					if (pttn.test(value) === false) {
+						report(column, line, 'Unexpected '+name+' "'+value+'"', type)
+					}
+				}
 			}
 		}
 	}
