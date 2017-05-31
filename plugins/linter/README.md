@@ -1,3 +1,0 @@
-# stylis linter
-
-WIP
