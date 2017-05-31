@@ -109,8 +109,8 @@
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
 
-	var column = 0 /* current column */
-	var line = 0 /* current line numebr */
+	var column = 1 /* current column */
+	var line = 1 /* current line numebr */
 	var pattern = 0 /* :pattern */
 
 	var cascade = 1 /* #id h1 h2 vs h1#id h2#id  */
@@ -172,7 +172,6 @@
 		var tail = 0
 		var trail = 0
 		var fmt = 0
-		var esc = 0
 		var insert = 0
 		var length = 0
 		var eof = body.length
@@ -323,10 +322,7 @@
 						fmt = 0
 						atrule = 0
 						chars = ''
-
-						block = chars
-						prefix = chars
-						suffix = chars
+						block = ''
 
 						break
 					}
@@ -412,7 +408,7 @@
 					}
 
 					// next line, reset column position
-					column = 0
+					column = 1
 					line++
 
 					break
@@ -1084,8 +1080,8 @@
 		key = ''
 		nscope = ''
 		nscopealt = ''
-		line = 0
-		column = 0
+		line = 1
+		column = 1
 		pattern = 0
 
 		return compress === 0 ? output : minify(output)

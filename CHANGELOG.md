@@ -1,3 +1,7 @@
+## 3.0.11 May 31, 2016
+
+- plugins, patch line and column number to start at `1` instead of `0`
+
 ## 3.0.10 May 30, 2016
 
 - patch isolation mode prefixing `nth-child()` functions
