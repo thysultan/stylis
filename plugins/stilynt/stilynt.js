@@ -7,25 +7,38 @@
 	var BLOCK = 2
 	var ATRULE = 3
 
-	function property (prop, line, column) {
-		var colon = prop.indexOf(':')
-		var name = prop.substring(0, colon).trim()
-		var value = prop.substring(colon+1).trim()
-
-		switch (name) {
-			case 'color': {
-				if (/^(?:[a-zA-Z]|#)/.test(value) === false) {
-					report('Unexpected invalid color "'+value+'"', line, column)
-				}
-				break
+	var properties = {
+		color: {
+			'': {
+				type: 'Invalid',
+				pattern: /^(?:[a-zA-Z]|#)/
 			}
 		}
 	}
 
-	function report (msg, line, column, type) {
-		var message = line+':'+column+' '+ msg
+	function property (content, line, column) {
+		var colon = content.indexOf(':')
+		var name = content.substring(0, colon).trim()
+		var value = content.substring(colon+1).trim()
+		var prop = properties[name]
 
-		console[type || 'error'](message)
+		if (prop == void 0) {
+			return
+		}
+
+		for (var key in prop) {
+			var rule = prop[key]
+			var pttn = rule.pattern
+			var type = rule.type 
+
+			if (pttn.test(value) === false) {
+				report(column, line, 'Unexpected '+name+' `'+value+'`', type)
+			}
+		}
+	}
+
+	function report (line, column, message, type) {
+		console.warn(line+':'+column+' '+ message + '. ' + type + '.')
 	}
 
 	function stilynt (context, content, selectors, parents, line, column, length) {

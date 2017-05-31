@@ -15,6 +15,8 @@
 			(window['stylis'] = factory())
 }(function () {
 
+	'use strict'
+
 	/**
 	 * Notes
 	 *
@@ -899,7 +901,7 @@
 		if (input.charCodeAt(9) !== DASH) {
 			var list = body.split(animationptn)
 
-			for (i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
+			for (var i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
 				var value = list[i]
 				var items = value.split(propertiesbtn)
 
@@ -955,7 +957,7 @@
 			var elements = selectors[i].split(elementptn)
 			var out = ''
 
-			for (var j = size = ctx = tail = code = 0, l = elements.length; j < l; j++) {
+			for (var j = 0, size = 0, ctx = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
 				if ((size = (element = elements[j]).length) === 0 && l > 1) {
 					continue
 				}

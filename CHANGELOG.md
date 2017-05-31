@@ -1,3 +1,7 @@
+## 3.0.12 May 31, 2016
+
+- patch missing `use strict` directive
+
 ## 3.0.11 May 31, 2016
 
 - plugins, patch line and column number to start at `1` instead of `0`
