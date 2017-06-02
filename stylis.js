@@ -805,7 +805,7 @@
 				}
 				case 964: {
 					// order: o, r, d
-					out = webkit + out + ms + flex + '-' + out + out
+					out = webkit + out + ms + 'flex' + '-' + out + out
 					break
 				}
 				// justify-content, j, u, s
