@@ -1,3 +1,7 @@
+## 3.0.15 June 02, 2016
+
+- fix a typo 
+
 ## 3.0.14 June 02, 2016
 
 - patch isolation mode `:not()` and `pseudo` selectors
