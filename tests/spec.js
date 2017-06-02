@@ -395,6 +395,7 @@ var spec = {
 
 			div {
 				color:papayawhip;
+				order: flex;
 			}
 		`,
 		expected:
@@ -471,6 +472,9 @@ var spec = {
 			`}`+
 			'.user div{'+
 			'color:papayawhip;'+
+			`-webkit-order: flex;`+
+			`-ms-flex-order: flex;`+
+			`order: flex;`+
 			'}'
 	},
 	'animations': {
