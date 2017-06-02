@@ -74,6 +74,10 @@ function run (tests, fn) {
 			fn.set({semicolon: options.semicolon})
 		}
 
+		if (options.compress !== void 0) {
+			fn.set({compress: options.compress})
+		}
+
 		var result = fn(
 			test.selector !== void 0 ? test.selector : '.user',
 			sample
@@ -89,6 +93,10 @@ function run (tests, fn) {
 
 		if (options.semicolon !== void 0) {
 			fn.set({semicolon: false})
+		}
+
+		if (options.compress !== void 0) {
+			fn.set({compress: false})
 		}
 
 		if (result !== expected || /[\0\r\n]/g.test(result)) {

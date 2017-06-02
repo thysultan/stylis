@@ -1,3 +1,8 @@
+## 3.0.14 June 02, 2016
+
+- patch isolation mode `:not()` and `pseudo` selectors
+- patch compress option to preserve spaces in `calc(0px + 10px)`
+
 ## 3.0.13 June 02, 2016
 
 - patch vendor prefix flexbox `inline-box`

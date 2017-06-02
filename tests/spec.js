@@ -134,8 +134,8 @@ var spec = {
 		expected: '.user:before{color: blue;}'
 	},
 	'@import': {
-		sample: `@import url('http://example.com');`,
-		expected: `@import url('http://example.com');`
+		sample: `@import url('http://example.com')`,
+		expected: `@import url('http://example.com')`
 	},
 	'@media & @supports': {
 		sample: `
@@ -802,6 +802,13 @@ var spec = {
 			:nth-of-type(2n) {
 				color: red;
 			}
+
+			a:not(:focus):disabled {
+				color: red;
+			}
+			a:not(:focus) :disabled {
+				color: red;
+			}
 		`,
 		expected: ``+
 		`[data-id=foo].user{color: red;}`+
@@ -816,7 +823,9 @@ var spec = {
 		`.class.user #id.user{color: red;}`+
 		`.user{color: red;}`+
 		`.a.b.user .c.user{color: red;}`+
-		`.user:nth-child(2n),.user:nth-last-child(2n),.user:nth-of-type(2n){color: red;}`
+		`.user:nth-child(2n),.user:nth-last-child(2n),.user:nth-of-type(2n){color: red;}`+
+		`a.user:not(:focus):disabled{color: red;}`+
+		`a.user:not(:focus) .user:disabled{color: red;}`
 	},
 	'cascade isolation complex': {
 		options: {
@@ -847,28 +856,23 @@ var spec = {
 				color:red;
 			}
 
-			a:not( a +b foo:hover :global(marquee) a) > :hover {
-			  color: red;
-			}
-
 			.root > :global(*):not(header) {
 			  color: red;
 			}
 
-			a:not( a +b foo:hover :global(marquee) a) > :hover {
+			a:matches( a +b foo:hover :global(marquee) a) > :hover {
 			  color: red;
 			}
 		`,
 		expected: ``+
 		`.List.user >*{margin-top: 10px;}`+
-		`.List.user * +*{margin-top: 10px;}`+
+		`.List.user *+*{margin-top: 10px;}`+
 		`.List.user > *{margin-top: 10px;}`+
 		`.List.user * + *{margin-top: 10px;}`+
 		`.foo #bar > baz{color: red;}`+
 		`div.user .react-select .some-child-of-react-select{color:red;}`+
-		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`+
-		`.root.user>*:not(header.user){color: red;}`+
-		`a.user:not(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`
+		`.root.user>*:not(header){color: red;}`+
+		`a.user:matches(a.user+b.user foo.user:hover marquee a.user)>.user:hover{color: red;}`
 	},
 	'cascade isolation @at-rules': {
 		options: {
@@ -1042,6 +1046,15 @@ var spec = {
 			}
 		`,
 		expected: `@media{.user div a{color: red;}@media{.user div a h1{color: red;}}}`
+	},
+	'compress': {
+		options: {
+			compress: true
+		},
+		sample: `
+			width: calc(20% + 503px)
+		`,
+		expected: `.user{width:calc(20% + 503px)}`
 	}
 };
 

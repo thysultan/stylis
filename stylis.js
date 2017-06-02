@@ -63,10 +63,10 @@
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
-	var beforeptn = /\s+(?=[{\];=:>+*])/g /* rm \s before ] ; = : */
-	var afterptn = /([[}=:>+*])\s+/g /* rm \s after characters [ } = : */
+	var beforeptn = /\s+(?=[{\];=:>])/g /* rm \s before ] ; = : */
+	var afterptn = /([[}=:>])\s+/g /* rm \s after characters [ } = : */
 	var tailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
-	var pseudoptn = /(:+) */g /* pseudo element */
+	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -87,8 +87,6 @@
 	var AT = 64 /* @ */
 	var SPACE = 32 /*   */
 	var AND = 38 /* & */
-	var HASH = 35 /* # */
-	var DOT = 46 /* . */
 	var DASH = 45 /* - */
 	var UNDERSCORE = 95 /* _ */
 	var STAR = 42 /* * */
@@ -481,6 +479,11 @@
 						// functions
 						case CLOSEPARENTHESES: {
 							if (str + cmt + brq === 0) {
+								// last character, eof
+								if (caret === eol) {
+									eol++
+									eof++
+								}
 								fnq--
 							}
 							break
@@ -489,11 +492,11 @@
 							if (str + cmt + brq === 0) {
 								if (context === 0) {
 									switch (tail*2 + trail*3) {
-										// :not
-										case 565: {
+										// :matches
+										case 533: {
 											break
 										}
-										// global, nth-child etc...
+										// :global, :not, :nth-child etc...
 										default: {
 											counter = 0
 											context = 1
@@ -565,7 +568,7 @@
 												break
 											}
 											default: {
-												char = '\0' + char + '\0'
+												char = '\0' + char + (code === COMMA ? '' : '\0')
 											}
 										}
 									} else {
@@ -586,6 +589,7 @@
 								}
 								case SPACE: {
 									switch (tail) {
+										case COMMA:
 										case TAB:
 										case SPACE:
 										case NEWLINE:
@@ -971,7 +975,7 @@
 			var elements = selectors[i].split(elementptn)
 			var out = ''
 
-			for (var j = 0, size = 0, ctx = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
+			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
 				if ((size = (element = elements[j]).length) === 0 && l > 1) {
 					continue
 				}
@@ -984,6 +988,7 @@
 					prefix = ''
 				} else {
 					switch (tail) {
+						case STAR:
 						case TILDE:
 						case GREATERTHAN:
 						case PLUS:
@@ -996,11 +1001,7 @@
 
 				switch (code) {
 					case AND: {
-						element = ''
-					}
-					case HASH:
-					case DOT: {
-						element = prefix + element + nscopealt
+						element = prefix + '' + nscopealt
 					}
 					case TILDE:
 					case GREATERTHAN:
@@ -1011,7 +1012,7 @@
 						break
 					}
 					case OPENBRACKET: {
-						element = (ctx = 1, prefix + element + nscopealt)
+						element = prefix + element + nscopealt
 						break
 					}
 					case COLON: {
@@ -1019,28 +1020,29 @@
 							// :global
 							case 530: {
 								element = prefix + element.substring(8, size - 1)
-							}
-							// :not
-							case 553: {
 								break
 							}
 							// :hover, :nth-child(), ...
 							default: {
-								element = (ctx === 2 ? '' : prefix + nscopealt) + element
+								if (j < 1 || elements[j-1].length < 1) {
+									element = prefix + nscopealt + element
+								}
 							}
 						}
 						break
 					}
+					case COMMA: {
+						prefix = ''
+					}
 					default: {
 						if (size > 1 && element.indexOf(':') > 0) {
-							element = prefix + element.replace(pseudoptn, nscopealt + '$1')
+							element = prefix + element.replace(pseudoptn, '$1' + nscopealt + '$2')
 						} else {
-							element = (ctx = 1, prefix + element + nscopealt)
+							element = prefix + element + nscopealt
 						}
 					}
 				}
 
-				ctx = ctx === 1 ? 2 : (ctx === 2 ? 0 : ctx)
 				out += element
 			}
 
