@@ -1,3 +1,7 @@
+## 3.0.13 June 02, 2016
+
+- patch vendor prefix flexbox `inline-box`
+
 ## 3.0.12 May 31, 2016
 
 - patch missing `use strict` directive

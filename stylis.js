@@ -810,20 +810,34 @@
 					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
 					break
 				}
-				// display(flex/inline-flex): d, i, s
+				// display(flex/inline-flex/inline-box): d, i, s
 				case 975: {
-					if ((index = out.indexOf('flex', 8)) > 0) {
-						// e, inline-flex
-						cache = out.charCodeAt(index - 2) === 101 ? 'inline-' : ''
-						out = out.indexOf('!important', 8) > 0 ? '!important' : ''
+					index = (out = input).length-10
+					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(8).trim()
 
-						out = (
-							'display:' + webkit + cache + 'box' + out + ';' +
-							'display:' + webkit + cache + 'flex' + out + ';' +
-							'display:' + ms + 'flexbox' + out + ';' +
-							'display:' + cache + 'flex' + out + ';'
-						)
+					switch (hash = cache.charCodeAt(0) + (cache.charCodeAt(7)|0)) {
+						// inline-
+						case 203: {
+							// inline-box
+							if (cache.charCodeAt(8) > 110) {
+								out = out.replace(cache, webkit+cache)+';'+out
+							}
+							break
+						}
+						// inline-flex
+						// flex
+						case 207:
+						case 102: {
+							out = (
+								out.replace(cache, webkit+(hash > 102 ? 'inline-' : '')+'box')+';'+
+								out.replace(cache, webkit+cache)+';'+
+								out.replace(cache, ms+cache+'box')+';'+
+								out
+							)
+						}
 					}
+					
+					out += ';'
 					break
 				}
 				// align-items, align-center, align-self: a, l, i, -
@@ -894,7 +908,7 @@
 		var length = input.length
 		var index = input.indexOf(':', 9) + 1
 		var declare = input.substring(0, index).trim()
-		var body = input.substring(index, length - 1).trim()
+		var body = input.substring(index, length-1).trim()
 		var out = ''
 
 		// shorthand
