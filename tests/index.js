@@ -104,7 +104,7 @@ function run (tests, fn) {
 		}
 
 		if (options.global !== void 0) {
-			fn.set({global: false})
+			fn.set({global: true})
 		}
 
 		if (result !== expected || /[\0\r\n]/g.test(result)) {
