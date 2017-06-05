@@ -1,3 +1,7 @@
+## 3.0.16 June 05, 2016
+
+- patch ReferenceError `escade` undefined
+
 ## 3.0.15 June 02, 2016
 
 - fix a ReferenceError `flex` undefined

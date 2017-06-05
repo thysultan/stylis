@@ -425,7 +425,7 @@
 					// current character
 					char = body.charAt(caret)
 
-					// remove comments, escade functions, strings, attributes and prepare selectors
+					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
 						// :p<l>aceholder
 						// :g<l>obal
@@ -1178,7 +1178,7 @@
 			var value = options[name]
 			switch (name) {
 				case 'keyframe': keyed = value|0; break
-				case 'global': escade = value|0; break
+				case 'global': escape = value|0; break
 				case 'cascade': cascade = value|0; break
 				case 'compress': compress = value|0; break
 				case 'prefix': vendor = value|0; break

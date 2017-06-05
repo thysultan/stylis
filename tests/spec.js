@@ -1059,6 +1059,13 @@ var spec = {
 			width: calc(20% + 503px)
 		`,
 		expected: `.user{width:calc(20% + 503px)}`
+	},
+	'disable global': {
+		options: {
+			global: false
+		},
+		sample: `:global(h1) {color: red;}`,
+		expected: `.user :global(h1){color: red;}`
 	}
 };
 

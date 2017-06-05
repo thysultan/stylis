@@ -78,6 +78,10 @@ function run (tests, fn) {
 			fn.set({compress: options.compress})
 		}
 
+		if (options.global !== void 0) {
+			fn.set({global: options.global})
+		}
+
 		var result = fn(
 			test.selector !== void 0 ? test.selector : '.user',
 			sample
@@ -97,6 +101,10 @@ function run (tests, fn) {
 
 		if (options.compress !== void 0) {
 			fn.set({compress: false})
+		}
+
+		if (options.global !== void 0) {
+			fn.set({global: false})
 		}
 
 		if (result !== expected || /[\0\r\n]/g.test(result)) {
