@@ -50,7 +50,7 @@
 	 */
 
 	var nulptn = /^\0+/g /* matches leading null characters */
-	var fmtptn = /[\0\r]/g /* matches new lines and null characters */
+	var fmtptn = /[\0\r]/g /* new line and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
@@ -1020,8 +1020,10 @@
 						switch (element.charCodeAt(1)*2 + element.charCodeAt(2)*3) {
 							// :global
 							case 530: {
-								element = prefix + element.substring(8, size - 1)
-								break
+								if (escape > 0) {
+									element = prefix + element.substring(8, size - 1)
+									break
+								}
 							}
 							// :hover, :nth-child(), ...
 							default: {

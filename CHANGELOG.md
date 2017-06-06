@@ -1,3 +1,7 @@
+## 3.0.17 June 07, 2017
+
+- improves auto semicolon insertion
+
 ## 3.0.16 June 05, 2017
 
 - patch ReferenceError `escade` undefined
