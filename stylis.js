@@ -377,6 +377,7 @@
 						// valid characters that
 						// may precede a newline
 						switch (tail) {
+							case COLON:
 							case COMMA:
 							case NULL:
 							case TAB:

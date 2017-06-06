@@ -981,6 +981,17 @@ var spec = {
 		`width: 0`+
 		`h3{display: none;}`
 	},
+	'multiline declaration': {
+		sample: `
+			html {
+			  background-image:
+			    linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+			    url(/static/background.svg);
+			}
+		`,
+		expected: ``+
+		`.user html{background-image:    linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),    url(/static/background.svg);}`
+	},
 	'middleware contexts': {
 		options: {
 			plugins: function (context, content, selector, parents, line, column, length) {
