@@ -1067,9 +1067,17 @@ var spec = {
 			compress: true
 		},
 		sample: `
+		  background-image:
+		    linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+		    url(/static/background.svg);
 			width: calc(20% + 503px)
 		`,
-		expected: `.user{width:calc(20% + 503px)}`
+		expected: ``+
+		`.user{`+
+		`background-image:linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(/static/background.svg);`+
+		`width:calc(20% + 503px)`+
+		`}`+
+		``
 	},
 	'disable global': {
 		options: {

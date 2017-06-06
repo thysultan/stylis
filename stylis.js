@@ -66,6 +66,7 @@
 	var beforeptn = /\s+(?=[{\];=:>])/g /* rm \s before ] ; = : */
 	var afterptn = /([[}=:>])\s+/g /* rm \s after characters [ } = : */
 	var tailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
+	var whiteptn = /\s{2,}/g
 	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
 
 	/* vendors */
@@ -1204,6 +1205,7 @@
 			.replace(beforeptn, '')
 			.replace(afterptn, '$1')
 			.replace(tailptn, '$1')
+			.replace(whiteptn, ' ')
 	}
 
 	stylis['use'] = use
