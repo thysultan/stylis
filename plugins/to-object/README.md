@@ -1,3 +1,3 @@
-# calc
+# to-object
 
-reduces calc() references whenever it's possible.
+converts css string to object form
