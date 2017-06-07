@@ -82,10 +82,14 @@ function run (tests, fn) {
 			fn.set({global: options.global})
 		}
 
-		var result = fn(
-			test.selector !== void 0 ? test.selector : '.user',
-			sample
-		);
+		try {
+			var result = fn(
+				test.selector !== void 0 ? test.selector : '.user',
+				sample
+			);
+		} catch (err) {
+			result = err+''
+		}
 
 		if (options.cascade !== void 0) {
 			fn.set({cascade: true})

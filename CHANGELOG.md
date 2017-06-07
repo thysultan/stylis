@@ -1,3 +1,8 @@
+## 3.0.18 June 07, 2017
+
+- patch middleware property context to remove the property when an empty string is returned
+- patch middleware preperation and post process context UUID
+
 ## 3.0.17 June 07, 2017
 
 - improves auto semicolon insertion

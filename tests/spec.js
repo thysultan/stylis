@@ -992,28 +992,6 @@ var spec = {
 		expected: ``+
 		`.user html{background-image:    linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),    url(/static/background.svg);}`
 	},
-	'middleware contexts': {
-		options: {
-			plugins: function (context, content, selector, parents, line, column, length) {
-				switch (context) {
-					case 1: return content+'/* property */';
-					case 2: return content+'/* block */';
-					case 3: return content+'/* at-rule */'
-				}
-			}
-		},
-		sample: `
-			color: blue;
-			h1 { color: red; }
-			@media {
-				color: red;
-			}
-		`,
-		expected: ``+
-		`.user{color: blue/* property */;/* block */}`+
-		`.user h1{color: red/* property */;/* block */}`+
-		`@media{.user{color: red/* property */;/* block */}/* at-rule */}`
-	},
 	'nesting selector multiple levels': {
 		sample: `
 			a {
@@ -1085,6 +1063,66 @@ var spec = {
 		},
 		sample: `:global(h1) {color: red;}`,
 		expected: `.user :global(h1){color: red;}`
+	},
+
+	'middleware contracts': {
+		options: {
+			plugins: function (context, content, selector, parents, line, column, length) {
+				switch (context) {
+					case -1: if (content.indexOf('.user') > -1) throw 'not prep context'; break
+					case -2: if (content.indexOf('.user') === -1) throw 'not post context'; break
+					case 1: return content+'/* property */';
+					case 2: return content+'/* block */';
+					case 3: return content+'/* at-rule */'
+				}
+			}
+		},
+		sample: `
+			color: blue;
+			h1 { color: red; }
+			@media {
+				color: red;
+			}
+		`,
+		expected: ``+
+		`.user{color: blue/* property */;/* block */}`+
+		`.user h1{color: red/* property */;/* block */}`+
+		`@media{.user{color: red/* property */;/* block */}/* at-rule */}`
+	},
+	'middleware remove property': {
+		options: {
+			plugins: function (context, content) {
+				switch (context) {
+					// i.e extract and polyfil custom properties
+					case 1: if (content.indexOf('--') > -1) return '';
+				}
+			}
+		},
+		sample: `
+		--foo: 'value'; 
+		color:red;
+		`,
+		expected: `.user{color:red;}`
+	},
+	'middleware remove block': {
+		options: {
+			plugins: function (context, content, selector) {
+				switch (context) {
+					// i.e extract and polyfill @apply/custom selectors
+					case 2: if (selector[0].indexOf('--') > -1) return '';
+				}
+			}
+		},
+		sample: `
+		--foo: {
+			color: red;
+		}
+
+		div {
+			color:red;
+		}
+		`,
+		expected: `.user div{color:red;}`
 	}
 };
 

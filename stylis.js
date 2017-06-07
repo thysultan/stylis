@@ -105,10 +105,10 @@
 	var KEYFRAME = 107 /* k */
 	var MEDIA = 109 /* m */
 	var SUPPORTS = 115 /* s */
-	var IMPORT = 169 /* i */
-	var CHARSET = 163 /* c */
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
+	var IMPORT = 169 /* @i */
+	var CHARSET = 163 /* @c */
 
 	var column = 1 /* current column */
 	var line = 1 /* current line numebr */
@@ -128,8 +128,8 @@
 	var plugged = 0
 
 	/* plugin context */
-	var POSTS = -1
-	var PREPS = -2
+	var POSTS = -2
+	var PREPS = -1
 	var UNKWN = 0
 	var PROPS = 1
 	var BLCKS = 2
@@ -162,7 +162,6 @@
 
 		var first = 0
 		var second = 0
-		var third = 0
 		var counter = 0
 		var context = 0
 		var atrule = 0
@@ -337,22 +336,26 @@
 						// execute plugins, property context
 						if (plugged > 0) {
 							if ((res = proxy(PROPS, chars, current, parent, line, column, out.length)) !== void 0) {
-								chars = res.trim()
+								if ((chars = res.trim()).length < 1) {
+									chars = '\0\0'
+								}
 							}
 						}
 
 						first = chars.charCodeAt(0)
 						second = chars.charCodeAt(1)
-						third = chars.charCodeAt(2)
 
 						switch (first + second) {
+							case NULL: {
+								break
+							}
 							case IMPORT:
 							case CHARSET: {
 								flat += chars + body.charAt(caret)
 								break
 							}
 							default: {
-								out += property(chars, first, second, third)
+								out += property(chars, first, second, chars.charCodeAt(2))
 							}
 						}
 

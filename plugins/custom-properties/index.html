@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>stylis.js linter WIP</title>
+	<script src='../../stylis.js'></script>
+	<script src='custom-properties.js'></script>
+</head>
+<body>
+
+<script>
+var sample = `
+:root {
+  --color: red;
+}
+
+div {
+  color: var(--color);
+}
+`
+stylis.use(customProperties)
+console.log(stylis('#id', sample))
+</script>
+
+</body>
+</html>
