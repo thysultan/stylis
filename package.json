@@ -1,7 +1,7 @@
 {
 	"name": "stylis",
 	"main": "stylis.js",
-	"types": "dio.d.ts",
+	"types": "stylis.d.ts",
 	"description": "light - weight css preprocessor",
 	"version": "3.0.18",
 	"homepage": "https://github.com/thysultan/stylis.js",
