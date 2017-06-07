@@ -6,27 +6,35 @@
 
 	'use strict'
 
+	var skip = null
 	var object = null
+	var compiler = null
 
 	function atoms () {
+		skip = true
+
 		var out = ''
 
 		for (var property in object) {
-			var selector = object[property].join(',')
-			out += selector + '{' + property + '}'
+			out += object[property].join(',') + compiler('', property)
 		}
 
-		return object = null, out;
+		return (object = skip = null, out)
 	}
 
 	function atomics (context, content, selectors, parents, line, column, length) {
+		if (skip === true && context !== void 0) {
+			return
+		}
+
 		switch (context) {
 			case 1: {
 				var index = content.indexOf(':')
 				var name = content.substring(0, index)
 				var value = content.substring(index+1).trim()
 				var prop = name+':'+value
-				var block = object[prop] = (object[prop] || []).concat(selectors)
+				
+				object[prop] = (object[prop] || []).concat(selectors)
 
 				break
 			}
@@ -39,6 +47,12 @@
 			}
 		}
 	}
+
+	function use (fn) {
+		compiler = fn
+	}
+
+	atomics['use'] = use
 
 	return atomics
 }))

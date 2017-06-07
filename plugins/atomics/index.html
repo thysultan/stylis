@@ -34,6 +34,8 @@ e {
 	width: 100%;
 }
 `
+atomics.use(stylis)
+stylis.set({compress: true})
 stylis.use(atomics)
 console.log(stylis('', sample))
 console.log('vs')
