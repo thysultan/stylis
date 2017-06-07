@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>stylis.js atomics WIP</title>
+	<script src='../../stylis.js'></script>
+	<script src='atomics.js'></script>
+</head>
+<body>
+
+<script>
+var sample = `
+a {
+	color: red;
+}
+
+b {
+	color: red;
+}
+
+c {
+	color: blue;
+}
+`
+stylis.use(atomics)
+console.log(stylis('', sample))
+console.log(atomics());
+</script>
+
+</body>
+</html>
