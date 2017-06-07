@@ -1,8 +1,9 @@
 ## 3.1.0 June 08, 2017
 
-- patch multiple chained middlewares
+- middleware, patch multiple chained middlewares
 - middleware, allow `post` context to affect the output
 - middleware, pass stylis to plugins as `this` reference for plugins to access
+- middleware, allow middleware to monkey-patch return value
 
 ## 3.0.19 June 07, 2017
 

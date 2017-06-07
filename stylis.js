@@ -1124,6 +1124,9 @@
 			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
 		}
 
+		// bit
+		code = 1
+
 		// cascade/isolate
 		if (cascade === 1) {
 			nscope = ns
@@ -1146,19 +1149,22 @@
 			var res = proxy(POSTS, output, selectors, selectors, line, column, output.length)
 			
 			if (res !== void 0) {
-				output = res
+				// bypass minification
+				if (typeof(output = res) !== 'string') {
+					code = 0
+				}
 			}
 		}
 
-		// destroy
+		// reset
 		key = ''
 		nscope = ''
 		nscopealt = ''
+		pattern = 0
 		line = 1
 		column = 1
-		pattern = 0
 
-		return compress === 0 ? output : minify(output)
+		return compress*code === 0 ? output : minify(output)
 	}
 
 	/**

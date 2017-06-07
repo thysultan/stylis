@@ -1,5 +1,14 @@
 type selectors = Array<string>
 
+declare enum context {
+	POSTS = -2,
+	PREPS = -1,
+	UNKWN = 0,
+	PROPS = 1,
+	BLCKS = 2,
+	ATRUL = 3
+}
+
 interface options {
 	keyframe?: boolean
 	global?: boolean
@@ -15,7 +24,8 @@ interface set {
 
 interface plugin {
 	(
-		context: number, 
+		this: stylis,
+		context: context, 
 		content: string, 
 		selector: selectors, 
 		parent: selectors, 
@@ -36,7 +46,7 @@ interface stylis {
 }
 
 declare global {
-	export const stylis: stylis;
+	export const stylis: stylis
 }
 
-export = stylis;
+export = stylis

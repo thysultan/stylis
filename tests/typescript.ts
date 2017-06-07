@@ -5,6 +5,6 @@ stylis.set({
 	global: true
 })
 
-stylis.use((context, content, selectors, parents, line, column, length)=> {
-	
+stylis.use(function plugin (context, content, selectors, parents, line, column, length) {
+	this('', '')
 })
