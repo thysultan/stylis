@@ -3,7 +3,9 @@
 		typeof define === 'function' && define['amd'] ? define(factory()) :
 			(window['customProperties'] = factory())
 }(function () {
-	var PROPERTY = 1
+	
+	'use strict'
+
 	var properties = null
 
 	function replace (match, group) {

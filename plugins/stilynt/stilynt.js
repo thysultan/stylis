@@ -3,9 +3,8 @@
 		typeof define === 'function' && define['amd'] ? define(factory()) :
 			(window['stilynt'] = factory())
 }(function () {
-	var PROPERTY = 1
-	var BLOCK = 2
-	var ATRULE = 3
+
+	'use strict'
 
 	// regex padding, margin
 	var r_pm = /^(?:\d|\.\d|auto)/
@@ -89,7 +88,7 @@
 
 	function stilynt (context, content, selectors, parents, line, column, length) {
 		switch (context) {
-			case PROPERTY: {
+			case 1: {
 				property(content, line, column)
 				break
 			}
