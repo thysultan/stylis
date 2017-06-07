@@ -20,7 +20,7 @@
 			out = next
 		}
 
-		return out
+		return /[-/*+ ]/.test(out) ? 'calc('+out+')' : out
 	}
 
 	function evaluate (match, numA, unitA, type, numB, unitB) {
@@ -63,15 +63,7 @@
 	function calc (context, content, selectors, parents, line, column, length) {
 		switch (context) {
 			case 1: {
-				var out = content;
-
-				while (out.indexOf('calc(') > -1) {
-					out = out.replace(/calc\(([\s\S]*)\)/g, reduce)
-				}
-
-				console.log(10000, out)
-
-				break
+				return content.indexOf('calc(') > -1 ? content.replace(/calc\(([\s\S]*)\)/g, reduce) : content
 			}
 		}
 	}
