@@ -34,12 +34,18 @@ e {
 	width: 100%;
 }
 `
-atomics.use(stylis)
+
 stylis.set({compress: true})
+
+var a = stylis('', sample);
+
 stylis.use(atomics)
-console.log(stylis('', sample))
+
+var b = stylis('', sample)
+
+console.log(a)
 console.log('vs')
-console.log(atomics());
+console.log(b);
 </script>
 
 </body>

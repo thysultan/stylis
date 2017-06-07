@@ -50,6 +50,7 @@ npm install stylis --save
 - keyframe and animation namespacing
 - plugins
 - minification
+- built to support [closure-compiler](https://developers.google.com/closure/compiler)
 
 ---
 
@@ -189,8 +190,8 @@ The optional middleware function accepts four arguments
 Plugins are executed in stages identified by an `context` interger value.
 
 ```
--1 /* preparation context */
 -2 /* post-process context */
+-1 /* preparation context */
 0  /* newline context */
 
 1  /* property context */
@@ -200,14 +201,14 @@ Plugins are executed in stages identified by an `context` interger value.
 
 > Note: Since the newline context is intended for source-map/linting plugins by default stylis will not execute plugins in this context unless enabled, this can be done through `stylis.use(true)` or disabled after that through `stylis.use(false)`.
 
-- `-1` preparation context, before the compiler starts
 - `-2` post processed context, before the compiled css output is returned
+- `-1` preparation context, before the compiler starts
 - `0` after every newline
 - `1` on a property declaration ex. `color: red;`
 - `2` after a selector block of css has been processed ex. `.foo {color:red;}`
 - `3` after a `@at-rule` block of css has been processed ex. `@media {h1{color:red;}}`
 
-If at any context greater than 0 that the middleware returns a different string the content of css will be replaced with the return value.
+If at any context(except -1 & 0) that the middleware returns a different string the content of css will be replaced with the return value.
 
 To remove all plugins just call `.use` with null/no arguments.
 

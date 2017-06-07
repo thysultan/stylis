@@ -159,13 +159,11 @@
 		var cmt = 0 /* comments /* // or /* */
 		var fnq = 0 /* functions () */
 		var str = 0 /* quotes '', "" */
-
 		var first = 0
 		var second = 0
 		var counter = 0
 		var context = 0
 		var atrule = 0
-
 		var pseudo = 0
 		var caret = 0
 		var code = 0
@@ -176,14 +174,12 @@
 		var length = 0
 		var eof = body.length
 		var eol = eof - 1
-
 		var char = ''
 		var chars = ''
 		var out = ''
 		var block = ''
 		var children = ''
 		var flat = ''
-
 		var ref
 		var res
 
@@ -1066,6 +1062,47 @@
 	}
 
 	/**
+	 * Proxy
+	 *
+	 * @param {number} context
+	 * @param {string} content
+	 * @param {Array<string>} selectors
+	 * @param {Array<string>} parents
+	 * @param {number} line
+	 * @param {number} column
+	 * @param {number} length
+	 * @return {(string|void)}
+	 */
+	function proxy (context, content, selectors, parents, line, column, length) {
+		for (var i = 0, out = content, next; i < plugged; i++) {
+			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length)) {
+				case void 0:
+				case false:
+				case true:
+				case null: {
+					break
+				}
+				default: {
+					out = next
+				}
+			}
+		}
+
+		switch (out) {
+			case void 0:
+			case false:
+			case true:
+			case null:
+			case content: {
+				break
+			}
+			default: {
+				return out + ''
+			}
+		}
+	}
+
+	/**
 	 * Stylis
 	 *
 	 * @param {string} selector
@@ -1106,7 +1143,11 @@
 
 		// execute plugins, post-process context
 		if (plugged > 0) {
-			proxy(POSTS, output, selectors, selectors, line, column, output.length)
+			var res = proxy(POSTS, output, selectors, selectors, line, column, output.length)
+			
+			if (res !== void 0) {
+				output = res
+			}
 		}
 
 		// destroy
@@ -1118,35 +1159,6 @@
 		pattern = 0
 
 		return compress === 0 ? output : minify(output)
-	}
-
-	/**
-	 * Proxy
-	 *
-	 * @param {number} context
-	 * @param {string} content
-	 * @param {Array<string>} selectors
-	 * @param {Array<string>} parents
-	 * @param {number} line
-	 * @param {number} column
-	 * @param {number} length
-	 * @return {(string|void)}
-	 */
-	function proxy (context, content, selectors, parents, line, column, length) {
-		for (var i = 0, out = content; i < plugged; i++) {
-			out = plugins[i](context, out, selectors, parents, line, column, length)
-		}
-
-		switch (out) {
-			case null:
-			case void 0:
-			case content: {
-				break
-			}
-			default: {
-				return out + ''
-			}
-		}
 	}
 
 	/**
@@ -1223,4 +1235,4 @@
 	stylis['set'] = set
 
 	return stylis
-}))
+}));

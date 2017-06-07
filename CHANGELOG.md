@@ -1,3 +1,9 @@
+## 3.1.0 June 08, 2017
+
+- patch multiple chained middlewares
+- middleware, allow `post` context to affect the output
+- middleware, pass stylis to plugins as `this` reference for plugins to access
+
 ## 3.0.19 June 07, 2017
 
 - patch `backface-visibility` vendor prefix

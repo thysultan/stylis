@@ -1132,6 +1132,39 @@ var spec = {
 		}
 		`,
 		expected: `.user div{color:red;}`
+	},
+	'middleware post process': {
+		options: {
+			plugins: [
+				function (ctx, cont) {
+					if (ctx===-2) {
+						return cont+'/*a*/'
+					}
+				}
+			]
+		},
+		sample: `color:red;`,
+		expected: ``+
+		`.user{color:red;}/*a*/`
+	},
+	'multiple middlewares': {
+		options: {
+			plugins: [
+				function (ctx, cont) {
+					if (ctx===1) {
+						return cont+'/*a*/'
+					}
+				},
+				function (ctx, cont) {
+					if (ctx===1) {
+						return cont+'/*b*/'
+					}
+				}
+			]
+		},
+		sample: `color:red;`,
+		expected: ``+
+		`.user{color:red/*a*//*b*/;}`
 	}
 };
 

@@ -8,22 +8,21 @@
 
 	var skip = null
 	var object = null
-	var compiler = null
 
-	function atoms () {
+	function atoms (compile) {
 		skip = true
 
 		var out = ''
 
 		for (var property in object) {
-			out += object[property].join(',') + compiler('', property)
+			out += object[property].join(',') + compile('', property)
 		}
 
 		return (object = skip = null, out)
 	}
 
 	function atomics (context, content, selectors, parents, line, column, length) {
-		if (skip === true && context !== void 0) {
+		if (skip === true) {
 			return
 		}
 
@@ -42,17 +41,11 @@
 				object = {}
 				break
 			}
-			case void 0: {
-				return atoms()
+			case -2: {
+				return atoms(this)
 			}
 		}
 	}
-
-	function use (fn) {
-		compiler = fn
-	}
-
-	atomics['use'] = use
 
 	return atomics
 }))
