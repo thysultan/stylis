@@ -30,7 +30,7 @@
 				object = {}
 				break
 			}
-			case void 0: {
+			case -2: {
 				return object
 			}
 		}

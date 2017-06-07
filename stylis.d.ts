@@ -40,7 +40,7 @@ interface use {
 }
 
 interface stylis {
-	(namescope: string, input: string): string
+	(namescope: string, input: string): string|any
 	set: set
 	use: use
 }

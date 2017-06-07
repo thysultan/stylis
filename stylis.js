@@ -1071,7 +1071,7 @@
 	 * @param {number} line
 	 * @param {number} column
 	 * @param {number} length
-	 * @return {(string|void)}
+	 * @return {(string|void|*)}
 	 */
 	function proxy (context, content, selectors, parents, line, column, length) {
 		for (var i = 0, out = content, next; i < plugged; i++) {
@@ -1097,7 +1097,7 @@
 				break
 			}
 			default: {
-				return out + ''
+				return out
 			}
 		}
 	}
@@ -1107,7 +1107,7 @@
 	 *
 	 * @param {string} selector
 	 * @param {string} input
-	 * @return {string}
+	 * @return {(string|*)}
 	 */
 	function stylis (selector, input) {
 		// setup
@@ -1225,7 +1225,7 @@
 	/**
 	 * Minify
 	 *
-	 * @param {string} output
+	 * @param {(string|*)} output
 	 * @return {string}
 	 */
 	function minify (output) {

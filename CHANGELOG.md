@@ -1,3 +1,7 @@
+## 3.1.1 June 08, 2017
+
+- middleware, patch: allow middleware to monkey-patch return value
+
 ## 3.1.0 June 08, 2017
 
 - middleware, patch multiple chained middlewares
