@@ -6,15 +6,7 @@
 
 	'use strict'
 
-	var object = {}
-
-	function toUpperCase (group) {
-		return group[1].toUpperCase()
-	}
-
-	function toCamel (content) {
-		return content.replace(/-([a-z])/g, toUpperCase)
-	}
+	var object = null
 
 	function atoms () {
 		var out = ''
@@ -24,7 +16,7 @@
 			out += selector + '{' + property + '}'
 		}
 
-		return out;
+		return object = null, out;
 	}
 
 	function atomics (context, content, selectors, parents, line, column, length) {
