@@ -107,8 +107,8 @@
 	var SUPPORTS = 115 /* s */
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
-	var IMPORT = 169 /* @i */
-	var CHARSET = 163 /* @c */
+	var IMPORT = 169 /* <at>i */
+	var CHARSET = 163 /* <at>c */
 
 	var column = 1 /* current column */
 	var line = 1 /* current line numebr */
@@ -791,6 +791,14 @@
 		} else if (vendor > 0) {
 			// vendor prefix
 			switch (hash) {
+				// background/backface-visibility, b, a, c
+				case 883: {
+					// backface-visibility, -
+					if (out.charCodeAt(8) === DASH) {
+						out = webkit + out + out
+					}
+					break
+				}
 				// appearance: a, p, p
 				case 978: {
 					out = webkit + out + moz + out + out

@@ -1,3 +1,7 @@
+## 3.0.19 June 07, 2017
+
+- patch `backface-visibility` vendor prefix
+
 ## 3.0.18 June 07, 2017
 
 - patch middleware property context to remove the property when an empty string is returned

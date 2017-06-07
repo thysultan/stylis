@@ -397,6 +397,10 @@ var spec = {
 				color:papayawhip;
 				order: flex;
 			}
+
+			div {
+				backface-visibility: hidden;
+			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust: none;text-size-adjust: none;}`+
@@ -475,6 +479,11 @@ var spec = {
 			`-webkit-order: flex;`+
 			`-ms-flex-order: flex;`+
 			`order: flex;`+
+			'}'+
+
+			'.user div{'+
+			`-webkit-backface-visibility: hidden;`+
+			`backface-visibility: hidden;`+
 			'}'
 	},
 	'animations': {
