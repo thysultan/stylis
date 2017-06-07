@@ -1,3 +1,5 @@
+type selectors = Array<string>
+
 interface options {
 	keyframe?: boolean
 	global?: boolean
@@ -11,8 +13,20 @@ interface set {
 	(options?: options): set
 }
 
+interface plugin {
+	(
+		context: number, 
+		content: string, 
+		selector: selectors, 
+		parent: selectors, 
+		line: number, 
+		column: number, 
+		length: number
+	): null|void|string
+}
+
 interface use {
-	(plugin?: Array<Function>|Function|null): use
+	(plugin?: Array<plugin>|plugin|null): use
 }
 
 interface stylis {

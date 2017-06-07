@@ -2,5 +2,9 @@
 
 stylis.use([()=>{}])
 stylis.set({
-	something: 1
+	global: true
+})
+
+stylis.use((context, content, selectors, parents, line, column, length)=> {
+	
 })
