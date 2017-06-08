@@ -20,6 +20,11 @@
 	/**
 	 * Notes
 	 *
+	 * The ['<method name>'] pattern is used to support closure compiler
+	 * the jsdoc signatures are also used to the same effect
+	 *
+	 * ---- 
+	 *
 	 * int + int + int === n4 [faster]
 	 *
 	 * vs
@@ -44,18 +49,18 @@
 	 * On the other hand sequences that are directly tied to the index of the character
 	 * resolve a far more accurate measure, it's also faster
 	 * to evaluate one condition in a switch statement
-	 * than three regardless of the added math
+	 * than three in an if statement regardless of the added math.
 	 *
-	 * This allows the property parser to in theory be both small and fast.
+	 * This allows the property parser to be both small and fast.
 	 */
 
 	var nulptn = /^\0+/g /* matches leading null characters */
-	var fmtptn = /[\0\r]/g /* new line and null characters */
+	var fmtptn = /[\0\r]/g /* matches new line and null characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
 	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
-	var propertiesbtn = / +\s*(?![^(]*[)])/g /* animation properties */
+	var propertiesptn = / +\s*(?![^(]*[)])/g /* animation properties */
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /&/g /* match & */
@@ -63,10 +68,10 @@
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
-	var beforeptn = /\s+(?=[{\];=:>])/g /* rm \s before ] ; = : */
-	var afterptn = /([[}=:>])\s+/g /* rm \s after characters [ } = : */
-	var tailptn = /(\{[^{]+?);(?=\})/g /* rm tail semi-colons ;} */
-	var whiteptn = /\s{2,}/g
+	var beforeptn = /\s+(?=[{\];=:>])/g /* matches \s before ] ; = : */
+	var afterptn = /([[}=:>])\s+/g /* matches \s after characters [ } = : */
+	var tailptn = /(\{[^{]+?);(?=\})/g /* matches tail semi-colons ;} */
+	var whiteptn = /\s{2,}/g /* matches repeating whitespace */
 	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
 
 	/* vendors */
@@ -137,6 +142,7 @@
 	var BLCKS = 2
 	var ATRUL = 3
 
+	/* plugin newline context */
 	var unkwn = 0
 
 	/* keyframe animation */
@@ -161,29 +167,31 @@
 		var cmt = 0 /* comments /* // or /* */
 		var fnq = 0 /* functions () */
 		var str = 0 /* quotes '', "" */
-		var first = 0
-		var second = 0
-		var counter = 0
-		var context = 0
-		var atrule = 0
-		var pseudo = 0
-		var caret = 0
-		var code = 0
-		var tail = 0
-		var trail = 0
-		var fmt = 0
-		var insert = 0
-		var length = 0
-		var eof = body.length
-		var eol = eof - 1
-		var char = ''
-		var chars = ''
-		var out = ''
-		var block = ''
-		var children = ''
-		var flat = ''
-		var ref
-		var res
+
+		var first = 0 /* first character */
+		var second = 0 /* second character */
+		
+		var counter = 0 /* count sequence termination */
+		var context = 0 /* track current context */
+		var atrule = 0 /* track @at-rule context */
+		var pseudo = 0 /* track pseudo token index */
+		var caret = 0 /* current character index */
+		var code = 0 /* current character code */
+		var tail = 0 /* last character */
+		var trail = 0 /* character before last */
+		var fmt = 0 /* control character formating context */
+		var insert = 0 /* auto semicolon insertion */
+		var length = 0 /* generic length address */
+		var eof = body.length /* end of file(length) */
+		var eol = eof - 1 /* end of file(characters) */
+		var char = '' /* current character */
+		var chars = '' /* current buffer of characters */
+		var block = '' /* next buffer of characters */
+		var out = '' /* compiled block */
+		var children = '' /* compiled children */
+		var flat = '' /* compiled leafs */
+		var ref /* generic address */
+		var res /* generic address */
 
 		// ...build body
 		while (caret < eof) {
@@ -207,28 +215,26 @@
 				}
 
 				// eof varient
-				switch (caret) {
-					case eol: {
-						if (fmt > 0) {
-							chars = chars.replace(fmtptn, '')
-						}
+				if (caret === eol) {
+					if (fmt > 0) {
+						chars = chars.replace(fmtptn, '')
+					}
 
-						if ((chars = chars.trim()).length > 0) {
-							switch (code) {
-								case SPACE:
-								case TAB:
-								case SEMICOLON:
-								case CARRIAGE:
-								case NEWLINE: {
-									break
-								}
-								default: {
-									chars += body.charAt(caret)
-								}
+					if ((chars = chars.trim()).length > 0) {
+						switch (code) {
+							case SPACE:
+							case TAB:
+							case SEMICOLON:
+							case CARRIAGE:
+							case NEWLINE: {
+								break
 							}
-
-							code = SEMICOLON
+							default: {
+								chars += body.charAt(caret)
+							}
 						}
+
+						code = SEMICOLON
 					}
 				}
 
@@ -444,7 +450,7 @@
 							}
 							break
 						}
-						// :pattern
+						// :<pattern>
 						case COLON: {
 							if (str + cmt + brq === 0) {
 								pseudo = caret
@@ -488,7 +494,7 @@
 						// functions
 						case CLOSEPARENTHESES: {
 							if (str + cmt + brq === 0) {
-								// last character, eof
+								// ) is the last character, add synthetic padding to avoid skipping this buffer
 								if (caret === eol) {
 									eol++
 									eof++
@@ -530,6 +536,7 @@
 							}
 
 							switch (cmt) {
+								// initialize line/block comment context
 								case 0: {
 									switch (code*2 + body.charCodeAt(caret+1)*3) {
 										// //
@@ -545,6 +552,7 @@
 									}
 									break
 								}
+								// end block comment context
 								case STAR: {
 									if (code === FOWARDSLASH && tail === STAR) {
 										char = ''
@@ -568,6 +576,7 @@
 								case CLOSEPARENTHESES:
 								case OPENPARENTHESES: {
 									if (context === 0) {
+										// outside of an isolated context i.e nth-child(<...>)
 										switch (tail) {
 											case TAB:
 											case SPACE:
@@ -581,6 +590,7 @@
 											}
 										}
 									} else {
+										// within an isolated context, sleep untill it's terminated
 										switch (code) {
 											case OPENPARENTHESES: {
 												context = ++counter
@@ -606,6 +616,7 @@
 											break
 										}
 										default: {
+											// ignore in isolated contexts
 											if (context === 0) {
 												char += '\0'
 											}
@@ -656,10 +667,12 @@
 					break
 				}
 				case PLACEHOLDER: {
-					// :placeholder
-					out = (out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
-						out.replace(plcholdrptn, '::' + moz + '$1') +
-						out.replace(plcholdrptn, ':' + ms + 'input-$1') + out)
+					// ::placeholder vendor prefix
+					if (vendor > 0) {
+						out = (out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
+							out.replace(plcholdrptn, '::' + moz + '$1') +
+							out.replace(plcholdrptn, ':' + ms + 'input-$1') + out)
+					}
 				}
 				default: {
 					pattern = 0
@@ -681,10 +694,11 @@
 		var selectors = current.trim().split(selectorptn)
 		var out = selectors
 
-		var length = out.length
+		var length = selectors.length
 		var l = parent.length
 
 		switch (l) {
+			// 0-1 parent selectors
 			case 0:
 			case 1: {
 				for (var i = 0, ref = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
@@ -692,7 +706,7 @@
 				}
 				break
 			}
-			// nested
+			// >2 parent selectors, nested
 			default: {
 				for (var i = 0, j = 0, out = []; i < length; i++) {
 					for (var k = 0; k < l; k++) {
@@ -928,11 +942,12 @@
 
 		// shorthand
 		if (input.charCodeAt(9) !== DASH) {
+			// split in case of multiple animations
 			var list = body.split(animationptn)
 
 			for (var i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
 				var value = list[i]
-				var items = value.split(propertiesbtn)
+				var items = value.split(propertiesptn)
 
 				while (value = items[index]) {
 					var peak = value.charCodeAt(0)
@@ -940,13 +955,14 @@
 					if (keyed === 1 && (
 						// letters
 						(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
-						// dash but not in sequence ex. --
+						// dash but not in sequence i.e --
 						(peak === DASH && value.charCodeAt(1) !== DASH)
 					)) {
 						// not a number/function
 						switch (isNaN(parseFloat(value)) + (value.indexOf('(') !== -1)) {
 							case 1: {
 								switch (value) {
+									// not a valid reserved keyword
 									case 'infinite': case 'alternate': case 'backwards': case 'running':
 									case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
 									case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
@@ -968,6 +984,7 @@
 				out += (i === 0 ? '' : ',') + items.join(' ')
 			}
 		} else {
+			// animation-name, n
 			out += input.charCodeAt(10) === 110 ? body + (keyed === 1 ? key : '') : body
 		}
 
@@ -982,22 +999,23 @@
 	 * @param {Array<string>} selectors
 	 */
 	function isolate (selectors) {
-		for (var i = 0, length = selectors.length, prefix, element; i < length; i++) {
+		for (var i = 0, length = selectors.length, padding, element; i < length; i++) {
+			// split individual elements in a selector i.e h1 h2 === [h1, h2]
 			var elements = selectors[i].split(elementptn)
 			var out = ''
 
 			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
+				// empty element
 				if ((size = (element = elements[j]).length) === 0 && l > 1) {
 					continue
 				}
 
-				prefix = ' '
 				tail = out.charCodeAt(out.length-1)
 				code = element.charCodeAt(0)
+				padding = ''
 
-				if (j === 0) {
-					prefix = ''
-				} else {
+				if (j !== 0) {
+					// determine if we need padding
 					switch (tail) {
 						case STAR:
 						case TILDE:
@@ -1005,14 +1023,17 @@
 						case PLUS:
 						case SPACE:
 						case OPENPARENTHESES:  {
-							prefix = ''
+							break
+						}
+						default: {
+							padding = ' '
 						}
 					}
 				}
 
 				switch (code) {
 					case AND: {
-						element = prefix + '' + nscopealt
+						element = padding + nscopealt
 					}
 					case TILDE:
 					case GREATERTHAN:
@@ -1023,7 +1044,7 @@
 						break
 					}
 					case OPENBRACKET: {
-						element = prefix + element + nscopealt
+						element = padding + element + nscopealt
 						break
 					}
 					case COLON: {
@@ -1031,27 +1052,27 @@
 							// :global
 							case 530: {
 								if (escape > 0) {
-									element = prefix + element.substring(8, size - 1)
+									element = padding + element.substring(8, size - 1)
 									break
 								}
 							}
 							// :hover, :nth-child(), ...
 							default: {
 								if (j < 1 || elements[j-1].length < 1) {
-									element = prefix + nscopealt + element
+									element = padding + nscopealt + element
 								}
 							}
 						}
 						break
 					}
 					case COMMA: {
-						prefix = ''
+						padding = ''
 					}
 					default: {
 						if (size > 1 && element.indexOf(':') > 0) {
-							element = prefix + element.replace(pseudoptn, '$1' + nscopealt + '$2')
+							element = padding + element.replace(pseudoptn, '$1' + nscopealt + '$2')
 						} else {
-							element = prefix + element + nscopealt
+							element = padding + element + nscopealt
 						}
 					}
 				}
@@ -1196,7 +1217,7 @@
 			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
 		}
 
-		// bit
+		// reset, used to assert if a plugin is moneky-patching the return value
 		code = 1
 
 		// cascade/isolate
