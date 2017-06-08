@@ -1,3 +1,8 @@
+## 3.1.2 June 08, 2017
+
+- escape user authored control characters that break browser vendor parsers `\0`, `\f`, `\v`
+- improve `::placeholder` detection
+
 ## 3.1.1 June 08, 2017
 
 - middleware, patch: allow middleware to monkey-patch return value

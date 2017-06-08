@@ -3,6 +3,10 @@
  * @type {Object}
  */
 var spec = {
+	'escape breaking control characters': {
+		sample: `content: "\f\0\v";`,
+		expected: `.user{content: "\\f\\0\\v";}`
+	},
 	'universal selector': {
 		sample: `
 		* {

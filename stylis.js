@@ -100,6 +100,8 @@
 	var PLUS = 43 /* + */
 	var TILDE = 126 /* ~ */
 	var NULL = 0 /* \0 */
+	var FORMFEED = 12 /* \f */
+	var VERTICALTAB = 11 /* \v */
 
 	/* special identifiers */
 	var KEYFRAME = 107 /* k */
@@ -428,11 +430,17 @@
 
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
+						// escape breaking control characters
+						case NULL: char = '\\0'; break
+						case FORMFEED: char = '\\f'; break
+						case VERTICALTAB: char = '\\v'; break
 						// :p<l>aceholder
 						// :g<l>obal
 						case 108: {
 							if (str + cmt + brq + pattern === 0 && pseudo > 0 && caret - pseudo === 2) {
-								pattern = tail
+								if (tail !== PLACEHOLDER || body.charCodeAt(caret-3) === COLON) {
+									pattern = tail
+								}
 							}
 							break
 						}
@@ -710,15 +718,9 @@
 		var prefix = parent
 		var code = selector.charCodeAt(0)
 
-		switch (code) {
-			case NULL: {
-				selector = selector.replace(nulptn, '')
-			}
-			case CARRIAGE:
-			case NEWLINE:
-			case SPACE: {
-				code = (selector = selector.trim()).charCodeAt(0)
-			}
+		// trim leading whitespace
+		if (code < 33) {
+			code = (selector = selector.trim()).charCodeAt(0)
 		}
 
 		switch (code) {
@@ -1103,68 +1105,18 @@
 	}
 
 	/**
-	 * Stylis
+	 * Minify
 	 *
-	 * @param {string} selector
-	 * @param {string} input
-	 * @return {(string|*)}
+	 * @param {(string|*)} output
+	 * @return {string}
 	 */
-	function stylis (selector, input) {
-		// setup
-		var ns = selector
-		var code = ns.charCodeAt(0)
-
-		// leading whitespace
-		if (code < 33) {
-			code = (ns = ns.trim()).charCodeAt(0)
-		}
-
-		// keyframe/animation namespace
-		if (keyed > 0) {
-			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
-		}
-
-		// bit
-		code = 1
-
-		// cascade/isolate
-		if (cascade === 1) {
-			nscope = ns
-		} else {
-			nscopealt = ns
-		}
-
-		var selectors = [nscope]
-
-		// execute plugins, pre-process context
-		if (plugged > 0) {
-			proxy(PREPS, input, selectors, selectors, line, column, 0)
-		}
-
-		// build
-		var output = compile(array, selectors, input, 0)
-
-		// execute plugins, post-process context
-		if (plugged > 0) {
-			var res = proxy(POSTS, output, selectors, selectors, line, column, output.length)
-			
-			if (res !== void 0) {
-				// bypass minification
-				if (typeof(output = res) !== 'string') {
-					code = 0
-				}
-			}
-		}
-
-		// reset
-		key = ''
-		nscope = ''
-		nscopealt = ''
-		pattern = 0
-		line = 1
-		column = 1
-
-		return compress*code === 0 ? output : minify(output)
+	function minify (output) {
+		return output
+			.replace(fmtptn, '')
+			.replace(beforeptn, '')
+			.replace(afterptn, '$1')
+			.replace(tailptn, '$1')
+			.replace(whiteptn, ' ')
 	}
 
 	/**
@@ -1223,18 +1175,68 @@
 	}
 
 	/**
-	 * Minify
+	 * Stylis
 	 *
-	 * @param {(string|*)} output
-	 * @return {string}
+	 * @param {string} selector
+	 * @param {string} input
+	 * @return {(string|*)}
 	 */
-	function minify (output) {
-		return output
-			.replace(fmtptn, '')
-			.replace(beforeptn, '')
-			.replace(afterptn, '$1')
-			.replace(tailptn, '$1')
-			.replace(whiteptn, ' ')
+	function stylis (selector, input) {
+		// setup
+		var ns = selector
+		var code = ns.charCodeAt(0)
+
+		// trim leading whitespace
+		if (code < 33) {
+			code = (ns = ns.trim()).charCodeAt(0)
+		}
+
+		// keyframe/animation namespace
+		if (keyed > 0) {
+			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
+		}
+
+		// bit
+		code = 1
+
+		// cascade/isolate
+		if (cascade === 1) {
+			nscope = ns
+		} else {
+			nscopealt = ns
+		}
+
+		var selectors = [nscope]
+
+		// execute plugins, pre-process context
+		if (plugged > 0) {
+			proxy(PREPS, input, selectors, selectors, line, column, 0)
+		}
+
+		// build
+		var output = compile(array, selectors, input, 0)
+
+		// execute plugins, post-process context
+		if (plugged > 0) {
+			var res = proxy(POSTS, output, selectors, selectors, line, column, output.length)
+			
+			if (res !== void 0) {
+				// bypass minification
+				if (typeof(output = res) !== 'string') {
+					code = 0
+				}
+			}
+		}
+
+		// reset
+		key = ''
+		nscope = ''
+		nscopealt = ''
+		pattern = 0
+		line = 1
+		column = 1
+
+		return compress*code === 0 ? output : minify(output)
 	}
 
 	stylis['use'] = use
