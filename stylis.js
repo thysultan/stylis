@@ -771,7 +771,7 @@
 			}
 			default: {
 				// html &
-				if (cascade > 0 && selector.indexOf('&') > 0) {
+				if (cascade > 0 && selector.indexOf(' &') > 0) {
 					return prefix.replace(nscope, '').trim() + ' ' + selector.replace(andptn, nscope)
 				}
 			}
