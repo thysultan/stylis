@@ -1,3 +1,7 @@
+## 3.1.3 June 08, 2017
+
+- patch inverse selector `html &:after` 
+
 ## 3.1.2 June 08, 2017
 
 - escape user authored control characters that break browser vendor parsers `\0`, `\f`, `\v`

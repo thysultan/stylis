@@ -69,6 +69,10 @@ var spec = {
 				}
 			}
 
+			html &:after {
+				color: red;
+			}
+
 			div {
 				h1 & {
 					color: red;
@@ -83,6 +87,7 @@ var spec = {
 		`.user h1 :global(body > li){color: red;}`+
 		`html .user{color: red;}`+
 		`html .user body{color: red;}`+
+		`html .user:after{color: red;}`+
 		`div h1 .user{color: red;}`
 	},
 	'comments': {
