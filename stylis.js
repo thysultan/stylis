@@ -330,12 +330,13 @@
 
 						break
 					}
-					case SEMICOLON: {
-						if (fmt > 0) {
-							chars = chars.replace(fmtptn, '')
+					case CLOSEBRACES: {
+						if ((chars = (fmt > 0 ? chars.replace(fmtptn, '') : chars).trim()).length === 0) {
+							chars = '\0\0'
 						}
-
-						chars = chars.trim()
+					}
+					case SEMICOLON: {
+						chars = (fmt > 0 ? chars.replace(fmtptn, '') : chars).trim()
 
 						// execute plugins, property context
 						if (plugged > 0) {

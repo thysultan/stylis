@@ -1,3 +1,7 @@
+## 3.1.4 June 09, 2017
+
+- support monkey-patching some common invalid css patterns
+
 ## 3.1.3 June 08, 2017
 
 - patch inverse selector `html &:after` 

@@ -3,6 +3,23 @@
  * @type {Object}
  */
 var spec = {
+	'monkey-patch some invalid css patterns': {
+		sample: ``,
+		sample: `
+				margin: 20px;
+				.b {
+				  border: 3px solid green;
+				}
+			}
+				.c {
+					color:red;
+				}
+				color:red;
+			}
+		`,
+		expected: ``+
+			`.user{margin: 20px;color:red;}.user .b{border: 3px solid green;}.user .c{color:red;}`
+	},
 	'escape breaking control characters': {
 		sample: `content: "\f\0\v";`,
 		expected: `.user{content: "\\f\\0\\v";}`
