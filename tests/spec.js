@@ -86,14 +86,18 @@ var spec = {
 				}
 			}
 
-			html &:after {
-				color: red;
-			}
-
 			div {
 				h1 & {
 					color: red;
 				}
+			}
+
+			html &:after {
+				color: red;
+			}
+
+			html [a=' &'] {
+				color: red;
 			}
 		`,
 		expected: `.user h1,h2{color: red;}`+
@@ -104,8 +108,9 @@ var spec = {
 		`.user h1 :global(body > li){color: red;}`+
 		`html .user{color: red;}`+
 		`html .user body{color: red;}`+
+		`div h1 .user{color: red;}`+
 		`html .user:after{color: red;}`+
-		`div h1 .user{color: red;}`
+		`.user html [a=' &']{color: red;}`
 	},
 	'comments': {
 		sample: `

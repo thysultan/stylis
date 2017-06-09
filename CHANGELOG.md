@@ -1,3 +1,9 @@
+## 3.1.5 June 09, 2017
+
+- improve cascade isolation mode
+- improve inverse selector detection
+- improve monkey-patching invalid css patterns
+
 ## 3.1.4 June 09, 2017
 
 - support monkey-patching some common invalid css patterns

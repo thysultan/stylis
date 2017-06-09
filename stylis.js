@@ -51,11 +51,11 @@
 	 * to evaluate one condition in a switch statement
 	 * than three in an if statement regardless of the added math.
 	 *
-	 * This allows the property parser to be both small and fast.
+	 * This allows the vendor prefixer to be both small and fast.
 	 */
 
 	var nulptn = /^\0+/g /* matches leading null characters */
-	var fmtptn = /[\0\r]/g /* matches new line and null characters */
+	var fmtptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
@@ -63,8 +63,8 @@
 	var propertiesptn = / +\s*(?![^(]*[)])/g /* animation properties */
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
-	var andptn = /&/g /* match & */
-	var keyptn = /\W+/g /* removes invalid characters from key */
+	var andptn = /\f?&/g /* match & */
+	var keyptn = /\W+/g /* removes invalid characters from keyframes */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
@@ -168,28 +168,31 @@
 		var fnq = 0 /* functions () */
 		var str = 0 /* quotes '', "" */
 
-		var first = 0 /* first character */
-		var second = 0 /* second character */
+		var first = 0 /* first character code */
+		var second = 0 /* second character code */
+		var code = 0 /* current character code */
+		var tail = 0 /* last character code */
+		var trail = 0 /* character before last code */
 		
 		var counter = 0 /* count sequence termination */
 		var context = 0 /* track current context */
 		var atrule = 0 /* track @at-rule context */
 		var pseudo = 0 /* track pseudo token index */
 		var caret = 0 /* current character index */
-		var code = 0 /* current character code */
-		var tail = 0 /* last character */
-		var trail = 0 /* character before last */
 		var fmt = 0 /* control character formating context */
 		var insert = 0 /* auto semicolon insertion */
+		var invert = 0 /* inverted selector pattern */
 		var length = 0 /* generic length address */
 		var eof = body.length /* end of file(length) */
 		var eol = eof - 1 /* end of file(characters) */
+
 		var char = '' /* current character */
 		var chars = '' /* current buffer of characters */
-		var block = '' /* next buffer of characters */
-		var out = '' /* compiled block */
+		var child = '' /* next buffer of characters */
+		var out = '' /* compiled body */
 		var children = '' /* compiled children */
 		var flat = '' /* compiled leafs */
+
 		var ref /* generic address */
 		var res /* generic address */
 
@@ -264,7 +267,7 @@
 								break
 							}
 
-							block += body.charAt(caret++)
+							child += body.charAt(caret++)
 						}
 
 						if (first === NULL) {
@@ -279,33 +282,33 @@
 								}
 
 								second = chars.charCodeAt(1)
-								block = compile(current, second > 108 ? current : array, block, second)
+								child = compile(current, second > 108 ? current : array, child, second)
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
-									ref = select(array, chars)
-									res = proxy(ATRUL, block, ref, current, line, column, out.length)
+									ref = select(array, chars, invert)
+									res = proxy(ATRUL, child, ref, current, line, column, out.length)
 									chars = ref.join('')
 
 									if (res !== void 0) {
-										block = res
+										child = res
 									}
 								}
 
 								switch (second) {
 									case MEDIA:
 									case SUPPORTS: {
-										block = chars + '{' + block + '}'
+										child = chars + '{' + child + '}'
 										break
 									}
 									case FONT: {
-										block = chars + block
+										child = chars + child
 										break
 									}
 									case KEYFRAME: {
 										chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
-										block = chars + '{' + block + '}'
-										block = '@' + (vendor > 0 ? webkit + block + '@' + block : block)
+										child = chars + '{' + child + '}'
+										child = '@' + (vendor > 0 ? webkit + child + '@' + child : child)
 										break
 									}
 								}
@@ -313,63 +316,63 @@
 							}
 							// selector
 							default: {
-								block = compile(current, select(current, chars), block, from)
+								child = compile(current, select(current, chars, invert), child, from)
 							}
 						}
 
-						children += block
+						children += child
 						caret++
 
 						// reset
 						context = 0
 						pseudo = 0
 						fmt = 0
+						invert = 0
 						atrule = 0
 						chars = ''
-						block = ''
+						child = ''
 
 						break
 					}
-					case CLOSEBRACES: {
-						if ((chars = (fmt > 0 ? chars.replace(fmtptn, '') : chars).trim()).length === 0) {
-							chars = '\0\0'
-						}
-					}
+					case CLOSEBRACES:
 					case SEMICOLON: {
 						chars = (fmt > 0 ? chars.replace(fmtptn, '') : chars).trim()
+						
+						if (code !== CLOSEBRACES || chars.length > 0) {
+							// execute plugins, property context
+							if (plugged > 0) {
+								if ((res = proxy(PROPS, chars, current, parent, line, column, out.length)) !== void 0) {
+									if ((chars = res.trim()).length === 0) {
+										chars = '\0\0'
+									}
+								}
+							}
 
-						// execute plugins, property context
-						if (plugged > 0) {
-							if ((res = proxy(PROPS, chars, current, parent, line, column, out.length)) !== void 0) {
-								if ((chars = res.trim()).length < 1) {
-									chars = '\0\0'
+							first = chars.charCodeAt(0)
+							second = chars.charCodeAt(1)
+
+							switch (first + second) {
+								case NULL: {
+									break
+								}
+								case IMPORT:
+								case CHARSET: {
+									flat += chars + body.charAt(caret)
+									break
+								}
+								default: {
+									out += pseudo > 0 ? property(chars, first, second, chars.charCodeAt(2)) : chars+';'
 								}
 							}
 						}
 
-						first = chars.charCodeAt(0)
-						second = chars.charCodeAt(1)
-
-						switch (first + second) {
-							case NULL: {
-								break
-							}
-							case IMPORT:
-							case CHARSET: {
-								flat += chars + body.charAt(caret)
-								break
-							}
-							default: {
-								out += property(chars, first, second, chars.charCodeAt(2))
-							}
-						}
-
 						caret++
 
 						// reset
 						context = 0
 						pseudo = 0
 						fmt = 0
+						invert = 0
 						chars = ''
 
 						break
@@ -438,9 +441,28 @@
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
 						// escape breaking control characters
-						case NULL: char = '\\0'; break
-						case FORMFEED: char = '\\f'; break
-						case VERTICALTAB: char = '\\v'; break
+						case NULL: {
+							char = '\\0'
+							break
+						}
+						case FORMFEED: {
+							char = '\\f'
+							break
+						}
+						case VERTICALTAB: {
+							char = '\\v'
+							break
+						}
+						// &
+						case AND: {
+							// inverted selector pattern i.e html &
+							if (str + cmt + brq === 0 && cascade*tail === SPACE) {
+								invert = 1
+								fmt = 1
+								char = '\f' + char
+							}
+							break
+						}
 						// :p<l>aceholder
 						// :g<l>obal
 						case 108: {
@@ -461,6 +483,7 @@
 						// selectors
 						case COMMA: {
 							if (cmt + fnq + str + brq === 0) {
+								invert = 1
 								fmt = 1
 								char += '\r'
 							}
@@ -568,8 +591,8 @@
 					if (cmt === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq + atrule === 0 && from !== KEYFRAME) {
-							switch ((fmt = 1, code)) {
+						if (cascade + str + brq + atrule === 0 && from !== KEYFRAME && code !== SEMICOLON) {
+							switch (code) {
 								case COMMA:
 								case TILDE:
 								case GREATERTHAN:
@@ -590,6 +613,7 @@
 												char = '\0' + char + (code === COMMA ? '' : '\0')
 											}
 										}
+										fmt = 1
 									} else {
 										// within an isolated context, sleep untill it's terminated
 										switch (code) {
@@ -599,6 +623,7 @@
 											}
 											case CLOSEPARENTHESES: {
 												if ((context = --counter) === 0) {
+													fmt = 1
 													char += '\0'
 												}
 												break
@@ -609,7 +634,12 @@
 								}
 								case SPACE: {
 									switch (tail) {
+										case NULL:
+										case OPENBRACES:
+										case CLOSEBRACES:
+										case SEMICOLON:
 										case COMMA:
+										case FORMFEED:
 										case TAB:
 										case SPACE:
 										case NEWLINE:
@@ -619,6 +649,7 @@
 										default: {
 											// ignore in isolated contexts
 											if (context === 0) {
+												fmt = 1
 												char += '\0'
 											}
 										}
@@ -633,16 +664,12 @@
 				}
 			}
 
-			// tail characters
+			// tail character codes
 			trail = tail
 			tail = code
 
 			// visit every character
 			caret++
-		}
-
-		if (fmt > 0) {
-			out = out.replace(fmtptn, '')
 		}
 
 		length = out.length
@@ -657,6 +684,7 @@
 		}
 
 		if (length > 0) {
+			// cascade isolation mode
 			if (cascade === 0 && from !== KEYFRAME) {
 				isolate(current)
 			}
@@ -689,9 +717,10 @@
 	 *
 	 * @param {Array<string>} parent
 	 * @param {string} current
+	 * @param {number} invert
 	 * @return {Array<string>}
 	 */
-	function select (parent, current) {
+	function select (parent, current, invert) {
 		var selectors = current.trim().split(selectorptn)
 		var out = selectors
 
@@ -703,7 +732,7 @@
 			case 0:
 			case 1: {
 				for (var i = 0, ref = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
-					out[i] = scope(out[i], ref, l).trim()
+					out[i] = scope(out[i], ref, l, invert).trim()
 				}
 				break
 			}
@@ -711,7 +740,7 @@
 			default: {
 				for (var i = 0, j = 0, out = []; i < length; i++) {
 					for (var k = 0; k < l; k++) {
-						out[j++] = scope(selectors[i], parent[k] + ' ', l).trim()
+						out[j++] = scope(selectors[i], parent[k] + ' ', l, invert).trim()
 					}
 				}
 			}
@@ -726,9 +755,10 @@
 	 * @param {string} input
 	 * @param {string} parent
 	 * @param {number} level
+	 * @param {number} invert
 	 * @return {string}
 	 */
-	function scope (input, parent, level) {
+	function scope (input, parent, level, invert) {
 		var selector = input
 		var prefix = parent
 		var code = selector.charCodeAt(0)
@@ -772,8 +802,11 @@
 			}
 			default: {
 				// html &
-				if (cascade > 0 && selector.indexOf(' &') > 0) {
-					return prefix.replace(nscope, '').trim() + ' ' + selector.replace(andptn, nscope)
+				if (invert*cascade > 0 && (code = selector.indexOf('\f')) > 0) {
+					return (
+						prefix.replace(nscope, '').trim() + ' ' + 
+						selector.substring(0, code) + nscope + selector.substring(code+2)
+					)
 				}
 			}
 		}

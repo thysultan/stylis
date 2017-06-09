@@ -111,11 +111,13 @@ function run (tests, fn) {
 			fn.set({global: true})
 		}
 
-		if (result !== expected || /[\0\r\n]/g.test(result)) {
+		var control = /[\0\r\n\f]/g.test(result)
+
+		if (result !== expected || control) {
 			// log why it failed
 			console.log(result.length, 'failed: ', name, '\n\n', result)
 			console.log(expected.length, 'expected: ', '\n\n', expected, '\n\n---------------\n\n')
-			console.log(result.indexOf('\0'))
+			console.log(control)
 
 			failed.push(name);
 
