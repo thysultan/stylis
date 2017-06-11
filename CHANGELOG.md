@@ -1,4 +1,4 @@
-## 3.1.6 June 11, 2017
+## 3.1.6 June 12, 2017
 
 - patch `@at-rule` middleware context replacement value
 - patch parent `html &` selector
