@@ -3,25 +3,25 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>stylis.js calc WIP</title>
+	<title>stylis.js mixins WIP</title>
 	<script src='../../stylis.js'></script>
-	<script src='calc.js'></script>
+	<script src='mixins.js'></script>
 </head>
 <body>
 
 <script>
 var sample = `
-width: calc(1/2)
+@mixin icon {
+	width: 16px;
+	height: 16px;
+}
 
-width: calc(2rem/2)
-
-width: calc(2rem - 2px)
-
-width: calc(2px * 2px)
-
-width: calc(3rem * 2 - 1rem)
+.search {
+	fill: black;
+	@include icon;
+}
 `
-stylis.use(calc)
+stylis.use(mixins)
 console.log(stylis('#id', sample))
 </script>
 

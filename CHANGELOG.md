@@ -1,3 +1,9 @@
+## 3.1.6 June 11, 2017
+
+- patch `@at-rule` middleware context replacement value
+- patch parent `html &` selector
+- patch `:read-only` selector vendor prefix
+
 ## 3.1.5 June 09, 2017
 
 - improve cascade isolation mode

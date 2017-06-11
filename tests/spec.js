@@ -108,7 +108,7 @@ var spec = {
 		`.user h1 :global(body > li){color: red;}`+
 		`html .user{color: red;}`+
 		`html .user body{color: red;}`+
-		`div h1 .user{color: red;}`+
+		`h1 .user div{color: red;}`+
 		`html .user:after{color: red;}`+
 		`.user html [a=' &']{color: red;}`
 	},
@@ -432,6 +432,10 @@ var spec = {
 			div {
 				backface-visibility: hidden;
 			}
+
+			h1:read-only {
+			  color: red;
+			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust: none;text-size-adjust: none;}`+
@@ -515,6 +519,12 @@ var spec = {
 			'.user div{'+
 			`-webkit-backface-visibility: hidden;`+
 			`backface-visibility: hidden;`+
+			'}'+
+			'.user h1:-moz-read-only{'+
+			'color: red;'+
+			'}'+
+			'.user h1:read-only{'+
+			'color: red;'+
 			'}'
 	},
 	'animations': {

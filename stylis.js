@@ -54,8 +54,8 @@
 	 * This allows the vendor prefixer to be both small and fast.
 	 */
 
-	var nulptn = /^\0+/g /* matches leading null characters */
-	var fmtptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
+	var nullptn = /^\0+/g /* matches leading null characters */
+	var formatptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
 	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
@@ -64,10 +64,11 @@
 	var elementptn = / *[\0] */g /* selector elements */
 	var selectorptn = /,\r+?/g /* splits selectors */
 	var andptn = /\f?&/g /* match & */
-	var keyptn = /\W+/g /* removes invalid characters from keyframes */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
+	var invalidptn = /\W+/g /* removes invalid characters from keyframes */
 	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
-	var plcholdrptn = /::?(place)/g /* match ::placeholder varient */
+	var plcholdrptn = /::(place)/g /* match ::placeholder varient */
+	var readonlyptn = /:(read-only)/g /* match :read-only varient */
 	var beforeptn = /\s+(?=[{\];=:>])/g /* matches \s before ] ; = : */
 	var afterptn = /([[}=:>])\s+/g /* matches \s after characters [ } = : */
 	var tailptn = /(\{[^{]+?);(?=\})/g /* matches tail semi-colons ;} */
@@ -114,6 +115,7 @@
 	var SUPPORTS = 115 /* s */
 	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
+	var READONLY = 111 /* o */
 	var IMPORT = 169 /* <at>i */
 	var CHARSET = 163 /* <at>c */
 
@@ -159,14 +161,14 @@
 	 * @param {Array<string>} parent
 	 * @param {Array<string>} current
 	 * @param {string} body
-	 * @param {number} from
+	 * @param {number} id
 	 * @return {string}
 	 */
-	function compile (parent, current, body, from) {
-		var brq = 0 /* brackets [] */
-		var cmt = 0 /* comments /* // or /* */
-		var fnq = 0 /* functions () */
-		var str = 0 /* quotes '', "" */
+	function compile (parent, current, body, id) {
+		var bracket = 0 /* brackets [] */
+		var comment = 0 /* comments /* // or /* */
+		var parentheses = 0 /* functions () */
+		var quote = 0 /* quotes '', "" */
 
 		var first = 0 /* first character code */
 		var second = 0 /* second character code */
@@ -179,7 +181,7 @@
 		var atrule = 0 /* track @at-rule context */
 		var pseudo = 0 /* track pseudo token index */
 		var caret = 0 /* current character index */
-		var fmt = 0 /* control character formating context */
+		var format = 0 /* control character formating context */
 		var insert = 0 /* auto semicolon insertion */
 		var invert = 0 /* inverted selector pattern */
 		var length = 0 /* generic length address */
@@ -192,15 +194,14 @@
 		var out = '' /* compiled body */
 		var children = '' /* compiled children */
 		var flat = '' /* compiled leafs */
-
-		var ref /* generic address */
-		var res /* generic address */
+		var selector /* generic selector address */
+		var result /* generic address */
 
 		// ...build body
 		while (caret < eof) {
 			code = body.charCodeAt(caret)
 
-			if (cmt + str + fnq + brq === 0) {
+			if (comment + quote + parentheses + bracket === 0) {
 				// auto semicolon insertion
 				if (insert === 1) {
 					// false flags, comma character
@@ -219,8 +220,8 @@
 
 				// eof varient
 				if (caret === eol) {
-					if (fmt > 0) {
-						chars = chars.replace(fmtptn, '')
+					if (format > 0) {
+						chars = chars.replace(formatptn, '')
 					}
 
 					if ((chars = chars.trim()).length > 0) {
@@ -271,14 +272,14 @@
 						}
 
 						if (first === NULL) {
-							first = (chars = chars.replace(nulptn, '').trim()).charCodeAt(0)
+							first = (chars = chars.replace(nullptn, '').trim()).charCodeAt(0)
 						}
 
 						switch (first) {
 							// @at-rule
 							case AT: {
-								if (fmt > 0) {
-									chars = chars.replace(fmtptn, '')
+								if (format > 0) {
+									chars = chars.replace(formatptn, '')
 								}
 
 								second = chars.charCodeAt(1)
@@ -286,12 +287,15 @@
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
-									ref = select(array, chars, invert)
-									res = proxy(ATRUL, child, ref, current, line, column, out.length)
-									chars = ref.join('')
+									selector = select(array, chars, invert)
+									result = proxy(ATRUL, child, selector, current, line, column, out.length, second)
+									chars = selector.join('')
 
-									if (res !== void 0) {
-										child = res
+									if (result !== void 0) {
+										if ((child = result.trim()).length === 0) {
+											second = 0
+											child = ''
+										}
 									}
 								}
 
@@ -316,7 +320,7 @@
 							}
 							// selector
 							default: {
-								child = compile(current, select(current, chars, invert), child, from)
+								child = compile(current, select(current, chars, invert), child, id)
 							}
 						}
 
@@ -326,7 +330,7 @@
 						// reset
 						context = 0
 						pseudo = 0
-						fmt = 0
+						format = 0
 						invert = 0
 						atrule = 0
 						chars = ''
@@ -336,13 +340,13 @@
 					}
 					case CLOSEBRACES:
 					case SEMICOLON: {
-						chars = (fmt > 0 ? chars.replace(fmtptn, '') : chars).trim()
+						chars = (format > 0 ? chars.replace(formatptn, '') : chars).trim()
 						
 						if (code !== CLOSEBRACES || chars.length > 0) {
 							// execute plugins, property context
 							if (plugged > 0) {
-								if ((res = proxy(PROPS, chars, current, parent, line, column, out.length)) !== void 0) {
-									if ((chars = res.trim()).length === 0) {
+								if ((result = proxy(PROPS, chars, current, parent, line, column, out.length, id)) !== void 0) {
+									if ((chars = result.trim()).length === 0) {
 										chars = '\0\0'
 									}
 								}
@@ -371,7 +375,7 @@
 						// reset
 						context = 0
 						pseudo = 0
-						fmt = 0
+						format = 0
 						invert = 0
 						chars = ''
 
@@ -385,7 +389,7 @@
 				case CARRIAGE:
 				case NEWLINE: {
 					// auto insert semicolon
-					if (cmt + str + fnq + brq + semicolon === 0) {
+					if (comment + quote + parentheses + bracket + semicolon === 0) {
 						// valid characters that
 						// may precede a newline
 						switch (tail) {
@@ -411,8 +415,8 @@
 					}
 
 					// terminate line comment
-					if (cmt === FOWARDSLASH) {
-						cmt = 0
+					if (comment === FOWARDSLASH) {
+						comment = 0
 					}
 
 					// execute plugins, newline context
@@ -456,79 +460,90 @@
 						// &
 						case AND: {
 							// inverted selector pattern i.e html &
-							if (str + cmt + brq === 0 && cascade*tail === SPACE) {
+							if (quote + comment + bracket === 0 && cascade*tail === SPACE) {
 								invert = 1
-								fmt = 1
+								format = 1
 								char = '\f' + char
 							}
 							break
 						}
-						// :p<l>aceholder
-						// :g<l>obal
+						// ::p<l>aceholder, l
+						// :read-on<l>y, l
 						case 108: {
-							if (str + cmt + brq + pattern === 0 && pseudo > 0 && caret - pseudo === 2) {
-								if (tail !== PLACEHOLDER || body.charCodeAt(caret-3) === COLON) {
-									pattern = tail
+							if (quote + comment + bracket + pattern === 0 && pseudo > 0) {
+								switch (caret - pseudo) {
+									// ::placeholder
+									case 2: {
+										if (tail === PLACEHOLDER && body.charCodeAt(caret-3) === COLON) {
+											pattern = tail
+										}
+									}
+									// :read-only
+									case 8: {
+										if (trail === READONLY) {
+											pattern = trail
+										}
+									}
 								}
 							}
 							break
 						}
 						// :<pattern>
 						case COLON: {
-							if (str + cmt + brq === 0) {
+							if (quote + comment + bracket === 0) {
 								pseudo = caret
 							}
 							break
 						}
 						// selectors
 						case COMMA: {
-							if (cmt + fnq + str + brq === 0) {
-								invert = 1
-								fmt = 1
+							if (comment + parentheses + quote + bracket === 0) {
+								format = 1
 								char += '\r'
 							}
 							break
 						}
-						// qoutes
+						// quotes
 						case DOUBLEQUOTE: {
-							if (cmt === 0) {
-								str = str === DOUBLEQUOTE ? 0 : (str === 0 ? DOUBLEQUOTE : str)
+							if (comment === 0) {
+								quote = quote === code ? 0 : (quote === 0 ? code : quote)
 							}
 							break
 						}
 						case SINGLEQUOTE: {
-							if (cmt === 0) {
-								str = str === SINGLEQUOTE ? 0 : (str === 0 ? SINGLEQUOTE : str)
+							if (comment === 0) {
+								quote = quote === code ? 0 : (quote === 0 ? code : quote)
 							}
 							break
 						}
 						// attributes
 						case OPENBRACKET: {
-							if (str + cmt + fnq === 0) {
-								brq = 1
+							if (quote + comment + parentheses === 0) {
+								bracket++
 							}
 							break
 						}
 						case CLOSEBRACKET: {
-							if (str + cmt + fnq === 0) {
-								brq = 0
+							if (quote + comment + parentheses === 0) {
+								bracket--
 							}
 							break
 						}
 						// functions
 						case CLOSEPARENTHESES: {
-							if (str + cmt + brq === 0) {
+							if (quote + comment + bracket === 0) {
 								// ) is the last character, add synthetic padding to avoid skipping this buffer
 								if (caret === eol) {
 									eol++
 									eof++
 								}
-								fnq--
+
+								parentheses--
 							}
 							break
 						}
 						case OPENPARENTHESES: {
-							if (str + cmt + brq === 0) {
+							if (quote + comment + bracket === 0) {
 								if (context === 0) {
 									switch (tail*2 + trail*3) {
 										// :matches
@@ -542,12 +557,13 @@
 										}
 									}
 								}
-								fnq++
+
+								parentheses++
 							}
 							break
 						}
 						case AT: {
-							if (cmt + fnq + str + brq + pseudo + atrule === 0) {
+							if (comment + parentheses + quote + bracket + pseudo + atrule === 0) {
 								atrule = 1
 							}
 							break
@@ -555,22 +571,22 @@
 						// block/line comments
 						case STAR:
 						case FOWARDSLASH: {
-							if (str + brq + fnq > 0) {
+							if (quote + bracket + parentheses > 0) {
 								break
 							}
 
-							switch (cmt) {
+							switch (comment) {
 								// initialize line/block comment context
 								case 0: {
 									switch (code*2 + body.charCodeAt(caret+1)*3) {
 										// //
 										case 235: {
-											cmt = FOWARDSLASH
+											comment = FOWARDSLASH
 											break
 										}
 										// /*
 										case 220: {
-											cmt = STAR
+											comment = STAR
 											break
 										}
 									}
@@ -580,7 +596,7 @@
 								case STAR: {
 									if (code === FOWARDSLASH && tail === STAR) {
 										char = ''
-										cmt = 0
+										comment = 0
 									}
 								}
 							}
@@ -588,10 +604,10 @@
 					}
 
 					// ignore comment blocks
-					if (cmt === 0) {
+					if (comment === 0) {
 						// aggressive isolation mode, divide each individual selector
 						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + str + brq + atrule === 0 && from !== KEYFRAME && code !== SEMICOLON) {
+						if (cascade + quote + bracket + atrule === 0 && id !== KEYFRAME && code !== SEMICOLON) {
 							switch (code) {
 								case COMMA:
 								case TILDE:
@@ -613,7 +629,7 @@
 												char = '\0' + char + (code === COMMA ? '' : '\0')
 											}
 										}
-										fmt = 1
+										format = 1
 									} else {
 										// within an isolated context, sleep untill it's terminated
 										switch (code) {
@@ -623,7 +639,7 @@
 											}
 											case CLOSEPARENTHESES: {
 												if ((context = --counter) === 0) {
-													fmt = 1
+													format = 1
 													char += '\0'
 												}
 												break
@@ -649,7 +665,7 @@
 										default: {
 											// ignore in isolated contexts
 											if (context === 0) {
-												fmt = 1
+												format = 1
 												char += '\0'
 											}
 										}
@@ -676,36 +692,38 @@
 
 		// execute plugins, block context
 		if (length > 0 && plugged > 0) {
-			res = proxy(BLCKS, out, current, parent, line, column, length)
+			result = proxy(BLCKS, out, current, parent, line, column, length, id)
 
-			if (res !== void 0) {
-				length = (out = res).length
+			if (result !== void 0) {
+				length = (out = result).length
 			}
 		}
 
 		if (length > 0) {
 			// cascade isolation mode
-			if (cascade === 0 && from !== KEYFRAME) {
+			if (cascade === 0 && id !== KEYFRAME) {
 				isolate(current)
 			}
 
 			out = current.join(',').trim() + '{' + out + '}'
 
-			switch (pattern) {
-				case 0: {
-					break
-				}
-				case PLACEHOLDER: {
-					// ::placeholder vendor prefix
-					if (vendor > 0) {
-						out = (out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
+			if (vendor*pattern > 0) {
+				switch (pattern) {
+					case READONLY: {
+						out = out.replace(readonlyptn, ':'+moz+'$1')+out
+						break
+					}
+					case PLACEHOLDER: {
+						// ::placeholder vendor prefix
+						out = (
+							out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
 							out.replace(plcholdrptn, '::' + moz + '$1') +
-							out.replace(plcholdrptn, ':' + ms + 'input-$1') + out)
+							out.replace(plcholdrptn, ':' + ms + 'input-$1') + out
+						)
+						break
 					}
 				}
-				default: {
-					pattern = 0
-				}
+				pattern = 0
 			}
 		}
 
@@ -731,8 +749,8 @@
 			// 0-1 parent selectors
 			case 0:
 			case 1: {
-				for (var i = 0, ref = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
-					out[i] = scope(out[i], ref, l, invert).trim()
+				for (var i = 0, selector = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
+					out[i] = scope(selector, out[i], invert, l).trim()
 				}
 				break
 			}
@@ -740,7 +758,7 @@
 			default: {
 				for (var i = 0, j = 0, out = []; i < length; i++) {
 					for (var k = 0; k < l; k++) {
-						out[j++] = scope(selectors[i], parent[k] + ' ', l, invert).trim()
+						out[j++] = scope(parent[k] + ' ', selectors[i], invert, l).trim()
 					}
 				}
 			}
@@ -752,15 +770,14 @@
 	/**
 	 * Scope
 	 *
-	 * @param {string} input
 	 * @param {string} parent
-	 * @param {number} level
+	 * @param {string} current
 	 * @param {number} invert
+	 * @param {number} level
 	 * @return {string}
 	 */
-	function scope (input, parent, level, invert) {
-		var selector = input
-		var prefix = parent
+	function scope (parent, current, invert, level) {
+		var selector = current
 		var code = selector.charCodeAt(0)
 
 		// trim leading whitespace
@@ -779,7 +796,7 @@
 						}
 					}
 					default: {
-						return selector.replace(andptn, prefix.trim())
+						return selector.replace(andptn, parent.trim())
 					}
 				}
 				break
@@ -796,22 +813,19 @@
 					}
 					default: {
 						// :hover
-						return prefix.trim() + selector
+						return parent.trim() + selector
 					}
 				}
 			}
 			default: {
 				// html &
-				if (invert*cascade > 0 && (code = selector.indexOf('\f')) > 0) {
-					return (
-						prefix.replace(nscope, '').trim() + ' ' + 
-						selector.substring(0, code) + nscope + selector.substring(code+2)
-					)
+				if (invert*cascade > 0 && selector.indexOf('\f') > 0) {
+					return selector.replace(andptn, parent.trim())
 				}
 			}
 		}
 
-		return prefix + selector
+		return parent + selector
 	}
 
 	/**
@@ -1112,7 +1126,7 @@
 				out += element
 			}
 
-			selectors[i] = out.replace(fmtptn, '').trim()
+			selectors[i] = out.replace(formatptn, '').trim()
 		}
 	}
 
@@ -1126,11 +1140,12 @@
 	 * @param {number} line
 	 * @param {number} column
 	 * @param {number} length
+	 * @param {number} id
 	 * @return {(string|void|*)}
 	 */
-	function proxy (context, content, selectors, parents, line, column, length) {
+	function proxy (context, content, selectors, parents, line, column, length, id) {
 		for (var i = 0, out = content, next; i < plugged; i++) {
-			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length)) {
+			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length, id)) {
 				case void 0:
 				case false:
 				case true:
@@ -1165,7 +1180,7 @@
 	 */
 	function minify (output) {
 		return output
-			.replace(fmtptn, '')
+			.replace(formatptn, '')
 			.replace(beforeptn, '')
 			.replace(afterptn, '$1')
 			.replace(tailptn, '$1')
@@ -1246,7 +1261,7 @@
 
 		// keyframe/animation namespace
 		if (keyed > 0) {
-			key = ns.replace(keyptn, code === OPENBRACKET ? '' : '-')
+			key = ns.replace(invalidptn, code === OPENBRACKET ? '' : '-')
 		}
 
 		// reset, used to assert if a plugin is moneky-patching the return value
@@ -1263,7 +1278,7 @@
 
 		// execute plugins, pre-process context
 		if (plugged > 0) {
-			proxy(PREPS, input, selectors, selectors, line, column, 0)
+			proxy(PREPS, input, selectors, selectors, line, column, 0, 0)
 		}
 
 		// build
@@ -1271,11 +1286,11 @@
 
 		// execute plugins, post-process context
 		if (plugged > 0) {
-			var res = proxy(POSTS, output, selectors, selectors, line, column, output.length)
+			var result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0)
 			
-			if (res !== void 0) {
+			if (result !== void 0) {
 				// bypass minification
-				if (typeof(output = res) !== 'string') {
+				if (typeof(output = result) !== 'string') {
 					code = 0
 				}
 			}
