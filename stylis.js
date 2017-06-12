@@ -332,7 +332,6 @@
 										}
 										default: {
 											child = chars + child
-											break
 										}
 									}
 								} else {
