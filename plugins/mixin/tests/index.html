@@ -4,8 +4,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>stylis.js mixins WIP</title>
-	<script src='../../stylis.js'></script>
-	<script src='mixins.js'></script>
+	<script src='../../../stylis.js'></script>
+	<script src='../index.js'></script>
 </head>
 <body>
 
@@ -21,7 +21,7 @@ var sample = `
 	@include icon;
 }
 `
-stylis.use(mixins)
+stylis.use(stylisMixin)
 console.log(stylis('#id', sample))
 </script>
 

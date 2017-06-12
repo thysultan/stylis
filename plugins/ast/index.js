@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['ast'] = factory())
+			(window['stylisAst'] = factory())
 }(function () {
 
 	'use strict'
@@ -21,7 +21,7 @@
 		this.children = []
 	}
 
-	function ast (context, content, selectors, parents, line, column, length, id) {
+	return function (context, content, selectors, parents, line, column, length, id) {
 		var index, name, value, node, type, deli, size
 
 		var rule = selectors.join(',')

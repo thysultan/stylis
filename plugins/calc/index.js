@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['calc'] = factory())
+			(window['stylisCalc'] = factory())
 }(function () {
 
 	'use strict'
@@ -60,13 +60,11 @@
 		return 0
 	} 
 
-	function calc (context, content, selectors, parents, line, column, length) {
+	return function (context, content, selectors, parents, line, column, length) {
 		switch (context) {
 			case 1: {
 				return content.indexOf('calc(') > -1 ? content.replace(/calc\(([\s\S]*)\)/g, reduce) : content
 			}
 		}
 	}
-
-	return calc
 }))

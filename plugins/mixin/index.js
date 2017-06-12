@@ -1,14 +1,14 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['mixins'] = factory())
+			(window['stylisMixin'] = factory())
 }(function () {
 	
 	'use strict'
 
 	var store = null
 
-	function mixins (context, content, selectors, parents, line, column, length) {
+	return function (context, content, selectors, parents, line, column, length) {
 		switch (context) {
 			case -1: {
 				store = {}
@@ -37,6 +37,4 @@
 			}
 		}
 	}
-
-	return mixins
 }))

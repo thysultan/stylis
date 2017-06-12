@@ -1,3 +1,3 @@
-# AST
+# stylis AST
 
-creates an ast
+stylis plugin to extract an AST

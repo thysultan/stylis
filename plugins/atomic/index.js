@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['atomics'] = factory())
+			(window['stylisAtomic'] = factory())
 }(function () {
 
 	'use strict'
@@ -21,7 +21,7 @@
 		return (object = skip = null, out)
 	}
 
-	function atomics (context, content, selectors, parents, line, column, length) {
+	return function (context, content, selectors, parents, line, column, length) {
 		if (skip === true) {
 			return
 		}
@@ -46,6 +46,4 @@
 			}
 		}
 	}
-
-	return atomics
 }))

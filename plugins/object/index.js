@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['toObject'] = factory())
+			(window['stylisObject'] = factory())
 }(function () {
 
 	'use strict'
@@ -16,7 +16,7 @@
 		return content.replace(/-([a-z])/g, toUpperCase)
 	}
 
-	function toObject (context, content, selectors, parents, line, column, length) {
+	return function (context, content, selectors, parents, line, column, length) {
 		switch (context) {
 			case 1: {
 				var selector = selectors.join(',')
@@ -35,6 +35,4 @@
 			}
 		}
 	}
-
-	return toObject
 }))

@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>stylis.js custom-properties WIP</title>
-	<script src='../../stylis.js'></script>
-	<script src='custom-properties.js'></script>
+	<title>stylis custom-properties</title>
+	<script src='../../../stylis.js'></script>
+	<script src='../index.js'></script>
 </head>
 <body>
 
@@ -19,7 +19,7 @@ div {
   color: var(--color);
 }
 `
-stylis.use(customProperties)
+stylis.use(stylisCustomProperties)
 console.log(stylis('#id', sample))
 </script>
 

@@ -1,3 +1,3 @@
 # custom properties
 
-Stylis plugin to transform W3C CSS Custom Properties for cascading variables
+stylis plugin to transform custom properties for cascading variables

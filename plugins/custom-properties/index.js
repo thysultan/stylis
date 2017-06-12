@@ -1,7 +1,7 @@
 (function (factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
 		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['customProperties'] = factory())
+			(window['stylisCustomProperties'] = factory())
 }(function () {
 	
 	'use strict'
@@ -9,10 +9,10 @@
 	var store = null
 
 	function replace (match, group) {
-		return properties[group] || value
+		return store[group] || value
 	}
 
-	function customProperties (context, content, selectors, parents, line, column, length) {
+	return function (context, content, selectors, parents, line, column, length) {
 		switch (context) {
 			case -1: {
 				// create store
@@ -41,6 +41,4 @@
 			}
 		}
 	}
-
-	return customProperties
 }))

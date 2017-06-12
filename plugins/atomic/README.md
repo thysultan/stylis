@@ -1,6 +1,6 @@
 # atomics
 
-creates atomic css by taking an input such as
+stylis plugin to create atomic css by taking an input such as
 
 ```css
 a {

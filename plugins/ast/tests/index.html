@@ -3,9 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>stylis.js ast WIP</title>
-	<script src='../../stylis.js'></script>
-	<script src='ast.js'></script>
+	<title>stylis ast</title>
+	<script src='../../../stylis.js'></script>
+	<script src='../index.js'></script>
 </head>
 <body>
 
@@ -39,7 +39,7 @@ var sample = `
 		display: block;
 	}
 `
-stylis.use(ast)
+stylis.use(stylisAst)
 console.log(stylis('#id', sample))
 </script>
 

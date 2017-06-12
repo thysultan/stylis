@@ -1,3 +1,3 @@
 # calc
 
-reduces calc() references whenever it's possible.
+stylis plugin to compute calc() references where possible.
