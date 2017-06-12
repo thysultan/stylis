@@ -1,3 +1,7 @@
+## 3.1.7 June 12, 2017
+
+- patch print `@at-rule` styles i.e `@page`, `@top-level` etc.
+
 ## 3.1.6 June 12, 2017
 
 - patch `@at-rule` middleware context replacement value

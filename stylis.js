@@ -66,7 +66,7 @@
 	var andptn = /\f?&/g /* match & */
 	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
 	var invalidptn = /\W+/g /* removes invalid characters from keyframes */
-	var keyframeptn = /@(k\w+s)\s*(\S*)\s*/ /* matches @keyframes $1 */
+	var keyframeptn = /@(k\w+)\s*(\S*)\s*/ /* matches @keyframes $1 */
 	var plcholdrptn = /::(place)/g /* match ::placeholder varient */
 	var readonlyptn = /:(read-only)/g /* match :read-only varient */
 	var beforeptn = /\s+(?=[{\];=:>])/g /* matches \s before ] ; = : */
@@ -113,11 +113,12 @@
 	var KEYFRAME = 107 /* k */
 	var MEDIA = 109 /* m */
 	var SUPPORTS = 115 /* s */
-	var FONT = 102 /* f */
 	var PLACEHOLDER = 112 /* p */
 	var READONLY = 111 /* o */
 	var IMPORT = 169 /* <at>i */
 	var CHARSET = 163 /* <at>c */
+	var PAGE = 112 /* <at>p */
+	var DOCUMENT = 100 /* <at>d */
 
 	var column = 1 /* current column */
 	var line = 1 /* current line numebr */
@@ -283,7 +284,22 @@
 								}
 
 								second = chars.charCodeAt(1)
-								child = compile(current, second > 108 ? current : array, child, second)
+
+								switch (second) {
+									case DOCUMENT:
+									case PAGE:
+									case MEDIA:
+									case SUPPORTS: {
+										selector = current
+										break
+									}
+									default: {
+										selector = array
+									}
+								}
+
+								child = compile(current, selector, child, second)
+								length = child.length
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
@@ -292,30 +308,37 @@
 									chars = selector.join('')
 
 									if (result !== void 0) {
-										if ((child = result.trim()).length === 0) {
+										if ((length = (child = result.trim()).length) === 0) {
 											second = 0
 											child = ''
 										}
 									}
 								}
 
-								switch (second) {
-									case MEDIA:
-									case SUPPORTS: {
-										child = chars + '{' + child + '}'
-										break
+								if (length > 0) {
+									switch (second) {
+										case DOCUMENT:
+										case PAGE:
+										case MEDIA:
+										case SUPPORTS: {
+											child = chars + '{' + child + '}'
+											break
+										}
+										case KEYFRAME: {
+											chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
+											child = chars + '{' + child + '}'
+											child = '@' + (vendor > 0 ? webkit + child + '@' + child : child)
+											break
+										}
+										default: {
+											child = chars + child
+											break
+										}
 									}
-									case FONT: {
-										child = chars + child
-										break
-									}
-									case KEYFRAME: {
-										chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
-										child = chars + '{' + child + '}'
-										child = '@' + (vendor > 0 ? webkit + child + '@' + child : child)
-										break
-									}
+								} else {
+									child = ''
 								}
+
 								break
 							}
 							// selector

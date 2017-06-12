@@ -3,8 +3,37 @@
  * @type {Object}
  */
 var spec = {
+	'at-rules': {
+		sample: `
+		@page {
+		  @top-left {
+		    font-size: 11px;
+		  }
+		}
+		@document url() {
+		  body {
+		    color: red;
+		  }
+		}
+		@viewport {
+		  min-width: 640px;
+		  max-width: 800px;
+		}
+		@counter-style list {
+		  system: fixed;
+		  symbols: url();
+		  suffix: " ";
+		}
+		`,
+		expected: ``+
+		`@page{@top-left{font-size: 11px;}}`+
+		`@document url(){`+
+		`.user body{color: red;}`+
+		'}'+
+		`@viewport{min-width: 640px;max-width: 800px;}`+
+		`@counter-style list{system: fixed;symbols: url();suffix: " ";}`
+	},
 	'monkey-patch some invalid css patterns': {
-		sample: ``,
 		sample: `
 				margin: 20px;
 				.b {
