@@ -465,7 +465,7 @@
 
 					// execute plugins, newline context
 					if (plugged * unkwn > 0) {
-						proxy(UNKWN, chars, current, parent, line, column, out.length)
+						proxy(UNKWN, chars, current, parent, line, column, out.length, id)
 					}
 
 					// next line, reset column position
