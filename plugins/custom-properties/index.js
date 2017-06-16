@@ -9,7 +9,7 @@
 	var store = null
 
 	function replace (match, group) {
-		return store[group] || value
+		return store[group] || match
 	}
 
 	return function (context, content, selectors, parents, line, column, length) {
@@ -32,7 +32,7 @@
 					var value = content.substring(index+1).trim()
 
 					return (store[name] = value, '')
-				} else if (content.indexOf('var(')) {
+				} else if (content.indexOf('var(') > 0) {
 					// replace custom properties
 					return content.replace(/var\((.*)\)/g, replace)
 				}

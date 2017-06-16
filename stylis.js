@@ -58,7 +58,7 @@
 	var formatptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
 	var colonptn = /: */g /* splits animation rules */
 	var cursorptn = /zoo|gra/ /* assert cursor varient */
-	var transformptn = / *(transform)/g /* vendor prefix transform, older webkit */
+	var transformptn = /([,: ])(transform)/g /* vendor prefix transform, older webkit */
 	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
 	var propertiesptn = / +\s*(?![^(]*[)])/g /* animation properties */
 	var elementptn = / *[\0] */g /* selector elements */
@@ -174,8 +174,9 @@
 		var first = 0 /* first character code */
 		var second = 0 /* second character code */
 		var code = 0 /* current character code */
-		var tail = 0 /* last character code */
-		var trail = 0 /* character before last code */
+		var tail = 0 /* previous character code */
+		var trail = 0 /* character before previous code */
+		var peak = 0 /* previous non-whitespace code */
 		
 		var counter = 0 /* count sequence termination */
 		var context = 0 /* track current context */
@@ -203,22 +204,6 @@
 			code = body.charCodeAt(caret)
 
 			if (comment + quote + parentheses + bracket === 0) {
-				// auto semicolon insertion
-				if (insert === 1) {
-					// false flags, comma character
-					switch (code) {
-						case COMMA: {
-							break
-						}
-						default: {
-							caret--
-							code = SEMICOLON
-						}
-					}
-
-					insert = 0
-				}
-
 				// eof varient
 				if (caret === eol) {
 					if (format > 0) {
@@ -240,6 +225,30 @@
 						}
 
 						code = SEMICOLON
+					}
+				}
+
+				// auto semicolon insertion
+				if (insert === 1) {
+					switch (code) {
+						// false flags
+						case OPENBRACES:
+						case COMMA: {
+							insert = 0
+							break
+						}
+						// ignore
+						case TAB:
+						case CARRIAGE:
+						case NEWLINE:
+						case SPACE: {
+							break
+						}
+						// valid
+						default: {
+							caret--
+							code = SEMICOLON
+						}
 					}
 				}
 
@@ -347,10 +356,10 @@
 						}
 
 						children += child
-						caret++
 
 						// reset
 						context = 0
+						insert = 0
 						pseudo = 0
 						format = 0
 						invert = 0
@@ -358,6 +367,7 @@
 						chars = ''
 						child = ''
 
+						caret++
 						break
 					}
 					case CLOSEBRACES:
@@ -365,6 +375,16 @@
 						chars = (format > 0 ? chars.replace(formatptn, '') : chars).trim()
 						
 						if (code !== CLOSEBRACES || chars.length > 0) {
+							// monkey-patch missing colon
+							if (pseudo === 0) {
+								first = chars.charCodeAt(0)
+
+								// first character is a letter or dash, buffer has a space character
+								if ((first === DASH || first > 96 && first < 123) && chars.indexOf(' ')) {
+									chars = chars.replace(' ', ': ')
+								}
+							}
+
 							// execute plugins, property context
 							if (plugged > 0) {
 								if ((result = proxy(PROPS, chars, current, parent, line, column, out.length, id)) !== void 0) {
@@ -387,20 +407,20 @@
 									break
 								}
 								default: {
-									out += pseudo > 0 ? property(chars, first, second, chars.charCodeAt(2)) : chars+';'
+									out += pseudo > 0 ? property(chars, first, second, chars.charCodeAt(2)) : chars + ';'
 								}
 							}
 						}
 
-						caret++
-
 						// reset
 						context = 0
+						insert = 0
 						pseudo = 0
 						format = 0
 						invert = 0
 						chars = ''
 
+						caret++
 						break
 					}
 				}
@@ -412,23 +432,25 @@
 				case NEWLINE: {
 					// auto insert semicolon
 					if (comment + quote + parentheses + bracket + semicolon === 0) {
-						// valid characters that
+						// valid non-whitespace characters that
 						// may precede a newline
-						switch (tail) {
+						switch (peak) {
+							case AT:
+							case TILDE:
+							case GREATERTHAN:
+							case STAR:
+							case PLUS:
+							case FOWARDSLASH:
+							case DASH:
 							case COLON:
 							case COMMA:
-							case NULL:
-							case TAB:
-							case CARRIAGE:
-							case NEWLINE:
-							case SPACE:
 							case SEMICOLON:
 							case OPENBRACES:
 							case CLOSEBRACES: {
 								break
 							}
 							default: {
-								// colon : present? register for auto semicolon insertion
+								// current buffer has a colon
 								if (pseudo > 0) {
 									insert = 1
 								}
@@ -698,6 +720,11 @@
 
 						// concat buffer of characters
 						chars += char
+
+						// previous non-whitespace character code
+						if (code !== SPACE) {
+							peak = code
+						}
 					}
 				}
 			}
@@ -727,7 +754,7 @@
 				isolate(current)
 			}
 
-			out = current.join(',').trim() + '{' + out + '}'
+			out = current.join(',') + '{' + out + '}'
 
 			if (vendor*pattern > 0) {
 				switch (pattern) {
@@ -984,7 +1011,7 @@
 
 					// transitions
 					if (second + third === 211 && out.charCodeAt(13) === 105 && out.indexOf('transform', 10) > 0) {
-						out = out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, webkit + '$1') + out
+						out = out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, '$1' + webkit + '$2') + out
 					}
 
 					break
@@ -1022,7 +1049,7 @@
 
 					if (keyed === 1 && (
 						// letters
-						(peak > AT && peak < 90) || (peak > 96 && peak < 122) || peak === UNDERSCORE ||
+						(peak > AT && peak < 90) || (peak > 96 && peak < 123) || peak === UNDERSCORE ||
 						// dash but not in sequence i.e --
 						(peak === DASH && value.charCodeAt(1) !== DASH)
 					)) {

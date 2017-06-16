@@ -1,3 +1,8 @@
+## 3.1.8 June 16, 2017
+
+- improve ASI(auto semicolon insertion) detection
+- patch `webkit` vendor prefix of `transform` within `transtion` property
+
 ## 3.1.7 June 12, 2017
 
 - patch print `@at-rule` styles i.e `@page`, `@top-level` etc.

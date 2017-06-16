@@ -45,9 +45,16 @@ var spec = {
 				}
 				color:red;
 			}
+
+			.d {
+				color red;
+			}
 		`,
 		expected: ``+
-			`.user{margin: 20px;color:red;}.user .b{border: 3px solid green;}.user .c{color:red;}`
+			`.user{margin: 20px;color:red;}`+
+			`.user .b{border: 3px solid green;}`+
+			`.user .c{color:red;}`+
+			`.user .d{color: red;}`
 	},
 	'escape breaking control characters': {
 		sample: `content: "\f\0\v";`,
@@ -443,9 +450,6 @@ var spec = {
 			  justify-content: flex-start;
 			  justify-content: justify;
 			}
-			& {
-				transition: transform 1s, all 400ms;
-			}
 
 			div {
 				align-items: value;
@@ -464,6 +468,10 @@ var spec = {
 
 			h1:read-only {
 			  color: red;
+			}
+
+			& {
+				transition: transform 1s,transform all 400ms,text-transform;
 			}
 		`,
 		expected:
@@ -516,12 +524,6 @@ var spec = {
 
 			`}` +
 
-			`.user{`+
-			`-webkit-transition:-webkit-transform 1s, all 400ms;`+
-			`-webkit-transition: transform 1s, all 400ms;`+
-			`transition: transform 1s, all 400ms;`+
-			`}`+
-
 			`.user div{`+
 
 			`-webkit-align-items: value;`+
@@ -554,7 +556,13 @@ var spec = {
 			'}'+
 			'.user h1:read-only{'+
 			'color: red;'+
-			'}'
+			'}'+
+
+			`.user{`+
+			`-webkit-transition: -webkit-transform 1s,-webkit-transform all 400ms,text-transform;`+
+			`-webkit-transition: transform 1s,transform all 400ms,text-transform;`+
+			`transition: transform 1s,transform all 400ms,text-transform;`+
+			`}`
 	},
 	'animations': {
 		sample: `
@@ -1032,11 +1040,17 @@ var spec = {
 					display: none
 				}
 			}
+
+			div:hover 
+				{
+				color: red
+			}
 		`,
 		expected: ``+
 		`.user{color: red;}`+
 		`.user h2{color: blue;width: 0;}`+
-		`.user h2 h3{display: none;}`
+		`.user h2 h3{display: none;}`+
+		`.user div:hover{color: red;}`
 	},
 	'semi-colons': {
 		options: {
@@ -1059,6 +1073,28 @@ var spec = {
 		`h2 color: blue`+
 		`width: 0`+
 		`h3{display: none;}`
+	},
+	'no semi-colons': {
+		options: {
+			semicolon: false
+		},
+		sample: `
+			color: red
+			color: red
+
+			h1:hover, 
+			h2:hover
+			,
+			h3
+			{
+				color: red
+				width: 0/
+					2
+			}
+		`,
+		expected: ``+
+		`.user{color: red;color: red;}`+
+		`.user h1:hover,.user h2:hover,.user h3{color: red;width: 0/2;}`
 	},
 	'multiline declaration': {
 		sample: `
