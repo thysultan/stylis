@@ -1,3 +1,7 @@
+## 3.1.9 June 20, 2017
+
+- patch for inverted parent selector `&` used without a leading space.
+
 ## 3.1.8 June 16, 2017
 
 - improve ASI(auto semicolon insertion) detection

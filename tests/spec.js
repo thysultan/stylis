@@ -189,8 +189,16 @@ var spec = {
 			& + & {
 				color: red;
 			}
+
+			.wrapper button& {
+			  color: red;
+			}
 		`,
-		expected: '.user{color: blue;}.user.user.user{color: red;}.user + .user{color: red;}'
+		expected: ``+
+		`.user{color: blue;}`+
+		`.user.user.user{color: red;}`+
+		`.user + .user{color: red;}`+
+		`.wrapper button.user{color: red;}`
 	},
 	'&:before': {
 		sample: `

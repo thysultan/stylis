@@ -504,7 +504,7 @@
 						// &
 						case AND: {
 							// inverted selector pattern i.e html &
-							if (quote + comment + bracket === 0 && cascade*tail === SPACE) {
+							if (quote + comment + bracket === 0 && cascade > 0) {
 								invert = 1
 								format = 1
 								char = '\f' + char
