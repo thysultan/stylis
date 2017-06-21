@@ -47,12 +47,12 @@
 				value = selectors.join(',')
 
 				if ((cache = maps[value]) === void 0) {
+					block = [RULE_START, index].concat(stack).concat([RULE_END])
 					heap[maps[value] = index++] = value
 				} else {
-					heap[cache] = value
+					block = [RULE_START, cache].concat(stack).concat([RULE_END])
 				}
 
-				block = [RULE_START].concat(stack).concat([RULE_END])
 				byte.push.apply(byte, block)
 
 				break
@@ -60,7 +60,7 @@
 			case -2: {	
 				return {
 					heap: heap,
-					byte: new Uint32Array(byte)
+					byte: byte
 				}
 			}
 		}
