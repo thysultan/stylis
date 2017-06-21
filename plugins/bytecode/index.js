@@ -25,7 +25,6 @@
 			case 1: {
 				name = content.substring(0, colon = content.indexOf(':')).trim()
 				value = content.substring(colon+1).trim()
-				cache = maps[name]
 
 				if ((cache = maps[name]) === void 0) {
 					stack.push(PROPERTY, index)
