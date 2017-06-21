@@ -1,0 +1,35 @@
+{
+	"name": "stylis-atomic",
+	"main": "index.js",
+	"description": "stylis plugin to create atomic css",
+	"version": "0.0.1",
+	"homepage": "https://github.com/thysultan/stylis.js",
+	"license": "MIT",
+	"author": {
+		"name": "Sultan Tarimo",
+		"email": "sultantarimo@me.com"
+	},
+	"keywords": [
+		"stylis",
+		"plugin"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/thysultan/stylis.js"
+	},
+	"bugs": {
+		"url": "https://github.com/thysultan/stylis.js/issues"
+	},
+	"scripts": {
+		"test": "node ./tests"
+	},
+	"files": [
+		"index.js"
+	],
+	"devDependencies": {
+		"stylis": "3.x"
+	},
+	"peerDependencies": {
+    "stylis": "3.x"
+  }
+}
