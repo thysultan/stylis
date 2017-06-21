@@ -53,7 +53,8 @@
 				}
 
 				byte.push.apply(byte, block)
-
+				stack = []
+				
 				break
 			}
 			case -2: {	
