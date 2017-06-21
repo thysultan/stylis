@@ -60,7 +60,7 @@
 			case -2: {	
 				return {
 					heap: heap,
-					byte: byte
+					byte: new Uint32Array(byte)
 				}
 			}
 		}
