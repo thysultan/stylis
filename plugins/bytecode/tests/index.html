@@ -11,12 +11,12 @@
 
 <script>
 var sample = `
-body {
-	color:red;
-}
-body {
-	color:red;
-	background: red;
+.some-class{
+	color: red;
+	display: block;
+	margin: 20px;
+	padding: 20px;
+	position: relative;
 }
 `
 stylis.use(stylisByte)
@@ -24,13 +24,13 @@ stylis.use(stylisByte)
 var program = stylis('', sample)
 var {heap, byte, length} = program
 
-function toString (heap, byte, length) {
-	var RULE_START = 0
-	var RULE_END = 1
-	var SELECTOR = 3
-	var PROPERTY = 10
-	var VALUE = 11
+var RULE_START = 0
+var RULE_END = 1
+var SELECTOR = 3
+var PROPERTY = 10
+var VALUE = 11
 
+function toString (heap, byte, length) {
 	var index = 0
 	var code = 0
 	var output = ''
@@ -93,27 +93,87 @@ function bench (fn, report, name) {
 	return result
 }
 
-// warm up
-bench(function () {
+function byteCodeBench () {
 	return toString(heap, byte, length)
-}, false, 'byte code')
+}
+
+// warm up
+bench(byteCodeBench, false, 'byte code')
 
 // run
-bench(function () {
-	return toString(heap, byte, length)
-}, true, 'byte code')
+bench(byteCodeBench, true, 'byte code')
 
 stylis.use(null)
 
-// warm up
-bench(function () {
+function stylisBench () {
 	return stylis('', sample)
-}, false, 'stylis')
+}
+
+// warm up
+bench(stylisBench, false, 'stylis')
 
 // run
-bench(function () {
-	return stylis('', sample)
-}, true, 'stylis')
+bench(stylisBench, true, 'stylis')
+
+var RULE_START = '0'
+var RULE_TYPE = '1'
+var RULE_END = '2'
+var SELECTOR = '3'
+var SCOPED = '4'
+var PROPERTY = '5'
+var VALUE = '6'
+var REF = '7'
+var CONDITION = '8'
+
+var input = [
+  '0',
+    '3', '.some-class',
+    '5', 'color',
+    '6', 'red',
+    '5', 'display',
+    '6', 'block',
+    '5', 'margin',
+    '6', '20px',
+    '5', 'padding',
+    '6', '20px',
+    '5', 'position',
+    '6', 'relative',
+  '2'
+] 
+
+var length = input.length
+
+function fromString (input, length) {
+	var output = ''
+
+  for (var i = 0; i < length; i++) {
+    switch (input[i]) {
+      case SELECTOR:
+        output += input[i + 1] + '{'
+        i++
+        break                
+      case PROPERTY:
+        output += input[i + 1] + ': '
+        i++    
+        break
+      case VALUE:
+        output += input[i + 1] + ';'
+        break
+      case RULE_END:
+        output += '}'
+        break
+    }
+  }        
+
+  return output
+}
+
+function fromStringBench() {
+	return fromString(input, length)
+}
+
+bench(fromStringBench, false, 'fromSingleArrayOfStrings')
+bench(fromStringBench, true, 'fromSingleArrayOfStrings')
 
 
 /**
