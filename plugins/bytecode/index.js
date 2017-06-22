@@ -65,11 +65,8 @@
 				}
 
 				// release
-				map = {}
-				heap = []
 				byte = []
 				stack = []
-				index = 0
 
 				return program
 			}
