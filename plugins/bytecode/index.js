@@ -60,7 +60,7 @@
 			case -2: {	
 				var program = {
 					heap: heap,
-					byte: new Uint32Array(byte),
+					byte: byte,
 					length: byte.length
 				}
 
