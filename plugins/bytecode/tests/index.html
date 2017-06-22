@@ -73,6 +73,48 @@ function toString (heap, byte, length) {
 console.log(program)
 console.log(toString(heap, byte, length))
 
+
+function bench (fn, report, name) {
+	var start = performance.now()
+
+	for (var i = 0; i < 1e5; i++) {
+		var result = fn()
+	}
+
+	var end = performance.now()
+
+	if (report) {
+		console.log(end-start, 'ms', result)
+	} else {
+		console.log('warming up '+name)
+	}
+
+	return result
+}
+
+// warm up
+bench(function () {
+	return toString(heap, byte, length)
+}, false, 'byte code')
+
+// run
+bench(function () {
+	return toString(heap, byte, length)
+}, true, 'byte code')
+
+stylis.use(null)
+
+// warm up
+bench(function () {
+	return stylis('', sample)
+}, false, 'stylis')
+
+// run
+bench(function () {
+	return stylis('', sample)
+}, true, 'stylis')
+
+
 /**
  *
  * body {color:red}body{color:red;}
