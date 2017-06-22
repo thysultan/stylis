@@ -76,15 +76,16 @@ console.log(toString(heap, byte, length))
 
 function bench (fn, report, name) {
 	var start = performance.now()
+	var length = 1e5
 
-	for (var i = 0; i < 1e5; i++) {
+	for (var i = 0; i < length; i++) {
 		var result = fn()
 	}
 
 	var end = performance.now()
 
 	if (report) {
-		console.log(end-start, 'ms', result)
+		console.log(length/(end-start), 'ops', result)
 	} else {
 		console.log('warming up '+name)
 	}
