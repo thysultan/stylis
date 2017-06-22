@@ -9,8 +9,8 @@
 	var maps = {}
 	var heap = []
 	var byte = []
-	var index = 0
 	var stack = []
+	var index = 0
 
 	var RULE_START = 0
 	var RULE_END = 1
@@ -46,22 +46,31 @@
 				value = selectors.join(',')
 
 				if ((cache = maps[value]) === void 0) {
-					block = [RULE_START, index].concat(stack).concat([RULE_END])
+					block = [RULE_START, SELECTOR, index].concat(stack, RULE_END)
 					heap[maps[value] = index++] = value
 				} else {
-					block = [RULE_START, cache].concat(stack).concat([RULE_END])
+					block = [RULE_START, SELECTOR, cache].concat(stack, RULE_END)
 				}
 
 				byte.push.apply(byte, block)
 				stack = []
-				
+
 				break
 			}
 			case -2: {	
-				return {
+				var program = {
 					heap: heap,
 					byte: byte
 				}
+
+				// release
+				maps = {}
+				heap = []
+				byte = []
+				stack = []
+				index = 0
+
+				return program
 			}
 		}
 	}
