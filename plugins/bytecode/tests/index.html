@@ -16,11 +16,62 @@ body {
 }
 body {
 	color:red;
+	background: red;
 }
 `
 stylis.use(stylisByte)
 
-console.log(stylis('', sample))
+var program = stylis('', sample)
+var {heap, byte, length} = program
+
+function toString (heap, byte, length) {
+	var RULE_START = 0
+	var RULE_END = 1
+	var SELECTOR = 3
+	var PROPERTY = 10
+	var VALUE = 11
+
+	var index = 0
+	var code = 0
+	var output = ''
+	var token = ''
+
+	while (index < length) {
+		code = byte[index]
+
+		switch (code) {
+			case RULE_START: {
+				index++
+				continue
+			}
+			case RULE_END: {
+				index++
+				output += '}'
+				continue
+			}
+			case SELECTOR: {
+				token = '{'
+				break
+			}
+			case PROPERTY: {
+				token = ':'
+				break
+			}
+			case VALUE: {
+				token = ';'
+				break
+			}
+		}
+
+		output += heap[byte[++index]] + token
+		index++
+	}
+
+	return output
+}
+
+console.log(program)
+console.log(toString(heap, byte, length))
 
 /**
  *

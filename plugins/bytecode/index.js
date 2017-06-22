@@ -60,8 +60,8 @@
 			case -2: {	
 				var program = {
 					heap: heap,
-					byte: byte,
-					map: map
+					byte: new Uint32Array(byte),
+					length: byte.length
 				}
 
 				// release
