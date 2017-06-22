@@ -21,6 +21,38 @@ body {
 stylis.use(stylisByte)
 
 console.log(stylis('', sample))
+
+/**
+ *
+ * body {color:red}body{color:red;}
+ * should produce
+ *
+ * byte = [
+ * 		0,  // rule start
+ * 		3,  // selector
+ * 		2,  // selector address, heap[2] === 'body'
+ * 		10, // property
+ * 		0,  // property address, heap[0] === 'color'
+ * 		11, // value
+ * 		1,  // value address, heap[1] === 'red'
+ * 		1,  // rule end
+ *
+ * 		0,  // rule start 
+ * 		3,  // selector
+ * 		2,  // selector address, heap[2] === 'body'
+ * 		10, // property
+ * 		0,  // property address heap[0] === 'color'
+ * 		11, // value
+ * 		1,  // value address, heap[1] === 'red'
+ * 		1   // rule end
+ * ]
+ *
+ * heap = {
+ * 		'color',
+ * 		'red',
+ * 		'body'
+ * }
+ */
 </script>
 
 </body>
