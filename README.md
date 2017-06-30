@@ -144,6 +144,18 @@ h1 h2 h3 {content: 'nesting'}
 stylis(selector: {String}, css: {String})
 ```
 
+#### Factory
+
+```js
+// factory pattern
+var stylis = new stylis(options)
+
+// singleton pattern
+var stylis = stylis
+```
+
+When using the factory pattern the if an object is passed as optional `options` argument, this will be passed to `stylis.set(options)` 
+
 #### Set
 
 ```javascript
@@ -167,7 +179,11 @@ stylis.set(options: {
 
 	// (dis/en)able (no)semicolon support
 	// false to enable no-semicolons (default)
-	semicolon: {Boolean} 
+	semicolon: {Boolean},
+
+	// tell stylis to make an effort to preserve empty rules, 
+	// i.e `.selector{ }`
+	preserve: {Boolean}
 })
 ```
 
@@ -181,7 +197,7 @@ The use function is chainable ex. `stylis.use()()()`
 
 ## Plugins
 
-The optional middleware function accepts four arguments
+The optional middleware function accepts four arguments with `this` pointing to a reference of the current stylis instance.
 
 ```js
 (context, content, selectors, parent, line, column, length)
@@ -199,7 +215,7 @@ Plugins are executed in stages identified by an `context` interger value.
 3  /* @at-rule block context */
 ```
 
-> Note: Since the newline context is intended for source-map/linting plugins by default stylis will not execute plugins in this context unless enabled, this can be done through `stylis.use(true)` or disabled after that through `stylis.use(false)`.
+> Note: Since the newline context is intended for source-map plugins by default stylis will not execute plugins in this context unless enabled, this can be done through `stylis.use(true)` or disabled after that through `stylis.use(false)`.
 
 - `-2` post processed context, before the compiled css output is returned
 - `-1` preparation context, before the compiler starts
@@ -208,7 +224,7 @@ Plugins are executed in stages identified by an `context` interger value.
 - `2` after a selector block of css has been processed ex. `.foo {color:red;}`
 - `3` after a `@at-rule` block of css has been processed ex. `@media {h1{color:red;}}`
 
-If at any context(except -1 & 0) that the middleware returns a different string the content of css will be replaced with the return value.
+If at any context(except 0) that the middleware returns a different string the content of css will be replaced with the return value.
 
 To remove all plugins just call `.use` with null/no arguments.
 

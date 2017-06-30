@@ -1,3 +1,11 @@
+## 3.2.0 June 30, 2017
+
+- add API to extract an isolated stylis instance.
+- middleware, allow `pre` context to affect the input.
+- vendor prefix `writing-mode`.
+- vendor prefix `column` varients.
+- add `preserve` options to preserve empty rules.
+
 ## 3.1.9 June 20, 2017
 
 - patch for inverted parent selector `&` used without a leading space.

@@ -6,15 +6,15 @@ var spec = {
 	'at-rules': {
 		sample: `
 		@page {
-		  @top-left {
-		    font-size: 11px;
-		  }
-		}
-		@document url() {
+	    size: A4 landscape;
+	  }
+
+		@document url(http://www.w3.org/), url-prefix(http://www.w3.org/Style/), domain(mozilla.org), regexp("https:.*") {
 		  body {
 		    color: red;
 		  }
 		}
+
 		@viewport {
 		  min-width: 640px;
 		  max-width: 800px;
@@ -26,8 +26,8 @@ var spec = {
 		}
 		`,
 		expected: ``+
-		`@page{@top-left{font-size: 11px;}}`+
-		`@document url(){`+
+		`@page{size: A4 landscape;}`+
+		`@document url(http://www.w3.org/), url-prefix(http://www.w3.org/Style/), domain(mozilla.org), regexp("https:.*"){`+
 		`.user body{color: red;}`+
 		'}'+
 		`@viewport{min-width: 640px;max-width: 800px;}`+
@@ -135,6 +135,12 @@ var spec = {
 			html [a=' &'] {
 				color: red;
 			}
+
+			:root {
+				h1 & {
+					color: red;
+				}
+			}
 		`,
 		expected: `.user h1,h2{color: red;}`+
 		`[title="[]()"]:not(h2):not(h2){color: red;}`+
@@ -146,7 +152,8 @@ var spec = {
 		`html .user body{color: red;}`+
 		`h1 .user div{color: red;}`+
 		`html .user:after{color: red;}`+
-		`.user html [a=' &']{color: red;}`
+		`.user html [a=' &']{color: red;}`+
+		'h1 .user:root{color: red;}'
 	},
 	'comments': {
 		sample: `
@@ -437,7 +444,7 @@ var spec = {
 		`,
 		expected: `.user h1:matches(.a, .b, :not(.c)){display: none;}`
 	},
-	'prefixer': {
+	'vendor prefixing': {
 		sample: `
 			html {
 			  text-size-adjust: none;
@@ -571,6 +578,84 @@ var spec = {
 			`-webkit-transition: transform 1s,transform all 400ms,text-transform;`+
 			`transition: transform 1s,transform all 400ms,text-transform;`+
 			`}`
+	},
+	'vendor prefixing II': {
+		sample: `
+			div {
+				writing-mode: vertical-lr;
+				writing-mode: vertical-rl;
+				writing-mode: horizontal-tb;
+				writing-mode: sideways-rl;
+				writing-mode: sideways-lr;
+			}
+		`,
+		expected: ``+
+		`.user div{`+
+		`-webkit-writing-mode: vertical-lr;`+
+		`-ms-writing-mode: tb;`+
+		`writing-mode: vertical-lr;`+
+
+		`-webkit-writing-mode: vertical-rl;`+
+		`-ms-writing-mode: tb-rl;`+
+		`writing-mode: vertical-rl;`+
+
+		`-webkit-writing-mode: horizontal-tb;`+
+		`-ms-writing-mode: lr;`+
+		`writing-mode: horizontal-tb;`+
+		
+		`writing-mode: sideways-rl;`+
+		`writing-mode: sideways-lr;`+
+		`}`
+	},
+	'vendor prefixing III': {
+		sample: `
+			color: red;
+			columns: auto;
+			column-count: auto;
+			column-fill: auto;
+			column-gap: auto;
+			column-rule: auto;
+			column-rule-color: auto;
+			column-rule-style: auto;
+			column-rule-width: auto;
+			column-span: auto;
+			column-width: auto;
+		`,
+		expected: ``+
+		`.user{`+
+		`color: red;`+
+		
+		`-webkit-columns: auto;`+
+		`columns: auto;`+
+		
+		`-webkit-column-count: auto;`+
+		`column-count: auto;`+
+		
+		`-webkit-column-fill: auto;`+
+		`column-fill: auto;`+
+
+		`-webkit-column-gap: auto;`+
+		`column-gap: auto;`+
+		
+		`-webkit-column-rule: auto;`+
+		`column-rule: auto;`+
+
+		`-webkit-column-rule-color: auto;`+
+		`column-rule-color: auto;`+
+
+		`-webkit-column-rule-style: auto;`+
+		`column-rule-style: auto;`+
+
+		`-webkit-column-rule-width: auto;`+
+		`column-rule-width: auto;`+
+
+		`-webkit-column-span: auto;`+
+		`column-span: auto;`+
+
+		`-webkit-column-width: auto;`+
+		`column-width: auto;`+
+		
+		`}`
 	},
 	'animations': {
 		sample: `
@@ -1262,7 +1347,7 @@ var spec = {
 		`.user{color:red;}/*a*/`
 	},
 	'multiple middlewares': {
-		options: {
+		options: {			
 			plugins: [
 				function (ctx, cont) {
 					if (ctx===1) {
@@ -1279,6 +1364,21 @@ var spec = {
 		sample: `color:red;`,
 		expected: ``+
 		`.user{color:red/*a*//*b*/;}`
+	},
+	'new instance': {
+		reset: false,
+		setup: function (stylis) {
+			var instance = new stylis;
+
+			if (instance === stylis)
+				throw 'could not create a new instance'
+
+			// this should prevent the previous test from affeting
+			// this test if every works as expected 
+			return instance
+		},
+		sample: `color: red;`,
+		expected: `.user{color: red;}`
 	}
 };
 

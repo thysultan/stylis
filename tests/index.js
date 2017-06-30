@@ -37,6 +37,7 @@ function run (tests, fn) {
 
 	var passed = [];
 	var failed = [];
+	var temp;
 
 	var format = {
 		reset: browser ? '' : '\x1b[0m',
@@ -56,7 +57,9 @@ function run (tests, fn) {
 		var expected = test.expected.trim();
 		var options = test.options || {};
 
-		fn.use(null);
+		if (options.reset !== false) {
+			fn.use(null);
+		}
 
 		if (options.plugins) {
 			fn.use(options.plugins);
@@ -83,10 +86,20 @@ function run (tests, fn) {
 		}
 
 		try {
+			if (test.setup) {
+				temp = fn
+				fn = test.setup(fn)	
+			}
+
 			var result = fn(
 				test.selector !== void 0 ? test.selector : '.user',
 				sample
 			);
+
+			if (temp !== void 0) {
+				fn = temp
+				temp = void 0
+			}
 		} catch (err) {
 			result = err+''
 		}

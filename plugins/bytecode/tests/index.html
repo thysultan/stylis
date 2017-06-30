@@ -86,6 +86,7 @@ function bench (fn, report, name) {
 
 	if (report) {
 		console.log(length/(end-start), 'ops', result)
+		console.log(name)
 	} else {
 		console.log('warming up '+name)
 	}

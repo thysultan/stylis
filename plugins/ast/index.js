@@ -30,6 +30,7 @@
 		switch (context) {
 			case -1: 
 				stack = []
+				break
 			case -2:
 				return stack
 			case 1:
