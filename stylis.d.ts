@@ -15,7 +15,8 @@ interface options {
 	cascade?: boolean
 	compress?: boolean
 	prefix?: boolean
-	semicolon?: boolean
+	semicolon?: boolean,
+	preserve: boolean
 }
 
 interface set {
