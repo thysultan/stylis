@@ -1419,7 +1419,7 @@
 	stylis['set'] = set
 
 	if (options !== void 0) {
-		use(options)
+		set(options)
 	}
 
 	return stylis

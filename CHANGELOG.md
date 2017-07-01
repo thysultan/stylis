@@ -1,3 +1,7 @@
+## 3.2.1 July 01, 2017
+
+- patch options passed to constructor when using the factory pattern
+
 ## 3.2.0 June 30, 2017
 
 - add API to extract an isolated stylis instance.

@@ -1368,7 +1368,7 @@ var spec = {
 	'new instance': {
 		reset: false,
 		setup: function (stylis) {
-			var instance = new stylis;
+			var instance = new stylis({compress: true});
 
 			if (instance === stylis)
 				throw 'could not create a new instance'
@@ -1378,7 +1378,7 @@ var spec = {
 			return instance
 		},
 		sample: `color: red;`,
-		expected: `.user{color: red;}`
+		expected: `.user{color:red}`
 	}
 };
 
