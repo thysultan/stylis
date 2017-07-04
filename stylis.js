@@ -1112,7 +1112,7 @@
 									case 'infinite': case 'alternate': case 'backwards': case 'running':
 									case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
 									case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
-									case 'paused': case 'reversed': case 'alternate-reverse': case 'inherit':
+									case 'paused': case 'reverse': case 'alternate-reverse': case 'inherit':
 									case 'initial': case 'unset': case 'step-start': case 'step-end': {
 										break
 									}

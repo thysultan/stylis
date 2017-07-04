@@ -695,7 +695,7 @@ var spec = {
 				backwards
 				running
 				paused
-				reversed
+				reverse
 				alternate-reverse
 				step-start
 				step-end
@@ -724,12 +724,12 @@ var spec = {
 		`.user h1{-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
 		`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1, 2, 4) `+
 		`ease-in-out ease ease-inOuter-user linear alternate normal forwards both `+
-		`none ease-in ease-out backwards running paused reversed alternate-reverse `+
+		`none ease-in ease-out backwards running paused reverse alternate-reverse `+
 		`step-start step-end step-end-something-user steps(4, end);`+
 		`animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user `+
 		`slidein-user cubic-bezier() cubic-bezier(1, 2, 4) ease-in-out ease `+
 		`ease-inOuter-user linear alternate normal forwards both none ease-in `+
-		`ease-out backwards running paused reversed alternate-reverse step-start `+
+		`ease-out backwards running paused reverse alternate-reverse step-start `+
 		`step-end step-end-something-user steps(4, end);}`+
 		`.user span{-webkit-animation-duration:0.6s;animation-duration:0.6s;`+
 		`-webkit-animation-name:slidein-user;animation-name:slidein-user;`+
