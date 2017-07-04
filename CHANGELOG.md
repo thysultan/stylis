@@ -1,3 +1,7 @@
+## 3.2.2 July 04, 2017
+
+- patch for valid value `reverse` in the `animation` short hand namespace.
+
 ## 3.2.1 July 01, 2017
 
 - patch options passed to constructor when using the factory pattern
