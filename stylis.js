@@ -10,10 +10,10 @@
  */
 /* eslint-disable */
 (function (factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory()) :
-		typeof define === 'function' && define['amd'] ? define(factory()) :
-			(window['stylis'] = factory())
-}(function factory (options) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory(null)) :
+		typeof define === 'function' && define['amd'] ? define(factory(null)) :
+			(window['stylis'] = factory(null))
+}(/** @param {*=} options */function factory (options) {
 
 	'use strict'
 
@@ -1336,7 +1336,7 @@
 	/**
 	 * Set
 	 *
-	 * @param {Object} options
+	 * @param {*} options
 	 */
 	function set (options) {		
 		for (var name in options) {
@@ -1360,7 +1360,7 @@
 	 *
 	 * @param {string} selector
 	 * @param {string} input
-	 * @return {(string|*)}
+	 * @return {*}
 	 */
 	function stylis (selector, input) {
 		if (this !== void 0 && this.constructor === stylis) {
@@ -1398,7 +1398,7 @@
 		if (plugged > 0) {
 			result = proxy(PREPS, input, selectors, selectors, line, column, 0, 0)
 
-			if (result !== void 0 && typeof(input = result) === 'string') {
+			if (result !== void 0 && typeof result === 'string') {
 				input = result
 			}
 		}
@@ -1410,7 +1410,7 @@
 		if (plugged > 0) {
 			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0)
 	
-			// bypass minification			
+			// bypass minification
 			if (result !== void 0 && typeof(output = result) !== 'string') {
 				code = 0
 			}
