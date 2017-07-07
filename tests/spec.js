@@ -3,6 +3,20 @@
  * @type {Object}
  */
 var spec = {
+	'calc rules': {
+		sample: `
+			height: calc( 100vh - 1px );
+			height: calc(
+										100vh -
+												1px
+									);
+		`,
+		expected: ``+
+		`.user{`+
+		`height: calc( 100vh - 1px );`+
+		`height: calc( 100vh - 1px );`+
+		'}'
+	},
 	'at-rules': {
 		sample: `
 		@page {
@@ -334,13 +348,13 @@ var spec = {
 		expected: ``+
 		`.user > #box-not-working{background: red;padding-left: 8px;width: 10px;height: 10px;}`+
 		`@media only screen and (min-width: 10px){`+
-		`.user > #box-not-working{width: calc(10px + 90px *(100vw - 10px) / 90);}`+
+		`.user > #box-not-working{width: calc( 10px + 90px * (100vw - 10px) / 90 );}`+
 		`}`+
 		`@media only screen and (min-width: 90px){`+
 		`.user > #box-not-working{width: 90px;}`+
 		`}`+
 		`@media only screen and (min-width: 10px){`+
-		`.user > #box-not-working{height: calc(10px + 90px *(100vw - 10px) / 90);}`+
+		`.user > #box-not-working{height: calc( 10px + 90px * (100vw - 10px) / 90 );}`+
 		`}`+
 		`@media only screen and (min-width: 90px){`+
 		`.user > #box-not-working{height: 90px;}`+
@@ -655,6 +669,17 @@ var spec = {
 		`-webkit-column-width: auto;`+
 		`column-width: auto;`+
 		
+		`}`
+	},
+	'vendor prefixing IV': {
+		sample: `
+			text-size-adjust: none;
+			text-decoration: none;
+		`,
+		expected: `.user{`+
+		`-webkit-text-size-adjust: none;`+
+		`text-size-adjust: none;`+
+		`text-decoration: none;`+
 		`}`
 	},
 	'animations': {
@@ -1121,7 +1146,29 @@ var spec = {
 		`span.user:hover{color: red;}`+
 		`[data-id=foo].user:hover{color: red;}`
 	},
-	'no semi-colons': {
+	'semi-colons': {
+		options: {
+			semicolon: true
+		},
+		sample: `
+			color: red
+
+			h2 {
+				color: blue
+				width: 0
+
+				h3 {
+					display: none
+				}
+			}
+		`,
+		expected: ``+
+		`.user color: red`+
+		`h2 color: blue`+
+		`width: 0`+
+		`h3{display: none;}`
+	},
+	'no semi-colons I': {
 		sample: `
 			color: red
 
@@ -1145,29 +1192,7 @@ var spec = {
 		`.user h2 h3{display: none;}`+
 		`.user div:hover{color: red;}`
 	},
-	'semi-colons': {
-		options: {
-			semicolon: true
-		},
-		sample: `
-			color: red
-
-			h2 {
-				color: blue
-				width: 0
-
-				h3 {
-					display: none
-				}
-			}
-		`,
-		expected: ``+
-		`.user color: red`+
-		`h2 color: blue`+
-		`width: 0`+
-		`h3{display: none;}`
-	},
-	'no semi-colons': {
+	'no semi-colons II': {
 		options: {
 			semicolon: false
 		},

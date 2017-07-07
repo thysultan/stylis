@@ -1,3 +1,8 @@
+## 3.2.3 July 07, 2017
+
+- patch to preserve intentional whitespace character in `calc` functions.
+- patch vendor prefixing of `text-decoration` getting mistaken for `text-size-adjust`.
+
 ## 3.2.2 July 04, 2017
 
 - patch for valid value `reverse` in the `animation` short hand namespace.

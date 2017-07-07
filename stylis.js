@@ -482,14 +482,22 @@
 					// increment column position
 					column++
 
-					// ignore tabs
-					if (code === TAB) {
-						break
-					}
-
 					// current character
 					char = body.charAt(caret)
 
+					if (code === TAB && quote === 0) {
+						switch (tail) {
+							case TAB:
+							case SPACE: {
+								char = ''
+								break
+							}
+							default: {
+								char = parentheses === 0 ? '' : ' '
+							}
+						}
+					}
+						
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
 						// escape breaking control characters
@@ -1025,10 +1033,14 @@
 					}
 					break
 				}
-				// transform, transition: t, r, a
 				// text-size-adjust: t, e, x
-				case 962:
 				case 1015: {
+					if (input.charCodeAt(9) !== DASH) {
+						break
+					}
+				}
+				// transform, transition: t, r, a
+				case 962: {
 					out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out
 
 					// transitions
