@@ -924,13 +924,18 @@ var spec = {
 				&::placeholder {
 				  color: pink;
 				}
+
+				.a {color:'red'}
+				.b {color:"red"}
 		 `,
 		 expected: `@media (min-width: 537px){`+
 		 	`.user{border-bottom: 4px solid red;}}`+
 		 	`.user::-webkit-input-placeholder{color: pink;}`+
 		 	`.user::-moz-placeholder{color: pink;}`+
 		 	`.user:-ms-input-placeholder{color: pink;}`+
-		 	`.user::placeholder{color: pink;}`
+		 	`.user::placeholder{color: pink;}`+
+		 	`.user .a{color:'red';}`+
+		 	`.user .b{color:"red";}`
 	},
 	// note the spaces after ;
 	'whitespace cascade true': {

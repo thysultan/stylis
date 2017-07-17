@@ -1,3 +1,7 @@
+## 3.2.4 July 17, 2017
+
+- patch for ASI when last character in selector block is a quote
+
 ## 3.2.3 July 07, 2017
 
 - patch to preserve intentional whitespace character in `calc` functions.
