@@ -371,7 +371,7 @@
 						chars = ''
 						child = ''
 
-						caret++
+						code = body.charCodeAt(++caret)
 						break
 					}
 					case CLOSEBRACES:

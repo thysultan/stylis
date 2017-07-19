@@ -1,3 +1,7 @@
+## 3.2.6 July 19, 2017
+
+- improve parsing selectors within a single non-breaking line.
+
 ## 3.2.5 July 19, 2017
 
 - improve typescript definitions [#47](https://github.com/thysultan/stylis.js/pull/47)
