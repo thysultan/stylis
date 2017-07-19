@@ -1,10 +1,14 @@
-/// <reference path="../stylis.d.ts" />
+// <reference path="../stylis.d.ts" />
 
-stylis.use([()=>{}])
-stylis.set({
-	global: true
-})
+import * as Stylis from '../'
 
+const stylis = new Stylis()
+
+stylis.set()
 stylis.use(function plugin (context, content, selectors, parents, line, column, length) {
 	this('', '')
+})
+
+stylis.use(function foo () {
+
 })

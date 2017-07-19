@@ -1,6 +1,10 @@
+## 3.2.5 July 19, 2017
+
+- improve typescript definitions [#47](https://github.com/thysultan/stylis.js/pull/47)
+
 ## 3.2.4 July 17, 2017
 
-- patch for ASI when last character in selector block is a quote
+- patch for ASI when last character in selector block is a quote.
 
 ## 3.2.3 July 07, 2017
 

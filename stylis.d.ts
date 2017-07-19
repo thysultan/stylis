@@ -7,50 +7,47 @@ declare enum Context {
 	ATRUL = 3
 }
 
-declare namespace Stylis {
-	interface StylisStatic {
-		new(options?: IOptions): StylisStatic
-		(namescope: string, input: string): string | any;
-		set: ISet;
-		use: IUse;
-	}
-
-	interface IOptions {
-		keyframe?: boolean
-		global?: boolean
-		cascade?: boolean
-		compress?: boolean
-		prefix?: boolean
-		semicolon?: boolean,
-		preserve?: boolean
-	}
-
-	interface ISet {
-		(options?: IOptions): ISet
-	}
-
-	interface IPlugin {
-		(this: StylisStatic,
-			context: Context,
-			content: string,
-			selector: ISelectors,
-			parent: ISelectors,
-			line: number,
-			column: number,
-			length: number): null | void | string
-	}
-
-	interface IUse {
-		(plugin?: Array<IPlugin> | IPlugin | null): IUse
-	}
-
-	type ISelectors = Array<string>;
+interface Stylis {
+	new(options?: Options): Stylis
+	(namescope: string, input: string): string | any
+	set: Set
+	use: Use
 }
 
-declare const stylis: Stylis.StylisStatic;
+interface Options {
+	keyframe?: boolean
+	global?: boolean
+	cascade?: boolean
+	compress?: boolean
+	prefix?: boolean
+	semicolon?: boolean
+	preserve?: boolean
+}
+
+interface Set {
+	(options?: Options): Set
+}
+
+interface Plugin {
+	(this: Stylis,
+		context: Context,
+		content: string,
+		selector: Selectors,
+		parent: Selectors,
+		line: number,
+		column: number,
+		length: number): null | void | string
+}
+
+interface Use {
+	(plugin?: Array<Plugin> | Plugin | null): Use
+}
+
+type Selectors = Array<string>
+
+declare const stylis: Stylis
 export = stylis
-export as namespace Stylis;
 
 declare global {
-	export const stylis: Stylis.StylisStatic;
+	export const stylis: Stylis
 }
