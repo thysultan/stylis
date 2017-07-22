@@ -371,7 +371,7 @@
 						chars = ''
 						child = ''
 
-						// invalid characters?
+						// invalid character?
 						switch (code = body.charCodeAt(++caret)) {
 							case SEMICOLON:
 							case CLOSEBRACES:
