@@ -74,6 +74,7 @@ var spec = {
 			};;
 
 			h1 {color:red}}};}
+			h1 {color:red}}}  ;}
 		`,
 		expected: ``+
 			`.user{margin: 20px;color:red;}`+
@@ -82,6 +83,7 @@ var spec = {
 			`.user .d{color: red;}`+
 			`@media(screen){.user{width: 20%;}}`+
 			`@media(screen){.user{width: 30%;}}`+
+			`.user h1{color:red;}`+
 			`.user h1{color:red;}`
 	},
 	'escape breaking control characters': {

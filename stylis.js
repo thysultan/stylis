@@ -371,10 +371,16 @@
 						chars = ''
 						child = ''
 
+						// invalid characters?
 						switch (code = body.charCodeAt(++caret)) {
 							case SEMICOLON:
 							case CLOSEBRACES:
-								while ((code = body.charCodeAt(++caret)) === SEMICOLON || code === CLOSEBRACES);
+								while (caret < eof) {
+									// valid character
+									if ((code = body.charCodeAt(++caret)) !== SEMICOLON && code !== CLOSEBRACES) {
+										break
+									}
+								}
 						}
 						break
 					}
