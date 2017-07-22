@@ -372,15 +372,13 @@
 						child = ''
 
 						// invalid character?
-						switch (code = body.charCodeAt(++caret)) {
-							case SEMICOLON:
-							case CLOSEBRACES:
-								while (caret < eof) {
-									// valid character
-									if ((code = body.charCodeAt(++caret)) !== SEMICOLON && code !== CLOSEBRACES) {
-										break
-									}
+						if ((code = body.charCodeAt(++caret)) === SEMICOLON) {
+							while (caret < eof) {
+								// valid character
+								if ((code = body.charCodeAt(++caret)) !== SEMICOLON) {
+									break
 								}
+							}
 						}
 						break
 					}
@@ -781,21 +779,19 @@
 		}
 
 		if (length > 0) {
-			// cascade isolation mode
-			if (cascade === 0 && id !== KEYFRAME) {
-				isolate(current)
-			}
+			// cascade isolation mode?
+			selector = cascade === 0 && id !== KEYFRAME ? isolate(current) : current
 
 			// execute plugins, block context
 			if (plugged > 0) {
-				result = proxy(BLCKS, out, current, parent, line, column, length, id)
+				result = proxy(BLCKS, out, selector, parent, line, column, length, id)
 
 				if (result !== void 0 && (out = result).length === 0) {
 					return flat + out + children
 				}
-			}		
+			}
 
-			out = current.join(',') + '{' + out + '}'
+			out = selector.join(',') + '{' + out + '}'
 
 			if (vendor*pattern > 0) {
 				switch (pattern) {
@@ -1174,12 +1170,12 @@
 	/**
 	 * Isolate
 	 *
-	 * @param {Array<string>} selectors
+	 * @param {Array<string>} current
 	 */
-	function isolate (selectors) {
-		for (var i = 0, length = selectors.length, padding, element; i < length; i++) {
+	function isolate (current) {
+		for (var i = 0, length = current.length, selector = Array(length), padding, element; i < length; i++) {
 			// split individual elements in a selector i.e h1 h2 === [h1, h2]
-			var elements = selectors[i].split(elementptn)
+			var elements = current[i].split(elementptn)
 			var out = ''
 
 			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
@@ -1258,8 +1254,10 @@
 				out += element
 			}
 
-			selectors[i] = out.replace(formatptn, '').trim()
+			selector[i] = out.replace(formatptn, '').trim()
 		}
+
+		return selector
 	}
 
 	/**

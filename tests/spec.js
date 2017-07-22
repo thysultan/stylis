@@ -71,7 +71,7 @@ var spec = {
 
 			@media(screen) {
 			  width: 30%;
-			};;
+			};;;;;
 
 			h1 {color:red}}};}
 			h1 {color:red}}}  ;}
@@ -1168,6 +1168,26 @@ var spec = {
 		`div.user h1.user,span.user h1.user{color: red;}`+
 		`span.user:hover{color: red;}`+
 		`[data-id=foo].user:hover{color: red;}`
+	},
+	'isolation edge cases': {
+		options: {
+			cascade: false
+		},
+		sample: `
+			width: 0;
+
+			@media(screen) {
+			  color: red;
+			}
+
+			h1 {
+				color:red;
+			}
+		`,
+		expected: ``+
+		`.user{width: 0;}`+
+		`@media(screen){.user{color: red;}}`+
+		`h1.user{color:red;}`
 	},
 	'semi-colons': {
 		options: {
