@@ -1,3 +1,7 @@
+## 3.2.7 July 22, 2017
+
+- improve fault-tolerance.
+
 ## 3.2.6 July 19, 2017
 
 - improve parsing selectors within a single non-breaking line.

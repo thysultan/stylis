@@ -63,12 +63,26 @@ var spec = {
 			.d {
 				color red;
 			}
+
+			;
+			@media(screen) {
+			  width: 20%;
+			};
+
+			@media(screen) {
+			  width: 30%;
+			};;
+
+			h1 {color:red}}};}
 		`,
 		expected: ``+
 			`.user{margin: 20px;color:red;}`+
 			`.user .b{border: 3px solid green;}`+
 			`.user .c{color:red;}`+
-			`.user .d{color: red;}`
+			`.user .d{color: red;}`+
+			`@media(screen){.user{width: 20%;}}`+
+			`@media(screen){.user{width: 30%;}}`+
+			`.user h1{color:red;}`
 	},
 	'escape breaking control characters': {
 		sample: `content: "\f\0\v";`,

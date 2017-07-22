@@ -371,14 +371,18 @@
 						chars = ''
 						child = ''
 
-						code = body.charCodeAt(++caret)
+						switch (code = body.charCodeAt(++caret)) {
+							case SEMICOLON:
+							case CLOSEBRACES:
+								while ((code = body.charCodeAt(++caret)) === SEMICOLON || code === CLOSEBRACES);
+						}
 						break
 					}
 					case CLOSEBRACES:
 					case SEMICOLON: {
 						chars = (format > 0 ? chars.replace(formatptn, '') : chars).trim()
-						
-						if (code !== CLOSEBRACES || chars.length > 0) {
+
+						if (chars.length > 1) {
 							// monkey-patch missing colon
 							if (pseudo === 0) {
 								first = chars.charCodeAt(0)
