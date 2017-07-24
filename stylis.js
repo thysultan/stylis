@@ -480,7 +480,8 @@
 				}
 				case SEMICOLON:
 				case CLOSEBRACES: {
-					if (comment + quote + parentheses + bracket === (column++, 0)) {
+					if (comment + quote + parentheses + bracket === 0) {
+						column++
 						break
 					}
 				}
