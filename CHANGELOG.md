@@ -1,3 +1,9 @@
+## 3.2.8 July 24, 2017
+
+- improve ASI.
+- improve whitespace comression.
+- improve fault-tolerance.
+
 ## 3.2.7 July 22, 2017
 
 - improve fault-tolerance.

@@ -370,16 +370,7 @@
 						atrule = 0
 						chars = ''
 						child = ''
-
-						// invalid character?
-						if ((code = body.charCodeAt(++caret)) === SEMICOLON) {
-							while (caret < eof) {
-								// valid character
-								if ((code = body.charCodeAt(++caret)) !== SEMICOLON) {
-									break
-								}
-							}
-						}
+						code = body.charCodeAt(++caret)
 						break
 					}
 					case CLOSEBRACES:
@@ -393,7 +384,7 @@
 
 								// first character is a letter or dash, buffer has a space character
 								if ((first === DASH || first > 96 && first < 123) && chars.indexOf(' ')) {
-									chars = chars.replace(' ', ': ')
+									chars = chars.replace(' ', ':')
 								}
 							}
 
@@ -431,8 +422,7 @@
 						format = 0
 						invert = 0
 						chars = ''
-
-						caret++
+						code = body.charCodeAt(++caret)
 						break
 					}
 				}
@@ -447,6 +437,9 @@
 						// valid non-whitespace characters that
 						// may precede a newline
 						switch (peak) {
+							case CLOSEPARENTHESES:
+							case SINGLEQUOTE:
+							case DOUBLEQUOTE:
 							case AT:
 							case TILDE:
 							case GREATERTHAN:
@@ -483,8 +476,13 @@
 					// next line, reset column position
 					column = 1
 					line++
-
 					break
+				}
+				case SEMICOLON:
+				case CLOSEBRACES: {
+					if (comment + quote + parentheses + bracket === (column++, 0)) {
+						break
+					}
 				}
 				default: {
 					// increment column position
@@ -492,22 +490,29 @@
 
 					// current character
 					char = body.charAt(caret)
-
-					if (code === TAB && quote === 0) {
-						switch (tail) {
-							case TAB:
-							case SPACE: {
-								char = ''
-								break
-							}
-							default: {
-								char = parentheses === 0 ? '' : ' '
-							}
-						}
-					}
 						
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
+						case TAB:
+						case SPACE: {
+							if (quote + bracket === 0) {
+								switch (tail) {
+									case COMMA:
+									case COLON:
+									case TAB:
+									case SPACE: {
+										char = ''
+										break
+									}
+									default: {
+										if (code !== SPACE) {
+											char = ' '
+										}
+									}
+								}
+							}
+							break
+						}
 						// escape breaking control characters
 						case NULL: {
 							char = '\\0'
@@ -1036,7 +1041,7 @@
 				// cursor, c, u, r
 				case 1005: {
 					if (cursorptn.test(out)) {
-						out = out.replace(colonptn, ': ' + webkit) + out.replace(colonptn, ': ' + moz) + out
+						out = out.replace(colonptn, ':' + webkit) + out.replace(colonptn, ':' + moz) + out
 					}
 					break
 				}
