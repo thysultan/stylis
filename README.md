@@ -67,7 +67,7 @@ font-size: 2em;
 
 h1 {
 	h2 {
-		h2 {
+		h3 {
 			content:'nesting'
 		}
 	}
@@ -154,7 +154,7 @@ var stylis = new stylis(options)
 var stylis = stylis
 ```
 
-When using the factory pattern the if an object is passed as optional `options` argument, this will be passed to `stylis.set(options)` 
+When using the factory pattern the if an object is passed as optional `options` argument, this will be passed to `stylis.set(options)`
 
 #### Set
 
@@ -162,26 +162,26 @@ When using the factory pattern the if an object is passed as optional `options` 
 // all options except compress and cascade are enabled by default
 stylis.set(options: {
 	// (dis/en)able :global selectors
-	global: {Boolean} 
+	global: {Boolean}
 
 	// (dis/en)able aggressive cascade isolation
 	// true for normal cascade(default) false for no cascading
-	cascade: {Boolean} 
+	cascade: {Boolean}
 
 	// (dis/en)able namespace keyframes + animations
-	keyframe: {Boolean} 
+	keyframe: {Boolean}
 
 	// (dis/en)able vendor prefixing
-	prefix: {Boolean} 
+	prefix: {Boolean}
 
 	// (dis/en)able aggressive minification
-	compress: {Boolean} 
+	compress: {Boolean}
 
 	// (dis/en)able (no)semicolon support
 	// false to enable no-semicolons (default)
 	semicolon: {Boolean},
 
-	// tell stylis to make an effort to preserve empty rules, 
+	// tell stylis to make an effort to preserve empty rules,
 	// i.e `.selector{ }`
 	preserve: {Boolean}
 })
