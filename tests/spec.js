@@ -696,11 +696,14 @@ var spec = {
 		sample: `
 			text-size-adjust:none;
 			text-decoration:none;
+			filter:grayscale(100%);
 		`,
 		expected: `.user{`+
 		`-webkit-text-size-adjust:none;`+
 		`text-size-adjust:none;`+
 		`text-decoration:none;`+
+		'-webkit-filter:grayscale(100%);'+
+		'filter:grayscale(100%);'+
 		`}`
 	},
 	'animations': {

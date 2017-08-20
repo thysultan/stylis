@@ -1,3 +1,8 @@
+## 3.2.9 August 20, 2017
+
+- minor performance improvements
+- vendor prefix `filter`
+
 ## 3.2.8 July 24, 2017
 
 - improve ASI.

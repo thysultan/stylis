@@ -259,7 +259,7 @@
 						chars = chars.trim()
 						first = chars.charCodeAt(0)
 						counter = 1
-						caret++
+						length = ++caret
 
 						while (caret < eof) {
 							code = body.charCodeAt(caret)
@@ -279,8 +279,10 @@
 								break
 							}
 
-							child += body.charAt(caret++)
+							caret++
 						}
+
+						child = body.substring(length, caret)
 
 						if (first === NULL) {
 							first = (chars = chars.replace(nullptn, '').trim()).charCodeAt(0)
@@ -942,6 +944,10 @@
 		} else if (vendor > 0) {
 			// vendor prefix
 			switch (hash) {
+				case 951: {
+					out = webkit + out + out
+					break
+				}
 				// color/column, c, o, l
 				case 963: {
 					// column
