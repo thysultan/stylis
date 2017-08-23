@@ -844,15 +844,15 @@
 			// 0-1 parent selectors
 			case 0:
 			case 1: {
-				for (var i = 0, selector = l === 0 ? '' : parent[0] + ' '; i < length; i++) {
+				for (var i = 0, selector = l === 0 ? '' : parent[0] + ' '; i < length; ++i) {
 					out[i] = scope(selector, out[i], invert, l).trim()
 				}
 				break
 			}
 			// >2 parent selectors, nested
 			default: {
-				for (var i = 0, j = 0, out = []; i < length; i++) {
-					for (var k = 0; k < l; k++) {
+				for (var i = 0, j = 0, out = []; i < length; ++i) {
+					for (var k = 0; k < l; ++k) {
 						out[j++] = scope(parent[k] + ' ', selectors[i], invert, l).trim()
 					}
 				}
@@ -933,8 +933,9 @@
 	 * @return {string}
 	 */
 	function property (input, first, second, third) {
-		var out = input + ';'
+		var i = 8
 		var index = 0
+		var out = input + ';'
 		var hash = (first*2) + (second*3) + (third*4)
 		var cache
 
@@ -992,18 +993,27 @@
 					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
 					break
 				}
+				// position: sticky
+				case 1017:
+					if (out.indexOf('stick', ++i) < -1) {
+						break
+					}
 				// display(flex/inline-flex/inline-box): d, i, s
 				case 975: {
 					index = (out = input).length-10
-					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(8).trim()
+					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(i).trim()
 
 					switch (hash = cache.charCodeAt(0) + (cache.charCodeAt(7)|0)) {
 						// inline-
 						case 203: {
 							// inline-box
-							if (cache.charCodeAt(8) > 110) {
-								out = out.replace(cache, webkit+cache)+';'+out
+							if (cache.charCodeAt(8) < 111) {
+								break
 							}
+						}
+						// inline-box/sticky
+						case 115: {
+							out = out.replace(cache, webkit+cache)+';'+out
 							break
 						}
 						// inline-flex
@@ -1104,7 +1114,7 @@
 						}
 					}
 
-					out = webkit+out+ms+cache+out
+					out = webkit + out + ms + cache + out
 					break
 				}
 			}
@@ -1131,7 +1141,7 @@
 			// split in case of multiple animations
 			var list = body.split(animationptn)
 
-			for (var i = 0, index = 0, length = list.length; i < length; index = 0, i++) {
+			for (var i = 0, index = 0, length = list.length; i < length; index = 0, ++i) {
 				var value = list[i]
 				var items = value.split(propertiesptn)
 
@@ -1185,12 +1195,12 @@
 	 * @param {Array<string>} current
 	 */
 	function isolate (current) {
-		for (var i = 0, length = current.length, selector = Array(length), padding, element; i < length; i++) {
+		for (var i = 0, length = current.length, selector = Array(length), padding, element; i < length; ++i) {
 			// split individual elements in a selector i.e h1 h2 === [h1, h2]
 			var elements = current[i].split(elementptn)
 			var out = ''
 
-			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; j++) {
+			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; ++j) {
 				// empty element
 				if ((size = (element = elements[j]).length) === 0 && l > 1) {
 					continue
@@ -1286,7 +1296,7 @@
 	 * @return {(string|void|*)}
 	 */
 	function proxy (context, content, selectors, parents, line, column, length, id) {
-		for (var i = 0, out = content, next; i < plugged; i++) {
+		for (var i = 0, out = content, next; i < plugged; ++i) {
 			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length, id)) {
 				case void 0:
 				case false:
@@ -1344,7 +1354,7 @@
 			default: {
 				switch (plugin.constructor) {
 					case Array: {
-						for (var i = 0, length = plugin.length; i < length; i++) {
+						for (var i = 0, length = plugin.length; i < length; ++i) {
 							use(plugin[i])
 						}
 						break
@@ -1368,7 +1378,7 @@
 	 *
 	 * @param {*} options
 	 */
-	function set (options) {		
+	function set (options) {
 		for (var name in options) {
 			var value = options[name]
 			switch (name) {

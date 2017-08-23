@@ -1,3 +1,7 @@
+## 3.2.10 August 20, 2017
+
+- vendor prefix `position: sticky`
+
 ## 3.2.9 August 20, 2017
 
 - minor performance improvements

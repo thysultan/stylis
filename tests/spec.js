@@ -697,6 +697,7 @@ var spec = {
 			text-size-adjust:none;
 			text-decoration:none;
 			filter:grayscale(100%);
+			position: sticky;
 		`,
 		expected: `.user{`+
 		`-webkit-text-size-adjust:none;`+
@@ -704,6 +705,8 @@ var spec = {
 		`text-decoration:none;`+
 		'-webkit-filter:grayscale(100%);'+
 		'filter:grayscale(100%);'+
+		'position:-webkit-sticky;'+
+		'position:sticky;'+
 		`}`
 	},
 	'animations': {
