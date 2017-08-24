@@ -995,7 +995,7 @@
 				}
 				// position: sticky
 				case 1017:
-					if (out.indexOf('stick', ++i) < -1) {
+					if (out.indexOf('stick', ++i) === -1) {
 						break
 					}
 				// display(flex/inline-flex/inline-box): d, i, s

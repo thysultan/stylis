@@ -1470,6 +1470,14 @@ var spec = {
 		},
 		sample: `color:red;`,
 		expected: `.user{color:red}`
+	},
+	'position fixed without prefixing [issue#53]': {
+		sample: `
+			position: fixed;
+		`,
+		expected: `.user{`+
+		'position:fixed;'+
+		`}`
 	}
 };
 
