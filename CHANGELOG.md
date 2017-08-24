@@ -1,4 +1,8 @@
-## 3.2.10 August 20, 2017
+## 3.2.11 August 24, 2017
+
+- patch vendor prefix `position: sticky`
+
+## 3.2.10 August 23, 2017
 
 - vendor prefix `position: sticky`
 
