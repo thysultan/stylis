@@ -254,7 +254,7 @@ var spec = {
 		sample: `@import url('http://example.com')`,
 		expected: `@import url('http://example.com')`
 	},
-	'@media & @supports': {
+	'@supports': {
 		sample: `
 			@supports (display:block) {
 				color:red;
@@ -268,6 +268,22 @@ var spec = {
 				display:none;
 			}
 
+			@supports (appearance: none) {
+				color:red;
+			}
+		`,
+		expected: ``+
+		`@supports (display:block){`+
+		`.user{color:red;display:none;}`+
+		`.user h1{color:red;}`+
+		`.user h1 h2{color:blue;}`+
+		`}`+
+		`@supports (-webkit-appearance:none)or(-moz-appearance:none)or(appearance:none){`+
+		`.user{color:red;}`+
+		`}`
+	},
+	'@media': {
+		sample: `
 			@media (max-width:600px) {
 				color:red;
 				h1 {
@@ -310,12 +326,6 @@ var spec = {
 		`
 		,
 		expected:
-		`@supports (display:block){`+
-		`.user{color:red;display:none;}`+
-		`.user h1{color:red;}`+
-		`.user h1 h2{color:blue;}`+
-		`}`+
-
 		`@media (max-width:600px){`+
 		`.user{color:red;display:none;}`+
 		`.user h1{color:red;}`+

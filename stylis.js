@@ -75,7 +75,9 @@
 	var whiteptn = /\s{2,}/g /* matches repeating whitespace */
 	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
 	var writingptn = /[svh]\w+-[tblr]{2}/ /* match writing mode property values */
-	var gradientptn = /([\w-]+t\()/g
+	var gradientptn = /([\w-]+t\()/g /* match *gradient property */
+	var supportsptn = /\(\s*([^]*?)\s*\)/g /* match supports (groups) */
+	var propertyptn = /([^]*?);/g /* match properties leading semicolon 
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -334,9 +336,11 @@
 
 								if (length > 0) {
 									switch (second) {
-										case DOCUMENT:
-										case MEDIA:
 										case SUPPORTS: {
+											chars = chars.replace(supportsptn, supports)
+										}
+										case DOCUMENT:
+										case MEDIA: {
 											child = chars + '{' + child + '}'
 											break
 										}
@@ -1129,6 +1133,17 @@
 		}
 
 		return out
+	}
+
+	/**
+	 * @param {string} match
+	 * @param {string} group
+	 * @return {string}
+	 */
+	function supports (match, group) {
+		var out = property(group, group.charCodeAt(0), group.charCodeAt(1), group.charCodeAt(2))
+
+		return out !== group+';' ? out.replace(propertyptn, 'or($1)').substring(2) : '('+group+')'
 	}
 
 	/**

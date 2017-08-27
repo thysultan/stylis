@@ -1,6 +1,10 @@
+## 3.2.13 August 28, 2017
+
+- vendor prefix `@supports (...rules)` rules
+
 ## 3.2.12 August 27, 2017
 
-- vendor prefxi `masks`
+- vendor prefix `masks`
 
 ## 3.2.11 August 24, 2017
 
