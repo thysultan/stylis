@@ -1,3 +1,7 @@
+## 3.2.12 August 27, 2017
+
+- vendor prefxi `masks`
+
 ## 3.2.11 August 24, 2017
 
 - patch vendor prefix `position: sticky`

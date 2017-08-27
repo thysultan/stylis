@@ -698,6 +698,8 @@ var spec = {
 			text-decoration:none;
 			filter:grayscale(100%);
 			position: sticky;
+			mask-image: linear-gradient(#fff);
+			mask-image: none;
 		`,
 		expected: `.user{`+
 		`-webkit-text-size-adjust:none;`+
@@ -707,6 +709,10 @@ var spec = {
 		'filter:grayscale(100%);'+
 		'position:-webkit-sticky;'+
 		'position:sticky;'+
+		'-webkit-mask-image:-webkit-linear-gradient(#fff);'+
+		'mask-image:linear-gradient(#fff);'+
+		'-webkit-mask-image:none;'+
+		'mask-image:none;'+
 		`}`
 	},
 	'animations': {

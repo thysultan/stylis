@@ -75,6 +75,7 @@
 	var whiteptn = /\s{2,}/g /* matches repeating whitespace */
 	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
 	var writingptn = /[svh]\w+-[tblr]{2}/ /* match writing mode property values */
+	var gradientptn = /([\w-]+t\()/g
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -945,6 +946,12 @@
 		} else if (vendor > 0) {
 			// vendor prefix
 			switch (hash) {
+				// mask
+				case 969: {
+					out = webkit + out.replace(gradientptn, webkit+'$1') + out
+					break
+				}
+				// filter
 				case 951: {
 					out = webkit + out + out
 					break
@@ -994,10 +1001,11 @@
 					break
 				}
 				// position: sticky
-				case 1017:
-					if (out.indexOf('stick', ++i) === -1) {
+				case 1017: {
+					if (out.indexOf('sticky', ++i) === -1) {
 						break
 					}
+				}
 				// display(flex/inline-flex/inline-box): d, i, s
 				case 975: {
 					index = (out = input).length-10
