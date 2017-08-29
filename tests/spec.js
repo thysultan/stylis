@@ -1308,6 +1308,16 @@ var spec = {
 		expected: ``+
 		`.user html{background-image: linear-gradient(0deg,rgba(255,255,255,0.8),rgba(255,255,255,0.8)), url(/static/background.svg);}`
 	},
+	'multiline declaration with subproperties': {
+		sample: `
+			html {
+			  background-image: linear-gradient(0deg, red, blue) center
+					center no-repeat;
+			}
+		`,
+		expected: ``+
+		`.user html{background-image: linear-gradient(0deg,red,blue) center center no-repeat;}`
+	},
 	'nesting selector multiple levels': {
 		sample: `
 			a {
