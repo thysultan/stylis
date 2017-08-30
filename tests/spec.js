@@ -725,6 +725,18 @@ var spec = {
 		'mask-image:none;'+
 		`}`
 	},
+	'vendor prefixing V': {
+		sample: `
+			display :flex!important;
+		`,
+		expected: ``+
+		`.user{`+
+		`display :-webkit-box!important;`+
+		`display :-webkit-flex!important;`+
+		`display :-ms-flexbox!important;`+
+		`display :flex!important;`+
+		`}`
+	},
 	'animations': {
 		sample: `
 			h2 {

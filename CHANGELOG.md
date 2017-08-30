@@ -1,3 +1,7 @@
+## 3.2.14 August 30, 2017
+
+- patch vendor prefix `display :flex`
+
 ## 3.2.13 August 28, 2017
 
 - vendor prefix `@supports (...rules)` rules

@@ -938,7 +938,6 @@
 	 * @return {string}
 	 */
 	function property (input, first, second, third) {
-		var i = 8
 		var index = 0
 		var out = input + ';'
 		var hash = (first*2) + (second*3) + (third*4)
@@ -1006,14 +1005,14 @@
 				}
 				// position: sticky
 				case 1017: {
-					if (out.indexOf('sticky', ++i) === -1) {
+					if (out.indexOf('sticky', 9) === -1) {
 						break
 					}
 				}
 				// display(flex/inline-flex/inline-box): d, i, s
 				case 975: {
 					index = (out = input).length-10
-					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(i).trim()
+					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(input.indexOf(':', 7) + 1).trim()
 
 					switch (hash = cache.charCodeAt(0) + (cache.charCodeAt(7)|0)) {
 						// inline-
