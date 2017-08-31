@@ -983,6 +983,7 @@ var spec = {
 				.a {color:'red'}
 				.b {color:"red"}
 				.a {color:red;}[role=button]{color:red;}
+				.b {padding:30 3}
 		 `,
 		 expected: `@media (min-width:537px){`+
 		 	`.user{border-bottom:4px solid red;}}`+
@@ -992,7 +993,8 @@ var spec = {
 		 	`.user::placeholder{color:pink;}`+
 		 	`.user .a{color:'red';}`+
 		 	`.user .b{color:"red";}`+
-		 	`.user .a{color:red;}.user [role=button]{color:red;}`
+		 	`.user .a{color:red;}.user [role=button]{color:red;}`+
+		 	`.user .b{padding:30 3;}`
 	},
 	// note the spaces after ;
 	'whitespace cascade true': {

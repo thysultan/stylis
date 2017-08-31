@@ -214,7 +214,7 @@
 						chars = chars.replace(formatptn, '')
 					}
 
-					if ((chars = chars.trim()).length > 0) {
+					if (chars.trim().length > 0) {
 						switch (code) {
 							case SPACE:
 							case TAB:

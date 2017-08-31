@@ -1,3 +1,7 @@
+## 3.2.15 August 31, 2017
+
+- patch unnecessary triming of required whitespace in no-semicolon rule
+
 ## 3.2.14 August 30, 2017
 
 - patch vendor prefix `display :flex`
