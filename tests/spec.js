@@ -728,6 +728,7 @@ var spec = {
 	'vendor prefixing V': {
 		sample: `
 			display :flex!important;
+			justify-content: space-between;
 		`,
 		expected: ``+
 		`.user{`+
@@ -735,6 +736,10 @@ var spec = {
 		`display :-webkit-flex!important;`+
 		`display :-ms-flexbox!important;`+
 		`display :flex!important;`+
+		`-webkit-box-pack:justify;`+
+		`-webkit-justify-content:space-between;`+
+		`-ms-flex-pack:justify;`+
+		`justify-content:space-between;`+
 		`}`
 	},
 	'animations': {

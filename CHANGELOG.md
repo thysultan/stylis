@@ -1,3 +1,8 @@
+## 3.2.16 September 08, 2017
+
+- handle `-ms-` vendor prefix for `justify-content: space-between;`.
+- improve minification of empty rules.
+
 ## 3.2.15 August 31, 2017
 
 - patch unnecessary triming of required whitespace in no-semicolon rule
