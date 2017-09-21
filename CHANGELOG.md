@@ -1,3 +1,8 @@
+## 3.2.17 September 21, 2017
+
+- patch `-ms-` vendor prefix for `align-self: flex-<start|end>`
+	align-self in IE10 must be just `start` and `end`.
+
 ## 3.2.16 September 08, 2017
 
 - handle `-ms-` vendor prefix for `justify-content: space-between;`.

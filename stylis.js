@@ -78,6 +78,7 @@
 	var gradientptn = /([\w-]+t\()/g /* match *gradient property */
 	var supportsptn = /\(\s*([^]*?)\s*\)/g /* match supports (groups) */
 	var propertyptn = /([^]*?);/g /* match properties leading semicolon */
+	var selfptn = /-self|flex-/g /* match flex- and -self in align-self: flex-*; */
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -1058,7 +1059,7 @@
 							}
 							// align-self, s
 							case 115: {
-								out = webkit + out + ms + 'flex-item-' + out.replace('-self', '') + out
+								out = webkit + out + ms + 'flex-item-' + out.replace(selfptn, '') + out
 								break
 							}
 							// align-content

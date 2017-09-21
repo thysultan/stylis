@@ -729,6 +729,8 @@ var spec = {
 		sample: `
 			display :flex!important;
 			justify-content: space-between;
+			align-self: flex-start;
+			align-self: flex-end;
 		`,
 		expected: ``+
 		`.user{`+
@@ -740,6 +742,12 @@ var spec = {
 		`-webkit-justify-content:space-between;`+
 		`-ms-flex-pack:justify;`+
 		`justify-content:space-between;`+
+		`-webkit-align-self:flex-start;`+
+		`-ms-flex-item-align:start;`+
+		`align-self:flex-start;`+
+		`-webkit-align-self:flex-end;`+
+		`-ms-flex-item-align:end;`+
+		`align-self:flex-end;`+
 		`}`
 	},
 	'animations': {
