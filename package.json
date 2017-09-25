@@ -3,7 +3,7 @@
 	"main": "stylis.js",
 	"types": "stylis.d.ts",
 	"description": "light - weight css preprocessor",
-	"version": "3.2.17",
+	"version": "3.2.18",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {

@@ -1,3 +1,7 @@
+## 3.2.18 September 25, 2017
+
+- patch `<max|min>-content` vendor prefixing mismatch.
+
 ## 3.2.17 September 21, 2017
 
 - patch `-ms-` vendor prefix for `align-self: flex-<start|end>`

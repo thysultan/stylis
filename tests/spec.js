@@ -498,6 +498,11 @@ var spec = {
 		  	color:red;
 			}
 			& {
+				width:var(--foo-content);
+				width:var(-content);
+				width:var(--max-content);
+				width:--max-content;
+
 				width:max-content;
 				width:min-content;
 				display:flex!important;
@@ -543,6 +548,10 @@ var spec = {
 
 			`.user{`+
 
+			'width:var(--foo-content);'+
+			'width:var(-content);'+
+			`width:var(--max-content);`+
+			`width:--max-content;`+
 			`width:-webkit-max-content;`+
 			`width:-moz-max-content;width:max-content;`+
 			`width:-webkit-min-content;`+

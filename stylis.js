@@ -1081,8 +1081,10 @@
 				case 953: {
 					if ((index = out.indexOf('-content', 9)) > 0) {
 						// width: min-content / width: max-content
-						cache = out.substring(index - 3)
-						out = 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
+						if (out.charCodeAt(index - 3) === 109 && out.charCodeAt(index - 4) !== 45) {
+							cache = out.substring(index - 3)
+							out = 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
+						}
 					}
 					break
 				}
