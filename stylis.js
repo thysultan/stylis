@@ -958,9 +958,12 @@
 					out = webkit + out.replace(gradientptn, webkit+'$1') + out
 					break
 				}
-				// filter
+				// filter/fill f, i, l
 				case 951: {
-					out = webkit + out + out
+					// filter
+					if (out.charCodeAt(3) === 116) {
+						out = webkit + out + out
+					}
 					break
 				}
 				// color/column, c, o, l

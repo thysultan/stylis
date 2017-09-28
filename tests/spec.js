@@ -716,6 +716,7 @@ var spec = {
 			text-size-adjust:none;
 			text-decoration:none;
 			filter:grayscale(100%);
+			fill:red;
 			position: sticky;
 			mask-image: linear-gradient(#fff);
 			mask-image: none;
@@ -726,6 +727,7 @@ var spec = {
 		`text-decoration:none;`+
 		'-webkit-filter:grayscale(100%);'+
 		'filter:grayscale(100%);'+
+		'fill:red;'+
 		'position:-webkit-sticky;'+
 		'position:sticky;'+
 		'-webkit-mask-image:-webkit-linear-gradient(#fff);'+
