@@ -568,11 +568,11 @@ var spec = {
 			`display:inline-flex;`+
 			`display:-webkit-inline-box;`+
 			`display:inline-box;`+
-
+			
 			`-webkit-transform:rotate(30deg);`+
 			`-ms-transform:rotate(30deg);`+
 			`transform:rotate(30deg);`+
-
+			
 			`cursor:-webkit-grab;`+
 			`cursor:-moz-grab;cursor:grab;`+
 
@@ -580,7 +580,7 @@ var spec = {
 			`-webkit-justify-content:flex-end;`+
 			`-ms-flex-pack:end;`+
 			`justify-content:flex-end;`+
-
+			
 			`-webkit-box-pack:start;`+
 			`-webkit-justify-content:flex-start;`+
 			`-ms-flex-pack:start;`+
@@ -607,7 +607,7 @@ var spec = {
 			`-webkit-align-content:value;`+
 			`-ms-flex-line-pack:value;`+
 			`align-content:value;`+
-
+			
 			`}`+
 			'.user div{'+
 			'color:papayawhip;'+
@@ -656,7 +656,7 @@ var spec = {
 		`-webkit-writing-mode:horizontal-tb;`+
 		`-ms-writing-mode:lr;`+
 		`writing-mode:horizontal-tb;`+
-
+		
 		`writing-mode:sideways-rl;`+
 		`writing-mode:sideways-lr;`+
 		`}`
@@ -678,19 +678,19 @@ var spec = {
 		expected: ``+
 		`.user{`+
 		`color:red;`+
-
+		
 		`-webkit-columns:auto;`+
 		`columns:auto;`+
-
+		
 		`-webkit-column-count:auto;`+
 		`column-count:auto;`+
-
+		
 		`-webkit-column-fill:auto;`+
 		`column-fill:auto;`+
 
 		`-webkit-column-gap:auto;`+
 		`column-gap:auto;`+
-
+		
 		`-webkit-column-rule:auto;`+
 		`column-rule:auto;`+
 
@@ -708,7 +708,7 @@ var spec = {
 
 		`-webkit-column-width:auto;`+
 		`column-width:auto;`+
-
+		
 		`}`
 	},
 	'vendor prefixing IV': {
@@ -727,7 +727,7 @@ var spec = {
 		`text-decoration:none;`+
 		'-webkit-filter:grayscale(100%);'+
 		'filter:grayscale(100%);'+
-    'fill:red;'+
+		'fill:red;'+
 		'position:-webkit-sticky;'+
 		'position:sticky;'+
 		'-webkit-mask-image:-webkit-linear-gradient(#fff);'+
@@ -1024,7 +1024,7 @@ var spec = {
 	'whitespace cascade true': {
 		sample: `
 			html {
-				width:0;
+				width:0;  	     
 			}
 		`,
 		expected: `.user html{width:0;}`
@@ -1036,8 +1036,8 @@ var spec = {
 		},
 		sample: `
 			html{
-				width:0;
-			}
+				width:0;  	  
+			}   
 		`,
 		expected: `html.user{width:0;}`
 	},
@@ -1289,7 +1289,7 @@ var spec = {
 				}
 			}
 
-			div:hover
+			div:hover 
 				{
 				color:red
 			}
@@ -1308,7 +1308,7 @@ var spec = {
 			color:red
 			color:red
 
-			h1:hover,
+			h1:hover, 
 			h2:hover
 			,
 			h3
@@ -1452,7 +1452,7 @@ var spec = {
 			}
 		},
 		sample: `
-		--foo:'value';
+		--foo:'value'; 
 		color:red;
 		`,
 		expected: `.user{color:red;}`
@@ -1492,7 +1492,7 @@ var spec = {
 		`.user{color:red;}/*a*/`
 	},
 	'multiple middlewares': {
-		options: {
+		options: {			
 			plugins: [
 				function (ctx, cont) {
 					if (ctx===1) {
@@ -1519,7 +1519,7 @@ var spec = {
 				throw 'could not create a new instance'
 
 			// this should prevent the previous test from affeting
-			// this test if every works as expected
+			// this test if every works as expected 
 			return instance
 		},
 		sample: `color:red;`,
