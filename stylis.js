@@ -8,12 +8,11 @@
  *
  * light - weight css preprocessor @licence MIT
  */
-/* eslint-disable */
-(function (factory) {
+(function (factory) {/* eslint-disable */
 	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory(null)) :
 		typeof define === 'function' && define['amd'] ? define(factory(null)) :
 			(window['stylis'] = factory(null))
-}(/** @param {*=} options */function factory (options) {
+}(/** @param {*=} options */function factory (options) {/* eslint-disable */
 
 	'use strict'
 
@@ -960,7 +959,7 @@
 				}
 				// filter/fill f, i, l
 				case 951: {
-					// filter
+					// filter, t
 					if (out.charCodeAt(3) === 116) {
 						out = webkit + out + out
 					}

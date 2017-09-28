@@ -1,3 +1,7 @@
+## 3.2.19 September 29, 2017
+
+- patch, svg `fill` vendor prefixing mismatch.
+
 ## 3.2.18 September 25, 2017
 
 - patch `<max|min>-content` vendor prefixing mismatch.
