@@ -960,9 +960,8 @@
 				}
 				// fill/filter, f, i, l
 				case 951: {
-          // filter
-          if (out.charCodeAt(3) === 116) {
-            console.log(out, out.charCodeAt(5));
+					// filter
+					if (out.charCodeAt(3) === 116) {
 						out = webkit + out + out
 					}
 					break

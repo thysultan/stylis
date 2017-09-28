@@ -716,7 +716,7 @@ var spec = {
 			text-size-adjust:none;
 			text-decoration:none;
 			filter:grayscale(100%);
-      fill:red;
+			fill:red;
 			position: sticky;
 			mask-image: linear-gradient(#fff);
 			mask-image: none;
