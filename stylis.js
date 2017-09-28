@@ -23,7 +23,7 @@
 	 * The ['<method name>'] pattern is used to support closure compiler
 	 * the jsdoc signatures are also used to the same effect
 	 *
-	 * ---- 
+	 * ----
 	 *
 	 * int + int + int === n4 [faster]
 	 *
@@ -182,7 +182,7 @@
 		var tail = 0 /* previous character code */
 		var trail = 0 /* character before previous code */
 		var peak = 0 /* previous non-whitespace code */
-		
+
 		var counter = 0 /* count sequence termination */
 		var context = 0 /* track current context */
 		var atrule = 0 /* track @at-rule context */
@@ -502,7 +502,7 @@
 
 					// current character
 					char = body.charAt(caret)
-						
+
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
 						case TAB:
@@ -790,7 +790,7 @@
  		if (preserve > 0) {
  			if (length === 0 && children.length === 0 && (current[0].length === 0) === false) {
  				if (id !== MEDIA || (current.length === 1 && (cascade > 0 ? nscopealt : nscope) === current[0])) {
-					length = current.join(',').length + 2 					
+					length = current.join(',').length + 2
  				}
  			}
 		}
@@ -958,9 +958,13 @@
 					out = webkit + out.replace(gradientptn, webkit+'$1') + out
 					break
 				}
-				// filter
+				// fill/filter, f, i, l
 				case 951: {
-					out = webkit + out + out
+          // filter
+          if (out.charCodeAt(3) === 116) {
+            console.log(out, out.charCodeAt(5));
+						out = webkit + out + out
+					}
 					break
 				}
 				// color/column, c, o, l
@@ -1043,7 +1047,7 @@
 							)
 						}
 					}
-					
+
 					out += ';'
 					break
 				}
@@ -1477,7 +1481,7 @@
 		// execute plugins, post-process context
 		if (plugged > 0) {
 			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0)
-	
+
 			// bypass minification
 			if (result !== void 0 && typeof(output = result) !== 'string') {
 				code = 0
