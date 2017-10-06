@@ -22,7 +22,7 @@
 	 * The ['<method name>'] pattern is used to support closure compiler
 	 * the jsdoc signatures are also used to the same effect
 	 *
-	 * ---- 
+	 * ----
 	 *
 	 * int + int + int === n4 [faster]
 	 *
@@ -181,7 +181,7 @@
 		var tail = 0 /* previous character code */
 		var trail = 0 /* character before previous code */
 		var peak = 0 /* previous non-whitespace code */
-		
+
 		var counter = 0 /* count sequence termination */
 		var context = 0 /* track current context */
 		var atrule = 0 /* track @at-rule context */
@@ -501,7 +501,7 @@
 
 					// current character
 					char = body.charAt(caret)
-						
+
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
 						case TAB:
@@ -789,7 +789,7 @@
  		if (preserve > 0) {
  			if (length === 0 && children.length === 0 && (current[0].length === 0) === false) {
  				if (id !== MEDIA || (current.length === 1 && (cascade > 0 ? nscopealt : nscope) === current[0])) {
-					length = current.join(',').length + 2 					
+					length = current.join(',').length + 2
  				}
  			}
 		}
@@ -952,72 +952,96 @@
 		} else if (vendor > 0) {
 			// vendor prefix
 			switch (hash) {
-				// mask
-				case 969: {
-					out = webkit + out.replace(gradientptn, webkit+'$1') + out
-					break
+				// text-decoration/text-size-adjust: t, e, x
+				case 1015: {
+					// text-size-adjust, -
+					return out.charCodeAt(9) === DASH ? webkit + out + out : out
 				}
 				// filter/fill f, i, l
 				case 951: {
 					// filter, t
-					if (out.charCodeAt(3) === 116) {
-						out = webkit + out + out
-					}
-					break
+					return out.charCodeAt(3) === 116 ? webkit + out + out : out
 				}
 				// color/column, c, o, l
 				case 963: {
-					// column
-					if (out.charCodeAt(5) === 110) {
-						out = webkit + out + out
-					}
-					break
+					// column, n
+					return out.charCodeAt(5) === 110 ? webkit + out + out : out
+				}
+				// mask, m, a, s
+				// clip-path, c, l, i
+				case 969:
+				case 942: {
+					return webkit + out + out
 				}
 				// appearance: a, p, p
 				case 978: {
-					out = webkit + out + moz + out + out
-					break
+					return webkit + out + moz + out + out
 				}
 				// hyphens: h, y, p
 				// user-select: u, s, e
 				case 1019:
 				case 983: {
-					out = webkit + out + moz + out + ms + out + out
-					break
+					return webkit + out + moz + out + ms + out + out
 				}
 				// background/backface-visibility, b, a, c
 				case 883: {
 					// backface-visibility, -
-					if (out.charCodeAt(8) === DASH) {
-						out = webkit + out + out
-					}
-					break
+					return out.charCodeAt(8) === DASH ? webkit + out + out : out
 				}
 				// flex: f, l, e
 				case 932: {
-					out = webkit + out + ms + out + out
-					break
+					return webkit + out + ms + out + out
 				}
 				// order: o, r, d
 				case 964: {
-					out = webkit + out + ms + 'flex' + '-' + out + out
-					break
+					return webkit + out + ms + 'flex' + '-' + out + out
 				}
 				// justify-content, j, u, s
 				case 1023: {
 					cache = out.substring(out.indexOf(':', 15)).replace('flex-', '').replace('space-between', 'justify')
-					out = webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
-					break
+					return webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
+				}
+				// cursor, c, u, r
+				case 1005: {
+					return cursorptn.test(out) ? out.replace(colonptn, ':' + webkit) + out.replace(colonptn, ':' + moz) + out : out
+				}
+				// writing-mode, w, r, i
+				case 1000: {
+					cache = out.substring(13).trim()
+					index = cache.indexOf('-') + 1
+
+					switch (cache.charCodeAt(0)+cache.charCodeAt(index)) {
+						// vertical-lr
+						case 226: {
+							cache = out.replace(writingptn, 'tb')
+							break
+						}
+						// vertical-rl
+						case 232: {
+							cache = out.replace(writingptn, 'tb-rl')
+							break
+						}
+						// horizontal-tb
+						case 220: {
+							cache = out.replace(writingptn, 'lr')
+							break
+						}
+						default: {
+							return out
+						}
+					}
+
+					return webkit + out + ms + cache + out
 				}
 				// position: sticky
 				case 1017: {
 					if (out.indexOf('sticky', 9) === -1) {
-						break
+						return out
 					}
 				}
 				// display(flex/inline-flex/inline-box): d, i, s
 				case 975: {
-					index = (out = input).length-10
+					index = (out = input).length - 10
 					cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(input.indexOf(':', 7) + 1).trim()
 
 					switch (hash = cache.charCodeAt(0) + (cache.charCodeAt(7)|0)) {
@@ -1045,9 +1069,8 @@
 							)
 						}
 					}
-					
-					out += ';'
-					break
+
+					return out + ';'
 				}
 				// align-items, align-center, align-self: a, l, i, -
 				case 938: {
@@ -1056,26 +1079,17 @@
 							// align-items, i
 							case 105: {
 								cache = out.replace('-items', '')
-								out = webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
-								break
+								return webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
 							}
 							// align-self, s
 							case 115: {
-								out = webkit + out + ms + 'flex-item-' + out.replace(selfptn, '') + out
-								break
+								return webkit + out + ms + 'flex-item-' + out.replace(selfptn, '') + out
 							}
 							// align-content
 							default: {
-								out = webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out
+								return webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out
 							}
 						}
-					}
-					break
-				}
-				// cursor, c, u, r
-				case 1005: {
-					if (cursorptn.test(out)) {
-						out = out.replace(colonptn, ':' + webkit) + out.replace(colonptn, ':' + moz) + out
 					}
 					break
 				}
@@ -1085,16 +1099,10 @@
 						// width: min-content / width: max-content
 						if (out.charCodeAt(index - 3) === 109 && out.charCodeAt(index - 4) !== 45) {
 							cache = out.substring(index - 3)
-							out = 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
+							return 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
 						}
 					}
 					break
-				}
-				// text-size-adjust: t, e, x
-				case 1015: {
-					if (input.charCodeAt(9) !== DASH) {
-						break
-					}
 				}
 				// transform, transition: t, r, a
 				case 962: {
@@ -1102,38 +1110,9 @@
 
 					// transitions
 					if (second + third === 211 && out.charCodeAt(13) === 105 && out.indexOf('transform', 10) > 0) {
-						out = out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, '$1' + webkit + '$2') + out
+						return out.substring(0, out.indexOf(';', 27) + 1).replace(transformptn, '$1' + webkit + '$2') + out
 					}
 
-					break
-				}
-				// writing-mode, w, r, i
-				case 1000: {
-					cache = out.substring(13).trim()
-					index = cache.indexOf('-')+1
-
-					switch (cache.charCodeAt(0)+cache.charCodeAt(index)) {
-						// vertical-lr
-						case 226: {
-							cache = out.replace(writingptn, 'tb')
-							break
-						}
-						// vertical-rl
-						case 232: {
-							cache = out.replace(writingptn, 'tb-rl')
-							break
-						}
-						// horizontal-tb
-						case 220: {
-							cache = out.replace(writingptn, 'lr')
-							break
-						}
-						default: {
-							return out
-						}
-					}
-
-					out = webkit + out + ms + cache + out
 					break
 				}
 			}
@@ -1479,7 +1458,7 @@
 		// execute plugins, post-process context
 		if (plugged > 0) {
 			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0)
-	
+
 			// bypass minification
 			if (result !== void 0 && typeof(output = result) !== 'string') {
 				code = 0

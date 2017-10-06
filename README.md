@@ -50,7 +50,7 @@ npm install stylis --save
 - keyframe and animation namespacing
 - plugins
 - minification
-- built to support [closure-compiler](https://developers.google.com/closure/compiler)
+- built to support [closure-compiler advanced mode](https://developers.google.com/closure/compiler)
 
 ---
 

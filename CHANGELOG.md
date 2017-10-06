@@ -1,3 +1,7 @@
+## 3.2.20 October 06, 2017
+
+- patch `mask-image` prefixes for gradients `mask-image: linear-gradient(transparent, black); `
+
 ## 3.2.19 September 29, 2017
 
 - patch, svg `fill` vendor prefixing mismatch.
@@ -119,7 +123,7 @@
 
 ## 3.1.3 June 08, 2017
 
-- patch inverse selector `html &:after` 
+- patch inverse selector `html &:after`
 
 ## 3.1.2 June 08, 2017
 
