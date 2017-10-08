@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>stylis rule sheet</title>
+	<script src='../../../stylis.js'></script>
+	<script src='../index.js'></script>
+</head>
+<body>
+
+	<h1>Hello</h1>
+
+<script>
+var sample = `
+	@import "./foo.css";
+
+	body {
+		background: gray;
+	}
+
+	h1 {
+		color: papayawhip;
+	}
+
+	h2 {
+		color: red;
+
+		div, h3 {
+			width: 10px;
+			color: red;
+		}
+	}
+
+	div {
+		font:none;
+	}
+
+	@keyframes hahaha {
+	  from {top: 0;}
+	  to {top: 100;}
+	}
+
+	@font-face {
+		src: none;
+	}
+
+	@page {size:A4 landscape;}
+
+  @viewport {min-width:640px;}
+  @counter-style list {
+    system:fixed;
+  }
+
+  @document {
+    body {
+      color: red;
+    }
+  }
+
+	@media {
+		display:none;
+	}
+
+	h1 {
+		width: 0
+		div {
+			height: 0;
+
+			@media {
+				color: blue;
+
+				h2 {
+					color: purple;
+
+					@media {
+						display:none;
+					}
+				}
+			}
+		}
+	}
+`
+
+var sheet = document.head.appendChild(document.createElement('style')).sheet
+var length = sheet.cssRules.length
+
+var plugin = stylisRuleSheet((value) => {
+	try {
+		console.log(value)
+		sheet.insertRule(value, length)
+		length++
+	} catch (e) {
+		console.error(e)
+	}
+})
+
+stylis.use(plugin)
+
+var output = stylis('', sample)
+
+// ouput will either be an empty string or contain
+// all the rules that would have errorer if passed to insertRule,
+// this includes
+// @viewport
+// @counter-style
+// @document
+// @import* when not inserted as the first rule
+console.log(output)
+
+</script>
+
+</body>
+</html>

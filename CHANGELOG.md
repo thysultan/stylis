@@ -1,3 +1,9 @@
+## 3.3.0 October 08, 2017
+
+- Passes an additional depth argument to plugins.
+
+	This can be used within a plugin to tell if you are in a flat selector/nested selector and how far deep.
+
 ## 3.2.20 October 06, 2017
 
 - patch `mask-image` prefixes for gradients `mask-image: linear-gradient(transparent, black); `

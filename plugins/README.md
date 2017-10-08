@@ -1,5 +1,6 @@
 # Plugins
 
+- [rule-sheet](https://github.com/thysultan/stylis.js/blob/master/plugins/rule-sheet)
 - [custom-selector](https://github.com/thysultan/stylis.js/blob/master/plugins/custom-selector)
 - [custom-properties](https://github.com/thysultan/stylis.js/blob/master/plugins/custom-selector)
 - [calc](https://github.com/thysultan/stylis.js/blob/master/plugins/calc)

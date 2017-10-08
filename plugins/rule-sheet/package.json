@@ -1,11 +1,8 @@
 {
-	"name": "stylis",
-	"main": "stylis.js",
-	"unpkg": "stylis.min.js",
-	"jsdelivr": "stylis.min.js",
-	"types": "stylis.d.ts",
-	"description": "light - weight css preprocessor",
-	"version": "3.3.0",
+	"name": "stylis-rule-sheet",
+	"main": "index.js",
+	"description": "stylis plugin to extract individual rules to use with insertRule API",
+	"version": "0.0.1",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {
@@ -13,8 +10,8 @@
 		"email": "sultantarimo@me.com"
 	},
 	"keywords": [
-		"css",
-		"preprocessor"
+		"stylis",
+		"plugin"
 	],
 	"repository": {
 		"type": "git",
@@ -26,5 +23,13 @@
 	"scripts": {
 		"test": "node ./tests"
 	},
-	"files": ["stylis.js", "stylis.min.js", "stylis.d.ts"]
+	"files": [
+		"index.js"
+	],
+	"devDependencies": {
+		"stylis": "3.x"
+	},
+	"peerDependencies": {
+  	"stylis": "3.x"
+  }
 }

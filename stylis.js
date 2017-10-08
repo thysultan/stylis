@@ -167,9 +167,10 @@
 	 * @param {Array<string>} current
 	 * @param {string} body
 	 * @param {number} id
+	 * @param {number} depth
 	 * @return {string}
 	 */
-	function compile (parent, current, body, id) {
+	function compile (parent, current, body, id, depth) {
 		var bracket = 0 /* brackets [] */
 		var comment = 0 /* comments /* // or /* */
 		var parentheses = 0 /* functions () */
@@ -312,7 +313,7 @@
 									}
 								}
 
-								child = compile(current, selector, child, second)
+								child = compile(current, selector, child, second, depth+1)
 								length = child.length
 
 								// preserve empty @at-rule
@@ -362,7 +363,7 @@
 							}
 							// selector
 							default: {
-								child = compile(current, select(current, chars, invert), child, id)
+								child = compile(current, select(current, chars, invert), child, id, depth+1)
 							}
 						}
 
@@ -1453,7 +1454,7 @@
 		}
 
 		// build
-		var output = compile(array, selectors, input, 0)
+		var output = compile(array, selectors, input, 0, 0)
 
 		// execute plugins, post-process context
 		if (plugged > 0) {
