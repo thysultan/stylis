@@ -324,7 +324,7 @@
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
 									selector = select(array, chars, invert)
-									result = proxy(ATRUL, child, selector, current, line, column, length, second)
+									result = proxy(ATRUL, child, selector, current, line, column, length, second, depth)
 									chars = selector.join('')
 
 									if (result !== void 0) {
@@ -398,7 +398,7 @@
 
 							// execute plugins, property context
 							if (plugged > 0) {
-								if ((result = proxy(PROPS, chars, current, parent, line, column, out.length, id)) !== void 0) {
+								if ((result = proxy(PROPS, chars, current, parent, line, column, out.length, id, depth)) !== void 0) {
 									if ((length = (chars = result.trim()).length) === 0) {
 										chars = '\0\0'
 									}
@@ -481,7 +481,7 @@
 
 					// execute plugins, newline context
 					if (plugged * unkwn > 0) {
-						proxy(UNKWN, chars, current, parent, line, column, out.length, id)
+						proxy(UNKWN, chars, current, parent, line, column, out.length, id, depth)
 					}
 
 					// next line, reset column position
@@ -801,7 +801,7 @@
 
 			// execute plugins, block context
 			if (plugged > 0) {
-				result = proxy(BLCKS, out, selector, parent, line, column, length, id)
+				result = proxy(BLCKS, out, selector, parent, line, column, length, id, depth)
 
 				if (result !== void 0 && (out = result).length === 0) {
 					return flat + out + children
@@ -1303,11 +1303,12 @@
 	 * @param {number} column
 	 * @param {number} length
 	 * @param {number} id
+	 * @param {number} depth
 	 * @return {(string|void|*)}
 	 */
-	function proxy (context, content, selectors, parents, line, column, length, id) {
+	function proxy (context, content, selectors, parents, line, column, length, id, depth) {
 		for (var i = 0, out = content, next; i < plugged; ++i) {
-			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length, id)) {
+			switch (next = plugins[i].call(stylis, context, out, selectors, parents, line, column, length, id, depth)) {
 				case void 0:
 				case false:
 				case true:
@@ -1446,7 +1447,7 @@
 
 		// execute plugins, pre-process context
 		if (plugged > 0) {
-			result = proxy(PREPS, input, selectors, selectors, line, column, 0, 0)
+			result = proxy(PREPS, input, selectors, selectors, line, column, 0, 0, 0)
 
 			if (result !== void 0 && typeof result === 'string') {
 				input = result
@@ -1458,7 +1459,7 @@
 
 		// execute plugins, post-process context
 		if (plugged > 0) {
-			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0)
+			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0, 0)
 
 			// bypass minification
 			if (result !== void 0 && typeof(output = result) !== 'string') {

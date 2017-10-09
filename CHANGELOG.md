@@ -1,3 +1,7 @@
+## 3.3.1 October 09, 2017
+
+- patch: passes an additional depth argument to plugins.
+
 ## 3.3.0 October 08, 2017
 
 - Passes an additional depth argument to plugins.

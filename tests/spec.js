@@ -1434,7 +1434,11 @@ var spec = {
 	},
 	'middleware contracts': {
 		options: {
-			plugins: function (context, content, selector, parents, line, column, length) {
+			plugins: function (context, content, selector, parents, line, column, length, depth) {
+				if (typeof depth !== 'number') {
+					throw 'depth argument not passed to middleware'
+				}
+
 				switch (context) {
 					case -1: if (content.indexOf('.user') > -1) throw 'not prep context'; break
 					case -2: if (content.indexOf('.user') === -1) throw 'not post context'; break
