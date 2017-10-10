@@ -8,6 +8,7 @@
 
 	return function (callback) {
 		var stack = []
+		var children = []
 
 		function toString (selectors, content) {
 			return selectors.join(',')+'{'+content+'}'
@@ -15,43 +16,54 @@
 
 		return function (context, content, selectors, parents, line, column, length, at, depth) {
 			switch (context) {
+				// property context
 				case 1:
 					return
+				// selector context
 				case 2:
-					// @at-rule context
+					// @at-rule content?
 					if (at > 0)
 						return
 
-					// #a { #b {}} ?
-					if (depth > 1)
-						return stack.push(toString(selectors, content)), ''
+					switch (depth) {
+						// normal {}
+						case 1:
+							stack.push(toString(selectors, content))
 
-					callback(toString(selectors, content))
-
-					if (stack.length > 0) {
-						stack.forEach(callback)
-						stack = []
+							if (children.length > 0)
+								children = (stack.push.apply(stack, children), [])
+							break
+						// flat/nested
+						default:
+							children.push(toString(selectors, content))
 					}
 
 					return ''
+				// @at-rule context
 				case 3:
 					switch (at) {
 						// @font-face
 						case 102:
 						// @page
 						case 112:
-							return callback(selectors[0]+content), ''
+							stack.push(selectors[0]+content)
 						// @viewport
 						// @counter-style
 						// @document
 						case 118:
 						case 99:
 						case 100:
-							return
+							break
 						default:
-							return callback(toString(selectors, content)), ''
+							stack.push(toString(selectors, content))
 					}
+
+					return ''
+				// post process context
 				case -2:
+					children.forEach(callback)
+					stack.forEach(callback)
+					children = []
 					stack = []
 			}
 		}

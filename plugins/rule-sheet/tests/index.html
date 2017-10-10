@@ -47,19 +47,40 @@ var sample = `
 
 	@page {size:A4 landscape;}
 
+	// these three are not passed to the callback
+	// since insertRule throws, including @import
   @viewport {min-width:640px;}
   @counter-style list {
     system:fixed;
   }
-
   @document {
     body {
       color: red;
     }
   }
 
+	font-size: 2rem;
+	padding: 16px;
+
+	&:hover {
+	  color: pink;
+	  &.class {
+	    color: purple;
+	  }
+	  &.some-class {
+	    color: hotpink;
+	  }
+	}
+
 	@media {
 		display:none;
+	}
+
+	&.other-class {
+	  color: blue;
+	  &:active {
+	    color: red;
+	  }
 	}
 
 	h1 {
@@ -88,8 +109,8 @@ var length = sheet.cssRules.length
 var plugin = stylisRuleSheet((value) => {
 	try {
 		console.log(value)
-		sheet.insertRule(value, length)
-		length++
+		// sheet.insertRule(value, length)
+		// length++
 	} catch (e) {
 		console.error(e)
 	}
@@ -97,10 +118,10 @@ var plugin = stylisRuleSheet((value) => {
 
 stylis.use(plugin)
 
-var output = stylis('', sample)
+var output = stylis('.css-hash', sample)
 
 // ouput will either be an empty string or contain
-// all the rules that would have errorer if passed to insertRule,
+// all the rules that would have thrown if passed to insertRule,
 // this includes
 // @viewport
 // @counter-style
