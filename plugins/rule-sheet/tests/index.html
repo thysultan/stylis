@@ -13,7 +13,7 @@
 
 <script>
 var sample = `
-	@import "./foo.css";
+	@import "./test.css";
 
 	body {
 		background: gray;
@@ -47,12 +47,13 @@ var sample = `
 
 	@page {size:A4 landscape;}
 
-	// these three are not passed to the callback
-	// since insertRule throws, including @import
+
   @viewport {min-width:640px;}
+
   @counter-style list {
     system:fixed;
   }
+
   @document {
     body {
       color: red;
@@ -93,24 +94,32 @@ var sample = `
 
 				h2 {
 					color: purple;
-
-					@media {
-						display:none;
-					}
 				}
 			}
 		}
 	}
+
+	textarea::placeholder,
+	input::placeholder {
+		color:red;
+	}
+
+	@supports (position: sticky) {
+    background: red;
+  }
 `
 
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
+stylis.set({
+	// prefix: false
+})
 
 var plugin = stylisRuleSheet((value) => {
 	try {
 		console.log(value)
-		// sheet.insertRule(value, length)
-		// length++
+		sheet.insertRule(value, length)
+		length++
 	} catch (e) {
 		console.error(e)
 	}

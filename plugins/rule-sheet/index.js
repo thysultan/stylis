@@ -9,62 +9,46 @@
 	return function (callback) {
 		var stack = []
 		var children = []
+		var delimiter = '\b'
+		var needle = delimiter+'}'
 
-		function toString (selectors, content) {
-			return selectors.join(',')+'{'+content+'}'
+		function toString (block) {
+			if (block)
+				callback(block + '}')
 		}
 
 		return function (context, content, selectors, parents, line, column, length, at, depth) {
 			switch (context) {
 				// property context
 				case 1:
-					return
+					// @import
+					if (depth === 0 && content.charCodeAt(0) === 64)
+						return callback(content), ''
+					break
 				// selector context
 				case 2:
-					// @at-rule content?
-					if (at > 0)
-						return
-
-					switch (depth) {
-						// normal {}
-						case 1:
-							stack.push(toString(selectors, content))
-
-							if (children.length > 0)
-								children = (stack.push.apply(stack, children), [])
-							break
-						// flat/nested
-						default:
-							children.push(toString(selectors, content))
-					}
-
-					return ''
-				// @at-rule context
+					if (at === 0)
+						return content + delimiter
+					break
 				case 3:
 					switch (at) {
 						// @font-face
-						case 102:
 						// @page
-						case 112:
-							stack.push(selectors[0]+content)
 						// @viewport
 						// @counter-style
-						// @document
+						case 102:
+						case 112:
 						case 118:
 						case 99:
+							return callback(selectors[0]+content), ''
+						// @document
 						case 100:
-							break
+							return callback(selectors[0]+'{'+content+'}'), ''
 						default:
-							stack.push(toString(selectors, content))
+							return content + delimiter
 					}
-
-					return ''
-				// post process context
 				case -2:
-					children.forEach(callback)
-					stack.forEach(callback)
-					children = []
-					stack = []
+					content.split(needle).forEach(toString)
 			}
 		}
 	}
