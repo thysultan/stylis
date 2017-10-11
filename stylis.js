@@ -1130,7 +1130,7 @@
 	function supports (match, group) {
 		var out = property(group, group.charCodeAt(0), group.charCodeAt(1), group.charCodeAt(2))
 
-		return out !== group+';' ? out.replace(propertyptn, 'or($1)').substring(2) : '('+group+')'
+		return out !== group+';' ? out.replace(propertyptn, ' or ($1)').substring(4) : '('+group+')'
 	}
 
 	/**

@@ -6,17 +6,8 @@ stylis plugin to extract individual rules to use with the insertRule API
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
 
-var plugin = stylisRuleSheet((rulset, safe) => {
-	// indicates that the rule will throw when used with `insertRule`
-	if (safe < 0)
-		return
-
-	try {
-		sheet.insertRule(rulset, length)
-		length++
-	} catch (e) {
-		console.log(e)
-	}
+var plugin = stylisRuleSheet((value) => {
+	length = sheet.insertRule(value, length) + 1
 })
 
 stylis.use(plugin)

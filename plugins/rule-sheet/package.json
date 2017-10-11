@@ -2,7 +2,7 @@
 	"name": "stylis-rule-sheet",
 	"main": "index.js",
 	"description": "stylis plugin to extract individual rules to use with insertRule API",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {
@@ -26,9 +26,6 @@
 	"files": [
 		"index.js"
 	],
-	"devDependencies": {
-		"stylis": "3.x"
-	},
 	"peerDependencies": {
   	"stylis": "3.x"
   }

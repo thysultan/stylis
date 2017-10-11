@@ -278,7 +278,7 @@ var spec = {
 		`.user h1{color:red;}`+
 		`.user h1 h2{color:blue;}`+
 		`}`+
-		`@supports (-webkit-appearance:none)or(-moz-appearance:none)or(appearance:none){`+
+		`@supports (-webkit-appearance:none) or (-moz-appearance:none) or (appearance:none){`+
 		`.user{color:red;}`+
 		`}`
 	},

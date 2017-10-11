@@ -1,3 +1,9 @@
+## 3.3.2 October 11, 2017
+
+- patch `@supports` vendor prefixes to include a space between the `or` clause i.e `@supports (display: sticky)`
+
+	The lack of space seems to break some css pipelines i.e `insertRule`.
+
 ## 3.3.1 October 09, 2017
 
 - patch: passes an additional depth argument to plugins.

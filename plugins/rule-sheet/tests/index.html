@@ -13,7 +13,7 @@
 
 <script>
 var sample = `
-	@import "./test.css";
+	@import "./index.html";
 
 	body {
 		background: gray;
@@ -47,19 +47,6 @@ var sample = `
 
 	@page {size:A4 landscape;}
 
-
-  @viewport {min-width:640px;}
-
-  @counter-style list {
-    system:fixed;
-  }
-
-  @document {
-    body {
-      color: red;
-    }
-  }
-
 	font-size: 2rem;
 	padding: 16px;
 
@@ -74,7 +61,7 @@ var sample = `
 	}
 
 	@media {
-		display:none;
+		content: "?";
 	}
 
 	&.other-class {
@@ -85,7 +72,8 @@ var sample = `
 	}
 
 	h1 {
-		width: 0
+		width: auto;
+
 		div {
 			height: 0;
 
@@ -104,40 +92,22 @@ var sample = `
 		color:red;
 	}
 
-	@supports (position: sticky) {
+	@supports(position: sticky){
     background: red;
   }
 `
 
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
-stylis.set({
-	// prefix: false
-})
 
 var plugin = stylisRuleSheet((value) => {
-	try {
-		console.log(value)
-		sheet.insertRule(value, length)
-		length++
-	} catch (e) {
-		console.error(e)
-	}
+	console.log(value)
+	length = sheet.insertRule(value, length) + 1
 })
 
 stylis.use(plugin)
 
-var output = stylis('.css-hash', sample)
-
-// ouput will either be an empty string or contain
-// all the rules that would have thrown if passed to insertRule,
-// this includes
-// @viewport
-// @counter-style
-// @document
-// @import* when not inserted as the first rule
-console.log(output)
-
+stylis('html', sample)
 </script>
 
 </body>
