@@ -97,6 +97,12 @@ var sample = `
   }
 `
 
+var sample = `
+span { color: red }
+@font-face { font-family: test; src: url(test.woff); }
+div { color: red }
+`
+
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
 

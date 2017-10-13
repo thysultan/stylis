@@ -36,7 +36,7 @@
 						// @font-face, @page
 						case 102:
 						case 112:
-							return insertRule(selectors[0]+content)
+							return insertRule(selectors[0]+content), ''
 						default:
 							return content + delimiter
 					}
