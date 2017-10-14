@@ -1550,6 +1550,69 @@ var spec = {
 		expected: `.user{`+
 		'position:fixed;'+
 		`}`
+	},
+	'disable prefixing': {
+		sample: `
+				transform: none;
+				animation: none;
+				@keyframes name {0: {color:red;}}
+				input::read-only, h1{color:red;}
+		`,
+		expected: `
+			.user{`+
+				`transform:none;`+
+				`animation:none;`+
+			`}`+
+			`@keyframes name-user{`+
+				`0:{color:red;}`+
+			`}`+
+			`.user input::read-only,.user h1{`+
+				`color:red;`+
+			`}
+		`,
+		options: {
+			prefix: false
+		}
+	},
+	'disable prefixing dynamically': {
+		sample: `
+				display: flex;
+				transform: none;
+				animation: none;
+				@keyframes name {0: {color:red;}}
+				input::read-only, h1{color:red;}
+		`,
+		expected: `
+			.user{`+
+				`display:flex;`+
+				`-webkit-transform:none;`+
+				`-ms-transform:none;`+
+				`transform:none;`+
+				`animation:none;`+
+			`}`+
+			`@keyframes name-user{`+
+				`0:{color:red;}`+
+			`}`+
+			`.user input::read-only,.user h1{`+
+				`color:red;`+
+			`}
+		`,
+		options: {
+			prefix: function (key, value, context) {
+				if (typeof context !== 'number')
+					throw 'fail'
+
+				switch (key) {
+					case 'transform':
+						return true
+					case 'disable':
+						if (value !== 'flex')
+							throw 'fail'
+					default:
+						return false
+				}
+			}
+		}
 	}
 };
 
