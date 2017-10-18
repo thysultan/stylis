@@ -684,6 +684,7 @@
 										}
 										// /*
 										case 220: {
+											length = caret
 											comment = STAR
 											break
 										}
@@ -693,6 +694,10 @@
 								// end block comment context
 								case STAR: {
 									if (code === FOWARDSLASH && tail === STAR) {
+										// /*<!> ... */, !
+										if (body.charCodeAt(length+2) === 33) {
+											out += body.substring(length, caret+1)
+										}
 										char = ''
 										comment = 0
 									}

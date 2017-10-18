@@ -215,8 +215,23 @@ var spec = {
 			{
 				color: red; /* 2 */
 			}
+
+			/*! 1 */
+			color: red;
+			/*! 2 */
+
+			h1 {
+				/*! 1 */
+				color: red;
+				/*! 2 */
+				color: red;
+				/*! 3 */
+			}
 		`,
-		expected: '.user button{color:blue;}.user button{color:red;}'
+		expected: ``+
+			`.user{/*! 1 */color:red;/*! 2 */}`+
+			`.user button{color:blue;}.user button{color:red;}`+
+			`.user h1{/*! 1 */color:red;/*! 2 */color:red;/*! 3 */}`
 	},
 	'&': {
 		sample: `
@@ -1614,6 +1629,13 @@ var spec = {
 						return false
 				}
 			}
+		}
+	},
+	'preserve empty selectors option': {
+		sample: `h1 {}`,
+		expected: `.user h1{}`,
+		options: {
+			preserve: true
 		}
 	}
 };
