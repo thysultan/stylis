@@ -1011,8 +1011,13 @@
 			case 964: {
 				return webkit + out + ms + 'flex' + '-' + out + out
 			}
-			// justify-content, j, u, s
+			// justify-items/justify-content, j, u, s
 			case 1023: {
+				// justify-content, c
+				if (out.charCodeAt(8) !== 99) {
+					break
+				}
+
 				cache = out.substring(out.indexOf(':', 15)).replace('flex-', '').replace('space-between', 'justify')
 				return webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
 			}

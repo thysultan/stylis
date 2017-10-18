@@ -766,6 +766,7 @@ var spec = {
 		sample: `
 			clip-path: none;
 			mask-image: none;
+			justify-items: center;
 		`,
 		expected: ``+
 		`.user{`+
@@ -773,6 +774,7 @@ var spec = {
 			`clip-path:none;`+
 			`-webkit-mask-image:none;`+
 			`mask-image:none;`+
+			`justify-items:center;`+
 		`}`
 	},
 	'animations': {
