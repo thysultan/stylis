@@ -1,3 +1,9 @@
+## 3.4.0 October 20, 2017
+
+- patch incorrect vendor prefixing of justify-content
+- support legal block comments `/*! */`
+- patch multiple none and multiple values for `animation-name`
+
 ## 3.3.2 October 11, 2017
 
 - patch `@supports` vendor prefixes to include a space between the `or` clause i.e `@supports (display: sticky)`
