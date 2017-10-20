@@ -85,10 +85,18 @@ function run (tests, fn) {
 			fn.set({global: options.global})
 		}
 
+		if (options.prefix !== void 0) {
+			fn.set({prefix: options.prefix})
+		}
+
+		if (options.preserve !== void 0) {
+			fn.set({preserve: options.preserve})
+		}
+
 		try {
 			if (test.setup) {
 				temp = fn
-				fn = test.setup(fn)	
+				fn = test.setup(fn)
 			}
 
 			var result = fn(
@@ -122,6 +130,14 @@ function run (tests, fn) {
 
 		if (options.global !== void 0) {
 			fn.set({global: true})
+		}
+
+		if (options.prefix !== void 0) {
+			fn.set({prefix: false})
+		}
+
+		if (options.preserve !== void 0) {
+			fn.set({preserve: false})
 		}
 
 		var control = /[\0\r\n\f]/g.test(result)

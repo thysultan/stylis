@@ -172,7 +172,7 @@ stylis.set(options: {
 	keyframe: {Boolean}
 
 	// (dis/en)able vendor prefixing
-	prefix: {Boolean}
+	prefix: {Boolean|Function(key: string, value: string, context: number)}
 
 	// (dis/en)able aggressive minification
 	compress: {Boolean}
@@ -185,6 +185,45 @@ stylis.set(options: {
 	// i.e `.selector{ }`
 	preserve: {Boolean}
 })
+```
+
+Vendor Prefixing
+
+By default vendor is enabled, however there is an option to disable vendor prefixing, either completely or dynamically.
+
+The following would disable prefixing.
+
+```js
+stylis.set({prefix: false})
+```
+
+Alternatively you can disable prefixing on a case by case basis by providing a function that returns a `boolean` indiciating whether to prefixing that particular rule.
+
+```js
+stylis.use({
+	prefix: (key, value, context) => {
+		return false
+	}
+})
+```
+
+The arguments correspond to the rule that is about to be vendor prefixed. For example:
+
+```js
+// transform: none;
+key = 'transform'
+value = 'none'
+context = 1
+
+// :read-only {...}
+key = ':read-only'
+value = '...'
+context = 2
+
+// @keyframes {...}
+key = '@keyframes'
+value = '...'
+context = 3
 ```
 
 #### Use

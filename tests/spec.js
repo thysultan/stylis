@@ -215,8 +215,23 @@ var spec = {
 			{
 				color: red; /* 2 */
 			}
+
+			/*! 1 */
+			color: red;
+			/*! 2 */
+
+			h1 {
+				/*! 1 */
+				color: red;
+				/*! 2 */
+				color: red;
+				/*! 3 */
+			}
 		`,
-		expected: '.user button{color:blue;}.user button{color:red;}'
+		expected: ``+
+			`.user{/*! 1 */color:red;/*! 2 */}`+
+			`.user button{color:blue;}.user button{color:red;}`+
+			`.user h1{/*! 1 */color:red;/*! 2 */color:red;/*! 3 */}`
 	},
 	'&': {
 		sample: `
@@ -766,6 +781,7 @@ var spec = {
 		sample: `
 			clip-path: none;
 			mask-image: none;
+			justify-items: center;
 		`,
 		expected: ``+
 		`.user{`+
@@ -773,6 +789,7 @@ var spec = {
 			`clip-path:none;`+
 			`-webkit-mask-image:none;`+
 			`mask-image:none;`+
+			`justify-items:center;`+
 		`}`
 	},
 	'animations': {
@@ -823,11 +840,16 @@ var spec = {
 				`;
 			}
 			span {
-      			animation-duration: 0.6s;
-      			animation-name: slidein;
-      			animation-iteration-count: infinite;
-      			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
-		    }
+  			animation-duration: 0.6s;
+  			animation-name: slidein;
+  			animation-iteration-count: infinite;
+  			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
+	    }
+
+	    input {
+	    	animation-name: anim1, anim2;
+	    	animation-name: none;
+	    }
 		`,
 		expected:
 		/*
@@ -835,25 +857,39 @@ var spec = {
 			the animation-name in a grouped animation: property
 		*/
 		`.user h2{`+
-		`-webkit-animation:initial inherit unset --invalid;animation:initial inherit unset --invalid;}`+
-		`.user span{-webkit-animation:_name_-user -name-user %name 1name __name-user;`+
-		`animation:_name_-user -name-user %name 1name __name-user;}`+
-		`.user div{-webkit-animation-name:bounce-user;animation-name:bounce-user;}`+
-		`.user h1{-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
-		`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) `+
-		`ease-in-out ease ease-inOuter-user linear alternate normal forwards both `+
-		`none ease-in ease-out backwards running paused reverse alternate-reverse `+
-		`step-start step-end step-end-something-user steps(4,end);`+
-		`animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user `+
-		`slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease `+
-		`ease-inOuter-user linear alternate normal forwards both none ease-in `+
-		`ease-out backwards running paused reverse alternate-reverse step-start `+
-		`step-end step-end-something-user steps(4,end);}`+
-		`.user span{-webkit-animation-duration:0.6s;animation-duration:0.6s;`+
-		`-webkit-animation-name:slidein-user;animation-name:slidein-user;`+
-		`-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;`+
-		`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
-		`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}`
+			`-webkit-animation:initial inherit unset --invalid;animation:initial inherit unset --invalid;}`+
+		`.user span{`+
+			`-webkit-animation:_name_-user -name-user %name 1name __name-user;`+
+			`animation:_name_-user -name-user %name 1name __name-user;`+
+		`}`+
+		`.user div{`+
+			`-webkit-animation-name:bounce-user;animation-name:bounce-user;`+
+		`}`+
+		`.user h1{`+
+			`-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
+			`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) `+
+			`ease-in-out ease ease-inOuter-user linear alternate normal forwards both `+
+			`none ease-in ease-out backwards running paused reverse alternate-reverse `+
+			`step-start step-end step-end-something-user steps(4,end);`+
+			`animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user `+
+			`slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease `+
+			`ease-inOuter-user linear alternate normal forwards both none ease-in `+
+			`ease-out backwards running paused reverse alternate-reverse step-start `+
+			`step-end step-end-something-user steps(4,end)`+
+		`;}`+
+		`.user span{`+
+			`-webkit-animation-duration:0.6s;animation-duration:0.6s;`+
+			`-webkit-animation-name:slidein-user;animation-name:slidein-user;`+
+			`-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;`+
+			`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
+			`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
+		`}`+
+		`.user input{`+
+			`-webkit-animation-name:anim1-user,anim2-user;`+
+			`animation-name:anim1-user,anim2-user;`+
+			`-webkit-animation-name:none;`+
+			`animation-name:none;`+
+		`}`
 	},
 	'animations disabled namespace': {
 		options: {
@@ -1550,6 +1586,76 @@ var spec = {
 		expected: `.user{`+
 		'position:fixed;'+
 		`}`
+	},
+	'disable prefixing': {
+		sample: `
+				transform: none;
+				animation: none;
+				@keyframes name {0: {color:red;}}
+				input::read-only, h1{color:red;}
+		`,
+		expected: `
+			.user{`+
+				`transform:none;`+
+				`animation:none;`+
+			`}`+
+			`@keyframes name-user{`+
+				`0:{color:red;}`+
+			`}`+
+			`.user input::read-only,.user h1{`+
+				`color:red;`+
+			`}
+		`,
+		options: {
+			prefix: false
+		}
+	},
+	'disable prefixing dynamically': {
+		sample: `
+				display: flex;
+				transform: none;
+				animation: none;
+				@keyframes name {0: {color:red;}}
+				input::read-only, h1{color:red;}
+		`,
+		expected: `
+			.user{`+
+				`display:flex;`+
+				`-webkit-transform:none;`+
+				`-ms-transform:none;`+
+				`transform:none;`+
+				`animation:none;`+
+			`}`+
+			`@keyframes name-user{`+
+				`0:{color:red;}`+
+			`}`+
+			`.user input::read-only,.user h1{`+
+				`color:red;`+
+			`}
+		`,
+		options: {
+			prefix: function (key, value, context) {
+				if (typeof context !== 'number')
+					throw 'fail'
+
+				switch (key) {
+					case 'transform':
+						return true
+					case 'disable':
+						if (value !== 'flex')
+							throw 'fail'
+					default:
+						return false
+				}
+			}
+		}
+	},
+	'preserve empty selectors option': {
+		sample: `h1 {}`,
+		expected: `.user h1{}`,
+		options: {
+			preserve: true
+		}
 	}
 };
 
