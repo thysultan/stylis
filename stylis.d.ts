@@ -19,7 +19,7 @@ interface Options {
 	global?: boolean
 	cascade?: boolean
 	compress?: boolean
-	prefix?: boolean
+	prefix?: (key: string, value: string, context: number) => boolean|boolean
 	semicolon?: boolean
 	preserve?: boolean
 }
@@ -36,7 +36,9 @@ interface Plugin {
 		parent: Selectors,
 		line: number,
 		column: number,
-		length: number): null | void | string
+		length: number,
+		at: number,
+		depth: number): null | void | string
 }
 
 interface Use {
