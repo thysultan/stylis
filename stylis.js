@@ -1185,55 +1185,63 @@
 		var length = input.length
 		var index = input.indexOf(':', 9) + 1
 		var declare = input.substring(0, index).trim()
-		var body = input.substring(index, length-1).trim()
-		var out = ''
+		var out = input.substring(index, length-1).trim()
 
-		// shorthand
-		if (input.charCodeAt(9) !== DASH) {
-			// split in case of multiple animations
-			var list = body.split(animationptn)
+		switch (input.charCodeAt(9)*keyed) {
+			case 0: {
+				break
+			}
+			// animation-*, -
+			case DASH: {
+				// animation-name, n
+				if (input.charCodeAt(10) !== 110) {
+					break
+				}
+			}
+			// animation/animation-name
+			default: {
+				// split in case of multiple animations
+				var list = out.split((out = '', animationptn))
 
-			for (var i = 0, index = 0, length = list.length; i < length; index = 0, ++i) {
-				var value = list[i]
-				var items = value.split(propertiesptn)
+				for (var i = 0, index = 0, length = list.length; i < length; index = 0, ++i) {
+					var value = list[i]
+					var items = value.split(propertiesptn)
 
-				while (value = items[index]) {
-					var peak = value.charCodeAt(0)
+					while (value = items[index]) {
+						var peak = value.charCodeAt(0)
 
-					if (keyed === 1 && (
-						// letters
-						(peak > AT && peak < 90) || (peak > 96 && peak < 123) || peak === UNDERSCORE ||
-						// dash but not in sequence i.e --
-						(peak === DASH && value.charCodeAt(1) !== DASH)
-					)) {
-						// not a number/function
-						switch (isNaN(parseFloat(value)) + (value.indexOf('(') !== -1)) {
-							case 1: {
-								switch (value) {
-									// not a valid reserved keyword
-									case 'infinite': case 'alternate': case 'backwards': case 'running':
-									case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
-									case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
-									case 'paused': case 'reverse': case 'alternate-reverse': case 'inherit':
-									case 'initial': case 'unset': case 'step-start': case 'step-end': {
-										break
-									}
-									default: {
-										value += key
+						if (keyed === 1 && (
+							// letters
+							(peak > AT && peak < 90) || (peak > 96 && peak < 123) || peak === UNDERSCORE ||
+							// dash but not in sequence i.e --
+							(peak === DASH && value.charCodeAt(1) !== DASH)
+						)) {
+							// not a number/function
+							switch (isNaN(parseFloat(value)) + (value.indexOf('(') !== -1)) {
+								case 1: {
+									switch (value) {
+										// not a valid reserved keyword
+										case 'infinite': case 'alternate': case 'backwards': case 'running':
+										case 'normal': case 'forwards': case 'both': case 'none': case 'linear':
+										case 'ease': case 'ease-in': case 'ease-out': case 'ease-in-out':
+										case 'paused': case 'reverse': case 'alternate-reverse': case 'inherit':
+										case 'initial': case 'unset': case 'step-start': case 'step-end': {
+											break
+										}
+										default: {
+											value += key
+										}
 									}
 								}
 							}
 						}
+
+						items[index++] = value
 					}
 
-					items[index++] = value
+					out += (i === 0 ? '' : ',') + items.join(' ')
 				}
-
-				out += (i === 0 ? '' : ',') + items.join(' ')
 			}
-		} else {
-			// animation-name, n
-			out += input.charCodeAt(10) === 110 ? body + (keyed === 1 ? key : '') : body
 		}
 
 		out = declare + out + ';'

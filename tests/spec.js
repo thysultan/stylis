@@ -840,11 +840,16 @@ var spec = {
 				`;
 			}
 			span {
-      			animation-duration: 0.6s;
-      			animation-name: slidein;
-      			animation-iteration-count: infinite;
-      			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
-		    }
+  			animation-duration: 0.6s;
+  			animation-name: slidein;
+  			animation-iteration-count: infinite;
+  			animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
+	    }
+
+	    input {
+	    	animation-name: anim1, anim2;
+	    	animation-name: none;
+	    }
 		`,
 		expected:
 		/*
@@ -852,25 +857,39 @@ var spec = {
 			the animation-name in a grouped animation: property
 		*/
 		`.user h2{`+
-		`-webkit-animation:initial inherit unset --invalid;animation:initial inherit unset --invalid;}`+
-		`.user span{-webkit-animation:_name_-user -name-user %name 1name __name-user;`+
-		`animation:_name_-user -name-user %name 1name __name-user;}`+
-		`.user div{-webkit-animation-name:bounce-user;animation-name:bounce-user;}`+
-		`.user h1{-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
-		`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) `+
-		`ease-in-out ease ease-inOuter-user linear alternate normal forwards both `+
-		`none ease-in ease-out backwards running paused reverse alternate-reverse `+
-		`step-start step-end step-end-something-user steps(4,end);`+
-		`animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user `+
-		`slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease `+
-		`ease-inOuter-user linear alternate normal forwards both none ease-in `+
-		`ease-out backwards running paused reverse alternate-reverse step-start `+
-		`step-end step-end-something-user steps(4,end);}`+
-		`.user span{-webkit-animation-duration:0.6s;animation-duration:0.6s;`+
-		`-webkit-animation-name:slidein-user;animation-name:slidein-user;`+
-		`-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;`+
-		`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
-		`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}`
+			`-webkit-animation:initial inherit unset --invalid;animation:initial inherit unset --invalid;}`+
+		`.user span{`+
+			`-webkit-animation:_name_-user -name-user %name 1name __name-user;`+
+			`animation:_name_-user -name-user %name 1name __name-user;`+
+		`}`+
+		`.user div{`+
+			`-webkit-animation-name:bounce-user;animation-name:bounce-user;`+
+		`}`+
+		`.user h1{`+
+			`-webkit-animation:0.6s .6ms 200ms infinite something-ease-user `+
+			`infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) `+
+			`ease-in-out ease ease-inOuter-user linear alternate normal forwards both `+
+			`none ease-in ease-out backwards running paused reverse alternate-reverse `+
+			`step-start step-end step-end-something-user steps(4,end);`+
+			`animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user `+
+			`slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease `+
+			`ease-inOuter-user linear alternate normal forwards both none ease-in `+
+			`ease-out backwards running paused reverse alternate-reverse step-start `+
+			`step-end step-end-something-user steps(4,end)`+
+		`;}`+
+		`.user span{`+
+			`-webkit-animation-duration:0.6s;animation-duration:0.6s;`+
+			`-webkit-animation-name:slidein-user;animation-name:slidein-user;`+
+			`-webkit-animation-iteration-count:infinite;animation-iteration-count:infinite;`+
+			`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
+			`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`+
+		`}`+
+		`.user input{`+
+			`-webkit-animation-name:anim1-user,anim2-user;`+
+			`animation-name:anim1-user,anim2-user;`+
+			`-webkit-animation-name:none;`+
+			`animation-name:none;`+
+		`}`
 	},
 	'animations disabled namespace': {
 		options: {
