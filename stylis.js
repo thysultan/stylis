@@ -79,6 +79,7 @@
 	var propertyptn = /([^]*?);/g /* match properties leading semicolon */
 	var selfptn = /-self|flex-/g /* match flex- and -self in align-self: flex-*; */
 	var pseudofmt = /[^]*?(:[rp][el]a[\w-]+)[^]*/ /* extrats :readonly or :placholder from selector */
+	var trimptn = /[ \t]+$/ /* match tail whitspace */
 
 	/* vendors */
 	var webkit = '-webkit-'
@@ -306,7 +307,8 @@
 								switch (second) {
 									case DOCUMENT:
 									case MEDIA:
-									case SUPPORTS: {
+									case SUPPORTS:
+									case DASH: {
 										selector = current
 										break
 									}
@@ -343,7 +345,8 @@
 											chars = chars.replace(supportsptn, supports)
 										}
 										case DOCUMENT:
-										case MEDIA: {
+										case MEDIA:
+										case DASH: {
 											child = chars + '{' + child + '}'
 											break
 										}
@@ -484,6 +487,24 @@
 					// terminate line comment
 					if (comment === FOWARDSLASH) {
 						comment = 0
+					} else {
+						switch (tail) {
+							case NULL:
+							case TAB:
+							case SPACE:
+							case NEWLINE:
+							case CARRIAGE: {
+								break
+							}
+							default: {
+								// @TODO
+								// chars += ' '
+								// if (cascade + context === 0) {
+								// 	format = 1
+								// 	chars += '\0'
+								// }
+							}
+						}
 					}
 
 					// execute plugins, newline context
@@ -514,7 +535,7 @@
 					switch (code) {
 						case TAB:
 						case SPACE: {
-							if (quote + bracket === 0) {
+							if (quote + bracket + comment === 0) {
 								switch (tail) {
 									case COMMA:
 									case COLON:
@@ -522,6 +543,10 @@
 									case SPACE: {
 										char = ''
 										break
+									}
+									case NEWLINE: {
+										// @TODO
+										// chars = chars.replace(trimptn, '')
 									}
 									default: {
 										if (code !== SPACE) {
@@ -751,6 +776,7 @@
 									}
 									break
 								}
+								case TAB:
 								case SPACE: {
 									switch (tail) {
 										case NULL:
@@ -781,7 +807,7 @@
 						chars += char
 
 						// previous non-whitespace character code
-						if (code !== SPACE) {
+						if (code !== SPACE && code !== TAB) {
 							peak = code
 						}
 					}
@@ -1010,6 +1036,23 @@
 			}
 			// flex: f, l, e
 			case 932: {
+				if (out.charCodeAt(4) === DASH) {
+					switch (out.charCodeAt(5)) {
+						// flex-grow, g
+						case 103: {
+							return webkit + 'box-' + out.replace('-grow', '') + ms + out.replace('grow', 'positive') + out
+						}
+						// flex-shrink, s
+						case 115: {
+							return ms + out.replace('shrink', 'negative') + out
+						}
+						// flex-basis, b
+						case 98: {
+							return ms + out.replace('basis', 'preferred-size') + out
+						}
+					}
+				}
+
 				return webkit + out + ms + out + out
 			}
 			// order: o, r, d

@@ -38,6 +38,12 @@ var spec = {
 		  symbols:url();
 		  suffix:" ";
 		}
+
+		@-moz-document url-prefix() {
+			.selector {
+				color:lime;
+			}
+		}
 		`,
 		expected: ``+
 		`@page{size:A4 landscape;}`+
@@ -45,7 +51,8 @@ var spec = {
 		`.user body{color:red;}`+
 		'}'+
 		`@viewport{min-width:640px;max-width:800px;}`+
-		`@counter-style list{system:fixed;symbols:url();suffix:" ";}`
+		`@counter-style list{system:fixed;symbols:url();suffix:" ";}`+
+		`@-moz-document url-prefix(){.user .selector{color:lime;}}`
 	},
 	'monkey-patch some invalid css patterns': {
 		sample: `
@@ -782,14 +789,27 @@ var spec = {
 			clip-path: none;
 			mask-image: none;
 			justify-items: center;
+
+			flex-grow: none;
+			flex-shrink: none;
+			flex-basis: none;
 		`,
 		expected: ``+
 		`.user{`+
 			`-webkit-clip-path:none;`+
 			`clip-path:none;`+
+
 			`-webkit-mask-image:none;`+
 			`mask-image:none;`+
 			`justify-items:center;`+
+
+			`-webkit-box-flex:none;`+
+			`-ms-flex-positive:none;`+
+			`flex-grow:none;`+
+			`-ms-flex-negative:none;`+
+			`flex-shrink:none;`+
+			`-ms-flex-preferred-size:none;`+
+			`flex-basis:none;`+
 		`}`
 	},
 	'animations': {
