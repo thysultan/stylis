@@ -487,24 +487,9 @@
 					// terminate line comment
 					if (comment === FOWARDSLASH) {
 						comment = 0
-					} else {
-						switch (tail) {
-							case NULL:
-							case TAB:
-							case SPACE:
-							case NEWLINE:
-							case CARRIAGE: {
-								break
-							}
-							default: {
-								// @TODO
-								// chars += ' '
-								// if (cascade + context === 0) {
-								// 	format = 1
-								// 	chars += '\0'
-								// }
-							}
-						}
+					} else if (cascade + context === 0) {
+						format = 1
+						chars += '\0'
 					}
 
 					// execute plugins, newline context
@@ -543,10 +528,6 @@
 									case SPACE: {
 										char = ''
 										break
-									}
-									case NEWLINE: {
-										// @TODO
-										// chars = chars.replace(trimptn, '')
 									}
 									default: {
 										if (code !== SPACE) {
@@ -1012,6 +993,12 @@
 			case 963: {
 				// column, n
 				return out.charCodeAt(5) === 110 ? webkit + out + out : out
+			}
+			// box-decoration-break, b, o, x
+			case 1009: {
+				if (out.charCodeAt(4) !== 100) {
+					break
+				}
 			}
 			// mask, m, a, s
 			// clip-path, c, l, i

@@ -1,8 +1,9 @@
 ## (Unreleased)
 
-- [x] patch for manual prefixed at-rules. i.e `@-moz-document {...}`.
-- [x] patch for flexbox vendor prefix `flex-grow`, `flex-shrink` and `flex-basis`.
-- [ ] better handle special `:global` selector with `newlines` in cascade isolation mode.
+- patch for manual prefixed at-rules. i.e `@-moz-document {...}`.
+- patch for flexbox vendor prefix `flex-grow`, `flex-shrink` and `flex-basis`.
+- vendor prefix `box-decoration-break`.
+- better handle special `:global` selector with `newlines` in cascade isolation mode.
 
 ## 3.4.0 October 20, 2017
 

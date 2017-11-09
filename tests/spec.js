@@ -793,6 +793,9 @@ var spec = {
 			flex-grow: none;
 			flex-shrink: none;
 			flex-basis: none;
+
+			box-decoration-break: none;
+			box-sizing:none;
 		`,
 		expected: ``+
 		`.user{`+
@@ -806,10 +809,17 @@ var spec = {
 			`-webkit-box-flex:none;`+
 			`-ms-flex-positive:none;`+
 			`flex-grow:none;`+
+
 			`-ms-flex-negative:none;`+
 			`flex-shrink:none;`+
+
 			`-ms-flex-preferred-size:none;`+
 			`flex-basis:none;`+
+
+			`-webkit-box-decoration-break:none;`+
+			`box-decoration-break:none;`+
+
+			`box-sizing:none;`+
 		`}`
 	},
 	'animations': {
@@ -1318,11 +1328,18 @@ var spec = {
 			h1 {
 				color:red;
 			}
+
+			.a
+			:global(.b
+					.c) .d {
+			  color:red;
+			}
 		`,
 		expected: ``+
 		`.user{width:0;}`+
 		`@media(screen){.user{color:red;}}`+
-		`h1.user{color:red;}`
+		`h1.user{color:red;}`+
+		`.a.user .b .c .d.user{color:red;}`
 	},
 	'semi-colons': {
 		options: {
