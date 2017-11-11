@@ -4,6 +4,7 @@
 - patch for flexbox vendor prefix `flex-grow`, `flex-shrink` and `flex-basis`.
 - vendor prefix `box-decoration-break`.
 - better handle special `:global` selector with `newlines` in cascade isolation mode.
+- patches for input that end ends exactly(absent-whitespace) with a comment.
 
 ## 3.4.0 October 20, 2017
 

@@ -211,6 +211,19 @@
 		while (caret < eof) {
 			code = body.charCodeAt(caret)
 
+			// eof varient
+			if (caret === eol) {
+				// last character + noop context, add synthetic padding for noop context to terminate
+				if (comment + quote + parentheses + bracket !== 0) {
+					if (comment === FOWARDSLASH) {
+						code = NEWLINE
+					}
+
+					eof++
+					eol++
+				}
+			}
+
 			if (comment + quote + parentheses + bracket === 0) {
 				// eof varient
 				if (caret === eol) {
@@ -601,22 +614,12 @@
 						case DOUBLEQUOTE: {
 							if (comment === 0) {
 								quote = quote === code ? 0 : (quote === 0 ? code : quote)
-								// " last character, add synthetic padding
-								if (caret === eol) {
-									eol++
-									eof++
-								}
 							}
 							break
 						}
 						case SINGLEQUOTE: {
 							if (comment === 0) {
 								quote = quote === code ? 0 : (quote === 0 ? code : quote)
-								// ' last character, add synthetic padding
-								if (caret === eol) {
-									eol++
-									eof++
-								}
 							}
 							break
 						}
@@ -636,12 +639,6 @@
 						// functions
 						case CLOSEPARENTHESES: {
 							if (quote + comment + bracket === 0) {
-								// ) last character, add synthetic padding
-								if (caret === eol) {
-									eol++
-									eof++
-								}
-
 								parentheses--
 							}
 							break

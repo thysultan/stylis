@@ -1693,6 +1693,30 @@ var spec = {
 		options: {
 			preserve: true
 		}
+	},
+	'noop tail I': {
+		sample: `color:red/**/`,
+		expected: `.user{color:red;}`
+	},
+	'noop tail I': {
+		sample: `color:red//`,
+		expected: `.user{color:red;}`
+	},
+	'noop tail III': {
+		sample: `color:red[]`,
+		expected: `.user{color:red[];}`
+	},
+	'noop tail IV': {
+		sample: `color:red()`,
+		expected: `.user{color:red();}`
+	},
+	'noop tail V': {
+		sample: `color:red''`,
+		expected: `.user{color:red'';}`
+	},
+	'noop tail V': {
+		sample: `color:red""`,
+		expected: `.user{color:red"";}`
 	}
 };
 
