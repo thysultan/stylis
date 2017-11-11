@@ -1,4 +1,4 @@
-## 3.4.1 October 20, 2017
+## 3.4.1 November 11, 2017
 
 - patch for manual prefixed at-rules. i.e `@-moz-document {...}`.
 - patch for flexbox vendor prefix `flex-grow`, `flex-shrink` and `flex-basis`.
