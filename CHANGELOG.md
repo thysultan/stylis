@@ -1,3 +1,7 @@
+## 3.4.2 November 13, 2017
+
+- patch `@page {...}` nested context.
+
 ## 3.4.1 November 11, 2017
 
 - patch for manual prefixed at-rules. i.e `@-moz-document {...}`.

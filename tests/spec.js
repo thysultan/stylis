@@ -44,6 +44,17 @@ var spec = {
 				color:lime;
 			}
 		}
+
+		@page {
+			color:red;
+
+		  @bottom-right {
+		    content: counter(pages);
+		    margin-right: 1cm;
+		  }
+
+		  width: none;
+		}
 		`,
 		expected: ``+
 		`@page{size:A4 landscape;}`+
@@ -52,7 +63,8 @@ var spec = {
 		'}'+
 		`@viewport{min-width:640px;max-width:800px;}`+
 		`@counter-style list{system:fixed;symbols:url();suffix:" ";}`+
-		`@-moz-document url-prefix(){.user .selector{color:lime;}}`
+		`@-moz-document url-prefix(){.user .selector{color:lime;}}`+
+		`@page{color:red;@bottom-right{content:counter(pages);margin-right:1cm;}width:none;}`
 	},
 	'monkey-patch some invalid css patterns': {
 		sample: `

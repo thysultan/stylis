@@ -124,6 +124,7 @@
 	var IMPORT = 169 /* <at>i */
 	var CHARSET = 163 /* <at>c */
 	var DOCUMENT = 100 /* <at>d */
+	var PAGE = 112 /* <at>p */
 
 	var column = 1 /* current column */
 	var line = 1 /* current line numebr */
@@ -376,6 +377,10 @@
 										}
 										default: {
 											child = chars + child
+
+											if (id === PAGE) {
+												child = (out += child, '')
+											}
 										}
 									}
 								} else {
