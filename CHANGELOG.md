@@ -1,3 +1,7 @@
+## 3.4.3 November 14, 2017
+
+- Improve fault tolerance.
+
 ## 3.4.2 November 13, 2017
 
 - patch `@page {...}` nested context.

@@ -216,10 +216,11 @@
 			if (caret === eol) {
 				// last character + noop context, add synthetic padding for noop context to terminate
 				if (comment + quote + parentheses + bracket !== 0) {
-					if (comment === FOWARDSLASH) {
-						code = NEWLINE
+					if (comment !== 0) {
+						code = comment === FOWARDSLASH ? NEWLINE : FOWARDSLASH
 					}
 
+					quote = parentheses = bracket = 0
 					eof++
 					eol++
 				}

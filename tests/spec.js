@@ -1729,6 +1729,14 @@ var spec = {
 	'noop tail V': {
 		sample: `color:red""`,
 		expected: `.user{color:red"";}`
+	},
+	'noop tail VI': {
+		sample: `h1{color:rgb([`,
+		expected: `.user h1{color:rgb([;}`
+	},
+	'noop tail VII': {
+		sample: `h1{color:red/**}`,
+		expected: `.user h1{color:red;}`
 	}
 };
 
