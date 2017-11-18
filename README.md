@@ -187,7 +187,7 @@ stylis.set(options: {
 })
 ```
 
-Vendor Prefixing
+#### Vendor Prefixing
 
 By default vendor is enabled, however there is an option to disable vendor prefixing, either completely or dynamically.
 
