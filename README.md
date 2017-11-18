@@ -200,7 +200,7 @@ stylis.set({prefix: false})
 Alternatively you can disable prefixing on a case by case basis by providing a function that returns a `boolean` indiciating whether to prefixing that particular rule.
 
 ```js
-stylis.use({
+stylis.set({
 	prefix: (key, value, context) => {
 		return false
 	}
