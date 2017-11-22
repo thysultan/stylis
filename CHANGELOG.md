@@ -1,3 +1,7 @@
+## 3.4.4 November 22, 2017
+
+- Fix `@support (...)` vendor prefix for values that end in parenthesis `()`.
+
 ## 3.4.3 November 14, 2017
 
 - Improve fault tolerance.

@@ -305,15 +305,25 @@ var spec = {
 			@supports (appearance: none) {
 				color:red;
 			}
+
+			@supports (backdrop-filter: blur(10px)) {
+				backdrop-filter: blur(10px);
+			}
 		`,
 		expected: ``+
 		`@supports (display:block){`+
-		`.user{color:red;display:none;}`+
-		`.user h1{color:red;}`+
-		`.user h1 h2{color:blue;}`+
+			`.user{color:red;display:none;}`+
+			`.user h1{color:red;}`+
+			`.user h1 h2{color:blue;}`+
 		`}`+
 		`@supports (-webkit-appearance:none) or (-moz-appearance:none) or (appearance:none){`+
-		`.user{color:red;}`+
+			`.user{color:red;}`+
+		`}`+
+		`@supports (-webkit-backdrop-filter:blur(10px)) or (backdrop-filter:blur(10px)){`+
+			`.user{`+
+				`-webkit-backdrop-filter:blur(10px);`+
+				`backdrop-filter:blur(10px);`+
+			`}`+
 		`}`
 	},
 	'@media': {
