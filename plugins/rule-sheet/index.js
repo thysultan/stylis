@@ -23,7 +23,7 @@
 				case 1:
 					// @import
 					if (depth === 0 && content.charCodeAt(0) === 64)
-						return insertRule(content), ''
+						return insertRule(content+';'), ''
 					break
 				// selector
 				case 2:
