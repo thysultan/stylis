@@ -1,3 +1,8 @@
+## 3.4.5 November 25, 2017
+
+- Patch for <= Safari 8 `webkit` vendor prefix of `flex-basis`, `flex-shrink` and `flex-grow`, fixes [76](https://github.com/thysultan/stylis.js/issues/76)
+- Improve no semicolon mode, fixes [#74](https://github.com/thysultan/stylis.js/issues/74) and [#56](https://github.com/thysultan/stylis.js/pull/56).
+
 ## 3.4.4 November 22, 2017
 
 - Fix `@support (...)` vendor prefix for values that end in parenthesis `()`.

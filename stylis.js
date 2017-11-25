@@ -256,9 +256,14 @@
 					switch (code) {
 						// false flags
 						case OPENBRACES:
+						case CLOSEBRACES:
+						case SEMICOLON:
+						case DOUBLEQUOTE:
+						case SINGLEQUOTE:
+						case OPENPARENTHESES:
+						case CLOSEPARENTHESES:
 						case COMMA: {
 							insert = 0
-							break
 						}
 						// ignore
 						case TAB:
@@ -269,8 +274,26 @@
 						}
 						// valid
 						default: {
+							insert = 0
+							length = caret
+							first = code
 							caret--
 							code = SEMICOLON
+
+							while (length < eof) {
+								switch (body.charCodeAt(++length)) {
+									case NEWLINE:
+									case CARRIAGE:
+									case SEMICOLON: {
+										caret++
+										code = first
+									}
+									case COLON:
+									case OPENBRACES: {
+										length = eof
+									}
+								}
+							}
 						}
 					}
 				}
@@ -1030,15 +1053,15 @@
 					switch (out.charCodeAt(5)) {
 						// flex-grow, g
 						case 103: {
-							return webkit + 'box-' + out.replace('-grow', '') + ms + out.replace('grow', 'positive') + out
+							return webkit + 'box-' + out.replace('-grow', '') + webkit + out + ms + out.replace('grow', 'positive') + out
 						}
 						// flex-shrink, s
 						case 115: {
-							return ms + out.replace('shrink', 'negative') + out
+							return webkit + out + ms + out.replace('shrink', 'negative') + out
 						}
 						// flex-basis, b
 						case 98: {
-							return ms + out.replace('basis', 'preferred-size') + out
+							return webkit + out + ms + out.replace('basis', 'preferred-size') + out
 						}
 					}
 				}
