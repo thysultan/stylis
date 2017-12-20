@@ -567,6 +567,11 @@ var spec = {
 			}
 
 			div {
+				align-content:flex-start;
+				align-content:flex-end;
+			}
+
+			div {
 				color:papayawhip;
 				order:flex;
 			}
@@ -654,6 +659,19 @@ var spec = {
 			`align-content:value;`+
 
 			`}`+
+
+			`.user div{`+
+
+			`-webkit-align-content:flex-start;`+
+			`-ms-flex-line-pack:start;`+
+			`align-content:flex-start;`+
+
+			`-webkit-align-content:flex-end;`+
+			`-ms-flex-line-pack:end;`+
+			`align-content:flex-end;`+
+
+			`}`+
+
 			'.user div{'+
 			'color:papayawhip;'+
 			`-webkit-order:flex;`+
