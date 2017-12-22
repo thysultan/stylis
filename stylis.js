@@ -1168,7 +1168,7 @@
 						}
 						// align-content
 						default: {
-							return webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '') + out
+							return webkit + out + ms + 'flex-line-pack' + out.replace('align-content', '').replace(selfptn, '') + out
 						}
 					}
 				}
