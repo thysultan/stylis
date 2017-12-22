@@ -24,7 +24,16 @@
 		"url": "https://github.com/thysultan/stylis.js/issues"
 	},
 	"scripts": {
-		"test": "node ./tests"
+		"test": "node ./tests",
+		"minify": "uglifyjs stylis.js -o stylis.min.js --compress 'conditionals=false,if_return=false,booleans=false' --mangle --screw-ie8",
+		"prepublish": "npm run minify"
 	},
-	"files": ["stylis.js", "stylis.min.js", "stylis.d.ts"]
+	"files": [
+		"stylis.js",
+		"stylis.min.js",
+		"stylis.d.ts"
+	],
+	"devDependencies": {
+		"uglify-js": "^3.2.2"
+	}
 }
