@@ -1,3 +1,8 @@
+## 3.4.6 January 08, 2018
+
+- patch vendor prefix for align-content `flex-start` and `flex-end`.
+- Fix typescript declaration.
+
 ## 3.4.5 November 25, 2017
 
 - Patch for <= Safari 8 `webkit` vendor prefix of `flex-basis`, `flex-shrink` and `flex-grow`, fixes [76](https://github.com/thysultan/stylis.js/issues/76)
