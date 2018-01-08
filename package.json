@@ -1,8 +1,9 @@
 {
 	"name": "stylis",
-	"main": "stylis.js",
-	"unpkg": "stylis.min.js",
-	"jsdelivr": "stylis.min.js",
+	"main": "dist/stylis.cjs.js",
+	"module": "src/index.js",
+	"unpkg": "dist/stylis.min.js",
+	"jsdelivr": "dist/stylis.min.js",
 	"types": "stylis.d.ts",
 	"description": "light - weight css preprocessor",
 	"version": "3.4.7",
@@ -24,16 +25,19 @@
 		"url": "https://github.com/thysultan/stylis.js/issues"
 	},
 	"scripts": {
+		"build": "rollup -c",
+		"pretest": "npm run build",
 		"test": "node ./tests",
-		"minify": "uglifyjs stylis.js -o stylis.min.js --compress 'conditionals=false,if_return=false,booleans=false' --mangle --screw-ie8",
-		"prepublish": "npm run minify"
+		"prepublish": "npm run build"
 	},
 	"files": [
-		"stylis.js",
-		"stylis.min.js",
+		"src",
+		"dist",
 		"stylis.d.ts"
 	],
 	"devDependencies": {
+		"rollup": "^0.53.3",
+		"rollup-plugin-uglify": "^2.0.1",
 		"uglify-js": "^3.2.2"
 	}
 }

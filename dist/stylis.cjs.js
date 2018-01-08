@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  *          __        ___
  *    _____/ /___  __/ (_)____
@@ -8,14 +10,14 @@
  *
  * light - weight css preprocessor @licence MIT
  */
-(function (factory) {/* eslint-disable */
-	typeof exports === 'object' && typeof module !== 'undefined' ? (module['exports'] = factory(null)) :
-		typeof define === 'function' && define['amd'] ? define(factory(null)) :
-			(window['stylis'] = factory(null))
-}(/** @param {*=} options */function factory (options) {/* eslint-disable */
 
-	'use strict'
-
+/**
+	* factory
+	*
+	* @param {*=} options
+	* @return {*}
+	*/
+function factory (options) {
 	/**
 	 * Notes
 	 *
@@ -53,116 +55,112 @@
 	 * This allows the vendor prefixer to be both small and fast.
 	 */
 
-	var nullptn = /^\0+/g /* matches leading null characters */
-	var formatptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
-	var colonptn = /: */g /* splits animation rules */
-	var cursorptn = /zoo|gra/ /* assert cursor varient */
-	var transformptn = /([,: ])(transform)/g /* vendor prefix transform, older webkit */
-	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
-	var propertiesptn = / +\s*(?![^(]*[)])/g /* animation properties */
-	var elementptn = / *[\0] */g /* selector elements */
-	var selectorptn = /,\r+?/g /* splits selectors */
-	var andptn = /([\t\r\n ])*\f?&/g /* match & */
-	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g /* matches :global(.*) */
-	var invalidptn = /\W+/g /* removes invalid characters from keyframes */
-	var keyframeptn = /@(k\w+)\s*(\S*)\s*/ /* matches @keyframes $1 */
-	var plcholdrptn = /::(place)/g /* match ::placeholder varient */
-	var readonlyptn = /:(read-only)/g /* match :read-only varient */
-	var beforeptn = /\s+(?=[{\];=:>])/g /* matches \s before ] ; = : */
-	var afterptn = /([[}=:>])\s+/g /* matches \s after characters [ } = : */
-	var tailptn = /(\{[^{]+?);(?=\})/g /* matches tail semi-colons ;} */
-	var whiteptn = /\s{2,}/g /* matches repeating whitespace */
-	var pseudoptn = /([^\(])(:+) */g /* pseudo element */
-	var writingptn = /[svh]\w+-[tblr]{2}/ /* match writing mode property values */
-	var gradientptn = /([\w-]+t\()/g /* match *gradient property */
-	var supportsptn = /\(\s*(.*)\s*\)/g /* match supports (groups) */
-	var propertyptn = /([^]*?);/g /* match properties leading semicolon */
-	var selfptn = /-self|flex-/g /* match flex- and -self in align-self: flex-*; */
-	var pseudofmt = /[^]*?(:[rp][el]a[\w-]+)[^]*/ /* extrats :readonly or :placholder from selector */
-	var trimptn = /[ \t]+$/ /* match tail whitspace */
-
-	/* vendors */
-	var webkit = '-webkit-'
-	var moz = '-moz-'
-	var ms = '-ms-'
+	var nullptn = /^\0+/g; /* matches leading null characters */
+	var formatptn = /[\0\r\f]/g; /* matches new line, null and formfeed characters */
+	var colonptn = /: */g; /* splits animation rules */
+	var cursorptn = /zoo|gra/; /* assert cursor varient */
+	var transformptn = /([,: ])(transform)/g; /* vendor prefix transform, older webkit */
+	var animationptn = /,+\s*(?![^(]*[)])/g; /* splits multiple shorthand notation animations */
+	var propertiesptn = / +\s*(?![^(]*[)])/g; /* animation properties */
+	var elementptn = / *[\0] */g; /* selector elements */
+	var selectorptn = /,\r+?/g; /* splits selectors */
+	var andptn = /([\t\r\n ])*\f?&/g; /* match & */
+	var escapeptn = /:global\(((?:[^\(\)\[\]]*|\[.*\]|\([^\(\)]*\))*)\)/g; /* matches :global(.*) */
+	var invalidptn = /\W+/g; /* removes invalid characters from keyframes */
+	var keyframeptn = /@(k\w+)\s*(\S*)\s*/; /* matches @keyframes $1 */
+	var plcholdrptn = /::(place)/g; /* match ::placeholder varient */
+	var readonlyptn = /:(read-only)/g; /* match :read-only varient */
+	var beforeptn = /\s+(?=[{\];=:>])/g; /* matches \s before ] ; = : */
+	var afterptn = /([[}=:>])\s+/g; /* matches \s after characters [ } = : */
+	var tailptn = /(\{[^{]+?);(?=\})/g; /* matches tail semi-colons ;} */
+	var whiteptn = /\s{2,}/g; /* matches repeating whitespace */
+	var pseudoptn = /([^\(])(:+) */g; /* pseudo element */
+	var writingptn = /[svh]\w+-[tblr]{2}/; /* match writing mode property values */
+	var supportsptn = /\(\s*(.*)\s*\)/g; /* match supports (groups) */
+	var propertyptn = /([^]*?);/g; /* match properties leading semicolon */
+	var selfptn = /-self|flex-/g; /* match flex- and -self in align-self: flex-*; */
+	var pseudofmt = /[^]*?(:[rp][el]a[\w-]+)[^]*/; /* extrats :readonly or :placholder from selector */
+	var webkit = '-webkit-';
+	var moz = '-moz-';
+	var ms = '-ms-';
 
 	/* character codes */
-	var SEMICOLON = 59 /* ; */
-	var CLOSEBRACES = 125 /* } */
-	var OPENBRACES = 123 /* { */
-	var OPENPARENTHESES = 40 /* ( */
-	var CLOSEPARENTHESES = 41 /* ) */
-	var OPENBRACKET = 91 /* [ */
-	var CLOSEBRACKET = 93 /* ] */
-	var NEWLINE = 10 /* \n */
-	var CARRIAGE = 13 /* \r */
-	var TAB = 9 /* \t */
-	var AT = 64 /* @ */
-	var SPACE = 32 /*   */
-	var AND = 38 /* & */
-	var DASH = 45 /* - */
-	var UNDERSCORE = 95 /* _ */
-	var STAR = 42 /* * */
-	var COMMA = 44 /* , */
-	var COLON = 58 /* : */
-	var SINGLEQUOTE = 39 /* ' */
-	var DOUBLEQUOTE = 34 /* " */
-	var FOWARDSLASH = 47 /* / */
-	var GREATERTHAN = 62 /* > */
-	var PLUS = 43 /* + */
-	var TILDE = 126 /* ~ */
-	var NULL = 0 /* \0 */
-	var FORMFEED = 12 /* \f */
-	var VERTICALTAB = 11 /* \v */
+	var SEMICOLON = 59; /* ; */
+	var CLOSEBRACES = 125; /* } */
+	var OPENBRACES = 123; /* { */
+	var OPENPARENTHESES = 40; /* ( */
+	var CLOSEPARENTHESES = 41; /* ) */
+	var OPENBRACKET = 91; /* [ */
+	var CLOSEBRACKET = 93; /* ] */
+	var NEWLINE = 10; /* \n */
+	var CARRIAGE = 13; /* \r */
+	var TAB = 9; /* \t */
+	var AT = 64; /* @ */
+	var SPACE = 32; /*   */
+	var AND = 38; /* & */
+	var DASH = 45; /* - */
+	var UNDERSCORE = 95; /* _ */
+	var STAR = 42; /* * */
+	var COMMA = 44; /* , */
+	var COLON = 58; /* : */
+	var SINGLEQUOTE = 39; /* ' */
+	var DOUBLEQUOTE = 34; /* " */
+	var FOWARDSLASH = 47; /* / */
+	var GREATERTHAN = 62; /* > */
+	var PLUS = 43; /* + */
+	var TILDE = 126; /* ~ */
+	var NULL = 0; /* \0 */
+	var FORMFEED = 12; /* \f */
+	var VERTICALTAB = 11; /* \v */
 
 	/* special identifiers */
-	var KEYFRAME = 107 /* k */
-	var MEDIA = 109 /* m */
-	var SUPPORTS = 115 /* s */
-	var PLACEHOLDER = 112 /* p */
-	var READONLY = 111 /* o */
-	var IMPORT = 169 /* <at>i */
-	var CHARSET = 163 /* <at>c */
-	var DOCUMENT = 100 /* <at>d */
-	var PAGE = 112 /* <at>p */
+	var KEYFRAME = 107; /* k */
+	var MEDIA = 109; /* m */
+	var SUPPORTS = 115; /* s */
+	var PLACEHOLDER = 112; /* p */
+	var READONLY = 111; /* o */
+	var IMPORT = 169; /* <at>i */
+	var CHARSET = 163; /* <at>c */
+	var DOCUMENT = 100; /* <at>d */
+	var PAGE = 112; /* <at>p */
 
-	var column = 1 /* current column */
-	var line = 1 /* current line numebr */
-	var pattern = 0 /* :pattern */
+	var column = 1; /* current column */
+	var line = 1; /* current line numebr */
+	var pattern = 0; /* :pattern */
 
-	var cascade = 1 /* #id h1 h2 vs h1#id h2#id  */
-	var prefix = 1 /* vendor prefix */
-	var escape = 1 /* escape :global() pattern */
-	var compress = 0 /* compress output */
-	var semicolon = 0 /* no/semicolon option */
-	var preserve = 0 /* preserve empty selectors */
+	var cascade = 1; /* #id h1 h2 vs h1#id h2#id  */
+	var prefix = 1; /* vendor prefix */
+	var escape = 1; /* escape :global() pattern */
+	var compress = 0; /* compress output */
+	var semicolon = 0; /* no/semicolon option */
+	var preserve = 0; /* preserve empty selectors */
 
 	/* empty reference */
-	var array = []
+	var array = [];
 
 	/* plugins */
-	var plugins = []
-	var plugged = 0
-	var should = null
+	var plugins = [];
+	var plugged = 0;
+	var should = null;
 
 	/* plugin context */
-	var POSTS = -2
-	var PREPS = -1
-	var UNKWN = 0
-	var PROPS = 1
-	var BLCKS = 2
-	var ATRUL = 3
+	var POSTS = -2;
+	var PREPS = -1;
+	var UNKWN = 0;
+	var PROPS = 1;
+	var BLCKS = 2;
+	var ATRUL = 3;
 
 	/* plugin newline context */
-	var unkwn = 0
+	var unkwn = 0;
 
 	/* keyframe animation */
-	var keyed = 1
-	var key = ''
+	var keyed = 1;
+	var key = '';
 
 	/* selector namespace */
-	var nscopealt = ''
-	var nscope = ''
+	var nscopealt = '';
+	var nscope = '';
 
 	/**
 	 * Compile
@@ -175,54 +173,54 @@
 	 * @return {string}
 	 */
 	function compile (parent, current, body, id, depth) {
-		var bracket = 0 /* brackets [] */
-		var comment = 0 /* comments /* // or /* */
-		var parentheses = 0 /* functions () */
-		var quote = 0 /* quotes '', "" */
+		var bracket = 0; /* brackets [] */
+		var comment = 0; /* comments /* // or /* */
+		var parentheses = 0; /* functions () */
+		var quote = 0; /* quotes '', "" */
 
-		var first = 0 /* first character code */
-		var second = 0 /* second character code */
-		var code = 0 /* current character code */
-		var tail = 0 /* previous character code */
-		var trail = 0 /* character before previous code */
-		var peak = 0 /* previous non-whitespace code */
+		var first = 0; /* first character code */
+		var second = 0; /* second character code */
+		var code = 0; /* current character code */
+		var tail = 0; /* previous character code */
+		var trail = 0; /* character before previous code */
+		var peak = 0; /* previous non-whitespace code */
 
-		var counter = 0 /* count sequence termination */
-		var context = 0 /* track current context */
-		var atrule = 0 /* track @at-rule context */
-		var pseudo = 0 /* track pseudo token index */
-		var caret = 0 /* current character index */
-		var format = 0 /* control character formating context */
-		var insert = 0 /* auto semicolon insertion */
-		var invert = 0 /* inverted selector pattern */
-		var length = 0 /* generic length address */
-		var eof = body.length /* end of file(length) */
-		var eol = eof - 1 /* end of file(characters) */
+		var counter = 0; /* count sequence termination */
+		var context = 0; /* track current context */
+		var atrule = 0; /* track @at-rule context */
+		var pseudo = 0; /* track pseudo token index */
+		var caret = 0; /* current character index */
+		var format = 0; /* control character formating context */
+		var insert = 0; /* auto semicolon insertion */
+		var invert = 0; /* inverted selector pattern */
+		var length = 0; /* generic length address */
+		var eof = body.length; /* end of file(length) */
+		var eol = eof - 1; /* end of file(characters) */
 
-		var char = '' /* current character */
-		var chars = '' /* current buffer of characters */
-		var child = '' /* next buffer of characters */
-		var out = '' /* compiled body */
-		var children = '' /* compiled children */
-		var flat = '' /* compiled leafs */
-		var selector /* generic selector address */
-		var result /* generic address */
+		var char = ''; /* current character */
+		var chars = ''; /* current buffer of characters */
+		var child = ''; /* next buffer of characters */
+		var out = ''; /* compiled body */
+		var children = ''; /* compiled children */
+		var flat = ''; /* compiled leafs */
+		var selector; /* generic selector address */
+		var result; /* generic address */
 
 		// ...build body
 		while (caret < eof) {
-			code = body.charCodeAt(caret)
+			code = body.charCodeAt(caret);
 
 			// eof varient
 			if (caret === eol) {
 				// last character + noop context, add synthetic padding for noop context to terminate
 				if (comment + quote + parentheses + bracket !== 0) {
 					if (comment !== 0) {
-						code = comment === FOWARDSLASH ? NEWLINE : FOWARDSLASH
+						code = comment === FOWARDSLASH ? NEWLINE : FOWARDSLASH;
 					}
 
-					quote = parentheses = bracket = 0
-					eof++
-					eol++
+					quote = parentheses = bracket = 0;
+					eof++;
+					eol++;
 				}
 			}
 
@@ -230,7 +228,7 @@
 				// eof varient
 				if (caret === eol) {
 					if (format > 0) {
-						chars = chars.replace(formatptn, '')
+						chars = chars.replace(formatptn, '');
 					}
 
 					if (chars.trim().length > 0) {
@@ -243,11 +241,11 @@
 								break
 							}
 							default: {
-								chars += body.charAt(caret)
+								chars += body.charAt(caret);
 							}
 						}
 
-						code = SEMICOLON
+						code = SEMICOLON;
 					}
 				}
 
@@ -263,7 +261,7 @@
 						case OPENPARENTHESES:
 						case CLOSEPARENTHESES:
 						case COMMA: {
-							insert = 0
+							insert = 0;
 						}
 						// ignore
 						case TAB:
@@ -274,23 +272,23 @@
 						}
 						// valid
 						default: {
-							insert = 0
-							length = caret
-							first = code
-							caret--
-							code = SEMICOLON
+							insert = 0;
+							length = caret;
+							first = code;
+							caret--;
+							code = SEMICOLON;
 
 							while (length < eof) {
 								switch (body.charCodeAt(++length)) {
 									case NEWLINE:
 									case CARRIAGE:
 									case SEMICOLON: {
-										caret++
-										code = first
+										caret++;
+										code = first;
 									}
 									case COLON:
 									case OPENBRACES: {
-										length = eof
+										length = eof;
 									}
 								}
 							}
@@ -301,21 +299,21 @@
 				// token varient
 				switch (code) {
 					case OPENBRACES: {
-						chars = chars.trim()
-						first = chars.charCodeAt(0)
-						counter = 1
-						length = ++caret
+						chars = chars.trim();
+						first = chars.charCodeAt(0);
+						counter = 1;
+						length = ++caret;
 
 						while (caret < eof) {
-							code = body.charCodeAt(caret)
+							code = body.charCodeAt(caret);
 
 							switch (code) {
 								case OPENBRACES: {
-									counter++
+									counter++;
 									break
 								}
 								case CLOSEBRACES: {
-									counter--
+									counter--;
 									break
 								}
 							}
@@ -324,55 +322,55 @@
 								break
 							}
 
-							caret++
+							caret++;
 						}
 
-						child = body.substring(length, caret)
+						child = body.substring(length, caret);
 
 						if (first === NULL) {
-							first = (chars = chars.replace(nullptn, '').trim()).charCodeAt(0)
+							first = (chars = chars.replace(nullptn, '').trim()).charCodeAt(0);
 						}
 
 						switch (first) {
 							// @at-rule
 							case AT: {
 								if (format > 0) {
-									chars = chars.replace(formatptn, '')
+									chars = chars.replace(formatptn, '');
 								}
 
-								second = chars.charCodeAt(1)
+								second = chars.charCodeAt(1);
 
 								switch (second) {
 									case DOCUMENT:
 									case MEDIA:
 									case SUPPORTS:
 									case DASH: {
-										selector = current
+										selector = current;
 										break
 									}
 									default: {
-										selector = array
+										selector = array;
 									}
 								}
 
-								child = compile(current, selector, child, second, depth+1)
-								length = child.length
+								child = compile(current, selector, child, second, depth+1);
+								length = child.length;
 
 								// preserve empty @at-rule
 								if (preserve > 0 && length === 0) {
-									length = chars.length
+									length = chars.length;
 								}
 
 								// execute plugins, @at-rule context
 								if (plugged > 0) {
-									selector = select(array, chars, invert)
-									result = proxy(ATRUL, child, selector, current, line, column, length, second, depth)
-									chars = selector.join('')
+									selector = select(array, chars, invert);
+									result = proxy(ATRUL, child, selector, current, line, column, length, second, depth);
+									chars = selector.join('');
 
 									if (result !== void 0) {
 										if ((length = (child = result.trim()).length) === 0) {
-											second = 0
-											child = ''
+											second = 0;
+											child = '';
 										}
 									}
 								}
@@ -380,71 +378,71 @@
 								if (length > 0) {
 									switch (second) {
 										case SUPPORTS: {
-											chars = chars.replace(supportsptn, supports)
+											chars = chars.replace(supportsptn, supports);
 										}
 										case DOCUMENT:
 										case MEDIA:
 										case DASH: {
-											child = chars + '{' + child + '}'
+											child = chars + '{' + child + '}';
 											break
 										}
 										case KEYFRAME: {
-											chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''))
-											child = chars + '{' + child + '}'
+											chars = chars.replace(keyframeptn, '$1 $2' + (keyed > 0 ? key : ''));
+											child = chars + '{' + child + '}';
 
 											if (prefix === 1 || (prefix === 2 && vendor('@'+child, 3))) {
-												child = '@' + webkit + child + '@' + child
+												child = '@' + webkit + child + '@' + child;
 											} else {
-												child = '@' + child
+												child = '@' + child;
 											}
 											break
 										}
 										default: {
-											child = chars + child
+											child = chars + child;
 
 											if (id === PAGE) {
-												child = (out += child, '')
+												child = (out += child, '');
 											}
 										}
 									}
 								} else {
-									child = ''
+									child = '';
 								}
 
 								break
 							}
 							// selector
 							default: {
-								child = compile(current, select(current, chars, invert), child, id, depth+1)
+								child = compile(current, select(current, chars, invert), child, id, depth+1);
 							}
 						}
 
-						children += child
+						children += child;
 
 						// reset
-						context = 0
-						insert = 0
-						pseudo = 0
-						format = 0
-						invert = 0
-						atrule = 0
-						chars = ''
-						child = ''
-						code = body.charCodeAt(++caret)
+						context = 0;
+						insert = 0;
+						pseudo = 0;
+						format = 0;
+						invert = 0;
+						atrule = 0;
+						chars = '';
+						child = '';
+						code = body.charCodeAt(++caret);
 						break
 					}
 					case CLOSEBRACES:
 					case SEMICOLON: {
-						chars = (format > 0 ? chars.replace(formatptn, '') : chars).trim()
+						chars = (format > 0 ? chars.replace(formatptn, '') : chars).trim();
 
 						if ((length = chars.length) > 1) {
 							// monkey-patch missing colon
 							if (pseudo === 0) {
-								first = chars.charCodeAt(0)
+								first = chars.charCodeAt(0);
 
 								// first character is a letter or dash, buffer has a space character
 								if ((first === DASH || first > 96 && first < 123)) {
-									length = (chars = chars.replace(' ', ':')).length
+									length = (chars = chars.replace(' ', ':')).length;
 								}
 							}
 
@@ -452,13 +450,13 @@
 							if (plugged > 0) {
 								if ((result = proxy(PROPS, chars, current, parent, line, column, out.length, id, depth)) !== void 0) {
 									if ((length = (chars = result.trim()).length) === 0) {
-										chars = '\0\0'
+										chars = '\0\0';
 									}
 								}
 							}
 
-							first = chars.charCodeAt(0)
-							second = chars.charCodeAt(1)
+							first = chars.charCodeAt(0);
+							second = chars.charCodeAt(1);
 
 							switch (first + second) {
 								case NULL: {
@@ -466,26 +464,26 @@
 								}
 								case IMPORT:
 								case CHARSET: {
-									flat += chars + body.charAt(caret)
+									flat += chars + body.charAt(caret);
 									break
 								}
 								default: {
 									if (chars.charCodeAt(length-1) === COLON)
 										break
 
-									out += property(chars, first, second, chars.charCodeAt(2))
+									out += property(chars, first, second, chars.charCodeAt(2));
 								}
 							}
 						}
 
 						// reset
-						context = 0
-						insert = 0
-						pseudo = 0
-						format = 0
-						invert = 0
-						chars = ''
-						code = body.charCodeAt(++caret)
+						context = 0;
+						insert = 0;
+						pseudo = 0;
+						format = 0;
+						invert = 0;
+						chars = '';
+						code = body.charCodeAt(++caret);
 						break
 					}
 				}
@@ -520,7 +518,7 @@
 							default: {
 								// current buffer has a colon
 								if (pseudo > 0) {
-									insert = 1
+									insert = 1;
 								}
 							}
 						}
@@ -528,35 +526,35 @@
 
 					// terminate line comment
 					if (comment === FOWARDSLASH) {
-						comment = 0
+						comment = 0;
 					} else if (cascade + context === 0) {
-						format = 1
-						chars += '\0'
+						format = 1;
+						chars += '\0';
 					}
 
 					// execute plugins, newline context
 					if (plugged * unkwn > 0) {
-						proxy(UNKWN, chars, current, parent, line, column, out.length, id, depth)
+						proxy(UNKWN, chars, current, parent, line, column, out.length, id, depth);
 					}
 
 					// next line, reset column position
-					column = 1
-					line++
+					column = 1;
+					line++;
 					break
 				}
 				case SEMICOLON:
 				case CLOSEBRACES: {
 					if (comment + quote + parentheses + bracket === 0) {
-						column++
+						column++;
 						break
 					}
 				}
 				default: {
 					// increment column position
-					column++
+					column++;
 
 					// current character
-					char = body.charAt(caret)
+					char = body.charAt(caret);
 
 					// remove comments, escape functions, strings, attributes and prepare selectors
 					switch (code) {
@@ -568,12 +566,12 @@
 									case COLON:
 									case TAB:
 									case SPACE: {
-										char = ''
+										char = '';
 										break
 									}
 									default: {
 										if (code !== SPACE) {
-											char = ' '
+											char = ' ';
 										}
 									}
 								}
@@ -582,24 +580,24 @@
 						}
 						// escape breaking control characters
 						case NULL: {
-							char = '\\0'
+							char = '\\0';
 							break
 						}
 						case FORMFEED: {
-							char = '\\f'
+							char = '\\f';
 							break
 						}
 						case VERTICALTAB: {
-							char = '\\v'
+							char = '\\v';
 							break
 						}
 						// &
 						case AND: {
 							// inverted selector pattern i.e html &
 							if (quote + comment + bracket === 0 && cascade > 0) {
-								invert = 1
-								format = 1
-								char = '\f' + char
+								invert = 1;
+								format = 1;
+								char = '\f' + char;
 							}
 							break
 						}
@@ -611,13 +609,13 @@
 									// ::placeholder
 									case 2: {
 										if (tail === PLACEHOLDER && body.charCodeAt(caret-3) === COLON) {
-											pattern = tail
+											pattern = tail;
 										}
 									}
 									// :read-only
 									case 8: {
 										if (trail === READONLY) {
-											pattern = trail
+											pattern = trail;
 										}
 									}
 								}
@@ -627,48 +625,48 @@
 						// :<pattern>
 						case COLON: {
 							if (quote + comment + bracket === 0) {
-								pseudo = caret
+								pseudo = caret;
 							}
 							break
 						}
 						// selectors
 						case COMMA: {
 							if (comment + parentheses + quote + bracket === 0) {
-								format = 1
-								char += '\r'
+								format = 1;
+								char += '\r';
 							}
 							break
 						}
 						// quotes
 						case DOUBLEQUOTE: {
 							if (comment === 0) {
-								quote = quote === code ? 0 : (quote === 0 ? code : quote)
+								quote = quote === code ? 0 : (quote === 0 ? code : quote);
 							}
 							break
 						}
 						case SINGLEQUOTE: {
 							if (comment === 0) {
-								quote = quote === code ? 0 : (quote === 0 ? code : quote)
+								quote = quote === code ? 0 : (quote === 0 ? code : quote);
 							}
 							break
 						}
 						// attributes
 						case OPENBRACKET: {
 							if (quote + comment + parentheses === 0) {
-								bracket++
+								bracket++;
 							}
 							break
 						}
 						case CLOSEBRACKET: {
 							if (quote + comment + parentheses === 0) {
-								bracket--
+								bracket--;
 							}
 							break
 						}
 						// functions
 						case CLOSEPARENTHESES: {
 							if (quote + comment + bracket === 0) {
-								parentheses--
+								parentheses--;
 							}
 							break
 						}
@@ -682,19 +680,19 @@
 										}
 										// :global, :not, :nth-child etc...
 										default: {
-											counter = 0
-											context = 1
+											counter = 0;
+											context = 1;
 										}
 									}
 								}
 
-								parentheses++
+								parentheses++;
 							}
 							break
 						}
 						case AT: {
 							if (comment + parentheses + quote + bracket + pseudo + atrule === 0) {
-								atrule = 1
+								atrule = 1;
 							}
 							break
 						}
@@ -711,13 +709,13 @@
 									switch (code*2 + body.charCodeAt(caret+1)*3) {
 										// //
 										case 235: {
-											comment = FOWARDSLASH
+											comment = FOWARDSLASH;
 											break
 										}
 										// /*
 										case 220: {
-											length = caret
-											comment = STAR
+											length = caret;
+											comment = STAR;
 											break
 										}
 									}
@@ -728,10 +726,10 @@
 									if (code === FOWARDSLASH && tail === STAR) {
 										// /*<!> ... */, !
 										if (body.charCodeAt(length+2) === 33) {
-											out += body.substring(length, caret+1)
+											out += body.substring(length, caret+1);
 										}
-										char = ''
-										comment = 0
+										char = '';
+										comment = 0;
 									}
 								}
 							}
@@ -757,25 +755,25 @@
 											case SPACE:
 											case NEWLINE:
 											case CARRIAGE: {
-												char = char + '\0'
+												char = char + '\0';
 												break
 											}
 											default: {
-												char = '\0' + char + (code === COMMA ? '' : '\0')
+												char = '\0' + char + (code === COMMA ? '' : '\0');
 											}
 										}
-										format = 1
+										format = 1;
 									} else {
 										// within an isolated context, sleep untill it's terminated
 										switch (code) {
 											case OPENPARENTHESES: {
-												context = ++counter
+												context = ++counter;
 												break
 											}
 											case CLOSEPARENTHESES: {
 												if ((context = --counter) === 0) {
-													format = 1
-													char += '\0'
+													format = 1;
+													char += '\0';
 												}
 												break
 											}
@@ -801,8 +799,8 @@
 										default: {
 											// ignore in isolated contexts
 											if (context === 0) {
-												format = 1
-												char += '\0'
+												format = 1;
+												char += '\0';
 											}
 										}
 									}
@@ -811,58 +809,58 @@
 						}
 
 						// concat buffer of characters
-						chars += char
+						chars += char;
 
 						// previous non-whitespace character code
 						if (code !== SPACE && code !== TAB) {
-							peak = code
+							peak = code;
 						}
 					}
 				}
 			}
 
 			// tail character codes
-			trail = tail
-			tail = code
+			trail = tail;
+			tail = code;
 
 			// visit every character
-			caret++
+			caret++;
 		}
 
-		length = out.length
+		length = out.length;
 
 		// preserve empty selector
  		if (preserve > 0) {
  			if (length === 0 && children.length === 0 && (current[0].length === 0) === false) {
  				if (id !== MEDIA || (current.length === 1 && (cascade > 0 ? nscopealt : nscope) === current[0])) {
-					length = current.join(',').length + 2
+					length = current.join(',').length + 2;
  				}
  			}
 		}
 
 		if (length > 0) {
 			// cascade isolation mode?
-			selector = cascade === 0 && id !== KEYFRAME ? isolate(current) : current
+			selector = cascade === 0 && id !== KEYFRAME ? isolate(current) : current;
 
 			// execute plugins, block context
 			if (plugged > 0) {
-				result = proxy(BLCKS, out, selector, parent, line, column, length, id, depth)
+				result = proxy(BLCKS, out, selector, parent, line, column, length, id, depth);
 
 				if (result !== void 0 && (out = result).length === 0) {
 					return flat + out + children
 				}
 			}
 
-			out = selector.join(',') + '{' + out + '}'
+			out = selector.join(',') + '{' + out + '}';
 
 			if (prefix*pattern !== 0) {
 				if (prefix === 2 && !vendor(out, 2))
-					pattern = 0
+					pattern = 0;
 
 				switch (pattern) {
 					// ::read-only
 					case READONLY: {
-						out = out.replace(readonlyptn, ':'+moz+'$1')+out
+						out = out.replace(readonlyptn, ':'+moz+'$1')+out;
 						break
 					}
 					// ::placeholder
@@ -871,12 +869,12 @@
 							out.replace(plcholdrptn, '::' + webkit + 'input-$1') +
 							out.replace(plcholdrptn, '::' + moz + '$1') +
 							out.replace(plcholdrptn, ':' + ms + 'input-$1') + out
-						)
+						);
 						break
 					}
 				}
 
-				pattern = 0
+				pattern = 0;
 			}
 		}
 
@@ -892,18 +890,18 @@
 	 * @return {Array<string>}
 	 */
 	function select (parent, current, invert) {
-		var selectors = current.trim().split(selectorptn)
-		var out = selectors
+		var selectors = current.trim().split(selectorptn);
+		var out = selectors;
 
-		var length = selectors.length
-		var l = parent.length
+		var length = selectors.length;
+		var l = parent.length;
 
 		switch (l) {
 			// 0-1 parent selectors
 			case 0:
 			case 1: {
 				for (var i = 0, selector = l === 0 ? '' : parent[0] + ' '; i < length; ++i) {
-					out[i] = scope(selector, out[i], invert, l).trim()
+					out[i] = scope(selector, out[i], invert, l).trim();
 				}
 				break
 			}
@@ -911,7 +909,7 @@
 			default: {
 				for (var i = 0, j = 0, out = []; i < length; ++i) {
 					for (var k = 0; k < l; ++k) {
-						out[j++] = scope(parent[k] + ' ', selectors[i], invert, l).trim()
+						out[j++] = scope(parent[k] + ' ', selectors[i], invert, l).trim();
 					}
 				}
 			}
@@ -930,12 +928,12 @@
 	 * @return {string}
 	 */
 	function scope (parent, current, invert, level) {
-		var selector = current
-		var code = selector.charCodeAt(0)
+		var selector = current;
+		var code = selector.charCodeAt(0);
 
 		// trim leading whitespace
 		if (code < 33) {
-			code = (selector = selector.trim()).charCodeAt(0)
+			code = (selector = selector.trim()).charCodeAt(0);
 		}
 
 		switch (code) {
@@ -991,10 +989,10 @@
 	 * @return {string}
 	 */
 	function property (input, first, second, third) {
-		var index = 0
-		var out = input + ';'
-		var hash = (first*2) + (second*3) + (third*4)
-		var cache
+		var index = 0;
+		var out = input + ';';
+		var hash = (first*2) + (second*3) + (third*4);
+		var cache;
 
 		// animation: a, n, i characters
 		if (hash === 944) {
@@ -1079,7 +1077,7 @@
 					break
 				}
 
-				cache = out.substring(out.indexOf(':', 15)).replace('flex-', '').replace('space-between', 'justify')
+				cache = out.substring(out.indexOf(':', 15)).replace('flex-', '').replace('space-between', 'justify');
 				return webkit + 'box-pack' + cache + webkit + out + ms + 'flex-pack' + cache + out
 			}
 			// cursor, c, u, r
@@ -1088,23 +1086,23 @@
 			}
 			// writing-mode, w, r, i
 			case 1000: {
-				cache = out.substring(13).trim()
-				index = cache.indexOf('-') + 1
+				cache = out.substring(13).trim();
+				index = cache.indexOf('-') + 1;
 
 				switch (cache.charCodeAt(0)+cache.charCodeAt(index)) {
 					// vertical-lr
 					case 226: {
-						cache = out.replace(writingptn, 'tb')
+						cache = out.replace(writingptn, 'tb');
 						break
 					}
 					// vertical-rl
 					case 232: {
-						cache = out.replace(writingptn, 'tb-rl')
+						cache = out.replace(writingptn, 'tb-rl');
 						break
 					}
 					// horizontal-tb
 					case 220: {
-						cache = out.replace(writingptn, 'lr')
+						cache = out.replace(writingptn, 'lr');
 						break
 					}
 					default: {
@@ -1122,8 +1120,8 @@
 			}
 			// display(flex/inline-flex/inline-box): d, i, s
 			case 975: {
-				index = (out = input).length - 10
-				cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(input.indexOf(':', 7) + 1).trim()
+				index = (out = input).length - 10;
+				cache = (out.charCodeAt(index) === 33 ? out.substring(0, index) : out).substring(input.indexOf(':', 7) + 1).trim();
 
 				switch (hash = cache.charCodeAt(0) + (cache.charCodeAt(7)|0)) {
 					// inline-
@@ -1135,7 +1133,7 @@
 					}
 					// inline-box/sticky
 					case 115: {
-						out = out.replace(cache, webkit+cache)+';'+out
+						out = out.replace(cache, webkit+cache)+';'+out;
 						break
 					}
 					// inline-flex
@@ -1147,7 +1145,7 @@
 							out.replace(cache, webkit+cache)+';'+
 							out.replace(cache, ms+cache+'box')+';'+
 							out
-						)
+						);
 					}
 				}
 
@@ -1159,7 +1157,7 @@
 					switch (out.charCodeAt(6)) {
 						// align-items, i
 						case 105: {
-							cache = out.replace('-items', '')
+							cache = out.replace('-items', '');
 							return webkit + out + webkit + 'box-' + cache + ms + 'flex-' + cache + out
 						}
 						// align-self, s
@@ -1179,7 +1177,7 @@
 				if ((index = out.indexOf('-content', 9)) > 0) {
 					// width: min-content / width: max-content
 					if (out.charCodeAt(index - 3) === 109 && out.charCodeAt(index - 4) !== 45) {
-						cache = out.substring(index - 3)
+						cache = out.substring(index - 3);
 						return 'width:' + webkit + cache + 'width:' + moz + cache + 'width:' + cache
 					}
 				}
@@ -1187,7 +1185,7 @@
 			}
 			// transform, transition: t, r, a
 			case 962: {
-				out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out
+				out = webkit + out + (out.charCodeAt(5) === 102 ? ms + out : '') + out;
 
 				// transitions
 				if (second + third === 211 && out.charCodeAt(13) === 105 && out.indexOf('transform', 10) > 0) {
@@ -1201,19 +1199,10 @@
 		return out
 	}
 
-	var i = 0
-
-	/**
-	 * Vendor
-	 *
-	 * @param {string} content
-	 * @param {number} context
-	 * @return {boolean}
-	 */
 	function vendor (content, context) {
-		var index = content.indexOf(context === 1 ? ':' : '{')
-		var key = content.substring(0, context !== 3 ? index : 10)
-		var value = content.substring(index + 1, content.length - 1)
+		var index = content.indexOf(context === 1 ? ':' : '{');
+		var key = content.substring(0, context !== 3 ? index : 10);
+		var value = content.substring(index + 1, content.length - 1);
 
 		return should(context !== 2 ? key : key.replace(pseudofmt, '$1'), value, context)
 	}
@@ -1226,7 +1215,7 @@
 	 * @return {string}
 	 */
 	function supports (match, group) {
-		var out = property(group, group.charCodeAt(0), group.charCodeAt(1), group.charCodeAt(2))
+		var out = property(group, group.charCodeAt(0), group.charCodeAt(1), group.charCodeAt(2));
 
 		return out !== group+';' ? out.replace(propertyptn, ' or ($1)').substring(4) : '('+group+')'
 	}
@@ -1238,10 +1227,10 @@
 	 * @return {string}
 	 */
 	function animation (input) {
-		var length = input.length
-		var index = input.indexOf(':', 9) + 1
-		var declare = input.substring(0, index).trim()
-		var out = input.substring(index, length-1).trim()
+		var length = input.length;
+		var index = input.indexOf(':', 9) + 1;
+		var declare = input.substring(0, index).trim();
+		var out = input.substring(index, length-1).trim();
 
 		switch (input.charCodeAt(9)*keyed) {
 			case 0: {
@@ -1257,14 +1246,14 @@
 			// animation/animation-name
 			default: {
 				// split in case of multiple animations
-				var list = out.split((out = '', animationptn))
+				var list = out.split((out = '', animationptn));
 
 				for (var i = 0, index = 0, length = list.length; i < length; index = 0, ++i) {
-					var value = list[i]
-					var items = value.split(propertiesptn)
+					var value = list[i];
+					var items = value.split(propertiesptn);
 
 					while (value = items[index]) {
-						var peak = value.charCodeAt(0)
+						var peak = value.charCodeAt(0);
 
 						if (keyed === 1 && (
 							// letters
@@ -1285,22 +1274,22 @@
 											break
 										}
 										default: {
-											value += key
+											value += key;
 										}
 									}
 								}
 							}
 						}
 
-						items[index++] = value
+						items[index++] = value;
 					}
 
-					out += (i === 0 ? '' : ',') + items.join(' ')
+					out += (i === 0 ? '' : ',') + items.join(' ');
 				}
 			}
 		}
 
-		out = declare + out + ';'
+		out = declare + out + ';';
 
 		if (prefix === 1 || (prefix === 2 && vendor(out, 1)))
 			return webkit + out + out
@@ -1316,8 +1305,8 @@
 	function isolate (current) {
 		for (var i = 0, length = current.length, selector = Array(length), padding, element; i < length; ++i) {
 			// split individual elements in a selector i.e h1 h2 === [h1, h2]
-			var elements = current[i].split(elementptn)
-			var out = ''
+			var elements = current[i].split(elementptn);
+			var out = '';
 
 			for (var j = 0, size = 0, tail = 0, code = 0, l = elements.length; j < l; ++j) {
 				// empty element
@@ -1325,9 +1314,9 @@
 					continue
 				}
 
-				tail = out.charCodeAt(out.length-1)
-				code = element.charCodeAt(0)
-				padding = ''
+				tail = out.charCodeAt(out.length-1);
+				code = element.charCodeAt(0);
+				padding = '';
 
 				if (j !== 0) {
 					// determine if we need padding
@@ -1341,14 +1330,14 @@
 							break
 						}
 						default: {
-							padding = ' '
+							padding = ' ';
 						}
 					}
 				}
 
 				switch (code) {
 					case AND: {
-						element = padding + nscopealt
+						element = padding + nscopealt;
 					}
 					case TILDE:
 					case GREATERTHAN:
@@ -1359,7 +1348,7 @@
 						break
 					}
 					case OPENBRACKET: {
-						element = padding + element + nscopealt
+						element = padding + element + nscopealt;
 						break
 					}
 					case COLON: {
@@ -1367,35 +1356,35 @@
 							// :global
 							case 530: {
 								if (escape > 0) {
-									element = padding + element.substring(8, size - 1)
+									element = padding + element.substring(8, size - 1);
 									break
 								}
 							}
 							// :hover, :nth-child(), ...
 							default: {
 								if (j < 1 || elements[j-1].length < 1) {
-									element = padding + nscopealt + element
+									element = padding + nscopealt + element;
 								}
 							}
 						}
 						break
 					}
 					case COMMA: {
-						padding = ''
+						padding = '';
 					}
 					default: {
 						if (size > 1 && element.indexOf(':') > 0) {
-							element = padding + element.replace(pseudoptn, '$1' + nscopealt + '$2')
+							element = padding + element.replace(pseudoptn, '$1' + nscopealt + '$2');
 						} else {
-							element = padding + element + nscopealt
+							element = padding + element + nscopealt;
 						}
 					}
 				}
 
-				out += element
+				out += element;
 			}
 
-			selector[i] = out.replace(formatptn, '').trim()
+			selector[i] = out.replace(formatptn, '').trim();
 		}
 
 		return selector
@@ -1425,7 +1414,7 @@
 					break
 				}
 				default: {
-					out = next
+					out = next;
 				}
 			}
 		}
@@ -1468,23 +1457,23 @@
 		switch (plugin) {
 			case void 0:
 			case null: {
-				plugged = plugins.length = 0
+				plugged = plugins.length = 0;
 				break
 			}
 			default: {
 				switch (plugin.constructor) {
 					case Array: {
 						for (var i = 0, length = plugin.length; i < length; ++i) {
-							use(plugin[i])
+							use(plugin[i]);
 						}
 						break
 					}
 					case Function: {
-						plugins[plugged++] = plugin
+						plugins[plugged++] = plugin;
 						break
 					}
 					case Boolean: {
-						unkwn = !!plugin|0
+						unkwn = !!plugin|0;
 					}
 				}
 			}
@@ -1500,7 +1489,7 @@
 	 */
 	function set (options) {
 		for (var name in options) {
-			var value = options[name]
+			var value = options[name];
 			switch (name) {
 				case 'keyframe': keyed = value|0; break
 				case 'global': escape = value|0; break
@@ -1509,15 +1498,15 @@
 				case 'semicolon': semicolon = value|0; break
 				case 'preserve': preserve = value|0; break
 				case 'prefix':
-					should = null
+					should = null;
 
 					if (!value) {
-						prefix = 0
+						prefix = 0;
 					} else if (typeof value !== 'function') {
-						prefix = 1
+						prefix = 1;
 					} else {
-						prefix = 2
-						should = value
+						prefix = 2;
+						should = value;
 					}
 			}
 		}
@@ -1538,71 +1527,75 @@
 		}
 
 		// setup
-		var ns = selector
-		var code = ns.charCodeAt(0)
+		var ns = selector;
+		var code = ns.charCodeAt(0);
 
 		// trim leading whitespace
 		if (code < 33) {
-			code = (ns = ns.trim()).charCodeAt(0)
+			code = (ns = ns.trim()).charCodeAt(0);
 		}
 
 		// keyframe/animation namespace
 		if (keyed > 0) {
-			key = ns.replace(invalidptn, code === OPENBRACKET ? '' : '-')
+			key = ns.replace(invalidptn, code === OPENBRACKET ? '' : '-');
 		}
 
 		// reset, used to assert if a plugin is moneky-patching the return value
-		code = 1
+		code = 1;
 
 		// cascade/isolate
 		if (cascade === 1) {
-			nscope = ns
+			nscope = ns;
 		} else {
-			nscopealt = ns
+			nscopealt = ns;
 		}
 
-		var selectors = [nscope]
-		var result
+		var selectors = [nscope];
+		var result;
 
 		// execute plugins, pre-process context
 		if (plugged > 0) {
-			result = proxy(PREPS, input, selectors, selectors, line, column, 0, 0, 0)
+			result = proxy(PREPS, input, selectors, selectors, line, column, 0, 0, 0);
 
 			if (result !== void 0 && typeof result === 'string') {
-				input = result
+				input = result;
 			}
 		}
 
 		// build
-		var output = compile(array, selectors, input, 0, 0)
+		var output = compile(array, selectors, input, 0, 0);
 
 		// execute plugins, post-process context
 		if (plugged > 0) {
-			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0, 0)
+			result = proxy(POSTS, output, selectors, selectors, line, column, output.length, 0, 0);
 
 			// bypass minification
 			if (result !== void 0 && typeof(output = result) !== 'string') {
-				code = 0
+				code = 0;
 			}
 		}
 
 		// reset
-		key = ''
-		nscope = ''
-		nscopealt = ''
-		pattern = 0
-		line = 1
-		column = 1
+		key = '';
+		nscope = '';
+		nscopealt = '';
+		pattern = 0;
+		line = 1;
+		column = 1;
 
 		return compress*code === 0 ? output : minify(output)
 	}
 
-	stylis['use'] = use
-	stylis['set'] = set
+	stylis['use'] = use;
+	stylis['set'] = set;
 
 	if (options !== void 0) {
-		set(options)
+		set(options);
 	}
 
 	return stylis
-}));
+}
+
+var index = factory(null)
+
+module.exports = index;

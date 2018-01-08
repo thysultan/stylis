@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>stylis byte</title>
-	<script src='../../../stylis.js'></script>
+	<script src='../../../dist/stylis.js'></script>
 	<script src='../index.js'></script>
 </head>
 <body>
@@ -140,7 +140,7 @@ var input = [
     '5', 'position',
     '6', 'relative',
   '2'
-] 
+]
 
 var length = input.length
 
@@ -153,10 +153,10 @@ function fromString (input, length) {
       case SELECTOR:
         output += input[i + 1] + '{'
         i++
-        break                
+        break
       case PROPERTY:
         output += input[i + 1] + ': '
-        i++    
+        i++
         break
       case VALUE:
         output += input[i + 1] + ';'
@@ -194,7 +194,7 @@ bench(fromStringBench, true, 'fromSingleArrayOfStrings')
  * 		1,  // value address, heap[1] === 'red'
  * 		1,  // rule end
  *
- * 		0,  // rule start 
+ * 		0,  // rule start
  * 		3,  // selector
  * 		2,  // selector address, heap[2] === 'body'
  * 		10, // property
