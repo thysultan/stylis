@@ -269,12 +269,29 @@ var spec = {
 			.wrapper button& {
 			  color:red;
 			}
+
+			:hover & {
+			  color: green;
+			}
+
+			div:hover & {
+			  color: green;
+			}
+
+			div:hover & {
+				h1 & {
+					color:red;
+				}
+			}
 		`,
 		expected: ``+
 		`.user{color:blue;}`+
 		`.user.user.user{color:red;}`+
 		`.user + .user{color:red;}`+
-		`.wrapper button.user{color:red;}`
+		`.wrapper button.user{color:red;}`+
+		`.user:hover .user{color:green;}`+
+		`div:hover .user{color:green;}`+
+		`h1 div:hover .user{color:red;}`
 	},
 	'&:before': {
 		sample: `

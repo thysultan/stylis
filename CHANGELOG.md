@@ -1,3 +1,7 @@
+## 3.4.7 January 08, 2018
+
+- patch inverted parent selector when used with an implicit `:psudo` selector.
+
 ## 3.4.6 January 08, 2018
 
 - patch vendor prefix for align-content `flex-start` and `flex-end`.

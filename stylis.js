@@ -966,7 +966,7 @@
 					}
 					default: {
 						// :hover
-						return parent.trim() + selector
+						return parent.trim() + selector.replace(andptn, '$1'+parent.trim())
 					}
 				}
 			}
