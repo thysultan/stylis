@@ -160,7 +160,7 @@ When using the factory pattern the if an object is passed as optional `options` 
 
 ```javascript
 // all options except compress and cascade are enabled by default
-stylis.set(options: {
+stylis.set({
 	// (dis/en)able :global selectors
 	global: {Boolean}
 
