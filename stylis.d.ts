@@ -19,7 +19,7 @@ interface Options {
 	global?: boolean
 	cascade?: boolean
 	compress?: boolean
-	prefix?: (key: string, value: string, context: number) => boolean|boolean
+	prefix?: boolean | ((key: string, value: string, context: number) => boolean)
 	semicolon?: boolean
 	preserve?: boolean
 }
