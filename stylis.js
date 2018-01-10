@@ -76,7 +76,7 @@
 	var writingptn = /[svh]\w+-[tblr]{2}/ /* match writing mode property values */
 	var gradientptn = /([\w-]+t\()/g /* match *gradient property */
 	var supportsptn = /\(\s*(.*)\s*\)/g /* match supports (groups) */
-	var propertyptn = /([^]*?);/g /* match properties leading semicolon */
+	var propertyptn = /([\s\S]*?);/g /* match properties leading semicolon */
 	var selfptn = /-self|flex-/g /* match flex- and -self in align-self: flex-*; */
 	var pseudofmt = /[^]*?(:[rp][el]a[\w-]+)[^]*/ /* extrats :readonly or :placholder from selector */
 	var trimptn = /[ \t]+$/ /* match tail whitspace */
