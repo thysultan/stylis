@@ -164,6 +164,12 @@
 	var nscopealt = ''
 	var nscope = ''
 
+  /**
+   * Workaround of Closure Compiler problem
+   * https://github.com/styled-components/styled-components/pull/1409
+   */
+  var flat
+
 	/**
 	 * Compile
 	 *
@@ -204,7 +210,7 @@
 		var child = '' /* next buffer of characters */
 		var out = '' /* compiled body */
 		var children = '' /* compiled children */
-		var flat = '' /* compiled leafs */
+		flat = '' /* compiled leafs */
 		var selector /* generic selector address */
 		var result /* generic address */
 
