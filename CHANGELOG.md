@@ -1,3 +1,7 @@
+## 3.4.8 January 11, 2018
+
+- patch for `@supports` parsing to work on IE8.
+
 ## 3.4.7 January 08, 2018
 
 - patch inverted parent selector when used with an implicit `:psudo` selector.
