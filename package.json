@@ -25,12 +25,13 @@
 	},
 	"scripts": {
 		"test": "node ./tests",
-		"minify": "uglifyjs stylis.js -o stylis.min.js --compress 'conditionals=false,if_return=false,booleans=false' --mangle --screw-ie8",
+		"minify": "uglifyjs stylis.js -o stylis.min.js --compress 'conditionals=false,if_return=false,booleans=false' --mangle --screw-ie8 --source-map url=stylis.min.js.map",
 		"prepublish": "npm run minify"
 	},
 	"files": [
 		"stylis.js",
 		"stylis.min.js",
+		"stylis.min.js.map",
 		"stylis.d.ts"
 	],
 	"devDependencies": {
