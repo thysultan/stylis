@@ -95,9 +95,18 @@ var sample = `
 	@supports(position: sticky){
     background: red;
   }
-`
 
-var sample = `
+  @media (max-width: 64em) {
+    .test {
+      margin-bottom: 1em;
+    }
+    @supports (-moz-appearance: none) and (display: contents) {
+      .test {
+        margin-bottom: 2rem;
+      }
+    }
+  }
+
 span { color: red }
 @import url('something');
 @font-face { font-family: test; src: url(test.woff); }
@@ -119,15 +128,33 @@ var sample = `
 
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
-
+var result = []
+var skipped = []
 var plugin = stylisRuleSheet((value) => {
-	console.log(value)
 	length = sheet.insertRule(value, length) + 1
+	result.push(value)
 })
 
 stylis.use(plugin)
 
-stylis('html', sample)
+stylis('html', `@media all { ${sample} }`)
+
+result = result.join('')
+var expected = `@font-face{src:none;}@page{size:A4 landscape;}@font-face{font-family:test;src:url(test.woff);}@media all{@import "./index.html";@import url('something');html{font-size:2rem;padding:16px;}html body{background:gray;}html h1{color:papayawhip;}html h2{color:red;}html h2 div,html h2 h3{width:10px;color:red;}html div{font:none;}@-webkit-keyframes hahahahtml{from{top:0;}to{top:100;}}@keyframes hahahahtml{from{top:0;}to{top:100;}}@media (max-width:64em){html .test{margin-bottom:1em;}@supports (-moz-appearance:none) and (display:contents){html .test{margin-bottom:2rem;}}}}`
+console.assert(result === expected, `
+
+Expected:
+
+	${expected}
+
+Instead got:
+
+ 	${result}
+`)
+
+if (result !== expected) {
+	alert('Compilation failed, look at the console for more details')
+}
 </script>
 
 </body>
