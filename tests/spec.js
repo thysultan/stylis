@@ -559,13 +559,6 @@ var spec = {
 		  	color:red;
 			}
 			& {
-				width:var(--foo-content);
-				width:var(-content);
-				width:var(--max-content);
-				width:--max-content;
-
-				width:max-content;
-				width:min-content;
 				display:flex!important;
 				display:inline-flex;
 				display:inline-box;
@@ -613,15 +606,6 @@ var spec = {
 			`.user input.red::placeholder{color:red;}`+
 
 			`.user{`+
-
-			'width:var(--foo-content);'+
-			'width:var(-content);'+
-			`width:var(--max-content);`+
-			`width:--max-content;`+
-			`width:-webkit-max-content;`+
-			`width:-moz-max-content;width:max-content;`+
-			`width:-webkit-min-content;`+
-			`width:-moz-min-content;width:min-content;`+
 
 			`display:-webkit-box!important;`+
 			`display:-webkit-flex!important;`+
@@ -804,6 +788,7 @@ var spec = {
 		expected: `.user{`+
 		`-webkit-text-size-adjust:none;`+
 		`text-size-adjust:none;`+
+		`-webkit-text-decoration:none;`+
 		`text-decoration:none;`+
 		'-webkit-filter:grayscale(100%);'+
 		'filter:grayscale(100%);'+
@@ -880,6 +865,73 @@ var spec = {
 			`box-decoration-break:none;`+
 
 			`box-sizing:none;`+
+		`}`
+	},
+	'vendor prefixing VII': {
+		sample: `
+			min-zoom: 0;
+			width: auto;
+			width: unset;
+			width: initial;
+			width: inherit;
+			width: 10;
+			width: min();
+
+			width: var(--foo-content);
+			width: var(-content);
+			width: var(--max-content);
+			width: --max-content;
+
+			width: fit-content;
+			min-width: max-content;
+			max-width: min-content;
+			height: fill-available;
+			max-height: fit-content;
+			width: stretch;
+			width: stretch !important;
+		`,
+		expected: ``+
+		`.user{`+
+			`min-zoom:0;`+
+			`width:auto;`+
+			`width:unset;`+
+			`width:initial;`+
+			`width:inherit;`+
+			`width:10;`+
+			`width:min();`+
+
+			'width:var(--foo-content);'+
+			'width:var(-content);'+
+			`width:var(--max-content);`+
+			`width:--max-content;`+
+
+			`width:-webkit-fit-content;`+
+			`width:-moz-fit-content;`+
+			`width:fit-content;`+
+
+			`min-width:-webkit-max-content;`+
+			`min-width:-moz-max-content;`+
+			`min-width:max-content;`+
+
+			`max-width:-webkit-min-content;`+
+			`max-width:-moz-min-content;`+
+			`max-width:min-content;`+
+
+			`height:-webkit-fill-available;`+
+			`height:-moz-available;`+
+			`height:fill-available;`+
+
+			`max-height:-webkit-fit-content;`+
+			`max-height:-moz-fit-content;`+
+			`max-height:fit-content;`+
+
+			`width:-webkit-fill-available;`+
+    	`width:-moz-available;`+
+    	`width:stretch;`+
+
+    	`width:-webkit-fill-available !important;`+
+    	`width:-moz-available !important;`+
+    	`width:stretch !important;`+
 		`}`
 	},
 	'animations': {

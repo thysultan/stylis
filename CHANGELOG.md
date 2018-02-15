@@ -1,3 +1,9 @@
+## 3.4.9 (Unreleased)
+
+- patch `text-decoration` to re-include vendor `-webkit-` prefix.
+- patch vendor prefix of height/width keyword varients i.e `stretch/fit-content`.
+- patch rule-sheet plugin to handle nested `@at` rules.
+
 ## 3.4.8 January 11, 2018
 
 - patch for `@supports` parsing to work on IE8.

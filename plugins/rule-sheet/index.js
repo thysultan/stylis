@@ -38,7 +38,7 @@
 						case 112:
 							return insertRule(selectors[0]+content), ''
 						default:
-							return content + delimiter
+							return content + (depth === 0 ? delimiter : '')
 					}
 				case -2:
 					content.split(needle).forEach(toSheet)

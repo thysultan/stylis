@@ -104,6 +104,19 @@ span { color: red }
 div { color: red }
 `
 
+var sample = `
+@media (width: 0) {
+  .test {
+    margin-bottom: 1;
+  }
+  @supports (font: none) {
+    .test {
+      margin-top: 2;
+    }
+  }
+}
+`
+
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
 
