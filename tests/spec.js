@@ -889,6 +889,8 @@ var spec = {
 			max-height: fit-content;
 			width: stretch;
 			width: stretch !important;
+			min-block-size:max-content;
+			min-inline-size:max-content;
 		`,
 		expected: ``+
 		`.user{`+
@@ -932,6 +934,14 @@ var spec = {
     	`width:-webkit-fill-available !important;`+
     	`width:-moz-available !important;`+
     	`width:stretch !important;`+
+
+    	`min-block-size:-webkit-max-content;`+
+    	`min-block-size:-moz-max-content;`+
+    	`min-block-size:max-content;`+
+
+    	`min-inline-size:-webkit-max-content;`+
+    	`min-inline-size:-moz-max-content;`+
+    	`min-inline-size:max-content;`+
 		`}`
 	},
 	'animations': {
