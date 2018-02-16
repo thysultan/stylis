@@ -1008,7 +1008,8 @@
 		switch (hash) {
 			// text-decoration/text-size-adjust: t, e, x
 			case 1015: {
-				return webkit + out + out
+				// text-size-adjust, - / text-decoration, d
+				return (out.charCodeAt(9) === DASH || out.charCodeAt(5) === 100) ? webkit + out + out : out
 			}
 			// filter/fill f, i, l
 			case 951: {
