@@ -1,4 +1,8 @@
-## 3.4.9 (Unreleased)
+## 3.4.10 (Unreleased)
+
+- patch for incorrect vendor prefixing of many `text-` properties
+
+## 3.4.9 February 15, 2018
 
 - patch `text-decoration` to re-include vendor `-webkit-` prefix.
 - patch vendor prefix of height/width keyword varients i.e `stretch/fit-content`.
@@ -630,4 +634,3 @@ stylis.set({
 ## 0.6.2 (December 04, 2016)
 
 - patch flat css `stylis('#id', 'color:red;')` to act as a block `stylis('#id', '&{color:red;}')`
-
