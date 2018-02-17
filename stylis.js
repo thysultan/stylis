@@ -282,14 +282,21 @@
 							code = SEMICOLON
 
 							while (length < eof) {
-								switch (body.charCodeAt(++length)) {
+								switch (body.charCodeAt(length++)) {
 									case NEWLINE:
 									case CARRIAGE:
 									case SEMICOLON: {
-										caret++
+										++caret
 										code = first
+										length = eof
+										break
 									}
-									case COLON:
+									case COLON: {
+										if (format > 0) {
+											++caret
+											code = first
+										}
+									}
 									case OPENBRACES: {
 										length = eof
 									}
@@ -1006,10 +1013,10 @@
 
 		// vendor prefix
 		switch (hash) {
-			// text-decoration/text-size-adjust: t, e, x
+			// text-decoration/text-size-adjust/text-shadow/text-align/text-transform: t, e, x
 			case 1015: {
-				// text-size-adjust, - / text-decoration, d
-				return (out.charCodeAt(9) === DASH || out.charCodeAt(5) === 100) ? webkit + out + out : out
+				// text-shadow/text-align/text-transform, a
+				return out.charCodeAt(10) === 97 ? webkit + out + out : out
 			}
 			// filter/fill f, i, l
 			case 951: {
@@ -1210,8 +1217,6 @@
 
 		return out
 	}
-
-	var i = 0
 
 	/**
 	 * Vendor

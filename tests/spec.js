@@ -777,6 +777,9 @@ var spec = {
 	},
 	'vendor prefixing IV': {
 		sample: `
+			text-align:none;
+			text-transform:none;
+			text-shadow:none;
 			text-size-adjust:none;
 			text-decoration:none;
 			filter:grayscale(100%);
@@ -786,6 +789,9 @@ var spec = {
 			mask-image: none;
 		`,
 		expected: `.user{`+
+		`text-align:none;`+
+		`text-transform:none;`+
+		`text-shadow:none;`+
 		`-webkit-text-size-adjust:none;`+
 		`text-size-adjust:none;`+
 		`-webkit-text-decoration:none;`+
@@ -1456,12 +1462,19 @@ var spec = {
 					.c) .d {
 			  color:red;
 			}
+
+			.foo :global(path),
+			.bar
+			  :global(path) {
+			  stroke: red;
+			}
 		`,
 		expected: ``+
 		`.user{width:0;}`+
 		`@media(screen){.user{color:red;}}`+
 		`h1.user{color:red;}`+
-		`.a.user .b .c .d.user{color:red;}`
+		`.a.user .b .c .d.user{color:red;}`+
+		`.foo.user path,.bar.user path{stroke:red;}`
 	},
 	'semi-colons': {
 		options: {

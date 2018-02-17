@@ -1,6 +1,7 @@
-## 3.4.10 (Unreleased)
+## 3.4.10 February 17, 2018
 
-- patch for incorrect vendor prefixing of many `text-` properties
+- patch for incorrect vendor prefixing of many `text-` properties, fixes #95.
+- improvments to no-semicolon option, fixes #97.
 
 ## 3.4.9 February 15, 2018
 
@@ -634,3 +635,4 @@ stylis.set({
 ## 0.6.2 (December 04, 2016)
 
 - patch flat css `stylis('#id', 'color:red;')` to act as a block `stylis('#id', '&{color:red;}')`
+
