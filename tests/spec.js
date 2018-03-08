@@ -1681,9 +1681,17 @@ var spec = {
 	},
 	'middleware contracts': {
 		options: {
-			plugins: function (context, content, selector, parents, line, column, length, depth) {
+			plugins: function (context, content, selector, parents, line, column, length, ns, depth, at) {
+				if (typeof ns !== 'number') {
+					throw 'ns argument not passed to middleware'
+				}
+
 				if (typeof depth !== 'number') {
 					throw 'depth argument not passed to middleware'
+				}
+
+				if (typeof at !== 'number') {
+					throw 'at argument not passed to middleware'
 				}
 
 				switch (context) {

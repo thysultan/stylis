@@ -1,3 +1,32 @@
+## 3.5.0 March 08, 2018
+
+- Pass extra argument to plugins that cen be used determine which `@at` rules are nested within each other. i.e
+
+```css
+@media (max-width: 100) {
+	.a {
+  	color: blue;
+	}
+	@supports (color:none) {
+    .b {
+      color: red;
+    }
+  }
+}
+```
+
+When processing the following in `@supports`
+
+```css
+.b {
+  color: red;
+}
+```
+
+Stylis internally knows that it is within `@media > @supports` but prior to this release did not pass this meta data to plugins.
+
+The presence of this meta data allows plugins to branch different logic when nested within specific `@at` rules, demonstrated in the most simple use case within the `stylis-rule-sheet` plugin, more advanced cases might use the specific type(denoted as a character code) of the `@at` rules involved.
+
 ## 3.4.10 February 17, 2018
 
 - patch for incorrect vendor prefixing of many `text-` properties, fixes #95.

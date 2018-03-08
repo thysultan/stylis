@@ -117,17 +117,37 @@ var sample = `
 }
 `
 
+var sample = `
+  @media (max-width: 100) {
+  	.a {
+    	color: blue;
+  	}
+  	@supports (color:none) {
+      .b {
+        color: red;
+      }
+    }
+  }
+
+  div {
+    @media (min-width: 500px) {
+      color: pink;
+    }
+  }
+`;
+
 var sheet = document.head.appendChild(document.createElement('style')).sheet
 var length = sheet.cssRules.length
+var pool = []
 
 var plugin = stylisRuleSheet((value) => {
-	console.log(value)
-	length = sheet.insertRule(value, length) + 1
+	pool.push(value)
+	// length = sheet.insertRule(value, length) + 1
 })
 
 stylis.use(plugin)
-
-stylis('html', sample)
+stylis('.a', sample)
+console.log(pool.join(''))
 </script>
 
 </body>
