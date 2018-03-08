@@ -5,13 +5,13 @@
 ```css
 @media (max-width: 100) {
 	.a {
-  	color: blue;
+		color: blue;
 	}
 	@supports (color:none) {
-    .b {
-      color: red;
-    }
-  }
+		.b {
+			color: red;
+		}
+	}
 }
 ```
 
