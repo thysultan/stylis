@@ -27,6 +27,6 @@
 		"index.js"
 	],
 	"peerDependencies": {
-  	"stylis": "3.x"
+  	"stylis": "^3.5.0"
   }
 }
