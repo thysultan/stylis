@@ -38,7 +38,7 @@ interface Plugin {
 		column: number,
 		length: number,
 		at: number,
-		depth: number): null | void | string
+		depth: number): any
 }
 
 interface Use {
