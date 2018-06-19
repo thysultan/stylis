@@ -950,6 +950,19 @@ var spec = {
     	`min-inline-size:max-content;`+
 		`}`
 	},
+	'vendor prefixing VIII': {
+		sample: `
+			background:image-set(url(foo.jpg) 2x);
+			background-image:image-set(url(foo.jpg) 2x);
+		`,
+		expected: ``+
+		`.user{`+
+			`background:-webkit-image-set(url(foo.jpg) 2x);`+
+			`background:image-set(url(foo.jpg) 2x);`+
+			`background-image:-webkit-image-set(url(foo.jpg) 2x);`+
+			`background-image:image-set(url(foo.jpg) 2x);`+
+		`}`
+	},
 	'animations': {
 		sample: `
 			h2 {
