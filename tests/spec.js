@@ -1216,6 +1216,7 @@ var spec = {
 				.b {color:"red"}
 				.a {color:red;}[role=button]{color:red;}
 				.b {padding:30 3}
+				.c {v-text-anchor: middle;}
 		 `,
 		 expected: `@media (min-width:537px){`+
 		 	`.user{border-bottom:4px solid red;}}`+
@@ -1226,7 +1227,8 @@ var spec = {
 		 	`.user .a{color:'red';}`+
 		 	`.user .b{color:"red";}`+
 		 	`.user .a{color:red;}.user [role=button]{color:red;}`+
-		 	`.user .b{padding:30 3;}`
+		 	`.user .b{padding:30 3;}`+
+		 	`.user .c{v-text-anchor:middle;}`
 	},
 	// note the spaces after ;
 	'whitespace cascade true': {
@@ -1468,13 +1470,25 @@ var spec = {
 			  :global(path) {
 			  stroke: red;
 			}
+
+			@keyframes hahaha {
+			  0%,
+			  1%{t:0}
+			}
+
+			:global(.a)
+			.b
+			.c{background:red}
 		`,
 		expected: ``+
 		`.user{width:0;}`+
 		`@media(screen){.user{color:red;}}`+
 		`h1.user{color:red;}`+
 		`.a.user .b .c .d.user{color:red;}`+
-		`.foo.user path,.bar.user path{stroke:red;}`
+		`.foo.user path,.bar.user path{stroke:red;}`+
+		`@-webkit-keyframes hahaha-user{0%,1%{t:0;}}`+
+		`@keyframes hahaha-user{0%,1%{t:0;}}`+
+		`.a .b.user .c.user{background:red;}`
 	},
 	'semi-colons': {
 		options: {

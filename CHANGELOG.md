@@ -1,3 +1,10 @@
+## 3.5.1 June 19, 2018
+
+- Fixes [#108](https://github.com/thysultan/stylis.js/issues/108)
+- Fixes [#105](https://github.com/thysultan/stylis.js/issues/105)
+- Fixes [#104](https://github.com/thysultan/stylis.js/issues/104)
+- Fixes [#103](https://github.com/thysultan/stylis.js/issues/103)
+
 ## 3.5.0 March 08, 2018
 
 - Pass extra argument to plugins that cen be used determine which `@at` rules are nested within each other. i.e
