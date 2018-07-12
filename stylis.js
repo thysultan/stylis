@@ -178,7 +178,6 @@
 	 */
 	function compile (parent, current, body, id, depth) {
 		var bracket = 0 /* brackets [] */
-		var comment = 0 /* comments /* // or /* */
 		var parentheses = 0 /* functions () */
 		var quote = 0 /* quotes '', "" */
 
@@ -217,18 +216,13 @@
 			// eof varient
 			if (caret === eol) {
 				// last character + noop context, add synthetic padding for noop context to terminate
-				if (comment + quote + parentheses + bracket !== 0) {
-					if (comment !== 0) {
-						code = comment === FOWARDSLASH ? NEWLINE : FOWARDSLASH
-					}
-
+				if (quote + parentheses + bracket !== 0) {
 					quote = parentheses = bracket = 0
-					eof++
-					eol++
+					eof = (eol = eof) + 1
 				}
 			}
 
-			if (comment + quote + parentheses + bracket === 0) {
+			if (quote + parentheses + bracket === 0) {
 				// eof varient
 				if (caret === eol) {
 					if (format > 0) {
@@ -316,9 +310,7 @@
 						length = ++caret
 
 						while (caret < eof) {
-							code = body.charCodeAt(caret)
-
-							switch (code) {
+							switch (code = body.charCodeAt(caret)) {
 								case OPENBRACES: {
 									counter++
 									break
@@ -326,6 +318,15 @@
 								case CLOSEBRACES: {
 									counter--
 									break
+								}
+								case FOWARDSLASH: {
+									switch (second = body.charCodeAt(caret + 1)) {
+										// /*, //
+										case STAR:
+										case FOWARDSLASH: {
+											caret = comment(second, caret, eol, body)
+										}
+									}
 								}
 							}
 
@@ -507,7 +508,7 @@
 				case CARRIAGE:
 				case NEWLINE: {
 					// auto insert semicolon
-					if (comment + quote + parentheses + bracket + semicolon === 0) {
+					if (quote + parentheses + bracket + semicolon === 0) {
 						// valid non-whitespace characters that
 						// may precede a newline
 						switch (peak) {
@@ -537,10 +538,7 @@
 						}
 					}
 
-					// terminate line comment
-					if (comment === FOWARDSLASH) {
-						comment = 0
-					} else if (cascade + context === 0 && id !== KEYFRAME && chars.length > 0) {
+					if (cascade + context === 0 && id !== KEYFRAME && chars.length > 0) {
 						format = 1
 						chars += '\0'
 					}
@@ -557,7 +555,7 @@
 				}
 				case SEMICOLON:
 				case CLOSEBRACES: {
-					if (comment + quote + parentheses + bracket === 0) {
+					if (quote + parentheses + bracket === 0) {
 						column++
 						break
 					}
@@ -573,7 +571,7 @@
 					switch (code) {
 						case TAB:
 						case SPACE: {
-							if (quote + bracket + comment === 0) {
+							if (quote + bracket === 0) {
 								switch (tail) {
 									case COMMA:
 									case COLON:
@@ -607,7 +605,7 @@
 						// &
 						case AND: {
 							// inverted selector pattern i.e html &
-							if (quote + comment + bracket === 0 && cascade > 0) {
+							if (quote + bracket === 0 && cascade > 0) {
 								invert = 1
 								format = 1
 								char = '\f' + char
@@ -617,7 +615,7 @@
 						// ::p<l>aceholder, l
 						// :read-on<l>y, l
 						case 108: {
-							if (quote + comment + bracket + pattern === 0 && pseudo > 0) {
+							if (quote + bracket + pattern === 0 && pseudo > 0) {
 								switch (caret - pseudo) {
 									// ::placeholder
 									case 2: {
@@ -637,14 +635,14 @@
 						}
 						// :<pattern>
 						case COLON: {
-							if (quote + comment + bracket === 0) {
+							if (quote + bracket === 0) {
 								pseudo = caret
 							}
 							break
 						}
 						// selectors
 						case COMMA: {
-							if (comment + parentheses + quote + bracket === 0) {
+							if (parentheses + quote + bracket === 0) {
 								format = 1
 								char += '\r'
 							}
@@ -652,39 +650,35 @@
 						}
 						// quotes
 						case DOUBLEQUOTE: {
-							if (comment === 0) {
-								quote = quote === code ? 0 : (quote === 0 ? code : quote)
-							}
+							quote = quote === code ? 0 : (quote === 0 ? code : quote)
 							break
 						}
 						case SINGLEQUOTE: {
-							if (comment === 0) {
-								quote = quote === code ? 0 : (quote === 0 ? code : quote)
-							}
+							quote = quote === code ? 0 : (quote === 0 ? code : quote)
 							break
 						}
 						// attributes
 						case OPENBRACKET: {
-							if (quote + comment + parentheses === 0) {
+							if (quote + parentheses === 0) {
 								bracket++
 							}
 							break
 						}
 						case CLOSEBRACKET: {
-							if (quote + comment + parentheses === 0) {
+							if (quote + parentheses === 0) {
 								bracket--
 							}
 							break
 						}
 						// functions
 						case CLOSEPARENTHESES: {
-							if (quote + comment + bracket === 0) {
+							if (quote + bracket === 0) {
 								parentheses--
 							}
 							break
 						}
 						case OPENPARENTHESES: {
-							if (quote + comment + bracket === 0) {
+							if (quote + bracket === 0) {
 								if (context === 0) {
 									switch (tail*2 + trail*3) {
 										// :matches
@@ -704,134 +698,113 @@
 							break
 						}
 						case AT: {
-							if (comment + parentheses + quote + bracket + pseudo + atrule === 0) {
+							if (parentheses + quote + bracket + pseudo + atrule === 0) {
 								atrule = 1
 							}
 							break
 						}
 						// block/line comments
-						case STAR:
 						case FOWARDSLASH: {
-							if (quote + bracket + parentheses > 0) {
-								break
-							}
-
-							switch (comment) {
-								// initialize line/block comment context
-								case 0: {
-									switch (code*2 + body.charCodeAt(caret+1)*3) {
-										// //
-										case 235: {
-											comment = FOWARDSLASH
-											break
-										}
-										// /*
-										case 220: {
-											length = caret
-											comment = STAR
-											break
-										}
+							if (quote + bracket + parentheses === 0) {
+								switch (first = second = body.charCodeAt(caret + 1)) {
+									// /*!
+									case STAR: {
+										second = body.charCodeAt(caret + 2)
 									}
-									break
-								}
-								// end block comment context
-								case STAR: {
-									if (code === FOWARDSLASH && tail === STAR) {
-										// /*<!> ... */, !
-										if (body.charCodeAt(length+2) === 33) {
-											out += body.substring(length, caret+1)
+									// /*, //
+									case FOWARDSLASH: {
+										if (char = '', caret = comment(first, length = caret, eol, body), second === 33) {
+											out += body.substring(length, caret)
 										}
-										char = ''
-										comment = 0
+										if (caret === eol) {
+											eof = (eol = eof) + 1
+										}
 									}
 								}
 							}
 						}
 					}
 
-					// ignore comment blocks
-					if (comment === 0) {
-						// aggressive isolation mode, divide each individual selector
-						// including selectors in :not function but excluding selectors in :global function
-						if (cascade + quote + bracket + atrule === 0 && id !== KEYFRAME && code !== SEMICOLON) {
-							switch (code) {
-								case COMMA:
-								case TILDE:
-								case GREATERTHAN:
-								case PLUS:
-								case CLOSEPARENTHESES:
-								case OPENPARENTHESES: {
-									if (context === 0) {
-										// outside of an isolated context i.e nth-child(<...>)
-										switch (tail) {
-											case TAB:
-											case SPACE:
-											case NEWLINE:
-											case CARRIAGE: {
-												char = char + '\0'
-												break
-											}
-											default: {
-												char = '\0' + char + (code === COMMA ? '' : '\0')
-											}
-										}
-										format = 1
-									} else {
-										// within an isolated context, sleep untill it's terminated
-										switch (code) {
-											case OPENPARENTHESES: {
-												// :globa<l>(
-												if (pseudo + 7 === caret && tail === 108) {
-													pseudo = 0
-												}
-												context = ++counter
-												break
-											}
-											case CLOSEPARENTHESES: {
-												if ((context = --counter) === 0) {
-													format = 1
-													char += '\0'
-												}
-												break
-											}
-										}
-									}
-									break
-								}
-								case TAB:
-								case SPACE: {
+					// aggressive isolation mode, divide each individual selector
+					// including selectors in :not function but excluding selectors in :global function
+					if (cascade + quote + bracket + atrule === 0 && id !== KEYFRAME && code !== SEMICOLON) {
+						switch (code) {
+							case COMMA:
+							case TILDE:
+							case GREATERTHAN:
+							case PLUS:
+							case CLOSEPARENTHESES:
+							case OPENPARENTHESES: {
+								if (context === 0) {
+									// outside of an isolated context i.e nth-child(<...>)
 									switch (tail) {
-										case NULL:
-										case OPENBRACES:
-										case CLOSEBRACES:
-										case SEMICOLON:
-										case COMMA:
-										case FORMFEED:
 										case TAB:
 										case SPACE:
 										case NEWLINE:
 										case CARRIAGE: {
+											char = char + '\0'
 											break
 										}
 										default: {
-											// ignore in isolated contexts
-											if (context === 0) {
+											char = '\0' + char + (code === COMMA ? '' : '\0')
+										}
+									}
+									format = 1
+								} else {
+									// within an isolated context, sleep untill it's terminated
+									switch (code) {
+										case OPENPARENTHESES: {
+											// :globa<l>(
+											if (pseudo + 7 === caret && tail === 108) {
+												pseudo = 0
+											}
+											context = ++counter
+											break
+										}
+										case CLOSEPARENTHESES: {
+											if ((context = --counter) === 0) {
 												format = 1
 												char += '\0'
 											}
+											break
+										}
+									}
+								}
+								break
+							}
+							case TAB:
+							case SPACE: {
+								switch (tail) {
+									case NULL:
+									case OPENBRACES:
+									case CLOSEBRACES:
+									case SEMICOLON:
+									case COMMA:
+									case FORMFEED:
+									case TAB:
+									case SPACE:
+									case NEWLINE:
+									case CARRIAGE: {
+										break
+									}
+									default: {
+										// ignore in isolated contexts
+										if (context === 0) {
+											format = 1
+											char += '\0'
 										}
 									}
 								}
 							}
 						}
+					}
 
-						// concat buffer of characters
-						chars += char
+					// concat buffer of characters
+					chars += char
 
-						// previous non-whitespace character code
-						if (code !== SPACE && code !== TAB) {
-							peak = code
-						}
+					// previous non-whitespace character code
+					if (code !== SPACE && code !== TAB) {
+						peak = code
 					}
 				}
 			}
@@ -1474,6 +1447,33 @@
 				return out
 			}
 		}
+	}
+
+	/**
+	 * @param {number} type
+	 * @param {number} index
+	 * @param {number} length
+	 * @param {string} body
+	 * @return {number}
+	 */
+	function comment (type, index, length, body) {
+		var i = index
+
+		if (type !== FOWARDSLASH) {
+			for (; i < length; ++i) {
+				if (body.charCodeAt(i) === FOWARDSLASH && body.charCodeAt(i - 1) === STAR) {
+					return i + 1
+				}
+			}
+		} else {
+			for (; i < length; i++) {
+				if (body.charCodeAt(i) === NEWLINE) {
+					return i + 1
+				}
+			}
+		}
+
+		return i
 	}
 
 	/**

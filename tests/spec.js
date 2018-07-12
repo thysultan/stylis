@@ -1934,6 +1934,18 @@ var spec = {
 	'noop tail VII': {
 		sample: `h1{color:red/**}`,
 		expected: `.user h1{color:red;}`
+	},
+	'comments(context character I)': {
+		sample:`.a{color:red;/* } */}`,
+		expected:`.user .a{color:red;}`
+	},
+	'comments(context character II)': {
+		sample:`.a{color:red;/*}*/}`,
+		expected:`.user .a{color:red;}`
+	},
+	'comments(context character III)': {
+		sample:`.a{color:red;/*{*/}`,
+		expected:`.user .a{color:red;}`
 	}
 };
 
