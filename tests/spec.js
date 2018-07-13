@@ -1923,15 +1923,15 @@ var spec = {
 		sample: `color:red''`,
 		expected: `.user{color:red'';}`
 	},
-	'noop tail V': {
+	'noop tail VI': {
 		sample: `color:red""`,
 		expected: `.user{color:red"";}`
 	},
-	'noop tail VI': {
+	'noop tail VII': {
 		sample: `h1{color:rgb([`,
 		expected: `.user h1{color:rgb([;}`
 	},
-	'noop tail VII': {
+	'noop tail VIII': {
 		sample: `h1{color:red/**}`,
 		expected: `.user h1{color:red;}`
 	},
@@ -1946,6 +1946,26 @@ var spec = {
 	'comments(context character III)': {
 		sample:`.a{color:red;/*{*/}`,
 		expected:`.user .a{color:red;}`
+	},
+	'comments(context character IV)': {
+		sample:`.a{/**/color:red}`,
+		expected:`.user .a{color:red;}`
+	},
+	'comments(context character V)': {
+		sample:`.a{color:red;/*//color:blue;*/}`,
+		expected:`.user .a{color:red;}`
+	},
+	'comments(context character VI)': {
+		sample: `background: url("img}.png");.a {background: url("img}.png");}`,
+		expected: `.user{background:url("img}.png");}.user .a{background:url("img}.png");}`
+	},
+	'comments(context character VII)': {
+		sample: `background: url(img}.png);.a {background: url(img}.png);}`,
+		expected: `.user{background:url(img}.png);}.user .a{background:url(img}.png);}`
+	},
+	'comments(context character VIII)': {
+		sample: `background: url[img}.png];.a {background: url[img}.png];}`,
+		expected: `.user{background:url[img}.png];}.user .a{background:url[img}.png];}`
 	}
 };
 
