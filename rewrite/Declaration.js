@@ -1,4 +1,15 @@
-import {WEBKIT, MOZ, MS} from './Constant.js'
+const WEBKIT = '-webkit-'
+const MOZ = '-moz-'
+const MS = '-ms-'
+
+/**
+ * @param {string} value
+ * @param {number} length
+ * @return {number}
+ */
+export function hash (value, length) {
+	return (((((((length << 2)^value.charCodeAt(0)) << 2)^value.charCodeAt(1)) << 2)^value.charCodeAt(2)) << 2)^value.charCodeAt(3)
+}
 
 /**
  * @param {string} value
@@ -6,11 +17,11 @@ import {WEBKIT, MOZ, MS} from './Constant.js'
  * @param {number} priority
  * @return {string}
  */
-export function property (value, length, priority) {
-	// NOTE: simple fast inlined non-crpyto hashing function, tested on all css properties with no collisions.
-	// Uses the first 4 characters as the shortest css property is 3 characters long + a colon ":"
-	// TODO: remove note.
-	switch ((((((((length << 2)^value.charCodeAt(0)) << 2)^value.charCodeAt(1)) << 2)^value.charCodeAt(2)) << 2)^value.charCodeAt(3)) {
+export function declaration (value, length, priority) {
+	switch (hash(value, length)) {
+		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
+		case 5737: case 4201: case 3177: case 3433: case 3177: case 1641: case 4457: case 2921: case 1641:
+			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 4548: case 7380: case 7415: case 6868: case 4215: case 7669:
 			return (WEBKIT+value+';') + (value)
@@ -22,7 +33,7 @@ export function property (value, length, priority) {
 			return (WEBKIT+value+';') + (MS+'flex-'+value+';') + (value)
 		// align-items
 		case 6211:
-			return (WEBKIT+value+';') + (WEBKIT+'box-'+(temp = value.replace('-items', '')+';')) + (MS+'flex-'+temp) + (value)
+			return (WEBKIT+value+';') + (value.replace(/(\w+).+(:[^]+)/, (WEBKIT+'box-$1$2;')+(MS+'flex-$1$2'))+';') + (value)
 		// align-self
 		case 6467:
 			return (WEBKIT+value+';') + (MS+'flex-item-'+value.replace(/flex-|-self/, '')+';') + (value)
@@ -43,7 +54,7 @@ export function property (value, length, priority) {
 			return (value.replace(/([^-])(transform)/g, '$1'+WEBKIT+'$2')+';') + (value)
 		// background
 		case 6519:
-			return (value.replace(/([^-])(image-set\()/g, '$1'+WEBKIT+'$2')+';') + (value)
+			return (value.replace(/([^-])(image-set\()/, '$1'+WEBKIT+'$2')+';') + (value)
 		// cursor
 		case 7211:
 			return (value.replace(/(.*)(zoom-\w+|grab\w*)(.*)/, '$1'+WEBKIT+'$2$3;$1'+MOZ+'$2$3')+';') + (value)
@@ -72,13 +83,13 @@ export function property (value, length, priority) {
 				switch (value.charCodeAt(length+1)) {
 					// (m)ax-content, (m)in-content
 					case 109:
-						return value.replace(/(.+:)(\w+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$2-$3;')+'$1$2-$3')
+						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$2-$3;')+'$1$2-$3')
 					// (f)ill-available
 					case 102:
-						return value.replace(/(.+:)(\w+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
+						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
 					// (s)tretch
 					case 115:
-						return property(value.replace('stretch', 'fill-available'), length, priority).replace(':fill-available', ':stretch')
+						return declaration(value.replace('stretch', 'fill-available'), length, priority).replace(':fill-available', ':stretch')
 				}
 			break
 		// position: sticky
@@ -94,7 +105,7 @@ export function property (value, length, priority) {
 					return (value.replace(value, WEBKIT+value)+';') + (value)
 				// (inline-)?fl(e)x
 				case 101:
-					return value.replace(/(\w+:)([^!]+)(!\w+)?/,
+					return value.replace(/(.+:)([^!]+)(!.+)?/,
 						('$1'+WEBKIT+(value.charCodeAt(size+7) === 45 ? 'inline-' : '')+'box$3;') +
 						('$1'+WEBKIT+'$2$3;') +
 						('$1'+MS+'$2box$3;') +
@@ -103,15 +114,46 @@ export function property (value, length, priority) {
 			}
 			break
 		// justify-content
-		case 5992: // TODO
+		case 5992:
 			return (
-				(WEBKIT+'box-pack'+(string = value.slice(length).replace('flex-', '').replace('space-between', 'justify'))+';')+
-				(WEBKIT+value+';') +
-				(MS+'flex-pack'+string+';') +
-				(value) +
-				(string = '')
+				(value.replace(/(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;')+(MS+'flex-pack:$3')).replace(/s.+-b.+/, 'justify')+';')+
+			 	(WEBKIT+value+';') +
+			 	(value)
 			)
 	}
 
 	return value
+}
+
+/**
+ * @param {string} value
+ * @param {number} length
+ * @param {string} uuid
+ * @return {string}
+ */
+export function animation (value, length, uuid) {
+	// return value
+	switch (length) {
+		// animation, animation-name
+		case 9: case 14:
+			// split on comma seperated boundaries outside of function boundaries
+			value = value.slice(0, length+1) + value.slice(length+1).split(/,+\s*(?![^(]+\))/g).map(function (value) {
+				// split on space seperated boundaries outside of function boundaries
+				return value.split(/\s+(?![^(]+\))/g).map(function (value) {
+					// match valid animation identifiers: https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident
+					if (/(?:[^\d\s]\w+|-[^-]+)/.test(value))
+						// exclude known tokens
+						if (!/(back|for)wards|step-|in(herit|itial)|none|unset|all|normal|ease|alternate|reverse|\(/.test(value))
+							switch (value) {
+								case 'linear': case 'infinite': case 'running': case 'both': case 'paused':
+									break
+								default:
+									return value + uuid
+							}
+					return value
+				}).join(' ')
+			}).join(',')
+	}
+
+	return (WEBKIT+value+';') + (value)
 }

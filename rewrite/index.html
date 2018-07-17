@@ -1,0 +1,21 @@
+<script type=module>
+	import {iterator} from './Iterator.js'
+	import {compile, parse} from './Parse.js'
+	import {stringify} from './Stringify.js'
+	import {proxy} from './Proxy.js'
+	import {selector} from './Selector.js'
+	import {declaration} from './Declaration.js'
+
+	const stylis = {iterator, compile, parse, stringify, proxy, selector, declaration}
+
+console.log(stylis.compile(`
+	h1 {
+		h2 {
+			animation:name 1s ease-in-out calc (1) name  1s ease-in-out;
+		}
+	}
+`))
+</script>
+<body>
+	<style style="display:block" contenteditable>body{}</style>
+</body>

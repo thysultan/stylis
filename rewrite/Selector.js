@@ -5,7 +5,7 @@
  * @param {number} priority
  * @return {Array}
  */
-export function scope (value, stack, breakpoint, priority) {
+export function selector (value, stack, breakpoint, priority) {
 	// TODO
 	if (breakpoint > 0)
 		return stack[breakpoint-1].map((str) => str + ' ' + value.join(','))

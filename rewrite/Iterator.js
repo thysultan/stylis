@@ -1,14 +1,26 @@
 const {fromCharCode} = String
 
-function iterator (value) {
-	var caret = 0, line = 0, column = 0, code = 0
-
-	return {
-		read: fromCharCode,
-  	next: function next () {
-  		if (++column, code = value.charCodeAt(caret++) === 10)
-  			++line, column = 0
-			return code
-  	}
+/**
+ * @return {number}
+ */
+function next () {
+	switch (++this.column, this.char = this.value.charCodeAt(this.caret++)) {
+		case 10: ++this.line, this.column = 1
+		default: return this.char
 	}
+}
+
+/**
+ * @return {number}
+ */
+function peek () {
+	return this.value.charCodeAt(this.caret)
+}
+
+/**
+ * @param {string} value
+ * @return {object}
+ */
+export function iterator (value) {
+	return {char: 0, line: 1, column: 1, caret: 0, value: value, next: next, peek: peek, read: fromCharCode}
 }
