@@ -1,21 +1,36 @@
 <script type=module>
 	import {iterator} from './Iterator.js'
-	import {compile, parse} from './Parse.js'
-	import {stringify} from './Stringify.js'
-	import {proxy} from './Proxy.js'
+	import {compile, generate, parse} from './Parse.js'
 	import {selector} from './Selector.js'
 	import {declaration} from './Declaration.js'
 
-	const stylis = {iterator, compile, parse, stringify, proxy, selector, declaration}
+	const stylis = {iterator, compile, generate, parse, selector, declaration}
 
-console.log(stylis.compile(`
-	h1 {
-		h2 {
-			animation:name 1s ease-in-out calc (1) name  1s ease-in-out;
-		}
+let sample
+
+sample = `
+h1{
+	animation:name 1s ease,name 1s ease;
+}
+h1,h2{
+	&,h1-&{
+		color:red;
 	}
-`))
+}
+
+div {
+	:hover {
+		color:red;
+	}
+}
+`
+// sample = `
+// animation:name 1s ease-in-out, name  1s ease , name  1s ease;
+// `
+console.log(stylis.compile(['body'], sample))
 </script>
 <body>
-	<style style="display:block" contenteditable>body{}</style>
+	<style style="display:block" contenteditable>
+	body{}
+</style>
 </body>

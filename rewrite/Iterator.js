@@ -3,7 +3,7 @@ const {fromCharCode} = String
 /**
  * @return {number}
  */
-function next () {
+export function next () {
 	switch (++this.column, this.char = this.value.charCodeAt(this.caret++)) {
 		case 10: ++this.line, this.column = 1
 		default: return this.char
@@ -13,7 +13,7 @@ function next () {
 /**
  * @return {number}
  */
-function peek () {
+export function peek () {
 	return this.value.charCodeAt(this.caret)
 }
 
