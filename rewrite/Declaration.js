@@ -1,6 +1,6 @@
-const WEBKIT = '-webkit-'
-const MOZ = '-moz-'
-const MS = '-ms-'
+var WEBKIT = '-webkit-'
+var MOZ = '-moz-'
+var MS = '-ms-'
 
 /**
  * @param {string} value

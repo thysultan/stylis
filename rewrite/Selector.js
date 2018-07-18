@@ -1,20 +1,20 @@
 /**
  * @param {string} value
- * @param {Array<number>} current
- * @param {Array<string>} elements
- * @param {Array<string>} parents
+ * @param {Array<number>} position
+ * @param {Array<string>} ancestor
  * @param {number} length
  * @param {number} ampersand
+ * @param {number} priority
  * @return {Array<string>}
  */
-export function selector (value, current, elements, parents, length, ampersand) {
+export function selector (value, position, ancestor, length, ampersand, priority) {
 	// for each element breakpoint extract element
-	for (var i = 0, j = 0, k = -1, x = value, y = 0; i < length; ++i)
+	for (var i = 0, j = 0, k = -1, x = value, y = 0, z = ['']; i < length; ++i)
 		// for each parent prepend to element
-		for (x = value.slice(k + 1, k = current[i]), y = 0; y < parents.length; ++y)
-			elements[j++] = scope(x, parents[y], ampersand)
+		for (x = value.slice(k + 1, k = position[i]), y = 0; y < ancestor.length; ++y)
+			z[j++] = scope(x, ancestor[y], ampersand)
 
-	return elements
+	return z
 }
 
 /**

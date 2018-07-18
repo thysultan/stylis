@@ -1,12 +1,14 @@
-const {fromCharCode} = String
-
 /**
  * @return {number}
  */
 export function next () {
-	switch (++this.column, this.char = this.value.charCodeAt(this.caret++)) {
-		case 10: ++this.line, this.column = 1
-		default: return this.char
+	var code = this.value.charCodeAt(this.index++)
+
+	switch (++this.column, code) {
+		case 10:
+			++this.line, this.column = 1
+		default:
+			return code
 	}
 }
 
@@ -14,7 +16,23 @@ export function next () {
  * @return {number}
  */
 export function peek () {
-	return this.value.charCodeAt(this.caret)
+	return this.value.charCodeAt(this.index)
+}
+
+/**
+ * @return {number}
+ */
+export function caret () {
+	return this.index
+}
+
+/**
+ * @param {number} begin
+ * @param {number} end
+ * @return {string}
+ */
+export function slice (begin, end) {
+	return this.value.substring(begin, this.index)
 }
 
 /**
@@ -22,5 +40,5 @@ export function peek () {
  * @return {object}
  */
 export function iterator (value) {
-	return {char: 0, line: 1, column: 1, caret: 0, value: value, next: next, peek: peek, read: fromCharCode}
+	return {index: 0, line: 1, column: 1, value: value, next: next, peek: peek, caret: caret, slice: slice}
 }

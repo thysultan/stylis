@@ -1,8 +1,3 @@
-export const DECLARATION = 0
-export const SELECTOR = 1
-export const ELEMENT = 2
-export const RULESET = 3
-
 /**
  * @param {number} char
  * @return {boolean}
@@ -29,30 +24,29 @@ export function token (char) {
  * @return {string}
  */
 export function compile (root, value) {
-	return this.parse([root], 0, this.iterator(value))
+	return this.parse([root], [0], 0, this.iterator(value))
 }
 
 /**
- * @param {Array<string>} current
+ * @param {Array<string>} selector
  * @param {Array<string>} ruleset
  * @param {Array<string>} sibling
  */
-export function generate (current, ruleset, sibling) {
-	return (ruleset.length ? current.join(',')+'{'+ruleset.join(';')+'}' : '') + sibling.join('')
+export function generate (selector, ruleset, sibling) {
+	return (ruleset.length ? selector.join(',') + '{'+ruleset.join(';') + '}' : '') + sibling.join('')
 }
 
 /**
  * @param {Array<string>} cascade
+ * @param {Array<number>} position
  * @param {number} size
  * @param {object} iterator
  * @return {string}
  */
-export function parse (cascade, size, iterator) {
-	var current = [0]
+export function parse (cascade, position, size, iterator) {
 	var ruleset = []
 	var sibling = []
 	var value = ''
-
 	var breakpoint = 0
 	var ampersand = 0
 	var priority = 0
@@ -102,40 +96,47 @@ export function parse (cascade, size, iterator) {
 				case 40: char++
 				// " '
 				case 34: case 39:
-					caret = iterator.caret
+					caret = iterator.caret()
 
 					while (next = iterator.next())
 						if (next === char)
 							break
 
-					value += iterator.value.substring(caret - 1, iterator.caret)
+					value += iterator.slice(caret - 1, iterator.caret())
 					break
 				// }
 				case 125:
 					break outer
 				// {
 				case 123:
-					current[length++] = value.length
+					position[length++] = value.length
 				// ;
 				case 59:
-					switch (char) {
+					switch (char + atrule) {
 						// ;
 						case 59:
 							ruleset.push(this.declaration(value, breakpoint, priority))
 							break
 						// {
 						case 123:
-							cascade.push(this.selector(value, current, [''], cascade[size], length, ampersand))
-							sibling.push(this.parse(cascade, size + 1, iterator))
+							cascade.push(this.selector(value, position, cascade[size], length, ampersand, priority))
+							sibling.push(this.parse(cascade, position, size + 1, iterator))
+							break
+						// @i
+						case 164:
+							sibling.push(this.group(atrule, value))
+							break
+						// @m
+						case 168:
 							break
 					}
 					value = '', ampersand = priority = atrule = length = 0
 					break
 				// ,
 				case 44:
-					current[length++] = value.length
+					position[length++] = value.length
 				default:
-					switch (value += iterator.read(char), char) {
+					switch (value += String.fromCharCode(char), char) {
 						// &
 						case 38:
 							ampersand = value.length - 1
