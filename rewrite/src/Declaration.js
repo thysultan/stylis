@@ -1,27 +1,34 @@
-var WEBKIT = '-webkit-'
-var MOZ = '-moz-'
-var MS = '-ms-'
+import {codeof, sizeof, hashof} from './Utility.js'
+
+export const WEBKIT = '-webkit-'
+export const MOZ = '-moz-'
+export const MS = '-ms-'
 
 /**
  * @param {string} value
  * @param {number} length
- * @return {number}
+ * @param {number} priority
+ * @param {string} uuid
+ * @param {*} state
+ * @return {string}
  */
-export function hash (value, length) {
-	return (((((((length << 2) ^ value.charCodeAt(0)) << 2) ^ value.charCodeAt(1)) << 2) ^ value.charCodeAt(2)) << 2) ^ value.charCodeAt(3)
+export function declaration (value, length, priority, uuid, state) {
+	return vendor(value, length, priority, uuid, state)
 }
 
 /**
  * @param {string} value
  * @param {number} length
  * @param {number} priority
+ * @param {string} uuid
+ * @param {string} state
  * @return {string}
  */
-export function declaration (value, length, priority) {
-	switch (hash(value, length)) {
+export function vendor (value, length, priority, uuid, state) {
+	switch (hashof(value, length, 4)) {
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
-		case 5737: case 4201: case 3177: case 3433: case 3177: case 1641: case 4457: case 2921: case 1641:
-			return animation(value, length, '')
+		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
+			return animation(value, length, priority, uuid, state)
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 4548: case 7380: case 7415: case 6868: case 4215: case 7669:
 			return (WEBKIT+value+';') + (value)
@@ -61,8 +68,8 @@ export function declaration (value, length, priority) {
 		// writing-mode
 		case 4912:
 			// vertical-lr, vertical-rl, horizontal-tb
-			if (value.length > 10)
-				switch (value.charCodeAt(length + 10)) {
+			if (sizeof(value) > 10)
+				switch (codeof(value, length + 10)) {
 					// vertical-l(r)
 					case 114:
 						return (WEBKIT+value+';') + (MS+value.replace(/[svh]\w+-[tblr]{2}/, 'tb')+';') + value
@@ -79,8 +86,8 @@ export function declaration (value, length, priority) {
 		case 5445: case 5701: case 4933: case 4677:
 		case 5533: case 5789: case 5021: case 4765:
 			// stretch, max-content, min-content, fill-available
-			if (value.length - length > 6)
-				switch (value.charCodeAt(length + 1)) {
+			if (sizeof(value) - length > 6)
+				switch (codeof(value, length + 1)) {
 					// (m)ax-content, (m)in-content
 					case 109:
 						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$2-$3;')+'$1$2-$3')
@@ -89,24 +96,24 @@ export function declaration (value, length, priority) {
 						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
 					// (s)tretch
 					case 115:
-						return declaration(value.replace('stretch', 'fill-available'), length, priority).replace(':fill-available', ':stretch')
+						return vendor(value.replace('stretch', 'fill-available'), length, priority, uuid, state).replace(':fill-available', ':stretch')
 				}
 			break
 		// position: sticky
 		case 8021:
 			// (s)ticky?
-			if (value.charCodeAt(length + 1) !== 115)
+			if (codeof(value, length + 1) !== 115)
 				break
 		// display: (flex|inline-flex|inline-box)
 		case 7468:
-			switch (value.charCodeAt(value.length - 2 - (property && 10))) {
+			switch (codeof(value, sizeof(value) - 2 - (priority && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
 					return (value.replace(value, WEBKIT+value)+';') + (value)
 				// (inline-)?fl(e)x
 				case 101:
 					return value.replace(/(.+:)([^!]+)(!.+)?/,
-						('$1'+WEBKIT+(value.charCodeAt(size + 7) === 45 ? 'inline-' : '')+'box$3;') +
+						('$1'+WEBKIT+(codeof(value, size + 7)  === 45 ? 'inline-' : '')+'box$3;') +
 						('$1'+WEBKIT+'$2$3;') +
 						('$1'+MS+'$2box$3;') +
 						('$1$2$3')
@@ -128,10 +135,12 @@ export function declaration (value, length, priority) {
 /**
  * @param {string} value
  * @param {number} length
+ * @param {number} priority
  * @param {string} uuid
+ * @param {string} state
  * @return {string}
  */
-export function animation (value, length, uuid) {
+export function animation (value, length, priority, uuid, state) {
 	if (uuid)
 		switch (length) {
 			// animation, animation-name

@@ -1,34 +1,116 @@
+<body>
+<style style="display:block;font:13px/1.8 Monaco,Mono-Space;padding:20;white-space:pre;" contenteditable></style>
+<style>
+	p {
+	  page-break-after: always;
+	}
+</style>
 <script type=module>
-	import {iterator} from './Iterator.js'
-	import {compile, generate, parse} from './Parse.js'
-	import {group} from './Group.js'
-	import {selector} from './Selector.js'
-	import {declaration} from './Declaration.js'
-
-	const stylis = {iterator, compile, generate, parse, group, selector, declaration}
+import stylis, {iterator, ruleset, statement, selector, declaration} from './stylis.js'
 
 let sample
 
 sample = `
 @import url();
-h1,h2{
-	&,h1-&{
+@charset "utf-8";
+@namespace svg url();
+
+@keyframes slidein {
+	100: {
+		color:red;
+		width:0;
+	}
+}
+
+@font-face {
+  font-family: none;
+}
+
+@viewport {
+  width: device-width;
+}
+
+@counter-style thumbs {
+  system: cyclic;
+}
+
+@font-feature-values Font One {
+  @styleset {
+    nice-style: 12;
+  }
+}
+
+@media () {
+	media {
 		color:red;
 	}
 }
-div {
-	:hover {
+
+@supports {
+	support {
+		color:red;
+	}
+}
+
+@page {
+  margin: 1cm;
+}
+
+@page {
+  @top-left {
+    font-size: 11px;
+  }
+}
+`
+// sample = `
+// @font-face { y: z; }
+// @viewport { y: z; }
+// @counter-style x { y: z; }
+// `
+
+// sample = `
+// @page {
+// 	y:z;
+//   @top-left { y: z; }
+// }
+// `
+
+sample = `
+@media () {
+	y: z;
+}
+@supports () {
+	y: z;
+}
+@document () {
+	y: z;
+}
+h1 {
+	h2 {
 		color:red;
 	}
 }
 `
 // sample = `
-// animation:name 1s ease-in-out, name  1s ease , name  1s ease;
+// @keyframes {
+// 	x { y: z; }
+// }
 // `
-console.log(stylis.compile(['body'], sample))
+
+// sample = `
+// @font-feature-values Font One {
+//   @styleset {
+//     nice-style: 12;
+//   }
+// }
+// `
+sample = `
+h1-&, h2 {
+	color:red;
+}
+`
+
+let result = stylis({iterator, ruleset, statement, selector, declaration}, ['body'], sample, '', {})
+
+console.log(document.querySelector('style').textContent = result)
 </script>
-<body>
-	<style style="display:block" contenteditable>
-	body{}
-</style>
-</body>
