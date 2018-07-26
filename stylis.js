@@ -821,6 +821,10 @@
 								}
 								case TAB:
 								case SPACE: {
+									// check for "::placeholder" after space and don't remove the space
+									if (body.charCodeAt(caret+1) === COLON && body.charCodeAt(caret+2) === COLON && body.charCodeAt(caret+3) === PLACEHOLDER) {
+										break
+									}
 									switch (tail) {
 										case NULL:
 										case OPENBRACES:
