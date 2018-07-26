@@ -1966,6 +1966,11 @@ var spec = {
 	'comments(context character VIII)': {
 		sample: `background: url[img}.png];.a {background: url[img}.png];}`,
 		expected: `.user{background:url[img}.png];}.user .a{background:url[img}.png];}`
+	},
+	'comments(bang at start)': {
+		selector: '',
+		sample: `/*! test */\nbody { color: red; }`,
+		expected: `body{color:red;}`
 	}
 };
 
