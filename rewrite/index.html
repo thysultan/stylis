@@ -1,10 +1,5 @@
 <body>
 <style style="display:block;font:13px/1.8 Monaco,Mono-Space;padding:20;white-space:pre;" contenteditable></style>
-<style>
-	p {
-	  page-break-after: always;
-	}
-</style>
 <script type=module>
 import stylis, {iterator, ruleset, statement, selector, declaration} from './stylis.js'
 
@@ -110,7 +105,16 @@ h1-&, h2 {
 }
 `
 
+sample = `
+background:\fred;
+`
+
 let result = stylis({iterator, ruleset, statement, selector, declaration}, ['body'], sample, '', {})
 
 console.log(document.querySelector('style').textContent = result)
+// document.querySelector('style').textContent = `
+// body {
+// 	background:\fred;
+// }`
+
 </script>

@@ -1,4 +1,4 @@
-import {charof} from './Utility.js'
+import {codeof} from './Utility.js'
 
 /**
  * @param {string} value
@@ -14,7 +14,7 @@ export function iterator (value, uuid, state) {
  * @return {number}
  */
 export function next () {
-	var code = charof(this.value, this.index++)
+	var code = codeof(this.value, this.index++)
 
 	if (++this.column, code === 10)
 		++this.line, this.column = 1
@@ -26,7 +26,7 @@ export function next () {
  * @return {number}
  */
 export function peek () {
-	return charof(this.value, this.index)
+	return codeof(this.value, this.index)
 }
 
 /**
@@ -42,5 +42,5 @@ export function caret () {
  * @return {string}
  */
 export function slice (begin, end) {
-	return this.value.slice(begin, this.index)
+	return this.value.slice(begin, end)
 }

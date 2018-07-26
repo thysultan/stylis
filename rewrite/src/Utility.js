@@ -37,9 +37,10 @@ export function hashof (value, seed, length) {
  */
 export function tokenof (char) {
 	switch (char) {
-		// \0 \t \n \s { } ; : , [ ( " ' ! @ /
-		case 0: case 9: case 10: case 32: case 123: case 125: case 59: case 58:
-		case 44: case 91: case 40: case 34: case 39: case 33: case 64: case 47:
+		// \0 \t \s \n \r \v \f
+		case 0: case 9: case 32: case 10: case 13: case 11: case 12:
+		// { } ; : , [ ( " ' ! @ /
+		case 123: case 125: case 59: case 58: case 44: case 91: case 40: case 34: case 39: case 33: case 64: case 47:
 			return 1
 	}
 

@@ -9,5 +9,5 @@ import {parse} from './Parse.js'
  * @return {string}
  */
 export function compile (instance, root, value, uuid, state) {
-	return parse(instance, instance.iterator(value, state), [0], [root], 0, 0, uuid || '', state || {})
+	return parse(instance, instance.iterator(value, uuid, state), [0], [root], 0, 0, uuid || '', state || {})
 }

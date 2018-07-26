@@ -6,7 +6,7 @@ import {absof, charof, sizeof, hashof, tokenof} from './Utility.js'
  * @param {Array<number>} position
  * @param {Array<string>} stack
  * @param {number} index
- * @param {number} type
+ * @param {number} atrule
  * @param {string} uuid
  * @param {*} state
  * @return {string}
@@ -20,6 +20,7 @@ export function parse (that, iterator, points, stack, index, atrule, uuid, state
 	var value = ''
 
 	var symbol = 0
+	var dynamic = 0
 	var breakpoint = 0
 	var priority = 0
 	var ampersand = 1
@@ -81,6 +82,10 @@ export function parse (that, iterator, points, stack, index, atrule, uuid, state
 
 					value += iterator.slice(caret - 1, iterator.caret())
 					break
+				// \f
+				case 12:
+					dynamic = sizeof(value) - 1
+					break
 				// }
 				case 125:
 					break outer
@@ -92,7 +97,7 @@ export function parse (that, iterator, points, stack, index, atrule, uuid, state
 					switch (code + symbol) {
 						// ;
 						case 59:
-							children += declare(that, value, breakpoint, priority, uuid, state)
+							children += (value = declare(that, value, breakpoint, priority, dynamic, uuid, state)) && value + ';'
 							break
 						// {
 						case 123:
@@ -115,7 +120,7 @@ export function parse (that, iterator, points, stack, index, atrule, uuid, state
 							sibling += value + '{' + parse(that, iterator, points, current, index, symbol, uuid, state) + '}'
 					}
 
-					value = '', ampersand = 1, symbol = breakpoint = priority = length = 0
+					value = '', ampersand = 1, symbol = dynamic = breakpoint = priority = length = 0
 					break
 				// ,
 				case 44:
@@ -166,7 +171,7 @@ export function parse (that, iterator, points, stack, index, atrule, uuid, state
  * @return {string}
  */
 export function declare (that, value, breakpoint, priority, uuid, state) {
-	return that.declaration(value, breakpoint, priority, uuid, state) + ';'
+	return that.declaration(value, breakpoint, priority, uuid, state)
 }
 
 /**
@@ -190,16 +195,5 @@ export function select (that, value, current, points, parents, length, uuid, sta
 	return current
 }
 
-/**
- * @param {object} that
- * @param {number} type
- * @param {string} value
- * @param {string} children
- * @param {number} atrule
- * @param {string} uuid
- * @param {*} state
- * @return {string}
- */
 export function group () {
-	// return that.statement(value, children, atrule, uuid, state)
 }

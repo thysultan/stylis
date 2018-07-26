@@ -12,7 +12,12 @@ export const MS = '-ms-'
  * @param {*} state
  * @return {string}
  */
-export function declaration (value, length, priority, uuid, state) {
+export function declaration (value, length, priority, dynamic, uuid, state) {
+	if (dynamic) {
+		console.log(dynamic, value, value.slice(dynamic))
+		// return ''
+	}
+
 	return vendor(value, length, priority, uuid, state)
 }
 
