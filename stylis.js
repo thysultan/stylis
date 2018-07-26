@@ -822,7 +822,7 @@
 								case TAB:
 								case SPACE: {
 									// check for "::placeholder" after space and don't remove the space
-									if (body.charCodeAt(caret+1) === COLON && body.charCodeAt(caret+2) === COLON && body.charCodeAt(caret+3) === PLACEHOLDER) {
+									if (body.charCodeAt(caret+1) === COLON && body.substr(caret+3, 15).match(/^(-webkit-input-|-moz-|ms-input-)?p.*/)) {
 										break
 									}
 									switch (tail) {

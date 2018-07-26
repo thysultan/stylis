@@ -1978,6 +1978,24 @@ var spec = {
 				opacity: 0; }
 		`,
 		expected: '.Test--Input ::-webkit-input-placeholder{opacity:0;}.Test--Input ::-moz-placeholder{opacity:0;}.Test--Input :-ms-input-placeholder{opacity:0;}.Test--Input ::placeholder{opacity:0;}'
+	},
+	'retain pre-prefixed placeholder whitespace with cascade false': {
+		options: {
+			cascade: false,
+			prefix: false,
+		},
+		selector: '',
+		sample: `
+			.Test--Input ::-webkit-input-placeholder {
+				opacity: 0; }
+			.Test--Input ::-moz-placeholder {
+				opacity: 0; }
+			.Test--Input :-ms-input-placeholder {
+				opacity: 0; }
+			.Test--Input ::placeholder {
+				opacity: 0; }
+		`,
+		expected: '.Test--Input ::-webkit-input-placeholder{opacity:0;}.Test--Input ::-moz-placeholder{opacity:0;}.Test--Input :-ms-input-placeholder{opacity:0;}.Test--Input ::placeholder{opacity:0;}'
 	}
 };
 
