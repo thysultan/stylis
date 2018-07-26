@@ -1966,6 +1966,18 @@ var spec = {
 	'comments(context character VIII)': {
 		sample: `background: url[img}.png];.a {background: url[img}.png];}`,
 		expected: `.user{background:url[img}.png];}.user .a{background:url[img}.png];}`
+	},
+	'retain placeholder whitespace with cascade false': {
+		options: {
+			cascade: false,
+			prefix: true,
+		},
+		selector: '',
+		sample: `
+			.Test--Input ::placeholder {
+				opacity: 0; }
+		`,
+		expected: '.Test--Input ::-webkit-input-placeholder{opacity:0;}.Test--Input ::-moz-placeholder{opacity:0;}.Test--Input :-ms-input-placeholder{opacity:0;}.Test--Input ::placeholder{opacity:0;}'
 	}
 };
 
