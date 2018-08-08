@@ -1,42 +1,51 @@
-import {codeof, sizeof, hashof} from './Utility.js'
-
-export const WEBKIT = '-webkit-'
-export const MOZ = '-moz-'
-export const MS = '-ms-'
+import {WEBKIT, MOZ, MS} from '../Constant.js'
+import {hash, strlen, charat, slice} from '../Utility.js'
 
 /**
  * @param {string} value
  * @param {number} length
- * @param {number} priority
- * @param {string} uuid
- * @param {*} state
  * @return {string}
  */
-export function declaration (value, length, priority, dynamic, uuid, state) {
-	if (dynamic) {
-		console.log(dynamic, value, value.slice(dynamic))
-		// return ''
-	}
+export function animation (value, length, uuid) {
+	if (uuid)
+		switch (length) {
+			// animation, animation-name
+			case 9: case 14:
+				// split on comma seperated boundaries outside of function boundaries
+				value = slice(value, 0, length + 1) + slice(value, length + 1, strlen(value)).split(/,+\s*(?![^(]+\))/g).map(function (value) {
+					// split on space seperated boundaries outside of function boundaries
+					return value.split(/\s+(?![^(]+\))/g).map(function (value) {
+						// match valid animation identifiers: https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident
+						if (/(?:[^\d\s]\w+|-[^-]+)/.test(value))
+							// exclude known tokens
+							if (!/(back|for)wards|step-|in(herit|itial)|none|unset|all|normal|ease|alternate|reverse|\(/.test(value))
+								switch (value) {
+									case 'linear': case 'infinite': case 'running': case 'both': case 'paused':
+										break
+									default:
+										return value + uuid
+								}
+						return value
+					}).join(' ')
+				}).join(',')
+		}
 
-	return vendor(value, length, priority, uuid, state)
+	return (WEBKIT+value+';') + (value)
 }
 
 /**
  * @param {string} value
  * @param {number} length
- * @param {number} priority
- * @param {string} uuid
- * @param {string} state
  * @return {string}
  */
-export function vendor (value, length, priority, uuid, state) {
-	switch (hashof(value, length, 4)) {
+export function vendor (value, length) {
+	switch (hash(value, 4, length)) {
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
-			return animation(value, length, priority, uuid, state)
+			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 4548: case 7380: case 7415: case 6868: case 4215: case 7669:
-			return (WEBKIT+value+';') + (value)
+			return [] (WEBKIT+value+';') + (value)
 		// box-decoration-break, appearance, user-select, flex, transform, hyphens
 		case 4029: case 6373: case 7318: case 7852: case 7882: case 7992:
 			return (WEBKIT+value+';') + (MOZ+value+';') + (MS+value+';') + (value)
@@ -73,8 +82,8 @@ export function vendor (value, length, priority, uuid, state) {
 		// writing-mode
 		case 4912:
 			// vertical-lr, vertical-rl, horizontal-tb
-			if (sizeof(value) > 10)
-				switch (codeof(value, length + 10)) {
+			if (strlen(value) > 10)
+				switch (charat(value, length + 10)) {
 					// vertical-l(r)
 					case 114:
 						return (WEBKIT+value+';') + (MS+value.replace(/[svh]\w+-[tblr]{2}/, 'tb')+';') + value
@@ -91,8 +100,8 @@ export function vendor (value, length, priority, uuid, state) {
 		case 5445: case 5701: case 4933: case 4677:
 		case 5533: case 5789: case 5021: case 4765:
 			// stretch, max-content, min-content, fill-available
-			if (sizeof(value) - length > 6)
-				switch (codeof(value, length + 1)) {
+			if (strlen(value) - length > 6)
+				switch (charat(value, length + 1)) {
 					// (m)ax-content, (m)in-content
 					case 109:
 						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$2-$3;')+'$1$2-$3')
@@ -101,24 +110,24 @@ export function vendor (value, length, priority, uuid, state) {
 						return value.replace(/(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
 					// (s)tretch
 					case 115:
-						return vendor(value.replace('stretch', 'fill-available'), length, priority, uuid, state).replace(':fill-available', ':stretch')
+						return vendor(value.replace('stretch', 'fill-available'), length).replace(':fill-available', ':stretch')
 				}
 			break
 		// position: sticky
 		case 8021:
 			// (s)ticky?
-			if (codeof(value, length + 1) !== 115)
+			if (charat(value, length + 1) !== 115)
 				break
 		// display: (flex|inline-flex|inline-box)
 		case 7468:
-			switch (codeof(value, sizeof(value) - 2 - (priority && 10))) {
+			switch (charat(value, strlen(value) - 2 - (value.indexOf('!important') && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
 					return (value.replace(value, WEBKIT+value)+';') + (value)
 				// (inline-)?fl(e)x
 				case 101:
 					return value.replace(/(.+:)([^!]+)(!.+)?/,
-						('$1'+WEBKIT+(codeof(value, size + 7)  === 45 ? 'inline-' : '')+'box$3;') +
+						('$1'+WEBKIT+(charat(value, size + 7)  === 45 ? 'inline-' : '')+'box$3;') +
 						('$1'+WEBKIT+'$2$3;') +
 						('$1'+MS+'$2box$3;') +
 						('$1$2$3')
@@ -137,37 +146,4 @@ export function vendor (value, length, priority, uuid, state) {
 	return value
 }
 
-/**
- * @param {string} value
- * @param {number} length
- * @param {number} priority
- * @param {string} uuid
- * @param {string} state
- * @return {string}
- */
-export function animation (value, length, priority, uuid, state) {
-	if (uuid)
-		switch (length) {
-			// animation, animation-name
-			case 9: case 14:
-				// split on comma seperated boundaries outside of function boundaries
-				value = value.slice(0, length + 1) + value.slice(length + 1).split(/,+\s*(?![^(]+\))/g).map(function (value) {
-					// split on space seperated boundaries outside of function boundaries
-					return value.split(/\s+(?![^(]+\))/g).map(function (value) {
-						// match valid animation identifiers: https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident
-						if (/(?:[^\d\s]\w+|-[^-]+)/.test(value))
-							// exclude known tokens
-							if (!/(back|for)wards|step-|in(herit|itial)|none|unset|all|normal|ease|alternate|reverse|\(/.test(value))
-								switch (value) {
-									case 'linear': case 'infinite': case 'running': case 'both': case 'paused':
-										break
-									default:
-										return value + uuid
-								}
-						return value
-					}).join(' ')
-				}).join(',')
-		}
 
-	return (WEBKIT+value+';') + (value)
-}

@@ -3,7 +3,7 @@
 		typeof define === 'function' && define['amd'] ? define(factory()) :
 			(window['stylisCustomProperties'] = factory())
 }(function () {
-	
+
 	'use strict'
 
 	var store = null
@@ -29,14 +29,13 @@
 					// collect custom properties
 					var index = content.indexOf(':')
 					var name = content.substring(0, index)
-					var value = content.substring(index+1).trim()
-
-					return (store[name] = value, '')
+					var value = content.substring(index + 1).trim()
+					store[name] = value
+					return content
 				} else if (content.indexOf('var(') > 0) {
 					// replace custom properties
-					return content.replace(/var\((.*)\)/g, replace)
+					return content.replace(/var\((.*)\)/g, replace) + ';' + content
 				}
-
 				break
 			}
 		}

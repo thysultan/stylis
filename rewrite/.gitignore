@@ -1,0 +1,16 @@
+.DS_Store
+Thumbs.db
+Desktop.ini
+node_modules
+npm-debug.log
+*~
+*.pyc
+*.sublime-project
+*.sublime-workspace
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+coverage
+package-lock.json
