@@ -1,0 +1,37 @@
+{
+  "name": "stylis",
+  "description": "light - weight css preprocessor",
+  "version": "4.0.0",
+  "homepage": "https://github.com/thysultan/stylis.js",
+  "license": "MIT",
+  "author": {
+    "name": "Sultan Tarimo",
+    "email": "sultantarimo@me.com"
+  },
+  "keywords": [
+    "css",
+    "preprocessor"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thysultan/stylis.js"
+  },
+  "bugs": {
+    "url": "https://github.com/thysultan/stylis.js/issues"
+  },
+  "main": "index.js",
+  "unpkg": "",
+  "jsdelivr": "",
+  "types": "",
+  "module": "index.js",
+  "files": [],
+  "devDependencies": {
+    "rollup": "^0.64.1"
+  },
+  "scripts": {
+    "prepublish": "npm run build",
+    "pretest": "npm run build",
+    "build": "rollup --config ./scripts/build.config.js",
+    "start": "rollup --config ./scripts/build.config.js --watch"
+  }
+}
