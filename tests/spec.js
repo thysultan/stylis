@@ -529,6 +529,17 @@ var spec = {
 		`background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAABCAIAAADsEU8HAAAACXBIW`+
 		`XMAAAsTAAALEwEAmpwYAAAAIklEQVQI12P8//8/Aw4wbdq0rKysAZG1trbGJXv06FH8sgDIJBbBfp+hFAAAAABJRU5ErkJggg==");}`
 	},
+	'urls with nesting': {
+		sample:
+			`.level-1 { `+
+			`  background: url(http://url.com/in-level-1); `+
+			`  .level-2 { background: url(http://url.com/in-level-2); }`+
+			`}`+
+			`.also-level-1 { background: url(http://url.com/again-in-level-1); }`,
+		expected: `.user .level-1{background:url(http://url.com/in-level-1);}`+
+		`.user .level-1 .level-2{background:url(http://url.com/in-level-2);}`+
+		`.user .also-level-1{background:url(http://url.com/again-in-level-1);}`
+	},
 	'last semicolon omission': {
 		sample: `
 			.content {
