@@ -1566,20 +1566,14 @@
 				break
 			}
 			default: {
-				switch (plugin.constructor) {
-					case Array: {
-						for (var i = 0, length = plugin.length; i < length; ++i) {
-							use(plugin[i])
-						}
-						break
+				if (Object.prototype.toString.call(plugin) === '[object Array]') {
+					for (var i = 0, length = plugin.length; i < length; ++i) {
+						use(plugin[i])
 					}
-					case Function: {
-						plugins[plugged++] = plugin
-						break
-					}
-					case Boolean: {
-						unkwn = !!plugin|0
-					}
+				} else if (typeof plugin === 'function') {
+					plugins[plugged++] = plugin
+				} else if (plugin === true || plugin === false || plugin instanceof Boolean) {
+					unkwn = !!plugin|0
 				}
 			}
  		}
