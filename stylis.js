@@ -1566,13 +1566,13 @@
 				break
 			}
 			default: {
-				if (Object.prototype.toString.call(plugin) === '[object Array]') {
+				if (typeof plugin === 'function') {
+					plugins[plugged++] = plugin
+				}	else if (typeof plugin === 'object' && plugin.length > -1) {
 					for (var i = 0, length = plugin.length; i < length; ++i) {
 						use(plugin[i])
 					}
-				} else if (typeof plugin === 'function') {
-					plugins[plugged++] = plugin
-				} else if (plugin === true || plugin === false || plugin instanceof Boolean) {
+				} else {
 					unkwn = !!plugin|0
 				}
 			}
