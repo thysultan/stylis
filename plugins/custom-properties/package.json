@@ -2,7 +2,7 @@
 	"name": "stylis-custom-properties",
 	"main": "index.js",
 	"description": "stylis plugin for custom properties",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {
@@ -30,6 +30,6 @@
 		"stylis": "3.x"
 	},
 	"peerDependencies": {
-    "stylis": "3.x"
-  }
+		"stylis": "3.x"
+	}
 }

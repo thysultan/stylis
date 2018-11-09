@@ -1,4 +1,4 @@
-export var COMMENT = 'comment'
+export var COMMENT = 'comm'
 export var DECLARATION = 'decl'
 export var RULE = 'rule'
 

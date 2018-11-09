@@ -1,3 +1,7 @@
+## 3.5.4 November 09, 2018
+
+- Patch [#125](https://github.com/thysultan/stylis.js/issues/125)
+
 ## 3.5.3 July 13, 2018
 
 - Patch [#110](https://github.com/thysultan/stylis.js/issues/110)

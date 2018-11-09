@@ -1,13 +1,15 @@
-import {token} from '../Utility.js'
+import {token, next, peek, slice, caret} from '../Utility.js'
 
 /**
  * @param {Object} read
- * @param {number} char
- * @return {number}
+ * @param {number} type
+ * @return {string}
  */
-export function identifier (read, char) {
-	while (!token(read.peek(0)))
-		read.next(char)
+export function identifier (read, type) {
+	var index = caret(read)
 
-	return read.caret
+	while (!token(peek(read, 0)))
+		next(read, type)
+
+	return slice(read, index, caret(read))
 }

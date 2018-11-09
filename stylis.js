@@ -1568,7 +1568,7 @@
 			default: {
 				if (typeof plugin === 'function') {
 					plugins[plugged++] = plugin
-				}	else if (typeof plugin === 'object' && plugin.length > -1) {
+				}	else if (typeof plugin === 'object') {
 					for (var i = 0, length = plugin.length; i < length; ++i) {
 						use(plugin[i])
 					}

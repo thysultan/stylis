@@ -95,12 +95,61 @@ export function push (arr, value) {
  * @param {*} source
  */
 export function node (type, props, children, value, source) {
-	return {type: type, props: props, children: children, value: value, source: source}
+	return {'type': type, 'props': props, 'children': children, 'value': value, 'source': source}
 }
 
 /**
  * @return {Object}
  */
 export function src (read) {
-	return {line: read.line, column: read.column, caret: read.caret}
+	return {'line': read.line, 'column': read.column, 'caret': read.caret}
+}
+
+/**
+ * @param {string} value
+ * @return {Object}
+ */
+export function iterator (value) {
+	return {"value": value, "line": 1, "column": 1, caret: 0}
+}
+
+/**
+ * @param {Object} read
+ * @param {number} begin
+ * @param {number} end
+ * @return {string}
+ */
+export function slice (read, begin, end) {
+	return substr(read.value, begin, end)
+}
+
+/**
+ * @param {Object} read
+ * @param {number} code
+ * @return {number}
+ */
+export function next (read, code) {
+	var char = charat(read.value, read.caret++)
+
+	if (read.column++, char === 10)
+		read.column = 1, read.line++
+
+	return char
+}
+
+/**
+ * @param {Object} read
+ * @param {number} distance
+ * @return {number}
+ */
+export function peek (read, distance) {
+	return charat(read.value, read.caret + distance)
+}
+
+/**
+ * @param {Object} read
+ * @return {number}
+ */
+export function caret (read) {
+	return read.caret
 }

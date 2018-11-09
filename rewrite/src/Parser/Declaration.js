@@ -1,12 +1,13 @@
 import {DECLARATION} from '../Constant.js'
-import {strlen, substr, push, node} from '../Utility.js'
+import {strlen, substr, push, node, src} from '../Utility.js'
 
 /**
+ * @param {Object} read
  * @param {Array<string>} stack
  * @param {string} value
  * @param {number} length
- * @param {Object} source
+ * @return {number}
  */
-export function declaration (stack, value, length, source) {
-	push(stack, node(DECLARATION, substr(value, 0, length), substr(value, length + 1, strlen(value)), value, source))
+export function declaration (read, stack, value, length) {
+	return push(stack, node(DECLARATION, substr(value, 0, length), substr(value, length + 1, strlen(value)), value, src(read)))
 }

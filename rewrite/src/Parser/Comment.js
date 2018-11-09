@@ -1,26 +1,22 @@
 import {COMMENT} from '../Constant.js'
-import {str, strlen, substr, trim, node, push} from '../Utility.js'
+import {str, strlen, substr, trim, node, push, src, next, peek, caret, slice} from '../Utility.js'
 
 /**
  * @param {Object} read
  * @param {Array<string>} stack
- * @param {number} char
- * @param {Object} source
+ * @param {number} type
  */
-export function comment (read, stack, char, source) {
-	var caret = read.caret - 2
-	var value = trim(str(read.peek(0)))
-	var type = value || str(char)
-	var offset = char === 42 ? 2 : 1
-	var next = char
+export function comment (read, stack, type) {
+	var char = 0
+	var index = caret(read) - 2
+	var value = trim(str(peek(read, 0))) || str(type)
+	var offset = type === 42 ? 2 : 1
 
-	while (next = read.next(char))
-		// //
-		if (char == 47 && next == 10)
+	while (char = next(read, type))
+		if (type == 47 && char == 10)
 			break
-		// /*
-		else if (char == 42 && next == 42 && read.peek(0) != 42 && read.next(char) == 47)
+		else if (type == 42 && char == 42 && peek(read, 0) != 42 && next(read, type) == 47)
 			break
 
-	push(stack, node(COMMENT, type, substr(value = read.slice(caret, read.caret), 2, strlen(value) - offset), value, source))
+	push(stack, node(COMMENT, value, substr(value = slice(read, index, caret(read)), 2, strlen(value) - offset), value, src(read)))
 }

@@ -1,7 +1,7 @@
 <body>
 <style style="display:block;font:13px/1.8 Monaco,Mono-Space;padding:20;white-space:pre;" contenteditable></style>
 <script type=module>
-import stylis from './stylis.js'
+import stylis from './index.js'
 
 let result, sample
 
@@ -49,8 +49,11 @@ sample = `@media all { h1 {color:red;} h2 {color:red;} @media (max-width: 100px)
 // /*! value */
 // // value
 // `
-sample = `@import url(...);`
-// sample = `@import url(...);color:red;`
+// sample = `@import url(...);`
+sample = `h1 { @media{ h2 {color:red; }} }`
+// sample = `media{color:red;}`
+// sample = `color:red;`
+// sample = `h1{color:url("red)");h2{color:red;}}`
 
 console.log(result = stylis(sample))
 // document.querySelector('style').textContent = result.join('')

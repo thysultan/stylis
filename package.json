@@ -5,7 +5,7 @@
 	"jsdelivr": "stylis.min.js",
 	"types": "stylis.d.ts",
 	"description": "light - weight css preprocessor",
-	"version": "3.5.3",
+	"version": "3.5.4",
 	"homepage": "https://github.com/thysultan/stylis.js",
 	"license": "MIT",
 	"author": {

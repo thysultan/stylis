@@ -1,84 +1,81 @@
-import {trim, token, str, strlen, substr, src, push, node} from '../Utility.js'
+import {str, strlen, sizeof, src, next} from '../Utility.js'
 import {rule} from './Rule.js'
 import {declaration} from './Declaration.js'
 import {comment} from './Comment.js'
 import {identifier} from './Identifier.js'
-import {recurrance} from './Recurrance.js'
 import {whitespace} from './Whitespace.js'
+import {delimiter} from './Delimiter.js'
 
 /**
  * @param {Object} read
  * @param {Array<number>} points
  * @param {Array<string>} styles
- * @param {Array<string>} parents
+ * @param {Array<string>} targets
  * @param {string} at
- * @param {Array<string>} decl
- * @param {Array<string>} target
+ * @param {Array<string>} rules
+ * @param {Array<string>} declarations
+ * @param {Array<string>} atrules
  * @return {Array<string>}
  */
-export function ruleset (read, points, styles, parents, at, decl, target) {
+export function ruleset (read, points, styles, targets, at, rules, declarations, atrules) {
+	var code = 1
 	var char = 0
 	var prev = 0
-	var next = 0
-
-	var code = 1
 	var index = 0
 	var length = 0
 	var offset = 0
-
 	var value = ''
 	var type = value
-	var props = parents
-	var children = target
+	var props = rules
+	var children = targets
 
-	// while ((next = read.next(code)) * code)
-		// switch (prev = char, char = next) {
-	while (next = read.next(code), code)
-		switch (prev = char, char = next) {
+	while (code)
+		switch (prev = char, char = next(read, code)) {
 			// /
 			case 47:
-				comment(read, children, read.next(char), src(read))
+				comment(read, children, next(read, char))
 				break
 			// [ ]
 			case 91:
-				char++
+				++char
 			// ( )
 			case 40:
-				char++
+				++char
 			// " '
 			case 34: case 39:
-				value += trim(read.slice(read.caret - 1, recurrance(read, char)))
+				value += delimiter(read, char)
 				break
 			// \t \n \s
 			case 9: case 10: case 32:
-				value += token(prev) > 0 || token(whitespace(read, char)) > 0 ? '' : ' '
+				value += whitespace(read, prev)
 				break
 			// {
 			case 123:
 				points[index++] = strlen(value)
-			// ; }
-			case 59: case 125: case 0:
-				switch (char -= offset) {
-					// }
-					case 125:
-						code = 0
-					// ;
-					case 59:
+			// } ;
+			case 125: case 59: case 0:
+				switch (char) {
+					// eof
+					case 125: case 0:
+						--code
+					// decl
+					case 59 + offset:
 						if (length)
-							declaration(decl, value, length, src(read))
+							declaration(read, declarations, value, length)
+						// if (code || !at || !sizeof(declarations)) {
+						// }
 						break
-					case 0:
-						code = 0;
-						break
-					// {
+					// rule/atrule
 					default:
-						rule(target, value, points, index, offset, offset ? [''] : parents, type, props = [], children = [], src(read))
+						rule(read, targets, value, points, index, offset, offset ? atrules : rules, type, props = [], children = [])
 
-						if (char != 52)
-							ruleset(read, points, styles, props, type, children, offset ? children : styles)
-						break
+						if (char == 59)
+							break
+
+						ruleset(read, points, styles, offset ? children : targets, type, offset ? rules : props, children, !offset ? atrules : props)
 				}
-				index = length = offset = 0, value = type = ''
+
+				index = length = offset = 0, type = value = ''
 				break
 			default:
 				switch (value += str(char), char) {
@@ -92,7 +89,7 @@ export function ruleset (read, points, styles, parents, at, decl, target) {
 						break
 					// @
 					case 64:
-						offset = strlen(type = value += read.slice(read.caret, identifier(read, char++)))
+						offset = strlen(type = value += identifier(read, char++))
 						break
 				}
 		}

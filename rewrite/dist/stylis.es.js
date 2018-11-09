@@ -1,4 +1,4 @@
-var COMMENT = 'comment';
+var COMMENT = 'comm';
 var DECLARATION = 'decl';
 var RULE = 'rule';
 
@@ -85,14 +85,14 @@ function push (arr, value) {
  * @param {*} source
  */
 function node (type, props, children, value, source) {
-	return {type: type, props: props, children: children, value: value, source: source}
+	return {'type': type, 'props': props, 'children': children, 'value': value, 'source': source}
 }
 
 /**
  * @return {Object}
  */
 function src (read) {
-	return {line: read.line, column: read.column, caret: read.caret}
+	return {'line': read.line, 'column': read.column, 'caret': read.caret}
 }
 
 /**
@@ -100,43 +100,52 @@ function src (read) {
  * @return {Object}
  */
 function iterator (value) {
-	return {value: value, slice: slice, next: next, peek: peek, line: 1, column: 1, caret: 0}
+	return {"value": value, "line": 1, "column": 1, caret: 0}
 }
 
 /**
- * @this {Object}
+ * @param {Object} read
  * @param {number} begin
  * @param {number} end
  * @return {string}
  */
-function slice (begin, end) {
-	return substr(this.value, begin, end)
+function slice (read, begin, end) {
+	return substr(read.value, begin, end)
 }
 
 /**
- * @this {Object}
+ * @param {Object} read
  * @param {number} code
  * @return {number}
  */
-function next (code) {
-	var char = charat(this.value, this.caret++);
+function next (read, code) {
+	var char = charat(read.value, read.caret++);
 
-	if (this.column++, char === 10)
-		this.column = 1, this.line++;
+	if (read.column++, char === 10)
+		read.column = 1, read.line++;
 
 	return char
 }
 
 /**
- * @this {Object}
+ * @param {Object} read
  * @param {number} distance
  * @return {number}
  */
-function peek (distance) {
-	return charat(this.value, this.caret + distance)
+function peek (read, distance) {
+	return charat(read.value, read.caret + distance)
 }
 
 /**
+ * @param {Object} read
+ * @return {number}
+ */
+function caret (read) {
+	return read.caret
+}
+
+/**
+ * @param {Object} read
  * @param {Array<string>} stack
  * @param {string} value
  * @param {Array<number>} points
@@ -146,172 +155,176 @@ function peek (distance) {
  * @param {string} type
  * @param {Array<string>} props
  * @param {Array<string>} children
- * @param {Object} source
+ * @return {number}
  */
-function rule (stack, value, points, length, offset, parents, type, props, children, source) {
+function rule (read, stack, value, points, length, offset, parents, type, props, children) {
 	for (var i = 0, j = offset - 1, k = '', l = sizeof(parents), m = 0; i < length; ++i)
 		for (k = substr(value, j + 1, j = points[i]), m = 0; m < l; ++m)
 			if (k = trim(parents[m] + ' ' + k))
 				push(props, k);
 
-	push(stack, node(type || RULE, props, children, value, source));
+	return push(stack, node(offset ? type : RULE, props, children, value, src(read)))
 }
 
 /**
+ * @param {Object} read
  * @param {Array<string>} stack
  * @param {string} value
  * @param {number} length
- * @param {Object} source
+ * @return {number}
  */
-function declaration (stack, value, length, source) {
-	push(stack, node(DECLARATION, substr(value, 0, length), substr(value, length + 1, strlen(value)), value, source));
+function declaration (read, stack, value, length) {
+	return push(stack, node(DECLARATION, substr(value, 0, length), substr(value, length + 1, strlen(value)), value, src(read)))
 }
 
 /**
  * @param {Object} read
  * @param {Array<string>} stack
- * @param {number} char
- * @param {Object} source
+ * @param {number} type
  */
-function comment (read, stack, char, source) {
-	var caret = read.caret - 2;
-	var value = trim(str(read.peek(0)));
-	var type = value || str(char);
-	var offset = char === 42 ? 2 : 1;
-	var next = char;
+function comment (read, stack, type) {
+	var char = 0;
+	var index = caret(read) - 2;
+	var value = trim(str(peek(read, 0))) || str(type);
+	var offset = type === 42 ? 2 : 1;
 
-	while (next = read.next(char))
-		// //
-		if (char == 47 && next == 10)
+	while (char = next(read, type))
+		if (type == 47 && char == 10)
 			break
-		// /*
-		else if (char == 42 && next == 42 && read.peek(0) != 42 && read.next(char) == 47)
+		else if (type == 42 && char == 42 && peek(read, 0) != 42 && next(read, type) == 47)
 			break
 
-	push(stack, node(COMMENT, type, substr(value = read.slice(caret, read.caret), 2, strlen(value) - offset), value, source));
+	push(stack, node(COMMENT, value, substr(value = slice(read, index, caret(read)), 2, strlen(value) - offset), value, src(read)));
 }
 
 /**
  * @param {Object} read
- * @param {number} char
- * @return {number}
+ * @param {number} type
+ * @return {string}
  */
-function identifier (read, char) {
-	while (!token(read.peek(0)))
-		read.next(char);
+function identifier (read, type) {
+	var index = caret(read);
 
-	return read.caret
+	while (!token(peek(read, 0)))
+		next(read, type);
+
+	return slice(read, index, caret(read))
 }
 
 /**
  * @param {Object} read
- * @param {number} char
- * @return {number}
+ * @param {number} prev
+ * @return {string}
  */
-function recurrance (read, char) {
-	var next = char;
+function whitespace (read, prev) {
+	var code = 0;
 
-	while (next = read.next(char))
-		// ] )
-		if (next == char)
+	while (code = peek(read, 0))
+		if (code > 32) {
 			break
-		// " '
-		else if (next == 34 || next == 39)
-			recurrance(read, next);
+		} else {
+			next(read, 0);
+		}
 
-	return read.caret
+	return token(prev) > 0 || token(code) > 0 ? '' : ' '
 }
 
 /**
  * @param {Object} read
- * @param {number} char
+ * @param {number} type
+ * @return {string}
+ */
+function delimiter (read, type) {
+	return trim(slice(read, caret(read) - 1, delimit(read, type)))
+}
+
+/**
+ * @param {Object} read
+ * @param {number} type
  * @return {number}
  */
-function whitespace (read, char) {
-	var next = char;
+function delimit (read, type) {
+	var char = 0;
 
-	while (next = read.peek(0))
-		if (next > 32)
+	while (char = next(read, type))
+		if (char == type)
 			break
-		else
-			read.next(char);
+		else if (char == 34 || char == 39)
+			delimit(read, char);
 
-	return next
+	return caret(read)
 }
 
 /**
  * @param {Object} read
  * @param {Array<number>} points
  * @param {Array<string>} styles
- * @param {Array<string>} parents
+ * @param {Array<string>} targets
  * @param {string} at
- * @param {Array<string>} decl
- * @param {Array<string>} target
+ * @param {Array<string>} rules
+ * @param {Array<string>} declarations
+ * @param {Array<string>} atrules
  * @return {Array<string>}
  */
-function ruleset (read, points, styles, parents, at, decl, target) {
+function ruleset (read, points, styles, targets, at, rules, declarations, atrules) {
+	var code = 1;
 	var char = 0;
 	var prev = 0;
-	var next = 0;
-
-	var code = 1;
 	var index = 0;
 	var length = 0;
 	var offset = 0;
-
 	var value = '';
 	var type = value;
-	var props = parents;
-	var children = target;
+	var props = rules;
+	var children = targets;
 
-	// while ((next = read.next(code)) * code)
-		// switch (prev = char, char = next) {
-	while (next = read.next(code), code)
-		switch (prev = char, char = next) {
+	while (code)
+		switch (prev = char, char = next(read, code)) {
 			// /
 			case 47:
-				comment(read, children, read.next(char), src(read));
+				comment(read, children, next(read, char));
 				break
 			// [ ]
 			case 91:
-				char++;
+				++char;
 			// ( )
 			case 40:
-				char++;
+				++char;
 			// " '
 			case 34: case 39:
-				value += trim(read.slice(read.caret - 1, recurrance(read, char)));
+				value += delimiter(read, char);
 				break
 			// \t \n \s
 			case 9: case 10: case 32:
-				value += token(prev) > 0 || token(whitespace(read, char)) > 0 ? '' : ' ';
+				value += whitespace(read, prev);
 				break
 			// {
 			case 123:
 				points[index++] = strlen(value);
-			// ; }
-			case 59: case 125: case 0:
-				switch (char -= offset) {
-					// }
-					case 125:
-						code = 0;
-					// ;
-					case 59:
+			// } ;
+			case 125: case 59: case 0:
+				switch (char) {
+					// eof
+					case 125: case 0:
+						--code;
+					// decl
+					case 59 + offset:
 						if (length)
-							declaration(decl, value, length, src(read));
+							declaration(read, declarations, value, length);
+						// if (code || !at || !sizeof(declarations)) {
+						// }
 						break
-					case 0:
-						code = 0;
-						break
-					// {
+					// rule/atrule
 					default:
-						rule(target, value, points, index, offset, offset ? [''] : parents, type, props = [], children = [], src(read));
+						rule(read, targets, value, points, index, offset, offset ? atrules : rules, type, props = [], children = []);
 
-						if (char != 52)
-							ruleset(read, points, styles, props, type, children, offset ? children : styles);
-						break
+						if (char == 59)
+							break
+
+						ruleset(read, points, styles, offset ? children : targets, type, offset ? rules : props, children, !offset ? atrules : props);
 				}
-				index = length = offset = 0, value = type = '';
+
+				index = length = offset = 0, type = value = '';
 				break
 			default:
 				switch (value += str(char), char) {
@@ -325,7 +338,7 @@ function ruleset (read, points, styles, parents, at, decl, target) {
 						break
 					// @
 					case 64:
-						offset = strlen(type = value += read.slice(read.caret, identifier(read, char++)));
+						offset = strlen(type = value += identifier(read, char++));
 						break
 				}
 		}
@@ -338,18 +351,17 @@ function ruleset (read, points, styles, parents, at, decl, target) {
  * @return {Object}
  */
 function compile (value) {
-	return parse(iterator(value), [0], [], [''])
+	return parse(value, [0], [])
 }
 
 /**
- * @param {Object} read
+ * @param {string} value
  * @param {Array<number>} points
  * @param {Array<string>} styles
- * @param {Array<string>} parents
  * @return {Array<string>}
  */
-function parse (read, points, styles, parents) {
-	return ruleset(read, points, styles, parents, RULE, [], styles)
+function parse (value, points, styles) {
+	return ruleset(iterator(value), points, styles, styles, '', [''], [], [''])
 }
 
 export default compile;

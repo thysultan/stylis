@@ -1,16 +1,19 @@
+import {token, next, peek} from '../Utility.js'
+
 /**
  * @param {Object} read
- * @param {number} char
- * @return {number}
+ * @param {number} prev
+ * @return {string}
  */
-export function whitespace (read, char) {
-	var next = char
+export function whitespace (read, prev) {
+	var code = 0
 
-	while (next = read.peek(0))
-		if (next > 32)
+	while (code = peek(read, 0))
+		if (code > 32) {
 			break
-		else
-			read.next(char)
+		} else {
+			next(read, 0)
+		}
 
-	return next
+	return token(prev) > 0 || token(code) > 0 ? '' : ' '
 }
