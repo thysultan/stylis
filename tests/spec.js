@@ -954,6 +954,8 @@ var spec = {
 		sample: `
 			background:image-set(url(foo.jpg) 2x);
 			background-image:image-set(url(foo.jpg) 2x);
+			cursor:image-set(url(foo.jpg) 2x),pointer;
+			cursor:image-set(url(foo.jpg) 2x),grab;
 		`,
 		expected: ``+
 		`.user{`+
@@ -961,6 +963,11 @@ var spec = {
 			`background:image-set(url(foo.jpg) 2x);`+
 			`background-image:-webkit-image-set(url(foo.jpg) 2x);`+
 			`background-image:image-set(url(foo.jpg) 2x);`+
+			`cursor:-webkit-image-set(url(foo.jpg) 2x),pointer;`+
+			`cursor:image-set(url(foo.jpg) 2x),pointer;`+
+			`cursor:-webkit-image-set(url(foo.jpg) 2x),-webkit-grab;`+
+			`cursor:image-set(url(foo.jpg) 2x),-moz-grab;`+
+			`cursor:image-set(url(foo.jpg) 2x),grab;`+
 		`}`
 	},
 	'animations': {
