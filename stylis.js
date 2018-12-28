@@ -56,7 +56,7 @@
 	var nullptn = /^\0+/g /* matches leading null characters */
 	var formatptn = /[\0\r\f]/g /* matches new line, null and formfeed characters */
 	var colonptn = /: */g /* splits animation rules */
-	var cursorptn = /zoo|gra/ /* assert cursor varient */
+	var cursorptn = /(zoo|gra)/ /* assert cursor varient */
 	var transformptn = /([,: ])(transform)/g /* vendor prefix transform, older webkit */
 	var animationptn = /,+\s*(?![^(]*[)])/g /* splits multiple shorthand notation animations */
 	var propertiesptn = / +\s*(?![^(]*[)])/g /* animation properties */
@@ -1129,7 +1129,16 @@
 			}
 			// cursor, c, u, r
 			case 1005: {
-				return cursorptn.test(out) ? out.replace(colonptn, ':' + webkit) + out.replace(colonptn, ':' + moz) + out : out
+				if (imgsrcptn.test(out)) {
+					return cursorptn.test(out)
+						? out.replace(cursorptn, webkit+'$1').replace(imgsrcptn, '$1'+webkit+'$2') +
+							out.replace(cursorptn, moz+'$1') + out
+						: out.replace(imgsrcptn, '$1'+webkit+'$2') + out
+				} else {
+					return cursorptn.test(out)
+						? out.replace(cursorptn, webkit+'$1') + out.replace(cursorptn, moz+'$1') + out
+						: out
+				}
 			}
 			// writing-mode, w, r, i
 			case 1000: {
