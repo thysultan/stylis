@@ -62,9 +62,25 @@ var spec = {
 		`.user body{color:red;}`+
 		'}'+
 		`@viewport{min-width:640px;max-width:800px;}`+
+		`@-ms-viewport{width: device-width;}`+
 		`@counter-style list{system:fixed;symbols:url();suffix:" ";}`+
 		`@-moz-document url-prefix(){.user .selector{color:lime;}}`+
 		`@page{color:red;@bottom-right{content:counter(pages);margin-right:1cm;}width:none;}`
+	},
+	'at-rules-empty-selector': {
+		sample: `
+		@viewport {
+			min-width:640px;
+			max-width:800px;
+		}
+
+		@-ms-viewport {
+			width: device-width;
+		}`,
+		expected: ``+
+		`@viewport{min-width:640px;max-width:800px;}`+
+		`@-ms-viewport{width: device-width;}`,
+		selector: ``,
 	},
 	'monkey-patch some invalid css patterns': {
 		sample: `
