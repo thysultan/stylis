@@ -19,19 +19,23 @@
   "bugs": {
     "url": "https://github.com/thysultan/stylis.js/issues"
   },
-  "main": "index.js",
-  "unpkg": "",
-  "jsdelivr": "",
+  "source": "index.js",
+  "main": "dist/stylis.cjs.js",
+  "unpkg": "dist/stylis.esm.js",
+  "jsdelivr": "dist/stylis.js",
   "types": "",
-  "module": "index.js",
-  "files": [],
+  "module": "dist/stylis.esm.js",
+  "browser": "dist/stylis.js",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
-    "rollup": "^0.64.1"
+    "klap": "^3.2.0"
   },
   "scripts": {
-    "prepublish": "npm run build",
+    "prepublishOnly": "npm run build",
     "pretest": "npm run build",
-    "build": "rollup --config ./scripts/build.config.js",
-    "start": "rollup --config ./scripts/build.config.js --watch"
+    "build": "klap build",
+    "start": "klap watch"
   }
 }
