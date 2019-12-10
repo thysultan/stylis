@@ -1250,6 +1250,15 @@
 
 				break
 			}
+			// padding-inline-start, padding-inline-end / margin-inline-start, margin-inline-end
+			case 915:   
+			case 965: { 
+				if (out.indexOf('-inline-') > 5) {
+					cache = out.replace('-inline', '')
+					return webkit + cache + out;
+				}
+				break
+			}
 		}
 
 		return out

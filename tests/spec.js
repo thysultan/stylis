@@ -597,6 +597,16 @@ var spec = {
 			& {
 				transition:transform 1s,transform all 400ms,text-transform;
 			}
+
+			div {
+				margin-inline-start:1px;
+				margin-inline-end:1px;
+			}
+
+			div {
+				padding-inline-start:1px;
+				padding-inline-end:1px;
+			}
 		`,
 		expected:
 			`.user html{-webkit-text-size-adjust:none;text-size-adjust:none;}`+
@@ -695,6 +705,20 @@ var spec = {
 			`-webkit-transition:-webkit-transform 1s,-webkit-transform all 400ms,text-transform;`+
 			`-webkit-transition:transform 1s,transform all 400ms,text-transform;`+
 			`transition:transform 1s,transform all 400ms,text-transform;`+
+			`}`+
+
+			`.user div{`+
+			`-webkit-margin-start:1px;`+
+			`margin-inline-start:1px;`+
+			`-webkit-margin-end:1px;`+
+			`margin-inline-end:1px;`+
+			`}`+
+
+			`.user div{`+
+			`-webkit-padding-start:1px;`+
+			`padding-inline-start:1px;`+
+			`-webkit-padding-end:1px;`+
+			`padding-inline-end:1px;`+
 			`}`
 	},
 	'vendor prefixing II': {
