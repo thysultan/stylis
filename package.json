@@ -30,7 +30,7 @@
     "dist"
   ],
   "devDependencies": {
-    "klap": "^3.2.0"
+    "klap": "^3.5.2"
   },
   "scripts": {
     "prepublishOnly": "npm run build",
