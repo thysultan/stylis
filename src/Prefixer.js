@@ -13,7 +13,7 @@ export function prefixer (value, length) {
 			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 4548: case 7380: case 7415: case 6868: case 4215: case 7669:
-			return [] (WEBKIT+value+';') + (value)
+			return (WEBKIT+value+';') + (value)
 		// box-decoration-break, appearance, user-select, flex, transform, hyphens
 		case 4029: case 6373: case 7318: case 7852: case 7882: case 7992:
 			return (WEBKIT+value+';') + (MOZ+value+';') + (MS+value+';') + (value)
