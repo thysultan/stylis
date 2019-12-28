@@ -12,43 +12,43 @@ export function prefixer (value, length) {
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
 			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
-		case 4548: case 7380: case 7415: case 6868: case 4215: case 7669:
+		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645:
 			return (WEBKIT+value+';') + (value)
 		// box-decoration-break, appearance, user-select, flex, transform, hyphens
-		case 4029: case 6373: case 7318: case 7852: case 7882: case 7992:
+		case 3005: case 5349: case 4246: case 6828: case 4810: case 6968:
 			return (WEBKIT+value+';') + (MOZ+value+';') + (MS+value+';') + (value)
 		// order
-		case 7189:
+		case 6165:
 			return (WEBKIT+value+';') + (MS+'flex-'+value+';') + (value)
 		// align-items
-		case 6211:
+		case 5187:
 			return (WEBKIT+value+';') + (replace(value, /(\w+).+(:[^]+)/, (WEBKIT+'box-$1$2;')+(MS+'flex-$1$2'))+';') + (value)
 		// align-self
-		case 6467:
+		case 5443:
 			return (WEBKIT+value+';') + (MS+'flex-item-'+replace(value, /flex-|-self/, '')+';') + (value)
 		// align-content
-		case 5699:
+		case 4675:
 			return (WEBKIT+value+';') + (MS+'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + ';') + (value)
 		// flex-shrink
-		case 6572:
+		case 5548:
 			return (WEBKIT+value+';') + (MS+replace(value, 'shrink', 'negative')+';') + (value)
 		// flex-basis
-		case 6316:
+		case 5292:
 			return (WEBKIT+value+';') + (MS+replace(value, 'basis', 'preferred-size')+';') + (value)
 		// flex-grow
-		case 7084:
+		case 6060:
 			return (WEBKIT+'box-'+replace(value, '-grow', '')+';') + (WEBKIT+value+';') + (MS+replace(value, 'grow', 'positive')+';') + (value)
 		// transition
-		case 7626:
+		case 4554:
 			return (replace(value, /([^-])(transform)/g, '$1'+WEBKIT+'$2')+';') + (value)
 		// background
-		case 6519:
+		case 5495:
 			return (replace(value, /([^-])(image-set\()/, '$1'+WEBKIT+'$2')+';') + (value)
 		// cursor
-		case 7211:
+		case 6187:
 			return (replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1'+WEBKIT+'$2$3;$1'+MOZ+'$2$3')+';') + (value)
 		// writing-mode
-		case 4912:
+		case 5936:
 			// vertical-lr, vertical-rl, horizontal-tb
 			if (strlen(value) > 10)
 				switch (charat(value, length + 10)) {
@@ -63,7 +63,7 @@ export function prefixer (value, length) {
 						return (WEBKIT+value+';') + (MS+replace(value, /[svh]\w+-[tblr]{2}/, 'lr')+';') + value
 				}
 			break
-		// (min|min)?(width|height|inline-size|block-size)
+		// (min|max)?(width|height|inline-size|block-size)
 		case 8116: case 7059: case 5753: case 5535:
 		case 5445: case 5701: case 4933: case 4677:
 		case 5533: case 5789: case 5021: case 4765:
@@ -82,12 +82,12 @@ export function prefixer (value, length) {
 				}
 			break
 		// position: sticky
-		case 8021:
+		case 4949:
 			// (s)ticky?
 			if (charat(value, length + 1) !== 115)
 				break
 		// display: (flex|inline-flex|inline-box)
-		case 7468:
+		case 6444:
 			switch (charat(value, strlen(value) - 2 - (indexof(value, '!important') && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
@@ -103,7 +103,7 @@ export function prefixer (value, length) {
 			}
 			break
 		// justify-content
-		case 5992:
+		case 4968:
 			return (
 				(replace(replace(value, /(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;')+(MS+'flex-pack:$3')), /s.+-b.+/, 'justify')+';')+
 			 	(WEBKIT+value+';') +
