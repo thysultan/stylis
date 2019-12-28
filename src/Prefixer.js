@@ -109,6 +109,9 @@ export function prefixer (value, length) {
 			 	(WEBKIT+value+';') +
 			 	(value)
 			)
+		// (margin|padding)-inline-(start|end)
+		case 4095: case 3583: case 4068: case 2532:
+			return (replace(value, /(.+)-inline(.+)/, WEBKIT+'$1$2')+';') + (value)
 	}
 
 	return value
