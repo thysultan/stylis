@@ -1,6 +1,6 @@
 export var COMMENT = 'comm'
 export var DECLARATION = 'decl'
-export var RULE = 'rule'
+export var RULESET = 'rule'
 
 export var IMPORT = '@import'
 export var CHARSET = '@charset'

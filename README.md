@@ -10,31 +10,39 @@ In comparision the current version sits around ~4kb.
 
 ```js
 const comment = {
-	source: {line: 1, column: 0, caret: 2},
 	value: "/*! Lorem ipsum dolor sit. */",
 	type: "comment",
 	props: '!',
 	children: "Lorem ipsum dolor sit.",
+	line: 1,
+	column: 1,
+	caret: 2
 }
 const decl = {
-	source: {line: 1, column: 0, caret: 2},
 	value: "color:red",
 	type: "decl",
 	props: "color",
-	children: "red"
+	children: "red",
+	line: 1,
+	column: 1,
+	caret: 2
 }
 const rule = {
-	source: {line: 1, column: 0, caret: 2},
 	value: "h1,h2",
 	type: "rule",
 	props: ['h1', 'h2'],
-	children: [...]
+	children: [...],
+	line: 1,
+	column: 1,
+	caret: 2
 }
 const atrule = {
-	source: {line: 1, column: 0, caret: 2},
 	value: "@media (max-width:100), (min-width:100)",
 	type: "@media",
 	props: ['(max-width:100)', '(min-width:100)'],
-	children: [...]
+	children: [...],
+	line: 1,
+	column: 1,
+	caret: 2
 }
 ```

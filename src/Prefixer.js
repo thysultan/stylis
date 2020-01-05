@@ -1,13 +1,13 @@
-import {WEBKIT, MOZ, MS} from './Enum.js'
-import {hash, strlen, charat, slice, replace, test, indexof} from './Utility.js'
+import {MS, MOZ, WEBKIT} from './Enum.js'
+import {hash, test, substr, charat, strlen, indexof, replace} from './Utility.js'
 
 /**
  * @param {string} value
  * @param {number} length
  * @return {string}
  */
-export function prefixer (value, length) {
-	switch (hash(value, 4, length)) {
+export function prefix (value, length) {
+	switch (hash(value, length)) {
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
 			return animation(value, length, '')
@@ -78,7 +78,7 @@ export function prefixer (value, length) {
 						return replace(value, /(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
 					// (s)tretch
 					case 115:
-						return prefixer(replace(replace(value, 'stretch', 'fill-available'), length), ':fill-available', ':stretch')
+						return prefix(replace(replace(value, 'stretch', 'fill-available'), length), ':fill-available', ':stretch')
 				}
 			break
 		// position: sticky
@@ -129,7 +129,7 @@ export function animation (value, length, uuid) {
 			// animation, animation-name
 			case 9: case 14:
 				// split on comma seperated boundaries outside of function boundaries
-				value = slice(value, 0, length + 1) + slice(value, length + 1, strlen(value)).split(/,+\s*(?![^(]+\))/g).map(function (value) {
+				value = substr(value, 0, length + 1) + substr(value, length + 1, strlen(value)).split(/,+\s*(?![^(]+\))/g).map(function (value) {
 					// split on space seperated boundaries outside of function boundaries
 					return value.split(/\s+(?![^(]+\))/g).map(function (value) {
 						// match valid animation identifiers: https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident

@@ -1,2 +1,2 @@
-export {compile as default} from './src/Compile.js'
-export {stringify} from './src/Stringify.js'
+export {compile} from './src/Parser.js'
+export {serialize} from './src/Serializer.js'

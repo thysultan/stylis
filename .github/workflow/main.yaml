@@ -1,0 +1,24 @@
+name: main
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [11.4.0]
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: setup ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: test
+      run: |
+        npm install
+        npm test
+    - name: report
+      uses: coverallsapp/github-action@v1.0.1
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: ./coverage/lcov.info
