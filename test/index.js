@@ -4,8 +4,6 @@ const stylis = string => serialize(compile(`.user{${string}}`))
 
 describe('PLACEHOLDER', () => {
   // TODO:
-  // - `:global()` is unimplemented, but probably right now it's by design - need to confirm, YES https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L145
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1702
   // - test vendor prefixing:
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L553
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L700
@@ -18,20 +16,6 @@ describe('PLACEHOLDER', () => {
   // - what about "animations disabled namespace" test? https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1065
   // - what about "keyframes disabled namespace" test? https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1095
   // - add "nested" test, but remove `:global()` from it https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1115
-  // - do we want to keep `cascade: false` behavior somehow? NO
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1256
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1267
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1350
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1397
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1415
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1460
-  // - do we want to keep `semicolon: true` behavior somehow? NO
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1506
-  // - do we want to make `compress` configurable? NO
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1685
-  // - do we want to make `preserve` configurable? NO
-  //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1899
-  // - what about plugins? and instances? too lazy their tests right now ;) YOU CAN IMPLEMENT ANY PLUGIN AT THE STRINGFY LEVEL
   // - add prefixer API and accompanying tests
 
   test('calc', () => {
