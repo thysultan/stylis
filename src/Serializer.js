@@ -1,5 +1,5 @@
-import {IMPORT, COMMENT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {strlen, sizeof} from './Utility.js'
+import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
+import {sizeof} from './Utility.js'
 import {prefix} from './Prefixer.js'
 
 /**

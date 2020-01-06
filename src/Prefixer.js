@@ -95,7 +95,7 @@ export function prefix (value, length) {
 				// (inline-)?fl(e)x
 				case 101:
 					return replace(value, /(.+:)([^!]+)(!.+)?/,
-						('$1'+WEBKIT+(charat(value, size + 7)  === 45 ? 'inline-' : '')+'box$3;') +
+						('$1'+WEBKIT+(charat(value, 14 /* display:inline- */)  === 45 ? 'inline-' : '')+'box$3;') +
 						('$1'+WEBKIT+'$2$3;') +
 						('$1'+MS+'$2box$3;') +
 						('$1$2$3')
@@ -106,8 +106,8 @@ export function prefix (value, length) {
 		case 4968:
 			return (
 				(replace(replace(value, /(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;')+(MS+'flex-pack:$3')), /s.+-b.+/, 'justify')+';')+
-			 	(WEBKIT+value+';') +
-			 	(value)
+				(WEBKIT+value+';') +
+				(value)
 			)
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
@@ -133,9 +133,9 @@ export function animation (value, length, uuid) {
 					// split on space seperated boundaries outside of function boundaries
 					return value.split(/\s+(?![^(]+\))/g).map(function (value) {
 						// match valid animation identifiers: https://developer.mozilla.org/en-US/docs/Web/CSS/custom-ident
-						if (testof(value, /(?:[^\d\s]\w+|-[^-]+)/))
+						if (test(value, /(?:[^\d\s]\w+|-[^-]+)/))
 							// exclude known tokens
-							if (!testof(value, /(back|for)wards|step-|in(herit|itial)|none|unset|all|normal|ease|alternate|reverse|\(/))
+							if (!test(value, /(back|for)wards|step-|in(herit|itial)|none|unset|all|normal|ease|alternate|reverse|\(/))
 								switch (value) {
 									case 'linear': case 'infinite': case 'running': case 'both': case 'paused':
 										break
