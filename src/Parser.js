@@ -1,6 +1,6 @@
 import {RULESET, DECLARATION, COMMENT} from './Enum.js'
 import {abs, trim, from, push, sizeof, strlen, substr, replace} from './Utility.js'
-import {node, next, peek, caret, slice, alloc, dealloc, delimiter, whitespace, identifier} from './Tokenizer.js'
+import {node, next, peek, caret, slice, alloc, dealloc, delimiter, whitespace, identifier, attoken} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -25,6 +25,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 	var scanning = 1
 	var previous = 0
 	var character = 0
+	var atrule = 0
 	var ampersand = 1
 	var type = ''
 	var props = rules
@@ -69,6 +70,8 @@ export function parse (value, points, declarations, rules, rulesets) {
 						if (character !== 59)
 							if (offset === 0)
 								parse(temporary, points, children, props, rulesets)
+							else if (attoken(atrule))
+								parse(temporary, points, children, [''], children)
 							else if (parse(value, points, props = [], rules, children), sizeof(props))
 								push(children, ruleset(value, points, 0, 0, rules, type, rules, props))
 				}
@@ -87,7 +90,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 						break
 					// @
 					case 64:
-						offset = strlen(type = temporary += identifier(caret())), character++
+						atrule = peek(0), offset = strlen(type = temporary += identifier(caret())), character++
 						break
 					// ,
 					case 44:

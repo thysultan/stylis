@@ -66,6 +66,20 @@ export function token (type) {
 }
 
 /**
+ * @param {number} type
+ * @return {number}
+ */
+export function attoken (type) {
+	switch (type) {
+		// m(edia), s(upports), d(ocument), -(moz-document)
+		case 109: case 115: case 100: case 45:
+			return 0
+	}
+
+	return 1
+}
+
+/**
  * @param {number} begin
  * @param {number} end
  * @return {string}
