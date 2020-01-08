@@ -192,75 +192,77 @@ describe('PLACEHOLDER', () => {
     expect(stylis(`@import url('http://example.com');`)).to.equal(`@import url('http://example.com');`)
   })
 
-  // TODO: declarations in at-rule are not grouped in a rule
-  // test('@supports', () => {
-  //  expect(stylis(`
-  //      @supports (display:block) {
-  //        color:red;
-  //        h1 {
-  //          color:red;
-  //          h2 {
-  //            color:blue;
-  //          }
-  //        }
-  //        display:none;
-  //      }
-  //      @supports (appearance: none) {
-  //        color:red;
-  //      }
-  //      @supports (backdrop-filter: blur(10px)) {
-  //        backdrop-filter: blur(10px);
-  //      }
-  //    `)).to.equal([
-  //      '@supports (display:block){.user{color:red;display:none;}.user h1{color:red;}.user h1 h2{color:blue;}}',
-  //      '@supports (appearance:none){.user{color:red;}}',
-  //      '@supports (backdrop-filter:blur(10px)){.user{backdrop-filter:blur(10px);}}'
-  //    ].join(''))
-  // })
+  test('@supports', () => {
+    expect(
+      stylis(`
+        @supports (display:block) {
+          color:red;
+          h1 {
+            color:red;
+            h2 {
+              color:blue;
+            }
+          }
+          display:none;
+        }
+        @supports (appearance: none) {
+          color:red;
+        }
+        @supports (backdrop-filter: blur(10px)) {
+          backdrop-filter: blur(10px);
+        }
+     `)
+    ).to.equal([
+      '@supports (display:block){.user{color:red;display:none;}.user h1{color:red;}.user h1 h2{color:blue;}}',
+      '@supports (appearance: none){.user{color:red;}}',
+      '@supports (backdrop-filter: blur(10px)){.user{backdrop-filter:blur(10px);}}'
+    ].join(''))
+  })
 
-  // TODO: declarations in at-rule are not grouped properly
-  // test('@media', () => {
-  //  expect(stylis(`
-  //      @media (max-width:600px) {
-  //        color:red;
-  //        h1 {
-  //          color:red;
-  //          h2 {
-  //            color:blue;
-  //          }
-  //        }
-  //        display:none;
-  //      }
-  //      @media (min-width:576px) {
-  //        &.card-deck {
-  //          .card {
-  //            &:not(:first-child) {
-  //                margin-left:15px;
-  //            }
-  //            &:not(:last-child) {
-  //                margin-right:15px;
-  //            }
-  //          }
-  //        }
-  //      }
-  //      @supports (display:block) {
-  //        @media (min-width:10px) {
-  //          background-color:seagreen;
-  //        }
-  //      }
-  //      @media (max-width:600px) {
-  //        & { color:red }
-  //      }
-  //      &:hover {
-  //        color:orange
-  //      }
-  //    `)).to.equal([
-  //      '@media (max-width:600px){.user{color:red;display:none;}.user h1{color:red;}.user h1 h2{color:blue;}}',
-  //      '@media (min-width:576px){.user.card-deck .card:not(:first-child){margin-left:15px;}.user.card-deck .card:not(:last-child){margin-right:15px;}}',
-  //      '@supports (display:block){@media (min-width:10px){.user{background-color:seagreen;}}}',
-  //      '@media (max-width:600px){.user{color:red;}}.user:hover{color:orange;}'
-  //    ].join(''))
-  // })
+  test('@media', () => {
+    expect(
+      stylis(`
+        @media (max-width:600px) {
+          color:red;
+          h1 {
+            color:red;
+            h2 {
+              color:blue;
+            }
+          }
+          display:none;
+        }
+        @media (min-width:576px) {
+          &.card-deck {
+            .card {
+              &:not(:first-child) {
+                margin-left:15px;
+              }
+              &:not(:last-child) {
+                margin-right:15px;
+              }
+            }
+          }
+        }
+        @supports (display:block) {
+          @media (min-width:10px) {
+            background-color:seagreen;
+          }
+        }
+        @media (max-width:600px) {
+          & { color:red }
+        }
+        &:hover {
+          color:orange
+        }
+     `)
+    ).to.equal([
+      '@media (max-width:600px){.user{color:red;display:none;}.user h1{color:red;}.user h1 h2{color:blue;}}',
+      '@media (min-width:576px){.user.card-deck .card:not(:first-child){margin-left:15px;}.user.card-deck .card:not(:last-child){margin-right:15px;}}',
+      '@supports (display:block){@media (min-width:10px){.user{background-color:seagreen;}}}',
+      '@media (max-width:600px){.user{color:red;}}.user:hover{color:orange;}'
+    ].join(''))
+  })
 
   // TODO: previously there was a generated whitespace after >
   // TODO: height in the middle of those rules doesn't get grouped with other declaratations

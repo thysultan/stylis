@@ -93,8 +93,17 @@ export function sizeof (value) {
 /**
  * @param {any[]} value
  * @param {any} element
- * @return {number}
+ * @return {void}
  */
 export function push (value, element) {
-	return value.push(element)
+	value.push(element)
+}
+
+/**
+ * @param {any[]} value
+ * @param {any} element
+ * @return {void}
+ */
+export function unshift (value, element) {
+	value.unshift(element)
 }
