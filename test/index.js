@@ -264,42 +264,36 @@ describe('PLACEHOLDER', () => {
     ].join(''))
   })
 
-  // TODO: previously there was a generated whitespace after >
-  // TODO: height in the middle of those rules doesn't get grouped with other declaratations
-  // TODO: also some other things wrong with the stringified output here, need further investigation when previous points get fixed
-  // test('@media specifity', () => {
-  //  expect(stylis(`
-  //    > #box-not-working {
-  //      background:red;
-  //      padding-left:8px;
-  //      width:10px;
-  //      @media only screen and (min-width:10px) {
-  //        width:calc(
-  //          10px + 90px *
-  //          (100vw - 10px) / 90
-  //        );
-  //      }
-  //      @media only screen and (min-width:90px) {
-  //        width:90px;
-  //      }
-  //      height: 10px;
-  //      @media only screen and (min-width:10px) {
-  //        height:calc(
-  //          10px + 90px *
-  //          (100vw - 10px) / 90
-  //        );
-  //      }
-  //      @media only screen and (min-width:90px) {
-  //        height: 90px;
-  //      }
-  //    }`)).to.equal([
-  //      '.user > #box-not-working{background:red;padding-left:8px;width:10px;height:10px;}',
-  //      '@media only screen and (min-width:10px){.user > #box-not-working{width:calc( 10px + 90px * (100vw - 10px) / 90 );}}',
-  //      '@media only screen and (min-width:90px){.user > #box-not-working{width:90px;}}',
-  //      '@media only screen and (min-width:10px){.user > #box-not-working{height:calc( 10px + 90px * (100vw - 10px) / 90 );}}',
-  //      '@media only screen and (min-width:90px){.user > #box-not-working{height:90px;}}'
-  //    ].join(''))
-  // })
+  test('@media specifity', () => {
+    expect(
+      stylis(`
+        > #box-not-working {
+          background:red;
+          padding-left:8px;
+          width:10px;
+          @media only screen and (min-width:10px) {
+            width: calc(10px + 90px * (100vw - 10px) / 90);
+          }
+          @media only screen and (min-width:90px) {
+            width: 90px;
+          }
+          height: 10px;
+          @media only screen and (min-width:10px) {
+            height: calc(10px + 90px * (100vw - 10px) / 90);
+          }
+          @media only screen and (min-width:90px) {
+            height: 90px;
+          }
+         }
+      `)
+    ).to.equal([
+      '.user >#box-not-working{background:red;padding-left:8px;width:10px;height:10px;}',
+      '@media only screen and (min-width:10px){.user >#box-not-working{width:calc(10px + 90px * (100vw - 10px)/90);}}',
+      '@media only screen and (min-width:90px){.user >#box-not-working{width:90px;}}',
+      '@media only screen and (min-width:10px){.user >#box-not-working{height:calc(10px + 90px * (100vw - 10px)/90);}}',
+      '@media only screen and (min-width:90px){.user >#box-not-working{height:90px;}}'
+    ].join(''))
+  })
 
   test('@font-face', () => {
     expect(
@@ -750,10 +744,9 @@ describe('PLACEHOLDER', () => {
   //  expect(stylis(`h1{color:rgb([`)).to.equal(`.user h1{color:rgb([;}`)
   // })
 
-  // TODO: fix it, seems like the root cause might be similar to "noop tail VII"
-  // test('noop tail VIII', () => {
-  //  expect(stylis(`h1{color:red/**}`)).to.equal(`.user h1{color:red;}`)
-  // })
+  test('noop tail VIII', () => {
+    expect(stylis(`h1{color:red/**}`)).to.equal(`.user h1{color:red;}`)
+  })
 
   test('comments(context character I)', () => {
     expect(stylis(`.a{color:red;/* } */}`)).to.equal(`.user .a{color:red;}`)
@@ -936,5 +929,9 @@ describe('PLACEHOLDER', () => {
 
   test('does not hang on unterminated block comment (#129)', () => {
     expect(stylis(`/*`)).to.equal(``)
+  })
+
+  test('handles single `/` in a value', () => {
+    expect(stylis(`font: 12px/14px serif;`)).to.equal(`.user{font:12px/14px serif;}`)
   })
 })
