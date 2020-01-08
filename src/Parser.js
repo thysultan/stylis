@@ -1,5 +1,5 @@
 import {RULESET, DECLARATION, COMMENT} from './Enum.js'
-import {abs, trim, from, push, sizeof, strlen, substr, replace} from './Utility.js'
+import {abs, trim, from, push, unshift, sizeof, strlen, substr, replace} from './Utility.js'
 import {node, next, peek, caret, slice, alloc, dealloc, delimiter, whitespace, identifier, attoken} from './Tokenizer.js'
 
 /**
@@ -73,7 +73,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 							else if (attoken(atrule))
 								parse(temporary, points, children, [''], children)
 							else if (parse(value, points, props = [], rules, children), sizeof(props))
-								push(children, ruleset(value, points, 0, 0, rules, type, rules, props))
+								unshift(children, ruleset(value, points, 0, 0, rules, type, rules, props))
 				}
 
 				index = length = offset = 0, ampersand = 1, type = temporary = ''
