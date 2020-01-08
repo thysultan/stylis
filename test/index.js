@@ -193,7 +193,6 @@ describe('PLACEHOLDER', () => {
   })
 
   // TODO: declarations in at-rule are not grouped in a rule
-  // TODO: original output was also auto-prefixed
   // test('@supports', () => {
   //  expect(stylis(`
   //      @supports (display:block) {
@@ -219,7 +218,7 @@ describe('PLACEHOLDER', () => {
   //    ].join(''))
   // })
 
-  // TODO: declarations in at-rule are not grouped in a rule
+  // TODO: declarations in at-rule are not grouped properly
   // test('@media', () => {
   //  expect(stylis(`
   //      @media (max-width:600px) {
@@ -260,7 +259,7 @@ describe('PLACEHOLDER', () => {
   //      '@media (min-width:576px){.user.card-deck .card:not(:first-child){margin-left:15px;}.user.card-deck .card:not(:last-child){margin-right:15px;}}',
   //      '@supports (display:block){@media (min-width:10px){.user{background-color:seagreen;}}}',
   //      '@media (max-width:600px){.user{color:red;}}.user:hover{color:orange;}'
-  //    ])
+  //    ].join(''))
   // })
 
   // TODO: previously there was a generated whitespace after >
@@ -313,20 +312,21 @@ describe('PLACEHOLDER', () => {
     )
   })
 
-  // TODO: doesn't work because compile doesn't replace & correctly
-  // test('multiple selectors', () => {
-  //  expect(stylis(`
-  //      span, h1 {
-  //        color:red;
-  //      }
-  //      h1, &:after, &:before {
-  //        color:red;
-  //      }
-  //    `)).to.equal([
-  //      `.user span,.user h1{color:red;}`,
-  //      `.user h1,.user:after,.user:before{color:red;}`
-  //  ].join(''))
-  // })
+  test('multiple selectors', () => {
+    expect(
+      stylis(`
+        span, h1 {
+          color:red;
+        }
+        h1, &:after, &:before {
+          color:red;
+        }
+     `)
+    ).to.equal([
+      `.user span,.user h1{color:red;}`,
+      `.user h1,.user:after,.user:before{color:red;}`
+   ].join(''))
+  })
 
   test('[title="a,b"] and :matches(a,b)', () => {
     expect(
@@ -502,19 +502,19 @@ describe('PLACEHOLDER', () => {
 
   // TODO: original output was prefixed
   // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace", () => {
+  // test('class namespace', () => {
   //  expect(stylis(' .foo', `h1 {animation:slide 1s;}`)).to.equal(`.foo h1{animation:slide-foo 1s;}`)
   // })
 
   // TODO: original output was prefixed
   // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace", () => {
+  // test('class namespace', () => {
   //  expect(stylis('#foo', `h1 {animation:slide 1s;}`)).to.equal(`#foo h1{animation:slide-foo 1s;}`)
   // })
 
   // TODO: original output was prefixed
   // TODO: keyframes are not being namespaced correctly now right now
-  // test('attribute namespace", () => {
+  // test('attribute namespace', () => {
   //  expect(stylis('[title=foo]', `h1 {animation:slide 1s;}`)).to.equal(`[title=foo] h1{animation:slidetitlefoo 1s;}`)
   // })
 
@@ -537,37 +537,33 @@ describe('PLACEHOLDER', () => {
   //   ).to.equal([`h1{animation:slide 1s;}`, `@keyframes name{0:{top:0;}}`].join(''))
   // })
 
-  // TODO: original output was prefixed
-  // TODO: declarations in at-rule are not grouped in a rule
-  // test('edge cases", () => {
-  //  expect(stylis(`
-  //        @media (min-width:537px) {
-  //          border-bottom:4px solid red;
-  //        }
-  //        &::placeholder {
-  //          color:pink;
-  //        }
-  //        .a {color:'red'}
-  //        .b {color:"red"}
-  //        .a {color:red;}[role=button]{color:red;}
-  //        .b {padding:30 3}
-  //        .c {v-text-anchor: middle;}
-  //     `)).to.equal([
-  //      `@media (min-width:537px){.user{border-bottom:4px solid red;}}`,
-  //      `.user::placeholder{color:pink;}`,
-  //      `.user .a{color:'red';}`,
-  //      `.user .b{color:"red";}`,
-  //      `.user .a{color:red;}`,
-  //      `.user [role=button]{color:red;}`,
-  //      `.user .b{padding:30 3;}`,
-  //      `.user .c{v-text-anchor:middle;}`
-  //  ].join(''))
-  // })
+  test('edge cases', () => {
+    expect(
+      stylis(`
+        @media (min-width:537px) {
+          border-bottom:4px solid red;
+        }
+        &::placeholder {
+          color:pink;
+        }
+        .a {color:'red'}
+        .b {color:"red"}
+        .a {color:red;}[role=button]{color:red;}
+        .b {padding:30 3}
+        .c {v-text-anchor: middle;}
+      `)
+    ).to.equal([
+      `@media (min-width:537px){.user{border-bottom:4px solid red;}}`,
+      `.user::placeholder{color:pink;}`,
+      `.user .a{color:'red';}`,
+      `.user .b{color:"red";}`,
+      `.user .a{color:red;}`,
+      `.user [role=button]{color:red;}`,
+      `.user .b{padding:30 3;}`,
+      `.user .c{v-text-anchor:middle;}`
+    ].join(''))
+  })
 
-  // TODO: there were two tests here:
-  // - "whitespace cascade true"
-  // - "whitespace cascade false"
-  // do we want to keep this configurable?
   test('whitespace', () => {
     expect(
       stylis(`
@@ -579,7 +575,7 @@ describe('PLACEHOLDER', () => {
   })
 
   // TODO: seems broken right now
-  // test('no semi-colons I", () => {
+  // test('no semi-colons I', () => {
   //  expect(stylis(`
   //      color:red
   //      h2 {
@@ -602,7 +598,7 @@ describe('PLACEHOLDER', () => {
   // })
 
   // TODO: seems broken right now
-  // test('no semi-colons II", () => {
+  // test('no semi-colons II', () => {
   //  expect(stylis(`
   //      color:red
   //      color:red
@@ -633,7 +629,7 @@ describe('PLACEHOLDER', () => {
   // })
 
   // TODO: seems broken right now
-  // test('no semi-colon III", () => {
+  // test('no semi-colon III', () => {
   //  expect(stylis(`
   //      grid:
   //        50%
@@ -723,21 +719,13 @@ describe('PLACEHOLDER', () => {
     ).to.equal([`@media{.user div a{color:red;}`, `@media{.user div a h1{color:hotpink;}}}`].join(''))
   })
 
-  // TODO: this is kinda relevant only in combination with auto-prefixing, so this test should be enabled while we add tests for prefixer
-  // test('position fixed without prefixing [issue#53]", () => {
-  //  expect(stylis(`
-  //      position: fixed;
-  //    `,)).to.equal('.user{position:fixed;}')
-  // })
-
   test('noop tail I', () => {
     expect(stylis(`color:red/**/`)).to.equal(`.user{color:red;}`)
   })
 
-  // TODO: fix it :v
-  // test('noop tail II", () => {
-  //  expect(stylis(`color:red//`,)).to.equal('.user{color:red;}')
-  // })
+  test('noop tail II', () => {
+   expect(stylis(`color:red//`,)).to.equal('.user{color:red;}')
+  })
 
   test('noop tail III', () => {
     expect(stylis(`color:red[]`)).to.equal(`.user{color:red[];}`)
@@ -755,13 +743,13 @@ describe('PLACEHOLDER', () => {
     expect(stylis(`color:red""`)).to.equal(`.user{color:red"";}`)
   })
 
-  // TODO: fix it, seems like the root cause might be similar to "noop tail II"
-  // test('noop tail VII", () => {
+  // TODO: fix it
+  // test('noop tail VII', () => {
   //  expect(stylis(`h1{color:rgb([`)).to.equal(`.user h1{color:rgb([;}`)
   // })
 
-  // TODO: fix it, seems like the root cause might be similar to "noop tail II"
-  // test('noop tail VIII", () => {
+  // TODO: fix it, seems like the root cause might be similar to "noop tail VII"
+  // test('noop tail VIII', () => {
   //  expect(stylis(`h1{color:red/**}`)).to.equal(`.user h1{color:red;}`)
   // })
 
@@ -845,25 +833,24 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`@media (min-width: 400px){.user div{border-left:1px solid hotpink;}.user span{border-top:none;}}`)
   })
 
-  // TODO: doesn't include namespace for some reason
-  // test('parenthesis in string literal I (#151)", () => {
-  //  var url = 'image_(1).jpg'
+  test('parenthesis in string literal I (#151)', () => {
+   var url = 'image_(1).jpg'
 
-  //  expect(
-  //    stylis(`
-  //      @media only screen and (max-width: 320px){
-  //          background: url("${url}");
-  //      }
+   expect(
+    stylis(`
+      @media only screen and (max-width: 320px){
+        background: url("${url}");
+      }
 
-  //      @media only screen and (min-width:321px) {
-  //        background: url("${url}");
-  //      }
-  //    `)
-  //  ).to.equal([
-  //    `@media only screen and (max-width: 320px){.user{background:url("image_(1).jpg");}}`,
-  //    `@media only screen and (min-width:321px){.user{background:url("image_(1).jpg");}}`
-  //  ].join(''))
-  // })
+      @media only screen and (min-width:321px) {
+        background: url("${url}");
+      }
+    `)
+   ).to.equal([
+     `@media only screen and (max-width: 320px){.user{background:url("image_(1).jpg");}}`,
+     `@media only screen and (min-width:321px){.user{background:url("image_(1).jpg");}}`
+   ].join(''))
+  })
 
   test('parenthesis in string literal II (#123)', () => {
     expect(
@@ -917,7 +904,7 @@ describe('PLACEHOLDER', () => {
   })
 
   // TODO: would fix #144
-  // test('css variables edge cases", () => {
+  // test('css variables edge cases', () => {
   //   expect(
   //     stylis(`
   //    --braces: { };
