@@ -1,11 +1,11 @@
 import {trim, strlen, charat, substr} from './Utility.js'
 
-var line = 1
-var column = 1
-var length = 0
-var position = 0
-var character = 0
-var temporary = ''
+export var line = 1
+export var column = 1
+export var length = 0
+export var position = 0
+export var character = 0
+export var temporary = ''
 
 /**
  * @param {string} value
@@ -20,7 +20,7 @@ export function node (value, type, props, children) {
 /**
  * @return {number}
  */
-export function next () {
+export function scan () {
 	character = position < length ? charat(temporary, position++) : 0
 
 	if (column++, character === 10)
@@ -50,12 +50,12 @@ export function caret () {
  */
 export function token (type) {
 	switch (type) {
-		// \0 \t \s \n
-		case 0: case 9: case 32: case 10:
-		// @ > + ~ : , ! /
-		case 64: case 62: case 43: case 126: case 58: case 44: case 33: case 47:
-		// { } ;
-		case 123: case 125: case 59:
+		// \0 \t \n \s
+		case 0: case 9: case 10: case 32:
+		// ! + , / : > @ ~
+		case 33: case 43: case 44: case 47: case 58: case 62: case 64: case 126:
+		// ; { }
+		case 59: case 123: case 125:
 			return 2
 		// ( )
 		case 40: case 41:
@@ -71,8 +71,8 @@ export function token (type) {
  */
 export function attoken (type) {
 	switch (type) {
-		// m(edia), s(upports), d(ocument), -(moz-document)
-		case 109: case 115: case 100: case 45:
+		// - d m s
+		case 45: case 100: case 109: case 115:
 			return 0
 	}
 
@@ -109,7 +109,7 @@ export function dealloc (value) {
  * @return {number}
  */
 export function delimit (type) {
-	while (character = next())
+	while (character = scan())
 		if (character === type)
 			break
 		else if (character === 34 || character === 39)
@@ -135,7 +135,7 @@ export function whitespace (type) {
 		if (character > 32)
 			break
 		else
-			next()
+			scan()
 
 	return token(type) > 1 || token(character) > 1 ? '' : ' '
 }
@@ -146,7 +146,7 @@ export function whitespace (type) {
  */
 export function identifier (index) {
 	while (!token(peek(0)))
-		next()
+		scan()
 
 	return slice(index, caret())
 }

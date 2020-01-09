@@ -1,6 +1,6 @@
-import {RULESET, DECLARATION, COMMENT} from './Enum.js'
-import {abs, trim, from, push, unshift, sizeof, strlen, substr, replace} from './Utility.js'
-import {node, next, peek, caret, slice, alloc, dealloc, delimiter, whitespace, identifier, attoken} from './Tokenizer.js'
+import {COMMENT, RULESET, DECLARATION} from './Enum.js'
+import {abs, trim, from, sizeof, strlen, substr, append, prepend, replace} from './Utility.js'
+import {node, scan, peek, caret, slice, alloc, token, dealloc, attoken, delimiter, whitespace, identifier} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -33,7 +33,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 	var temporary = type
 
 	while (scanning)
-		switch (previous = character, character = next()) {
+		switch (previous = character, character = scan()) {
 			// [ ]
 			case 91: ++character
 			// ( )
@@ -49,9 +49,9 @@ export function parse (value, points, declarations, rules, rulesets) {
 			// /
 			case 47:
 				switch (peek(0)) {
-					// *, /
+					// * /
 					case 42: case 47:
-						push(rulesets, comment(next()))
+						append(comment(scan()), rulesets)
 						break
 					default:
 						temporary += '/'
@@ -68,11 +68,11 @@ export function parse (value, points, declarations, rules, rulesets) {
 					// ;
 					case 59 + offset:
 						if (length > 0)
-							push(declarations, declaration(temporary, length))
+							append(declaration(temporary, length), declarations)
 						break
-					// rule/atrule
+					// rule/at-rule
 					default:
-						push(rulesets, ruleset(temporary, points, index, offset, rules, type, props = [], children = []))
+						append(ruleset(temporary, points, index, offset, rules, type, props = [], children = []), rulesets)
 
 						if (character !== 59)
 							if (offset === 0)
@@ -80,7 +80,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 							else if (attoken(atrule))
 								parse(temporary, points, children, [''], children)
 							else if (parse(value, points, props = [], rules, children), sizeof(props))
-								unshift(children, ruleset(value, points, 0, 0, rules, type, rules, props))
+								prepend(ruleset(value, points, 0, 0, rules, type, rules, props), children)
 				}
 
 				index = length = offset = 0, ampersand = 1, type = temporary = ''
@@ -119,10 +119,10 @@ export function comment (type) {
 	var temporary = trim(from(peek(0))) || from(type)
 	var character = 0
 
-	while (character = next())
+	while (character = scan())
 		if (character === 10 && type === 47)
 			break
-		else if (character === 42 && type === 42 && peek(0) !== 42 && next() === 47)
+		else if (character === 42 && type === 42 && peek(0) !== 42 && scan() === 47)
 			break
 
 	return node(temporary, COMMENT, temporary, substr(temporary = slice(index, caret()), 2, strlen(temporary) - offset))

@@ -91,19 +91,19 @@ export function sizeof (value) {
 }
 
 /**
- * @param {any[]} value
- * @param {any} element
+ * @param {any} value
+ * @param {any[]} array
  * @return {void}
  */
-export function push (value, element) {
-	value.push(element)
+export function append (value, array) {
+	array.push(value)
 }
 
 /**
- * @param {any[]} value
- * @param {any} element
+ * @param {any} value
+ * @param {any[]} array
  * @return {void}
  */
-export function unshift (value, element) {
-	value.unshift(element)
+export function prepend (value, array) {
+	array.unshift(value)
 }
