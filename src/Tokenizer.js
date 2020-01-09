@@ -113,7 +113,7 @@ export function delimit (type) {
 		if (character === type)
 			break
 		else if (character === 34 || character === 39)
-			delimit(character)
+			return delimit(type === 34 || type === 39 ? type : character)
 
 	return caret()
 }
