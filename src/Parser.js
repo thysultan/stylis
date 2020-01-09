@@ -48,7 +48,14 @@ export function parse (value, points, declarations, rules, rulesets) {
 				break
 			// /
 			case 47:
-				push(rulesets, comment(next()))
+				switch (peek(0)) {
+					// *, /
+					case 42: case 47:
+						push(rulesets, comment(next()))
+						break
+					default:
+						temporary += '/'
+				}
 				break
 			// {
 			case 123:
