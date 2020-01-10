@@ -103,6 +103,16 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`.user{color:red;}`)
   })
 
+  test('& in a string', () => {
+    expect(
+      stylis(`
+        [href="https://css-tricks.com?a=1&b=2"] {
+          color:red;
+        }
+     `)
+    ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
+  })
+
   test('comments', () => {
     expect(
       stylis(`
