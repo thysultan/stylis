@@ -93,7 +93,7 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`.user{color:20px;font-size:20px;}`)
   })
 
-  test('namespace', () => {
+  test('namespace I', () => {
     expect(
       stylis(`
         & {
@@ -101,6 +101,16 @@ describe('PLACEHOLDER', () => {
         }
      `)
     ).to.equal(`.user{color:red;}`)
+  })
+
+  test('namespace II', () => {
+    expect(
+      stylis(`
+        &[data-test="foo & bar"] {
+          color:red;
+        }
+     `)
+    ).to.equal(`.user[data-test="foo & bar"]{color:red;}`)
   })
 
   test('comments', () => {
