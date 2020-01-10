@@ -349,16 +349,15 @@ describe('PLACEHOLDER', () => {
     ].join(''))
   })
 
-  // TODO doesn't work - seems like ' in "" breaks stuff
-  // test('quotes', () => {
-  //  expect(stylis(`
-  //      .foo:before {
-  //          content:".hello {world}";
-  //          content:".hello {world} ' ";
-  //          content:'.hello {world} " ';
-  //      }
-  //    `)).to.equal(`.user .foo:before{content:".hello {world}";content:".hello {world} ' ";content:'.hello {world} " ';}`)
-  // })
+  test('quotes', () => {
+   expect(stylis(`
+      .foo:before {
+        content:".hello {world}";
+        content:".hello {world} ' ";
+        content:'.hello {world} " ';
+      }
+     `)).to.equal(`.user .foo:before{content:".hello {world}";content:".hello {world} ' ";content:'.hello {world} " ';}`)
+  })
 
   test('remove empty css', () => {
     expect(
@@ -570,98 +569,30 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`.user div{width:0;}`)
   })
 
-  // TODO: seems broken right now
-  // test('no semi-colons I', () => {
-  //  expect(stylis(`
-  //      color:red
-  //      h2 {
-  //        color:blue
-  //        width:0
-  //        h3 {
-  //          display:none
-  //        }
-  //      }
-  //      div:hover
-  //        {
-  //        color:red
-  //      }
-  //    `)).to.equal([
-  //      '.user{color:red;}',
-  //      '.user h2{color:blue;width:0;}',
-  //      '.user h2 h3{display:none;}',
-  //      '.user div:hover{color:red;}      '
-  //  ].join(''))
-  // })
+  test('no trailing semi-colons', () => {
+   expect(stylis(`
+      h2 {
+        display:none
+      }
+      div:hover
+        {
+        color:red
+      }
+     `)).to.equal([
+       '.user h2{display:none;}',
+       '.user div:hover{color:red;}'
+   ].join(''))
+  })
 
-  // TODO: seems broken right now
-  // test('no semi-colons II', () => {
-  //  expect(stylis(`
-  //      color:red
-  //      color:red
-  //      h1:hover,
-  //      h2:hover
-  //      ,
-  //      h3
-  //      {
-  //        color:red
-  //        width:0/
-  //          2
-  //      }
-  //      h1 {
-  //        grid-template-areas:
-  //          "header header header"
-  //          '. main .';
-  //      }
-  //      h1 {
-  //        width:calc(20px)
-  //                20px;
-  //      }
-  //    `)).to.equal([
-  //      `.user{color:red;color:red;}`,
-  //      `.user h1:hover,.user h2:hover,.user h3{color:red;width:0/ 2;}`,
-  //      `.user h1{grid-template-areas: "header header header" '. main .';}`,
-  //      `.user h1{width:calc(20px) 20px;}`
-  //  ].join(''))
-  // })
-
-  // TODO: seems broken right now
-  // test('no semi-colon III', () => {
-  //  expect(stylis(`
-  //      grid:
-  //        50%
-  //        50%
-  //      grid:
-  //        50%
-  //        /
-  //        50%
-  //      grid-template-areas: "a b b"
-  //                           "a c d";
-  //      background: center
-  //        center no-repeat;
-  //      color:red;
-  //      grid-template-columns: minmax(100px, max-content)
-  //                             repeat(auto-fill, 200px) 20%;
-  //      grid-template-columns: [linename1] 100px [linename2]
-  //                             repeat(auto-fit, [linename3 linename4] 300px)
-  //                             100px;
-  //      grid-template-columns: [linename1 linename2] 100px
-  //                             repeat(auto-fit, [linename1] 300px) [linename3];
-  //    `)).to.equal([
-  //      `.user{grid: 50% 50%;grid: 50% / 50%;grid-template-areas:"a b b" "a c d";background:center center no-repeat;color:red;grid-template-columns:minmax(100px,max-content) repeat(auto-fill,200px) 20%;grid-template-columns:[linename1] 100px [linename2] repeat(auto-fit,[linename3 linename4] 300px) 100px;grid-template-columns:[linename1 linename2] 100px repeat(auto-fit,[linename1] 300px) [linename3];}`
-  //  ].join(''))
-  // })
-
-  // TODO: whitespace is different than in original
-  // it shouldnt be a problem though?
-  // test('multiline declaration", () => {
-  //  expect(stylis(`
-  //      html {
-  //        background:
-  //          linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
-  //          url(/static/background.svg);
-  //      }
-  //    `)).to.equal(`.user html{background: linear-gradient(0deg,rgba(255,255,255,0.8),rgba(255,255,255,0.8)), url(/static/background.svg);}`)
-  // })
+  test('multiline declaration', () => {
+   expect(stylis(`
+      html {
+        background:
+          linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
+          url(/static/background.svg);
+      }
+     `)).to.equal(`.user html{background:linear-gradient(0deg, rgba(255, 255, 255, 0.8),rgba(255, 255, 255, 0.8)),url(/static/background.svg);}`)
+  })
 
   test('nesting selector multiple levels', () => {
     expect(
@@ -739,12 +670,7 @@ describe('PLACEHOLDER', () => {
     expect(stylis(`color:red""`)).to.equal(`.user{color:red"";}`)
   })
 
-  // TODO: fix it
-  // test('noop tail VII', () => {
-  //  expect(stylis(`h1{color:rgb([`)).to.equal(`.user h1{color:rgb([;}`)
-  // })
-
-  test('noop tail VIII', () => {
+  test('noop tail VII', () => {
     expect(stylis(`h1{color:red/**}`)).to.equal(`.user h1{color:red;}`)
   })
 
@@ -829,21 +755,19 @@ describe('PLACEHOLDER', () => {
   })
 
   test('parenthesis in string literal I (#151)', () => {
-   var url = 'image_(1).jpg'
-
    expect(
     stylis(`
       @media only screen and (max-width: 320px){
-        background: url("${url}");
+        background: url("${'image_(1).jpg'}");
       }
 
       @media only screen and (min-width:321px) {
-        background: url("${url}");
+        background: url("${'image_(1).jpg'}");
       }
     `)
    ).to.equal([
-     `@media only screen and (max-width: 320px){.user{background:url("image_(1).jpg");}}`,
-     `@media only screen and (min-width:321px){.user{background:url("image_(1).jpg");}}`
+     `@media only screen and (max-width: 320px){.user{background:url("${'image_(1).jpg'}");}}`,
+     `@media only screen and (min-width:321px){.user{background:url("${'image_(1).jpg'}");}}`
    ].join(''))
   })
 
@@ -898,34 +822,23 @@ describe('PLACEHOLDER', () => {
     ].join(''))
   })
 
-  // TODO: would fix #144
-  // test('css variables edge cases', () => {
-  //   expect(
-  //     stylis(`
-  //    --braces: { };
-  //    --at-keyword-unknown-block: @foobar {};
-  //    --at-keyword-known-block: @media {};
-  //    --cdo-at-top-level: <!--;
-  //    --cdc-at-top-level: -->;
-  //    --semicolon-not-top-level: (;);
-  //    --cdo-not-top-level: (<!--);
-  //    --cdc-not-top-level: (-->);
-  //  `)
-  //   ).to.equal(
-  //     `.user{` +
-  //       [
-  //         "--braces: { };",
-  //         "--at-keyword-unknown-block: @foobar {};",
-  //         "--at-keyword-known-block: @media {};",
-  //         "--cdo-at-top-level: <!--;",
-  //         "--cdc-at-top-level: -->;",
-  //         "--semicolon-not-top-level: (;);",
-  //         "--cdo-not-top-level: (<!--);",
-  //         "--cdc-not-top-level: (-->);"
-  //       ].join('') +
-  //       "}"
-  //   );
-  // });
+  test('css variables edge cases', () => {
+    expect(
+      stylis(`
+     --cdo-at-top-level: <!--;
+     --cdc-at-top-level: -->;
+     --semicolon-not-top-level: (;);
+     --cdo-not-top-level: (<!--);
+     --cdc-not-top-level: (-->);
+   `)
+    ).to.equal(`.user{` + [
+      `--cdo-at-top-level:<!--;`,
+      `--cdc-at-top-level:-->;`,
+      `--semicolon-not-top-level:(;);`,
+      `--cdo-not-top-level:(<!--);`,
+      `--cdc-not-top-level:(-->);`
+    ].join('') +'}')
+  })
 
   test('does not hang on unterminated block comment (#129)', () => {
     expect(stylis(`/*`)).to.equal(``)
