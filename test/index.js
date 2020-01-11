@@ -822,6 +822,10 @@ describe('PLACEHOLDER', () => {
     ].join(''))
   })
 
+  test('nested parenthesis', () => {
+    expect(stylis(`width: calc(calc(1) + 10);`)).to.equal(`.user{width:calc(calc(1) + 10);}`)
+  })
+
   test('css variables edge cases', () => {
     expect(
       stylis(`
