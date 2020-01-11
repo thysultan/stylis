@@ -110,12 +110,23 @@ export function dealloc (value) {
  */
 export function delimit (type) {
 	while (character = scan())
-		if (character === type)
-			break
-		else if (character === 34 || character === 39)
-			return delimit(type === 34 || type === 39 ? type : character)
-
-	return caret()
+		switch (character) {
+			// \0 ] ) " '
+			case 0: case type:
+				return caret()
+			// " '
+			case 34: case 39:
+				return delimit(type === 34 || type === 39 ? type : character)
+			// (
+			case 40:
+				if (type === 41)
+					delimit(type)
+				break
+			// \
+			case 92:
+				scan()
+				break
+		}
 }
 
 /**

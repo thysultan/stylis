@@ -288,9 +288,9 @@ describe('PLACEHOLDER', () => {
       `)
     ).to.equal([
       '.user >#box-not-working{background:red;padding-left:8px;width:10px;height:10px;}',
-      '@media only screen and (min-width:10px){.user >#box-not-working{width:calc(10px + 90px * (100vw - 10px)/90);}}',
+      '@media only screen and (min-width:10px){.user >#box-not-working{width:calc(10px + 90px * (100vw - 10px) / 90);}}',
       '@media only screen and (min-width:90px){.user >#box-not-working{width:90px;}}',
-      '@media only screen and (min-width:10px){.user >#box-not-working{height:calc(10px + 90px * (100vw - 10px)/90);}}',
+      '@media only screen and (min-width:10px){.user >#box-not-working{height:calc(10px + 90px * (100vw - 10px) / 90);}}',
       '@media only screen and (min-width:90px){.user >#box-not-working{height:90px;}}'
     ].join(''))
   })
@@ -591,7 +591,7 @@ describe('PLACEHOLDER', () => {
           linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
           url(/static/background.svg);
       }
-     `)).to.equal(`.user html{background:linear-gradient(0deg, rgba(255, 255, 255, 0.8),rgba(255, 255, 255, 0.8)),url(/static/background.svg);}`)
+     `)).to.equal(`.user html{background:linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),url(/static/background.svg);}`)
   })
 
   test('nesting selector multiple levels', () => {
