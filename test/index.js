@@ -1,8 +1,8 @@
 import {compile, serialize} from "../index.js"
 
-const stylis = string => serialize(compile(`.user{${string}}`))
+describe('core', () => {
+  const stylis = string => serialize(compile(`.user{${string}}`))
 
-describe('PLACEHOLDER', () => {
   // TODO:
   // - test vendor prefixing:
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L553
@@ -406,131 +406,117 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
-  // TODO: original output was prefixed
-  // TODO: some replacements were allowed previously and it doesn't work right now - "animation: _name_ -name %name 1name __name;"
-  // test('animations", () => {
-  //      /*
-  //      this also tests the parses ability to find and namespace
-  //      the animation-name in a grouped animation: property
-  //    */
-  //  expect(stylis(`
-  //      h2 {
-  //        animation: initial inherit unset --invalid;
-  //      }
-  //      span {
-  //        animation: _name_ -name %name 1name __name;
-  //      }
-  //      div {
-  //        animation-name: bounce
-  //      }
-  //      h1 {
-  //        animation:` +
-  //        `
-  //        0.6s
-  //        .6ms
-  //        200ms
-  //        infinite
-  //        something-ease
-  //        infinite-fire
-  //        slidein
-  //        cubic-bezier()
-  //        cubic-bezier(1,2,4)
-  //        ease-in-out
-  //        ease
-  //        ease-inOuter
-  //        linear
-  //        alternate
-  //        normal
-  //        forwards
-  //        both
-  //        none
-  //        ease-in
-  //        ease-out
-  //        backwards
-  //        running
-  //        paused
-  //        reverse
-  //        alternate-reverse
-  //        step-start
-  //        step-end
-  //        step-end-something
-  //        steps(4,end)
-  //        `.replace(/\n|\r| +/g, ' ') +
-  //        `;
-  //      }
-  //      span {
-  //        animation-duration: 0.6s;
-  //        animation-name: slidein;
-  //        animation-iteration-count: infinite;
-  //        animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
-  //      }
-  //      input {
-  //        animation-name: anim1, anim2;
-  //        animation-name: none;
-  //      }
-  //    `)).to.equal([
-  //      '.user h2{animation:initial inherit unset --invalid;}',
-  //      '.user span{animation:_name_-user -name-user %name 1name __name-user;}',
-  //      '.user div{animation-name:bounce-user;}',
-  //      '.user h1{animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease ease-inOuter-user linear alternate normal forwards both none ease-in ease-out backwards running paused reverse alternate-reverse step-start step-end step-end-something-user steps(4,end);}',
-  //      '.user span{animation-duration:0.6s;animation-name:slidein-user;animation-iteration-count:infinite;animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}',
-  //      '.user input{animation-name:anim1-user,anim2-user;animation-name:none;}'
-  //  ].join(''))
-  // })
+  test('animations', () => {
+    expect(
+      stylis(`
+        h2 {
+          animation: initial inherit unset --invalid;
+        }
+        span {
+          animation: _name_ -name %name 1name __name;
+        }
+        div {
+          animation-name: bounce
+        }
+        h1 {
+          animation:` +
+            `
+            0.6s
+            .6ms
+            200ms
+            infinite
+            something-ease
+            infinite-fire
+            slidein
+            cubic-bezier()
+            cubic-bezier(1,2,4)
+            ease-in-out
+            ease
+            ease-inOuter
+            linear
+            alternate
+            normal
+            forwards
+            both
+            none
+            ease-in
+            ease-out
+            backwards
+            running
+            paused
+            reverse
+            alternate-reverse
+            step-start
+            step-end
+            step-end-something
+            steps(4,end)
+            `.replace(/\n|\r| +/g, ' ') +
+          `;
+        }
+        span {
+          animation-duration: 0.6s;
+          animation-name: slidein;
+          animation-iteration-count: infinite;
+          animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
+        }
+        input {
+          animation-name: anim1, anim2;
+          animation-name: none;
+        }
+      `)
+    ).to.equal([
+      '.user h2{animation:initial inherit unset --invalid;}',
+      '.user span{animation:_name_ -name %name 1name __name;}',
+      '.user div{animation-name:bounce;}',
+      '.user h1{animation:0.6s .6ms 200ms infinite something-ease infinite-fire slidein cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease ease-inOuter linear alternate normal forwards both none ease-in ease-out backwards running paused reverse alternate-reverse step-start step-end step-end-something steps(4,end);}',
+      '.user span{animation-duration:0.6s;animation-name:slidein;animation-iteration-count:infinite;animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}',
+      '.user input{animation-name:anim1,anim2;animation-name:none;}'
+   ].join(''))
+  })
 
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly right now
-  // TODO: doesn't work because compile doesn't replace & correctly
-  // test('keyframes", () => {
-  //  expect(stylis(`
-  //      &{
-  //        animation:slidein 3s ease infinite;
-  //      }
-  //      @keyframes slidein {
-  //        to { transform:translate(20px); }
-  //      }
-  //    `)).to.equal([
-  //      '.user{animation:slidein-user 3s ease infinite;}',
-  //      '@keyframes slidein-user{to{transform:translate(20px);}}'
-  //  ].join(''))
-  // })
+  test('keyframes', () => {
+    expect(
+      stylis(`
+        &{
+          animation:slidein 3s ease infinite;
+        }
+        @keyframes slidein {
+          to { transform:translate(20px); }
+        }
+      `)
+    ).to.equal([
+      '.user{animation:slidein 3s ease infinite;}',
+      '@keyframes slidein{to{transform:translate(20px);}}'
+    ].join(''))
+  })
 
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace', () => {
-  //  expect(stylis(' .foo', `h1 {animation:slide 1s;}`)).to.equal(`.foo h1{animation:slide-foo 1s;}`)
-  // })
+  test('class namespace', () => {
+    expect(serialize(compile(`.foo { h1 {animation:slide 1s;} }`))).to.equal(`.foo h1{animation:slide 1s;}`)
+  })
 
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace', () => {
-  //  expect(stylis('#foo', `h1 {animation:slide 1s;}`)).to.equal(`#foo h1{animation:slide-foo 1s;}`)
-  // })
+  test('id namespace', () => {
+   expect(serialize(compile(`#foo { h1 {animation:slide 1s;} }`))).to.equal(`#foo h1{animation:slide 1s;}`)
+  })
 
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('attribute namespace', () => {
-  //  expect(stylis('[title=foo]', `h1 {animation:slide 1s;}`)).to.equal(`[title=foo] h1{animation:slidetitlefoo 1s;}`)
-  // })
+  test('attribute namespace', () => {
+   expect(serialize(compile(`[title=foo] { h1 {animation:slide 1s;} }`))).to.equal(`[title=foo] h1{animation:slide 1s;}`)
+  })
 
-  // TODO: original output was prefixed
-  // test('empty namespace', () => {
-  //   expect(
-  //     stylis(
-  //       '',
-  //       `
-  //         h1 {
-  //           animation:slide 1s; }
+  test('no namespace', () => {
+    expect(
+      serialize(compile(`
+        h1 {
+          animation:slide 1s;
+        }
 
-  //           @keyframes name {
-  //             0: {
-  //               top:0
-  //             }
-  //           }
-  //     `
-  //     )
-  //   ).to.equal([`h1{animation:slide 1s;}`, `@keyframes name{0:{top:0;}}`].join(''))
-  // })
+        @keyframes name {
+          0: {
+            top:0
+          }
+        }
+      `))
+    ).to.equal([`h1{animation:slide 1s;}`, `@keyframes name{0:{top:0;}}`].join(''))
+  })
 
   test('edge cases', () => {
     expect(
