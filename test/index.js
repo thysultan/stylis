@@ -844,13 +844,15 @@ describe('PLACEHOLDER', () => {
      --semicolon-not-top-level: (;);
      --cdo-not-top-level: (<!--);
      --cdc-not-top-level: (-->);
+     --ampersand: foo & bar;
    `)
     ).to.equal(`.user{` + [
       `--cdo-at-top-level:<!--;`,
       `--cdc-at-top-level:-->;`,
       `--semicolon-not-top-level:(;);`,
       `--cdo-not-top-level:(<!--);`,
-      `--cdc-not-top-level:(-->);`
+      `--cdc-not-top-level:(-->);`,
+      `--ampersand: foo & bar;`
     ].join('') +'}')
   })
 
