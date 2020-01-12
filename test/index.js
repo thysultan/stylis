@@ -106,7 +106,7 @@ describe('PLACEHOLDER', () => {
   test('& in a string', () => {
     expect(
       stylis(`
-        [href="https://css-tricks.com?a=1&b=2"] {
+        & [href="https://css-tricks.com?a=1&b=2"] {
           color:red;
         }
      `)
