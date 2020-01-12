@@ -54,7 +54,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 						append(comment(scan()), rulesets)
 						break
 					default:
-						temporary += '/'
+						temporary += from(character)
 				}
 				break
 			// {
@@ -89,7 +89,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 				switch (temporary += from(character), character) {
 					// &
 					case 38:
-						ampersand = offset > 0 ? 1 : -1
+						ampersand = offset > 0 ? 1 : -1, temporary += from(12)
 						break
 					// :
 					case 58:
@@ -146,7 +146,7 @@ export function ruleset (value, points, index, offset, rules, type, props, child
 
 	for (var i = 0, j = 0, k = 0; i < index; ++i)
 		for (var x = 0, y = substr(value, post + 1, post = abs(j = points[i])), z = value; x < size; ++x)
-			if (z = trim(j > 0 ? root[x] + ' ' + y : replace(y, /&/g, root[x])))
+			if (z = trim(j > 0 ? root[x] + ' ' + y : replace(y, /&\f/g, root[x])))
 				props[k++] = z
 
 	return node(value, offset === 0 ? RULESET : type, props, children)
