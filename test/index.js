@@ -13,9 +13,6 @@ describe('PLACEHOLDER', () => {
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L835
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L876
   //    - https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L953
-  // - what about "animations disabled namespace" test? https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1065
-  // - what about "keyframes disabled namespace" test? https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1095
-  // - add "nested" test, but remove `:global()` from it https://github.com/thysultan/stylis.js/blob/4561e9bc830fccf1cb0e9e9838488b4d1d5cebf5/tests/spec.js#L1115
   // - add prefixer API and accompanying tests
 
   test('calc', () => {
@@ -416,132 +413,6 @@ describe('PLACEHOLDER', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
-  // TODO: original output was prefixed
-  // TODO: some replacements were allowed previously and it doesn't work right now - "animation: _name_ -name %name 1name __name;"
-  // test('animations", () => {
-  //      /*
-  //      this also tests the parses ability to find and namespace
-  //      the animation-name in a grouped animation: property
-  //    */
-  //  expect(stylis(`
-  //      h2 {
-  //        animation: initial inherit unset --invalid;
-  //      }
-  //      span {
-  //        animation: _name_ -name %name 1name __name;
-  //      }
-  //      div {
-  //        animation-name: bounce
-  //      }
-  //      h1 {
-  //        animation:` +
-  //        `
-  //        0.6s
-  //        .6ms
-  //        200ms
-  //        infinite
-  //        something-ease
-  //        infinite-fire
-  //        slidein
-  //        cubic-bezier()
-  //        cubic-bezier(1,2,4)
-  //        ease-in-out
-  //        ease
-  //        ease-inOuter
-  //        linear
-  //        alternate
-  //        normal
-  //        forwards
-  //        both
-  //        none
-  //        ease-in
-  //        ease-out
-  //        backwards
-  //        running
-  //        paused
-  //        reverse
-  //        alternate-reverse
-  //        step-start
-  //        step-end
-  //        step-end-something
-  //        steps(4,end)
-  //        `.replace(/\n|\r| +/g, ' ') +
-  //        `;
-  //      }
-  //      span {
-  //        animation-duration: 0.6s;
-  //        animation-name: slidein;
-  //        animation-iteration-count: infinite;
-  //        animation-timing-function: cubic-bezier(0.1,0.7,1.0,0.1);
-  //      }
-  //      input {
-  //        animation-name: anim1, anim2;
-  //        animation-name: none;
-  //      }
-  //    `)).to.equal([
-  //      '.user h2{animation:initial inherit unset --invalid;}',
-  //      '.user span{animation:_name_-user -name-user %name 1name __name-user;}',
-  //      '.user div{animation-name:bounce-user;}',
-  //      '.user h1{animation:0.6s .6ms 200ms infinite something-ease-user infinite-fire-user slidein-user cubic-bezier() cubic-bezier(1,2,4) ease-in-out ease ease-inOuter-user linear alternate normal forwards both none ease-in ease-out backwards running paused reverse alternate-reverse step-start step-end step-end-something-user steps(4,end);}',
-  //      '.user span{animation-duration:0.6s;animation-name:slidein-user;animation-iteration-count:infinite;animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);}',
-  //      '.user input{animation-name:anim1-user,anim2-user;animation-name:none;}'
-  //  ].join(''))
-  // })
-
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly right now
-  // TODO: doesn't work because compile doesn't replace & correctly
-  // test('keyframes", () => {
-  //  expect(stylis(`
-  //      &{
-  //        animation:slidein 3s ease infinite;
-  //      }
-  //      @keyframes slidein {
-  //        to { transform:translate(20px); }
-  //      }
-  //    `)).to.equal([
-  //      '.user{animation:slidein-user 3s ease infinite;}',
-  //      '@keyframes slidein-user{to{transform:translate(20px);}}'
-  //  ].join(''))
-  // })
-
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace', () => {
-  //  expect(stylis(' .foo', `h1 {animation:slide 1s;}`)).to.equal(`.foo h1{animation:slide-foo 1s;}`)
-  // })
-
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('class namespace', () => {
-  //  expect(stylis('#foo', `h1 {animation:slide 1s;}`)).to.equal(`#foo h1{animation:slide-foo 1s;}`)
-  // })
-
-  // TODO: original output was prefixed
-  // TODO: keyframes are not being namespaced correctly now right now
-  // test('attribute namespace', () => {
-  //  expect(stylis('[title=foo]', `h1 {animation:slide 1s;}`)).to.equal(`[title=foo] h1{animation:slidetitlefoo 1s;}`)
-  // })
-
-  // TODO: original output was prefixed
-  // test('empty namespace', () => {
-  //   expect(
-  //     stylis(
-  //       '',
-  //       `
-  //         h1 {
-  //           animation:slide 1s; }
-
-  //           @keyframes name {
-  //             0: {
-  //               top:0
-  //             }
-  //           }
-  //     `
-  //     )
-  //   ).to.equal([`h1{animation:slide 1s;}`, `@keyframes name{0:{top:0;}}`].join(''))
-  // })
-
   test('edge cases', () => {
     expect(
       stylis(`
@@ -749,7 +620,7 @@ describe('PLACEHOLDER', () => {
     ].join(''))
   })
 
-  test('comment in a group of selectors inside a media query keeping consecutive rule inside that media query (#152)', () => {
+  test('comment in a group of selectors inside a media query (#152)', () => {
     expect(
       stylis(`
         @media (min-width: 400px) {
@@ -860,5 +731,73 @@ describe('PLACEHOLDER', () => {
 
   test('handles single `/` in a value', () => {
     expect(stylis(`font: 12px/14px serif;`)).to.equal(`.user{font:12px/14px serif;}`)
+  })
+
+  test('nested', () => {
+    expect(stylis(`
+      div {
+        h2 {
+          color:red;
+          h3 {
+            color:blue;
+          }
+        }
+      }
+
+      .foo & {
+          width:1px;
+          &:hover {
+            color:black;
+          }
+          li {
+            color:white;
+          }
+      }
+
+      h1, div {
+        color:red;
+        h2,
+        &:before {
+          color:red;
+        }
+        color:blue;
+        header {
+          font-size:12px;
+        }
+        @media {
+          color:red;
+        }
+        @media {
+          color:blue;
+        }
+      }
+
+      &.foo {
+        &.bar {
+          color:orange
+        }
+      }
+
+      &.foo {
+        &.bar {
+          &.barbar {
+            color:orange
+          }
+        }
+      }
+    `)).to.equal([
+      `.user div h2{color:red;}`+
+      `.user div h2 h3{color:blue;}`+
+      `.foo .user{width:1px;}`+
+      `.foo .user:hover{color:black;}`+
+      `.foo .user li{color:white;}`+
+      `.user h1,.user div{color:red;color:blue;}`+
+      `.user h1 h2,.user div h2,.user h1:before,.user div:before{color:red;}`+
+      `.user h1 header,.user div header{font-size:12px;}`+
+      `@media{.user h1,.user div{color:red;}}`+
+      `@media{.user h1,.user div{color:blue;}}`+
+      `.user.foo.bar{color:orange;}`+
+      `.user.foo.bar.barbar{color:orange;}`
+    ].join(''))
   })
 })
