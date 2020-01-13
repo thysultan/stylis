@@ -50,10 +50,13 @@ export function caret () {
  */
 export function token (type) {
 	switch (type) {
+		// * /
+		case 42: case 47:
+			return 3
 		// \0 \t \n \s
 		case 0: case 9: case 10: case 32:
 		// ! + , / : > @ ~
-		case 33: case 43: case 44: case 47: case 58: case 62: case 64: case 126:
+		case 33: case 43: case 44: case 58: case 62: case 64: case 126:
 		// ; { }
 		case 59: case 123: case 125:
 			return 2
