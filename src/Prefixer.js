@@ -13,40 +13,40 @@ export function prefix (value, length) {
 			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645:
-			return (WEBKIT+value+';') + (value)
+			return WEBKIT + value + ';' + value
 		// box-decoration-break, appearance, user-select, flex, transform, hyphens
 		case 3005: case 5349: case 4246: case 6828: case 4810: case 6968:
-			return (WEBKIT+value+';') + (MOZ+value+';') + (MS+value+';') + (value)
+			return WEBKIT + value + ';' + MOZ + value + ';' + MS + value + ';' + value
 		// order
 		case 6165:
-			return (WEBKIT+value+';') + (MS+'flex-'+value+';') + (value)
+			return WEBKIT + value + ';' + MS + 'flex-' + value + ';' + value
 		// align-items
 		case 5187:
-			return (WEBKIT+value+';') + (replace(value, /(\w+).+(:[^]+)/, (WEBKIT+'box-$1$2;')+(MS+'flex-$1$2'))+';') + (value)
+			return WEBKIT + value + ';' + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2;' + MS + 'flex-$1$2') + ';' + value
 		// align-self
 		case 5443:
-			return (WEBKIT+value+';') + (MS+'flex-item-'+replace(value, /flex-|-self/, '')+';') + (value)
+			return WEBKIT + value + ';' + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + ';' + value
 		// align-content
 		case 4675:
-			return (WEBKIT+value+';') + (MS+'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + ';') + (value)
+			return WEBKIT + value + ';' + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + ';' + value
 		// flex-shrink
 		case 5548:
-			return (WEBKIT+value+';') + (MS+replace(value, 'shrink', 'negative')+';') + (value)
+			return WEBKIT + value + ';' + MS + replace(value, 'shrink', 'negative') + ';' + value
 		// flex-basis
 		case 5292:
-			return (WEBKIT+value+';') + (MS+replace(value, 'basis', 'preferred-size')+';') + (value)
+			return WEBKIT + value + ';' + MS + replace(value, 'basis', 'preferred-size') + ';' + value
 		// flex-grow
 		case 6060:
-			return (WEBKIT+'box-'+replace(value, '-grow', '')+';') + (WEBKIT+value+';') + (MS+replace(value, 'grow', 'positive')+';') + (value)
+			return WEBKIT + 'box-' + replace(value, '-grow', '') + ';' + WEBKIT + value + ';' + MS + replace(value, 'grow', 'positive') + ';' + value
 		// transition
 		case 4554:
-			return (replace(value, /([^-])(transform)/g, '$1'+WEBKIT+'$2')+';') + (value)
+			return replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';' + value
 		// background
 		case 5495:
-			return (replace(value, /([^-])(image-set\()/, '$1'+WEBKIT+'$2')+';') + (value)
+			return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2') + ';' + value
 		// cursor
 		case 6187:
-			return (replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1'+WEBKIT+'$2$3;$1'+MOZ+'$2$3')+';') + (value)
+			return replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3;$1' + MOZ + '$2$3') + ';' + value
 		// writing-mode
 		case 5936:
 			// vertical-lr, vertical-rl, horizontal-tb
@@ -54,13 +54,13 @@ export function prefix (value, length) {
 				switch (charat(value, length + 10)) {
 					// vertical-l(r)
 					case 114:
-						return (WEBKIT+value+';') + (MS+replace(value, /[svh]\w+-[tblr]{2}/, 'tb')+';') + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + ';' + value
 					// vertical-r(l)
 					case 108:
-						return (WEBKIT+value+';') + (MS+replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl')+';') + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl') + ';' + value
 					// horizontal(-)tb
 					case 45:
-						return (WEBKIT+value+';') + (MS+replace(value, /[svh]\w+-[tblr]{2}/, 'lr')+';') + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + ';' + value
 				}
 			break
 		// (min|max)?(width|height|inline-size|block-size)
@@ -72,10 +72,10 @@ export function prefix (value, length) {
 				switch (charat(value, length + 1)) {
 					// (m)ax-content, (m)in-content
 					case 109:
-						return replace(value, /(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$2-$3;')+'$1$2-$3')
+						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$2-$3;' + '$1$2-$3')
 					// (f)ill-available
 					case 102:
-						return replace(value, /(.+:)(.+)-([^]+)/, ('$1'+WEBKIT+'$2-$3;')+('$1'+MOZ+'$3;')+'$1$2-$3')
+						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$3;' + '$1$2-$3')
 					// (s)tretch
 					case 115:
 						return prefix(replace(replace(value, 'stretch', 'fill-available'), length), ':fill-available', ':stretch')
@@ -91,27 +91,18 @@ export function prefix (value, length) {
 			switch (charat(value, strlen(value) - 2 - (indexof(value, '!important') && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
-					return (replace(value, value, WEBKIT+value)+';') + (value)
+					return replace(value, value, WEBKIT + value) + ';' + value
 				// (inline-)?fl(e)x
 				case 101:
-					return replace(value, /(.+:)([^!]+)(!.+)?/,
-						('$1'+WEBKIT+(charat(value, 14 /* display:inline- */)  === 45 ? 'inline-' : '')+'box$3;') +
-						('$1'+WEBKIT+'$2$3;') +
-						('$1'+MS+'$2box$3;') +
-						('$1$2$3')
-					)
+					return replace(value, /(.+:)([^!]+)(!.+)?/, ('$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3;') + ('$1' + WEBKIT + '$2$3;') + ('$1' + MS + '$2box$3;') + ('$1$2$3'))
 			}
 			break
 		// justify-content
 		case 4968:
-			return (
-				(replace(replace(value, /(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;')+(MS+'flex-pack:$3')), /s.+-b.+/, 'justify')+';')+
-				(WEBKIT+value+';') +
-				(value)
-			)
+			return ((replace(replace(value, /(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;') + (MS + 'flex-pack:$3')), /s.+-b.+/, 'justify') + ';') + (WEBKIT+value+';') + (value))
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
-			return (replace(value, /(.+)-inline(.+)/, WEBKIT+'$1$2')+';') + (value)
+			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + ';' + value
 	}
 
 	return value
@@ -147,5 +138,5 @@ export function animation (value, length, uuid) {
 				}).join(',')
 		}
 
-	return (WEBKIT+value+';') + (value)
+	return WEBKIT + value + ';' + value
 }

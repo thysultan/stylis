@@ -1,6 +1,5 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {sizeof} from './Utility.js'
-import {prefix} from './Prefixer.js'
 
 /**
  * @param {object[]} children
@@ -27,7 +26,7 @@ export function serialize (children) {
 export function stringify (value, type, props, children) {
 	switch (type) {
 		case DECLARATION:
-			return prefix(value + ';', props.length)
+			return value + ';'
 		case RULESET:
 			return sizeof(children) ? props.join(',') + '{' + serialize(children) + '}' : ''
 		case COMMENT:
