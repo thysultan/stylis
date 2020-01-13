@@ -48,7 +48,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 				break
 			// /
 			case 47:
-				token(peek(0)) > 2 ? append(comment(scan()), rulesets) : temporary += from(47) 
+				token(peek(0)) > 2 ? append(comment(scan()), rulesets) : temporary += from(47)
 				break
 			// {
 			case 123:
