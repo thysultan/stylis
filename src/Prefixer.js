@@ -8,9 +8,11 @@ import {hash, test, substr, charat, strlen, indexof, replace} from './Utility.js
  */
 export function prefix (value, length) {
 	switch (hash(value, length)) {
+		// @keyframes // TODO
+		case 9999999:
+			return value
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
-			return animation(value, length, '')
 		// text-decoration, filter, mask, clip-path, backface-visibility, column
 		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645:
 			return WEBKIT + value + ';' + value
