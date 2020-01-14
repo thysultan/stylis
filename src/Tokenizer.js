@@ -112,7 +112,7 @@ export function dealloc (value) {
  * @return {number}
  */
 export function delimit (type) {
-	while (character = scan())
+	while (scan())
 		switch (character) {
 			// \0 ] ) " '
 			case 0: case type:
