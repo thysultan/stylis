@@ -16,7 +16,7 @@ export var from = String.fromCharCode
  * @return {number}
  */
 export function hash (value, length) {
-	return ((((length << 2) ^ charat(value, 0) << 2) ^ charat(value, 1) << 2) ^ charat(value, 2) << 2) ^ charat(value, 3)
+	return (((((((length << 2) ^ charat(value, 0)) << 2) ^ charat(value, 1)) << 2) ^ charat(value, 2)) << 2) ^ charat(value, 3)
 }
 
 /**
