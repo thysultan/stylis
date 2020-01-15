@@ -695,21 +695,29 @@ describe('Parser', () => {
     expect(stylis(`width: calc(calc(1) + 10);`)).to.equal(`.user{width:calc(calc(1) + 10);}`)
   })
 
-  test('css variables edge cases', () => {
+  test('css variables edge cases (#144, #173)', () => {
     expect(
       stylis(`
-     --cdo-at-top-level: <!--;
-     --cdc-at-top-level: -->;
-     --semicolon-not-top-level: (;);
-     --cdo-not-top-level: (<!--);
-     --cdc-not-top-level: (-->);
-   `)
+        --braces: { };
+        --at-keyword-unknown-block: @foobar {};
+        --at-keyword-known-block: @media {};
+        --cdo-at-top-level: <!--;
+        --cdc-at-top-level: -->;
+        --semicolon-not-top-level: (;);
+        --cdo-not-top-level: (<!--);
+        --cdc-not-top-level: (-->);
+        --ampersand-preserved: foo & bar;
+      `)
     ).to.equal(`.user{` + [
+      `--braces:{};`,
+      `--at-keyword-unknown-block:@foobar{};`,
+      `--at-keyword-known-block:@media{};`,
       `--cdo-at-top-level:<!--;`,
       `--cdc-at-top-level:-->;`,
       `--semicolon-not-top-level:(;);`,
       `--cdo-not-top-level:(<!--);`,
-      `--cdc-not-top-level:(-->);`
+      `--cdc-not-top-level:(-->);`,
+      `--ampersand-preserved:foo & bar;`
     ].join('') +'}')
   })
 

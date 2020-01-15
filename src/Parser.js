@@ -26,6 +26,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 	var previous = 0
 	var character = 0
 	var atrule = 0
+	var variable = 1
 	var ampersand = 1
 	var type = ''
 	var props = rules
@@ -51,10 +52,10 @@ export function parse (value, points, declarations, rules, rulesets) {
 				token(peek(0)) > 2 ? append(comment(scan()), rulesets) : temporary += from(47)
 				break
 			// {
-			case 123:
+			case 123 * variable:
 				points[index++] = strlen(temporary) * ampersand
 			// } ; \0
-			case 125: case 59: case 0:
+			case 125 * variable: case 59: case 0:
 				switch (character) {
 					// \0 }
 					case 0: case 125: --scanning
@@ -76,17 +77,20 @@ export function parse (value, points, declarations, rules, rulesets) {
 								prepend(ruleset(value, points, 0, 0, rules, type, rules, props), children)
 				}
 
-				index = length = offset = 0, ampersand = 1, type = temporary = ''
+				index = length = offset = 0, variable = ampersand = 1, type = temporary = ''
 				break
+			// -
+			case 45:
+				if (previous === 45)
+					variable = 0
+			// :
+			case 58:
+				length = strlen(temporary)
 			default:
-				switch (temporary += from(character), character) {
+				switch (temporary += from(character), character * variable) {
 					// &
 					case 38:
 						ampersand = offset > 0 ? 1 : -1, temporary += from(12)
-						break
-					// :
-					case 58:
-						length = strlen(temporary) - 1
 						break
 					// @
 					case 64:
