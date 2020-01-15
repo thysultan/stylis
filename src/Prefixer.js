@@ -13,11 +13,13 @@ export function prefix (value, length) {
 			return value
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
-		// text-decoration, filter, mask, clip-path, backface-visibility, column
-		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645:
+		// text-decoration, filter, mask, clip-path, backface-visibility, column, box-decoration-break
+		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645: case 3005:
+		// columns, column-(count|fill|gap|rule|rule-color|rule-style|rule-width|span|width)
+		case 6389: case 5109: case 5365: case 5621: case 3829:
 			return WEBKIT + value + ';' + value
-		// box-decoration-break, appearance, user-select, flex, transform, hyphens
-		case 3005: case 5349: case 4246: case 6828: case 4810: case 6968:
+		// appearance, user-select, flex, transform, hyphens, text-size-adjust
+		case 5349: case 4246: case 6828: case 4810: case 6968: case 2756:
 			return WEBKIT + value + ';' + MOZ + value + ';' + MS + value + ';' + value
 		// order
 		case 6165:
@@ -43,8 +45,8 @@ export function prefix (value, length) {
 		// transition
 		case 4554:
 			return replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';' + value
-		// background
-		case 5495:
+		// background, background-image
+		case 5495: case 3959:
 			return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2') + ';' + value
 		// cursor
 		case 6187:
@@ -53,7 +55,7 @@ export function prefix (value, length) {
 		case 5936:
 			// vertical-lr, vertical-rl, horizontal-tb
 			if (strlen(value) > 10)
-				switch (charat(value, length + 10)) {
+				switch (charat(value, length + 11)) {
 					// vertical-l(r)
 					case 114:
 						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + ';' + value
@@ -90,7 +92,7 @@ export function prefix (value, length) {
 				break
 		// display: (flex|inline-flex|inline-box)
 		case 6444:
-			switch (charat(value, strlen(value) - 2 - (indexof(value, '!important') && 10))) {
+			switch (charat(value, strlen(value) - 2 - (~indexof(value, '!important') && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
 					return replace(value, value, WEBKIT + value) + ';' + value
