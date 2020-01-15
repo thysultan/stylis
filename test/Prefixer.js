@@ -104,10 +104,6 @@ describe('Prefixer', () => {
 		expect(prefix(`clip-path:none`, 9)).to.equal([`-webkit-clip-path:none;`, `clip-path:none`].join(''))
 	})
 
-	test('zoom', () => {
-		expect(prefix(`min-zoom:0`, 8)).to.equal([`min-zoom:0`].join(''))
-	})
-
 	test('size', () => {
 		expect(prefix(`width:auto`, 5)).to.equal([`width:auto`].join(''))
 		expect(prefix(`width:unset`, 5)).to.equal([`width:unset`].join(''))
@@ -128,6 +124,10 @@ describe('Prefixer', () => {
 		expect(prefix(`width:stretch !important`, 5)).to.equal([`width:fill-available !important`].join(''))
 		expect(prefix(`min-block-size:max-content`, 14)).to.equal([`min-block-size:-webkit-max-content;`, `min-block-size:-moz-max-content;`, `min-block-size:max-content`].join(''))
 		expect(prefix(`min-inline-size:max-content`, 15)).to.equal([`min-inline-size:-webkit-max-content;`, `min-inline-size:-moz-max-content;`, `min-inline-size:max-content`].join(''))
+	})
+
+	test('zoom', () => {
+		expect(prefix(`min-zoom:0`, 8)).to.equal([`min-zoom:0`].join(''))
 	})
 
 	test('background', () => {
