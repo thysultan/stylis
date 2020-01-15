@@ -45,7 +45,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 				break
 			// \t \n \s
 			case 9: case 10: case 32:
-				temporary += variable ? whitespace(previous) : from(character)
+				temporary += whitespace(previous)
 				break
 			// /
 			case 47:
