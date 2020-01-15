@@ -89,15 +89,15 @@ export function parse (value, points, declarations, rules, rulesets) {
 			default:
 				switch (temporary += from(character), character * variable) {
 					// &
-					case 38 * variable:
+					case 38:
 						ampersand = offset > 0 ? 1 : -1, temporary += from(12)
 						break
 					// @
-					case 64 * variable:
+					case 64:
 						atrule = peek(0), offset = strlen(type = temporary += identifier(caret())), character++
 						break
 					// ,
-					case 44 * variable:
+					case 44:
 						points[index++] = (strlen(temporary) - 1) * ampersand, ampersand = 1
 						break
 				}
