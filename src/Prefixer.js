@@ -8,13 +8,15 @@ import {hash, test, substr, charat, strlen, indexof, replace} from './Utility.js
  */
 export function prefix (value, length) {
 	switch (hash(value, length)) {
-		// @keyframes // TODO
-		case 9999999:
-			return value
+		// @keyframes
+		case 7517:
+			return replace(value, '@', '@' + WEBKIT) + value
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
-		// text-decoration, filter, mask, clip-path, backface-visibility, column, box-decoration-break
-		case 5572: case 6356: case 6391: case 5844: case 3191: case 6645: case 3005:
+		// text-decoration, filter, clip-path, backface-visibility, column, box-decoration-break
+		case 5572: case 6356: case 5844: case 3191: case 6645: case 3005:
+		// mask, mask-image, mask-(mode|clip|size), mask-(repeat|origin), mask-position, mask-composite,
+		case 6391: case 5879: case 5623: case 6135: case 4599: case 4855:
 		// columns, column-(count|fill|gap|rule|rule-color|rule-style|rule-width|span|width)
 		case 6389: case 5109: case 5365: case 5621: case 3829:
 			return WEBKIT + value + ';' + value
@@ -44,7 +46,7 @@ export function prefix (value, length) {
 			return WEBKIT + 'box-' + replace(value, '-grow', '') + ';' + WEBKIT + value + ';' + MS + replace(value, 'grow', 'positive') + ';' + value
 		// transition
 		case 4554:
-			return replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';' + value
+			return WEBKIT + replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';' + value
 		// background, background-image
 		case 5495: case 3959:
 			return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2') + ';' + value

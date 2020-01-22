@@ -11,28 +11,21 @@ describe('Prefixer', () => {
 		expect(prefix(`display:flex!important`, 7)).to.equal([`display:-webkit-box!important;`, `display:-webkit-flex!important;`, `display:-ms-flexbox!important;`, `display:flex!important`].join(''))
 		expect(prefix(`display:inline-flex`, 7)).to.equal([`display:-webkit-inline-box;`, `display:-webkit-inline-flex;`, `display:-ms-inline-flexbox;`, `display:inline-flex`].join(''))
 		expect(prefix(`display:inline-box`, 7)).to.equal([`-webkit-display:inline-box;`, `display:inline-box`].join(''))
-
 		expect(prefix(`flex-grow:none`, 9)).to.equal([`-webkit-box-flex:none;`, `-webkit-flex-grow:none;`, `-ms-flex-positive:none;`, `flex-grow:none`].join(''))
 		expect(prefix(`flex-shrink:none`, 11)).to.equal([`-webkit-flex-shrink:none;`, `-ms-flex-negative:none;`, `flex-shrink:none`].join(''))
 		expect(prefix(`flex-basis:none`, 10)).to.equal([`-webkit-flex-basis:none;`, `-ms-flex-preferred-size:none;`, `flex-basis:none`].join(''))
-
 		expect(prefix(`align-self:value`, 10)).to.equal([`-webkit-align-self:value;`, `-ms-flex-item-align:value;`, `align-self:value`].join(''))
 		expect(prefix(`align-self:flex-start`, 10)).to.equal([`-webkit-align-self:flex-start;`, `-ms-flex-item-align:flex-start;`, `align-self:flex-start`].join(''))
 		expect(prefix(`align-self:flex-end`, 10)).to.equal([`-webkit-align-self:flex-end;`, `-ms-flex-item-align:flex-end;`, `align-self:flex-end`].join(''))
-
 		expect(prefix(`align-content:value`, 13)).to.equal([`-webkit-align-content:value;`, `-ms-flex-line-pack:value;`, `align-content:value`].join(''))
 		expect(prefix(`align-content:flex-start`, 13)).to.equal([`-webkit-align-content:flex-start;`, `-ms-flex-line-pack:flex-start;`, `align-content:flex-start`].join(''))
 		expect(prefix(`align-content:flex-end`, 13)).to.equal([`-webkit-align-content:flex-end;`, `-ms-flex-line-pack:flex-end;`, `align-content:flex-end`].join(''))
-
 		expect(prefix(`align-items:value`, 11)).to.equal([`-webkit-align-items:value;`, `-webkit-box-align:value;`, `-ms-flex-align:value;`, `align-items:value`].join(''))
-
 		expect(prefix(`justify-content:flex-end`, 15)).to.equal([`-webkit-box-pack:end;`, `-ms-flex-pack:end;`, `-webkit-justify-content:flex-end;`, `justify-content:flex-end`].join(''))
 		expect(prefix(`justify-content:flex-start`, 15)).to.equal([`-webkit-box-pack:start;`, `-ms-flex-pack:start;`, `-webkit-justify-content:flex-start;`, `justify-content:flex-start`].join(''))
 		expect(prefix(`justify-content:justify`, 15)).to.equal([`-webkit-box-pack:justify;`, `-ms-flex-pack:justify;`, `-webkit-justify-content:justify;`, `justify-content:justify`].join(''))
 		expect(prefix(`justify-content:space-between`, 15)).to.equal([`-webkit-box-pack:justify;`, `-webkit-justify-content:space-between;`, `justify-content:space-between`].join(''))
-
 		expect(prefix(`justify-items:center`, 13)).to.equal([`justify-items:center`].join(''))
-
 		expect(prefix(`order:flex`, 5)).to.equal([`-webkit-order:flex;`, `-ms-flex-order:flex;`, `order:flex`].join(''))
 	})
 
@@ -48,8 +41,8 @@ describe('Prefixer', () => {
 		expect(prefix(`backface-visibility:hidden`, 19)).to.equal([`-webkit-backface-visibility:hidden;`, `backface-visibility:hidden`].join(''))
 	})
 
-	test.skip('transition', () => {
-		expect(prefix(`transition:transform 1s,transform all 400ms,text-transform`, 10)).to.equal([`-webkit-transition:text-transform,-webkit-transform 1s,-webkit-transform all 400ms;`, `transition:transform 1s,transform all 400ms,text-transform`].join(''))
+	test('transition', () => {
+		expect(prefix(`transition:transform 1s,transform all 400ms,text-transform`, 10)).to.equal([`-webkit-transition:-webkit-transform 1s,-webkit-transform all 400ms,text-transform;`, `transition:transform 1s,transform all 400ms,text-transform`].join(''))
 	})
 
 	test('writing-mode', () => {
@@ -81,9 +74,17 @@ describe('Prefixer', () => {
 		expect(prefix(`text-decoration:none`, 15)).to.equal([`-webkit-text-decoration:none;`, `text-decoration:none`].join(''))
 	})
 
-	test.skip('mask', () => {
-		expect(prefix(`mask-image:none`, 10)).to.equal([`-webkit-mask-image:none;`, `mask-image:none;`].join(''))
+	test('mask', () => {
+		expect(prefix(`mask:none`, 10)).to.equal([`-webkit-mask:none;`, `mask:none`].join(''))
+		expect(prefix(`mask-image:none`, 10)).to.equal([`-webkit-mask-image:none;`, `mask-image:none`].join(''))
 		expect(prefix(`mask-image:linear-gradient(#fff)`, 10)).to.equal([`-webkit-mask-image:linear-gradient(#fff);`, `mask-image:linear-gradient(#fff)`].join(''))
+		expect(prefix(`mask-mode:none`, 10)).to.equal([`-webkit-mask-mode:none;`, `mask-mode:none`].join(''))
+		expect(prefix(`mask-clip:none`, 10)).to.equal([`-webkit-mask-clip:none;`, `mask-clip:none`].join(''))
+		expect(prefix(`mask-size:none`, 10)).to.equal([`-webkit-mask-size:none;`, `mask-size:none`].join(''))
+		expect(prefix(`mask-repeat:none`, 10)).to.equal([`-webkit-mask-repeat:none;`, `mask-repeat:none`].join(''))
+		expect(prefix(`mask-origin:none`, 10)).to.equal([`-webkit-mask-origin:none;`, `mask-origin:none`].join(''))
+		expect(prefix(`mask-position:none`, 10)).to.equal([`-webkit-mask-position:none;`, `mask-position:none`].join(''))
+		expect(prefix(`mask-composite:none`, 10)).to.equal([`-webkit-mask-composite:none;`, `mask-composite:none`].join(''))
 	})
 
 	test('filter', () => {
@@ -143,7 +144,7 @@ describe('Prefixer', () => {
 		expect(prefix(`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1)`, 25)).to.equal([`-webkit-animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`, `animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1)`].join(''))
 	})
 
-	test.skip('keyframes', () => {
-		expect(prefix(`@keyframes name { to { transform:translate(20px); } }`)).to.equal([``].join(''))
+	test('keyframes', () => {
+		expect(prefix(`@keyframes name { to { color:red; } }`, 10)).to.equal([`@-webkit-keyframes name { to { color:red; } }`, `@keyframes name { to { color:red; } }`].join(''))
 	})
 })
