@@ -1,3 +1,4 @@
+export var ROOT = 'root'
 export var COMMENT = 'comm'
 export var RULESET = 'rule'
 export var DECLARATION = 'decl'

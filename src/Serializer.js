@@ -5,7 +5,7 @@ import {sizeof} from './Utility.js'
  * @param {object[]} children
  * @return {string}
  */
-export function serialize (children) {
+export function serializelist (children) {
 	var output = ''
 	var object = null
 	var length = sizeof(children)
@@ -14,6 +14,14 @@ export function serialize (children) {
 		output += stringify((object = children[i]).value, object.type, object.props, object.children)
 
 	return output
+}
+
+/**
+ * @param {object} root
+ * @return {string}
+ */
+export function serialize (root) {
+	return serializelist(root.children)
 }
 
 /**
@@ -28,12 +36,12 @@ export function stringify (value, type, props, children) {
 		case DECLARATION:
 			return value + ';'
 		case RULESET:
-			return sizeof(children) ? props.join(',') + '{' + serialize(children) + '}' : ''
+			return sizeof(children) ? props.join(',') + '{' + serializelist(children) + '}' : ''
 		case COMMENT:
 			return ''
 		case IMPORT:
 			return value + ';'
 	}
 
-	return value + '{' + serialize(children) + '}'
+	return value + '{' + serializelist(children) + '}'
 }

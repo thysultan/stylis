@@ -96,7 +96,7 @@ export function slice (begin, end) {
  * @return {number}
  */
 export function alloc (value) {
-	return line = column = 1, length = strlen(temporary = value), position = 0
+	line = column = 1, length = strlen(temporary = value), position = 0
 }
 
 /**

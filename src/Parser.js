@@ -1,4 +1,4 @@
-import {COMMENT, RULESET, DECLARATION} from './Enum.js'
+import {ROOT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, prepend, replace} from './Utility.js'
 import {node, scan, peek, caret, slice, alloc, dealloc, token, attoken, delimiter, whitespace, identifier} from './Tokenizer.js'
 
@@ -7,7 +7,10 @@ import {node, scan, peek, caret, slice, alloc, dealloc, token, attoken, delimite
  * @return {string[]}
  */
 export function compile (value) {
-	return dealloc(parse('', [alloc(value)], [], [''], []))
+	alloc(value)
+	const root = node('', ROOT, [], [])
+	root.children = dealloc(parse('', [0], [], [''], []))
+	return root
 }
 
 /**

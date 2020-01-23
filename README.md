@@ -9,6 +9,15 @@ In comparision the current version sits around ~4kb.
 ## AST(maybe)
 
 ```js
+const root = {
+	value: "",
+	type: "root",
+	props: [],
+	children: [...],
+	line: 1,
+	column: 1,
+	caret: 0
+}
 const comment = {
 	value: "/*! Lorem ipsum dolor sit. */",
 	type: "comment",
