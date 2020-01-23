@@ -92,11 +92,18 @@ export function slice (begin, end) {
 }
 
 /**
+ * @return {number}
+ */
+export function resetcursor() {
+	return line = column = 1, position = 0
+}
+
+/**
  * @param {string} value
  * @return {number}
  */
 export function alloc (value) {
-	line = column = 1, length = strlen(temporary = value), position = 0
+	return length = strlen(temporary = value), resetcursor()
 }
 
 /**
@@ -104,7 +111,7 @@ export function alloc (value) {
  * @return {object[]}
  */
 export function dealloc (value) {
-	return temporary = '', value
+	return temporary = '', resetcursor(), value
 }
 
 /**

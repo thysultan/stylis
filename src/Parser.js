@@ -7,10 +7,7 @@ import {node, scan, peek, caret, slice, alloc, dealloc, token, attoken, delimite
  * @return {string[]}
  */
 export function compile (value) {
-	alloc(value)
-	const root = node('', ROOT, [], [])
-	root.children = dealloc(parse('', [0], [], [''], []))
-	return root
+	return node('', ROOT, [], dealloc(parse('', [alloc(value)], [], [''], [])))
 }
 
 /**
