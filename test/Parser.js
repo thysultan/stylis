@@ -1,6 +1,6 @@
-import {compile, serialize} from "../index.js"
+import {compile, serialize, stringify} from "../index.js"
 
-const stylis = string => serialize(compile(`.user{${string}}`))
+const stylis = string => serialize(compile(`.user{${string}}`), stringify)
 
 describe('Parser', () => {
   test('calc', () => {

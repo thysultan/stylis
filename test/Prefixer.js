@@ -1,4 +1,4 @@
-import {prefix, compile, serialize} from "../index.js"
+import {prefix} from "../index.js"
 
 describe('Prefixer', () => {
 	// TODO:

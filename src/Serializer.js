@@ -1,39 +1,74 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {sizeof} from './Utility.js'
 
+// TODO: Remove this comment
+// Example Use:
+// serialize(compile(``), stringify) // default
+// serialize(compile(``), middleware([prefixer, stringify])) // middlware
+// function prefixer (current, callback) { if (current.type === DECLARATION) current.value = prefix(current.value) }
+
 /**
- * @param {object[]} children
+ * @param {object[]} current
+ * @param {function} callack
  * @return {string}
  */
-export function serialize (children) {
+export function serialize (current, callback) {
 	var output = ''
-	var object = null
-	var length = sizeof(children)
+	var length = sizeof(current)
 
 	for (var i = 0; i < length; i++)
-		output += stringify((object = children[i]).value, object.type, object.props, object.children)
+		output += callback(current[i], callback)
 
 	return output
 }
 
 /**
- * @param {string} value
- * @param {string} type
- * @param {string[]} props
- * @param {object[]} children
+ * @param {object[]} current
+ * @param {function} callback
  * @return {string}
  */
-export function stringify (value, type, props, children) {
-	switch (type) {
-		case DECLARATION:
+export function stringify (current, callback) {
+	var value = current.value
+	var props = current.props
+	var children = current.children
+
+	switch (current.type) {
+		case IMPORT: case DECLARATION:
 			return value + ';'
-		case RULESET:
-			return sizeof(children) ? props.join(',') + '{' + serialize(children) + '}' : ''
 		case COMMENT:
 			return ''
-		case IMPORT:
-			return value + ';'
+		case RULESET:
+			value = props.join(',')
 	}
 
-	return value + '{' + serialize(children) + '}'
+	return sizeof(children) ? value + '{' + serialize(children, stringify) + '}' : ''
+}
+
+/**
+ * @param {string} current
+ * @param {string} prefix
+ * @param {string} suffix
+ * @return {string}
+ */
+export function content (current, prefix, suffix) {
+	return strlen(value) > 0 ? prefix + value + suffix : ''
+}
+
+/**
+ * @param {function[]} current
+ * @return {function}
+ */
+export function middleware (current) {
+	var length = sizeof(current)
+
+	return function (current, callback) {
+		var output = ''
+		var string = ''
+
+		for (var i = 0; i < length; i++)
+			if (string = current[i](current, callback))
+				output += string
+
+		return output
+	}
 }
