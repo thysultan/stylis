@@ -1,5 +1,5 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {sizeof} from './Utility.js'
+import {sizeof, strlen} from './Utility.js'
 
 // TODO: Remove this comment
 // Example Use:
@@ -41,7 +41,7 @@ export function stringify (current, callback) {
 			value = props.join(',')
 	}
 
-	return sizeof(children) ? value + '{' + serialize(children, stringify) + '}' : ''
+	return sizeof(children) ? value + '{' + serialize(children, callback) + '}' : ''
 }
 
 /**
@@ -51,7 +51,7 @@ export function stringify (current, callback) {
  * @return {string}
  */
 export function content (current, prefix, suffix) {
-	return strlen(value) > 0 ? prefix + value + suffix : ''
+	return strlen(current) > 0 ? prefix + current + suffix : ''
 }
 
 /**
