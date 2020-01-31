@@ -6,6 +6,14 @@ Currently the rewrite sits comfortably just under 2kb, with a theoratical perfor
 
 In comparision the current version sits around ~4kb.
 
+### Example Use:
+
+```js
+serialize(compile(``), stringify) // default
+serialize(compile(``), middleware([prefixer, stringify])) // middlware
+function prefixer (current, callback) { if (current.type === DECLARATION) current.value = prefix(current.value) }
+```
+
 ## AST(maybe)
 
 ```js

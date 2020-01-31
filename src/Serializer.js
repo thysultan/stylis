@@ -1,38 +1,32 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {sizeof, strlen} from './Utility.js'
 
-// TODO: Remove this comment
-// Example Use:
-// serialize(compile(``), stringify) // default
-// serialize(compile(``), middleware([prefixer, stringify])) // middlware
-// function prefixer (current, callback) { if (current.type === DECLARATION) current.value = prefix(current.value) }
-
 /**
- * @param {object[]} current
+ * @param {object[]} children
  * @param {function} callack
  * @return {string}
  */
-export function serialize (current, callback) {
+export function serialize (children, callback) {
 	var output = ''
-	var length = sizeof(current)
+	var length = sizeof(children)
 
 	for (var i = 0; i < length; i++)
-		output += callback(current[i], callback)
+		output += callback(children[i], callback)
 
 	return output
 }
 
 /**
- * @param {object[]} current
+ * @param {object} element
  * @param {function} callback
  * @return {string}
  */
-export function stringify (current, callback) {
-	var value = current.value
-	var props = current.props
-	var children = current.children
+export function stringify (element, callback) {
+	var value = element.value
+	var props = element.props
+	var children = element.children
 
-	switch (current.type) {
+	switch (element.type) {
 		case IMPORT: case DECLARATION:
 			return value + ';'
 		case COMMENT:
@@ -41,32 +35,22 @@ export function stringify (current, callback) {
 			value = props.join(',')
 	}
 
-	return sizeof(children) ? value + '{' + serialize(children, callback) + '}' : ''
+	return strlen(children = sizeof(children) ? serialize(children, callback) : '') ? value + '{' + children + '}' : children
 }
 
 /**
- * @param {string} current
- * @param {string} prefix
- * @param {string} suffix
- * @return {string}
- */
-export function content (current, prefix, suffix) {
-	return strlen(current) > 0 ? prefix + current + suffix : ''
-}
-
-/**
- * @param {function[]} current
+ * @param {function[]} collection
  * @return {function}
  */
-export function middleware (current) {
-	var length = sizeof(current)
+export function middleware (collection) {
+	var length = sizeof(collection)
 
-	return function (current, callback) {
+	return function (element, callback) {
 		var output = ''
 		var string = ''
 
 		for (var i = 0; i < length; i++)
-			if (string = current[i](current, callback))
+			if (string = collection[i](element, callback))
 				output += string
 
 		return output

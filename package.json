@@ -11,7 +11,6 @@
   "main": "dist/stylis.umd.js",
   "module": "dist/stylis.esm.js",
   "exports": "./index.js",
-  "typings": "typings/index.d.ts",
   "files": [
     "index.js",
     "dist/",
