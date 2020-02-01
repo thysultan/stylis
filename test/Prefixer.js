@@ -1,6 +1,6 @@
 import {prefix} from "../index.js"
 
-describe.only('Prefixer', () => {
+describe('Prefixer', () => {
 	// TODO:
 	// - test vendor prefixing:
 	//    - ::placeholder ?
