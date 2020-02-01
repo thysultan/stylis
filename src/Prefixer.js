@@ -10,7 +10,7 @@ export function prefix (value, length) {
 	switch (hash(value, length)) {
 		// @keyframes
 		case 7517:
-			return replace(value, '@', '@' + WEBKIT) + value
+			return replace(value, '@', '@' + WEBKIT)
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
 		// text-decoration, filter, clip-path, backface-visibility, column, box-decoration-break
@@ -19,40 +19,40 @@ export function prefix (value, length) {
 		case 6391: case 5879: case 5623: case 6135: case 4599: case 4855:
 		// columns, column-(count|fill|gap|rule|rule-color|rule-style|rule-width|span|width)
 		case 6389: case 5109: case 5365: case 5621: case 3829:
-			return WEBKIT + value + ';' + value
+			return WEBKIT + value + ';'
 		// appearance, user-select, flex, transform, hyphens, text-size-adjust
 		case 5349: case 4246: case 6828: case 4810: case 6968: case 2756:
-			return WEBKIT + value + ';' + MOZ + value + ';' + MS + value + ';' + value
+			return WEBKIT + value + ';' + MOZ + value + ';' + MS + value + ';'
 		// order
 		case 6165:
-			return WEBKIT + value + ';' + MS + 'flex-' + value + ';' + value
+			return WEBKIT + value + ';' + MS + 'flex-' + value + ';'
 		// align-items
 		case 5187:
-			return WEBKIT + value + ';' + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2;' + MS + 'flex-$1$2') + ';' + value
+			return WEBKIT + value + ';' + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2;' + MS + 'flex-$1$2') + ';'
 		// align-self
 		case 5443:
-			return WEBKIT + value + ';' + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + ';' + value
+			return WEBKIT + value + ';' + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + ';'
 		// align-content
 		case 4675:
-			return WEBKIT + value + ';' + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + ';' + value
+			return WEBKIT + value + ';' + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + ';'
 		// flex-shrink
 		case 5548:
-			return WEBKIT + value + ';' + MS + replace(value, 'shrink', 'negative') + ';' + value
+			return WEBKIT + value + ';' + MS + replace(value, 'shrink', 'negative') + ';'
 		// flex-basis
 		case 5292:
-			return WEBKIT + value + ';' + MS + replace(value, 'basis', 'preferred-size') + ';' + value
+			return WEBKIT + value + ';' + MS + replace(value, 'basis', 'preferred-size') + ';'
 		// flex-grow
 		case 6060:
-			return WEBKIT + 'box-' + replace(value, '-grow', '') + ';' + WEBKIT + value + ';' + MS + replace(value, 'grow', 'positive') + ';' + value
+			return WEBKIT + 'box-' + replace(value, '-grow', '') + ';' + WEBKIT + value + ';' + MS + replace(value, 'grow', 'positive') + ';'
 		// transition
 		case 4554:
-			return WEBKIT + replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';' + value
+			return WEBKIT + replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2') + ';'
 		// background, background-image
 		case 5495: case 3959:
-			return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2') + ';' + value
+			return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2') + ';'
 		// cursor
 		case 6187:
-			return replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3;$1' + MOZ + '$2$3') + ';' + value
+			return replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3;$1' + MOZ + '$2$3') + ';'
 		// writing-mode
 		case 5936:
 			// vertical-lr, vertical-rl, horizontal-tb
@@ -60,13 +60,13 @@ export function prefix (value, length) {
 				switch (charat(value, length + 11)) {
 					// vertical-l(r)
 					case 114:
-						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + ';' + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + ';'
 					// vertical-r(l)
 					case 108:
-						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl') + ';' + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl') + ';'
 					// horizontal(-)tb
 					case 45:
-						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + ';' + value
+						return WEBKIT + value + ';' + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + ';'
 				}
 			break
 		// (min|max)?(width|height|inline-size|block-size)
@@ -78,13 +78,13 @@ export function prefix (value, length) {
 				switch (charat(value, length + 1)) {
 					// (m)ax-content, (m)in-content
 					case 109:
-						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$2-$3;' + '$1$2-$3')
+						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$2-$3;')
 					// (f)ill-available
 					case 102:
-						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$3;' + '$1$2-$3')
+						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3;' + '$1' + MOZ + '$3;')
 					// (s)tretch
 					case 115:
-						return prefix(replace(replace(value, 'stretch', 'fill-available'), length), ':fill-available', ':stretch')
+						return prefix(replace(value, 'stretch', 'fill-available'), length)
 				}
 			break
 		// position: sticky
@@ -97,21 +97,21 @@ export function prefix (value, length) {
 			switch (charat(value, strlen(value) - 2 - (~indexof(value, '!important') && 10))) {
 				// stic(k)y, inline-b(o)x
 				case 107: case 111:
-					return replace(value, value, WEBKIT + value) + ';' + value
+					return replace(value, value, WEBKIT + value) + ';'
 				// (inline-)?fl(e)x
 				case 101:
-					return replace(value, /(.+:)([^!]+)(!.+)?/, ('$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3;') + ('$1' + WEBKIT + '$2$3;') + ('$1' + MS + '$2box$3;') + ('$1$2$3'))
+					return replace(value, /(.+:)([^!]+)(!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3;' + '$1' + WEBKIT + '$2$3;' + '$1' + MS + '$2box$3;')
 			}
 			break
 		// justify-content
 		case 4968:
-			return ((replace(replace(value, /(.+:)(flex-)?(.*)/, (WEBKIT+'box-pack:$3;') + (MS + 'flex-pack:$3')), /s.+-b.+/, 'justify') + ';') + (WEBKIT+value+';') + (value))
+			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3;' + MS + 'flex-pack:$3'), /s.+-b.+/, 'justify') + ';' + WEBKIT + value + ';'
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
-			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + ';' + value
+			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + ';'
 	}
 
-	return value
+	return ''
 }
 
 /**
@@ -144,5 +144,5 @@ export function animation (value, length, uuid) {
 				}).join(',')
 		}
 
-	return WEBKIT + value + ';' + value
+	return WEBKIT + value + ';'
 }

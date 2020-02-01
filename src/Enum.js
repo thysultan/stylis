@@ -1,6 +1,6 @@
-export var COMMENT = 'comm'
-export var RULESET = 'rule'
-export var DECLARATION = 'decl'
+export var COMMENT = 'comment'
+export var RULESET = 'ruleset'
+export var DECLARATION = 'declaration'
 
 export var PAGE = '@page'
 export var MEDIA = '@media'

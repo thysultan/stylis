@@ -9,9 +9,10 @@ In comparision the current version sits around ~4kb.
 ### Example Use:
 
 ```js
+import {compile, stringify, prefixer, middleware} from 'stylis'
+
 serialize(compile(``), stringify) // default
 serialize(compile(``), middleware([prefixer, stringify])) // middlware
-function prefixer (current, callback) { if (current.type === DECLARATION) current.value = prefix(current.value) }
 ```
 
 ## AST(maybe)

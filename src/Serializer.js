@@ -37,22 +37,3 @@ export function stringify (element, callback) {
 
 	return strlen(children = sizeof(children) ? serialize(children, callback) : '') ? value + '{' + children + '}' : children
 }
-
-/**
- * @param {function[]} collection
- * @return {function}
- */
-export function middleware (collection) {
-	var length = sizeof(collection)
-
-	return function (element, callback) {
-		var output = ''
-		var string = ''
-
-		for (var i = 0; i < length; i++)
-			if (string = collection[i](element, callback))
-				output += string
-
-		return output
-	}
-}
