@@ -35,10 +35,7 @@ export function rulesheet (insert) {
 				return ''
 		}
 
-		inserting = 1
-		const rule = callback(element, callback)
-		insert(rule)
-		inserting = 0
+		inserting = 1, insert(callback(element, callback)), inserting = 0
 
 		return ''
 	}
