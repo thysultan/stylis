@@ -1,4 +1,4 @@
-import {KEYFRAMES, DECLARATION} from './Enum.js'
+import {KEYFRAMES, DECLARATION, COMMENT} from './Enum.js'
 import {sizeof, strlen} from './Utility.js'
 import {stringify} from './Serializer.js'
 import {prefix} from './Prefixer.js'
@@ -15,6 +15,33 @@ export function prefixer (element, callback) {
 	}
 
 	return ''
+}
+
+/**
+ * @param {function} insert
+ * @return {string}
+ */
+export function rulesheet (insert) {
+	let inserting = 0
+
+	return function (element, callback) {
+		if (inserting || !sizeof(element.children)) {
+			return ''
+		}
+
+		switch (element.type) {
+			case DECLARATION:
+			case COMMENT:
+				return ''
+		}
+
+		inserting = 1
+		const rule = callback(element, callback)
+		insert(rule)
+		inserting = 0
+
+		return ''
+	}
 }
 
 /**
