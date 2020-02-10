@@ -11,7 +11,7 @@ export function serialize (children, callback) {
 	var length = sizeof(children)
 
 	for (var i = 0; i < length; i++)
-		output += callback(children[i], callback)
+		output += callback(children[i], callback) || ''
 
 	return output
 }
@@ -22,18 +22,14 @@ export function serialize (children, callback) {
  * @return {string}
  */
 export function stringify (element, callback) {
-	var value = element.value
-	var props = element.props
-	var children = element.children
+	var output = ''
+	var string = element.value
 
 	switch (element.type) {
-		case IMPORT: case DECLARATION:
-			return value + ';'
-		case COMMENT:
-			return ''
-		case RULESET:
-			value = props.join(',')
+		case IMPORT: case DECLARATION: return string
+		case COMMENT: return output
+		case RULESET: string = element.props.join(',')
 	}
 
-	return strlen(children = sizeof(children) ? serialize(children, callback) : '') ? value + '{' + children + '}' : children
+	return strlen(output = serialize(element.children, callback)) ? string + '{' + output + '}' : ''
 }

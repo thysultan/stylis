@@ -1,4 +1,4 @@
-import {trim, strlen, charat, substr} from './Utility.js'
+import {from, trim, strlen, charat, substr, append} from './Utility.js'
 
 export var line = 1
 export var column = 1
@@ -6,6 +6,24 @@ export var length = 0
 export var position = 0
 export var character = 0
 export var temporary = ''
+
+/**
+ * @param {string[]} children
+ * @return {string[]}
+ */
+export function tokenize (children) {
+	while (scan())
+		switch (token(character)) {
+			case 0: append(identifier(caret() - 1), children)
+				break
+			case 2: append(delimiter(character), children)
+			case 4:
+				break
+			default: append(from(character), children)
+		}
+
+	return children
+}
 
 /**
  * @param {string} value
@@ -30,11 +48,10 @@ export function scan () {
 }
 
 /**
- * @param {number} distance
  * @return {number}
  */
-export function peek (distance) {
-	return charat(temporary, position + distance)
+export function peek () {
+	return charat(temporary, position)
 }
 
 /**
@@ -52,16 +69,20 @@ export function token (type) {
 	switch (type) {
 		// * /
 		case 42: case 47:
-			return 3
+			return 5
 		// \0 \t \n \s
 		case 0: case 9: case 10: case 32:
+			return 4
 		// ! + , / : > @ ~
 		case 33: case 43: case 44: case 58: case 62: case 64: case 126:
 		// ; { }
 		case 59: case 123: case 125:
+			return 3
+		// " ' ( [
+		case 34: case 39: case 40: case 91:
 			return 2
-		// ( )
-		case 40: case 41:
+		// ) ]
+		case 41: case 93:
 			return 1
 	}
 
@@ -93,15 +114,15 @@ export function slice (begin, end) {
 
 /**
  * @param {string} value
- * @return {number}
+ * @return {any[]}
  */
 export function alloc (value) {
-	return line = column = 1, length = strlen(temporary = value), position = 0
+	return line = column = 1, length = strlen(temporary = value), position = 0, []
 }
 
 /**
- * @param {object[]} value
- * @return {object[]}
+ * @param {any} value
+ * @return {any}
  */
 export function dealloc (value) {
 	return temporary = '', value
@@ -137,7 +158,7 @@ export function delimit (type) {
  * @return {string}
  */
 export function delimiter (type) {
-	return trim(slice(caret() - 1, delimit(type)))
+	return trim(slice(caret() - 1, delimit(type === 91 ? type + 2 : type === 40 ? type + 1 : type)))
 }
 
 /**
@@ -145,13 +166,10 @@ export function delimiter (type) {
  * @return {string}
  */
 export function whitespace (type) {
-	while (character = peek(0))
-		if (character > 32)
-			break
-		else
-			scan()
+	while ((character = peek()) < 33)
+		scan()
 
-	return token(type) > 1 || token(character) > 1 ? '' : ' '
+	return token(type) > 2 || token(character) > 2 ? '' : ' '
 }
 
 /**
@@ -159,7 +177,7 @@ export function whitespace (type) {
  * @return {string}
  */
 export function identifier (index) {
-	while (!token(peek(0)))
+	while (!token(peek()))
 		scan()
 
 	return slice(index, caret())

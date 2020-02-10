@@ -6,37 +6,38 @@ Currently the rewrite sits comfortably just under 2kb, with a theoratical perfor
 
 In comparision the current version sits around ~4kb.
 
-### Example Use:
+### Example:
 
 ```js
-import {compile, stringify, prefixer, middleware} from 'stylis'
+import {compile, serialize, stringify} from 'stylis'
 
-serialize(compile(``), stringify) // default
-serialize(compile(``), middleware([prefixer, stringify])) // middlware
+serialize(compile(`...`), stringify)
 ```
 
-## AST(maybe)
+## Abstract Syntax Structure
 
 ```js
 const comment = {
-	value: "/*! Lorem ipsum dolor sit. */",
-	type: "comment",
+	value: '/*! Lorem ipsum dolor sit. */',
+	type: 'comment',
 	props: '!',
-	children: "Lorem ipsum dolor sit.",
+	children: 'Lorem ipsum dolor sit.',
 	line: 1,
 	column: 1,
 	caret: 2
 }
-const decl = {
-	value: "color:red",
-	type: "decl",
-	props: "color",
-	children: "red",
+
+const declaration = {
+	value: 'color:red',
+	type: 'declaration',
+	props: 'color',
+	children: 'red',
 	line: 1,
 	column: 1,
 	caret: 2
 }
-const rule = {
+
+const ruleset = {
 	value: "h1,h2",
 	type: "rule",
 	props: ['h1', 'h2'],
@@ -45,7 +46,8 @@ const rule = {
 	column: 1,
 	caret: 2
 }
-const atrule = {
+
+const atruleset = {
 	value: "@media (max-width:100), (min-width:100)",
 	type: "@media",
 	props: ['(max-width:100)', '(min-width:100)'],

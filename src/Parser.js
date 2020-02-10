@@ -4,10 +4,10 @@ import {node, scan, peek, caret, slice, alloc, dealloc, token, attoken, delimite
 
 /**
  * @param {string} value
- * @return {string[]}
+ * @return {object[]}
  */
 export function compile (value) {
-	return dealloc(parse('', [alloc(value)], [], [''], []))
+	return dealloc(parse('', [0], [], [''], alloc(value)))
 }
 
 /**
@@ -35,12 +35,8 @@ export function parse (value, points, declarations, rules, rulesets) {
 
 	while (scanning)
 		switch (previous = character, character = scan()) {
-			// [ ]
-			case 91: ++character
-			// ( )
-			case 40: ++character
-			// " '
-			case 34: case 39:
+			// " ' [ (
+			case 34: case 39: case 91: case 40:
 				temporary += delimiter(character)
 				break
 			// \t \n \s
@@ -49,7 +45,7 @@ export function parse (value, points, declarations, rules, rulesets) {
 				break
 			// /
 			case 47:
-				token(peek(0)) > 2 ? append(comment(scan()), rulesets) : temporary += from(47)
+				token(peek()) > 4 ? append(comment(scan()), rulesets) : temporary += '/'
 				break
 			// {
 			case 123 * variable:
@@ -62,9 +58,11 @@ export function parse (value, points, declarations, rules, rulesets) {
 					// ;
 					case 59 + offset:
 						if (length > 0)
-							append(declaration(temporary, length), declarations)
+							append(declaration(temporary + ';', length), declarations)
 						break
-					// rule/at-rule
+					// @ ;
+					case 59: temporary += ';'
+					// { rule/at-rule
 					default:
 						append(ruleset(temporary, points, index, offset, rules, type, props = [], children = []), rulesets)
 
@@ -79,10 +77,6 @@ export function parse (value, points, declarations, rules, rulesets) {
 
 				index = length = offset = 0, variable = ampersand = 1, type = temporary = ''
 				break
-			// -
-			case 45:
-				if (previous === 45)
-					variable = 0
 			// :
 			case 58:
 				length = strlen(temporary)
@@ -90,16 +84,20 @@ export function parse (value, points, declarations, rules, rulesets) {
 				switch (temporary += from(character), character * variable) {
 					// &
 					case 38:
-						ampersand = offset > 0 ? 1 : -1, temporary += from(12)
+						ampersand = offset > 0 ? 1 : -1, temporary += '\f'
 						break
 					// @
 					case 64:
-						atrule = peek(0), offset = strlen(type = temporary += identifier(caret())), character++
+						atrule = peek(), offset = strlen(type = temporary += identifier(caret())), character++
 						break
 					// ,
 					case 44:
 						points[index++] = (strlen(temporary) - 1) * ampersand, ampersand = 1
 						break
+					// -
+					case 45:
+						if (previous === 45)
+							variable = 0
 				}
 		}
 
@@ -113,13 +111,13 @@ export function parse (value, points, declarations, rules, rulesets) {
 export function comment (type) {
 	var index = caret() - 2
 	var offset = type === 42 ? 2 : 1
-	var temporary = trim(from(peek(0))) || from(type)
+	var temporary = trim(from(peek())) || from(type)
 	var character = 0
 
 	while (character = scan())
 		if (character === 10 && type === 47)
 			break
-		else if (character === 42 && type === 42 && peek(0) !== 42 && scan() === 47)
+		else if (character === 42 && type === 42 && peek() !== 42 && scan() === 47)
 			break
 
 	return node(temporary, COMMENT, temporary, substr(temporary = slice(index, caret()), 2, strlen(temporary) - offset))
