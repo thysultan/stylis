@@ -166,8 +166,11 @@ export function delimiter (type) {
  * @return {string}
  */
 export function whitespace (type) {
-	while ((character = peek()) < 33)
-		scan()
+	while (character = peek())
+		if (character < 33)
+			scan()
+		else
+			break
 
 	return token(type) > 2 || token(character) > 2 ? '' : ' '
 }

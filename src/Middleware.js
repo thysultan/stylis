@@ -48,7 +48,7 @@ export function sourcemap (callback) {
 export function cascade (selector, namespace) {
 	selector.map(function (value) {
 		// h1 h2 :matches(h1 h2) => h1[uuid] h2[uuid] [uuid]:matches(h1 h2)
-		return delloc(tokenize(alloc(value))).map(function (value, index, children) {
+		return dealloc(tokenize(alloc(value))).map(function (value, index, children) {
 			switch (charat(value, 0)) {
 				// :global
 				case 'g':
@@ -56,7 +56,7 @@ export function cascade (selector, namespace) {
 				case '~': case '>': case '+': case '(':
 					break
 				default:
-					return value + uuid
+					return value + namespace
 			}
 		}).join(' ')
 	})
