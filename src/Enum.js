@@ -2,8 +2,8 @@ export var MS = '-ms-'
 export var MOZ = '-moz-'
 export var WEBKIT = '-webkit-'
 
-export var RULESET = 'ruleset'
-export var DECLARATION = 'declaration'
+export var RULESET = 'rule'
+export var DECLARATION = 'decl'
 
 export var PAGE = '@page'
 export var MEDIA = '@media'

@@ -29,7 +29,7 @@ A Light–weight CSS Preprocessor.
 ```js
 const declaration = {
 	value: 'color:red;',
-	type: 'declaration',
+	type: 'decl',
 	props: 'color',
 	children: 'red',
 	line: 1, column: 1
@@ -63,28 +63,70 @@ serialize(compile(`...`), stringify)
 ### Compile
 
 ```js
-compile(`h1{all:unset}`) === {value: 'h1', type: 'ruleset', props: ['h1'], children: [...]}
-compile(`--varb:unset;`) === {value: '--foo:unset;', type: 'declaration', props: '--foo', children: 'unset'}
-```
-
-### Serialize
-
-```js
-serialize(compile(`h1{all:unset}`), stringify)
-```
-
-### Middleware
-
-```js
-serialize(compile(`h1{all:unset}`), middleware((element, index, children) => console.log(element), stringify))
+compile('h1{all:unset}') === {value: 'h1', type: 'ruleset', props: ['h1'], children: [...]}
+compile('--varb:unset;') === {value: '--foo:unset;', type: 'declaration', props: '--foo', children: 'unset'}
 ```
 
 ### Tokenize
 
 ```js
-tokenize(`h1 h2 h3 [h4 h5] fn(args) "a b c"`) === ['h1', 'h2', 'h3', '[h4 h5]', 'fn', '(args)', '"a b c"']
+tokenize('h1 h2 h3 [h4 h5] fn(args) "a b c"') === ['h1', 'h2', 'h3', '[h4 h5]', 'fn', '(args)', '"a b c"']
 ```
+
+### Serialize
+
+```js
+serialize(compile('h1{all:unset}'), stringify)
+```
+
+## Middleware
+
+The middleware helper is a convinent helper utility, that for all intesive purpose you can do without if you intend to implement your own traversl logic. The `stringify` middleware is one such middleware that can be used in conjuction with it.
+
+Elements passed to middlewares have a `root` property that is the immediate root/parent of the current element.
+
+### Traversal
+
+```js
+serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
+	asset(children === element.root.children && children[index] === element.children)
+}, stringify])) === 'h1{all:unset;}'
+```
+
+### Mutating
+
+```js
+serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
+	if (element.type === 'decl' && element.props === 'all' && element.children === 'unset')
+		children.splice(index + 1, 0, {...element, value: 'color:red;'})
+}, stringify])) === 'h1{all:unset;color:red;}'
+````
+
+The abstract syntax tree also includes two other properties: `prefix, return` for more niche uses.
+
+### Prefixing
+
+```js
+serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
+	if (element.type === 'decl' && element.props === 'all' && element.children === 'unset')
+		element.prefx = 'color:red;'
+}, stringify])) === 'h1{color:red;unset;}'
+```
+
+### Reading
+
+```js
+serialize(compile('h1{all:unset}'), middleware([stringify, (element, index, children) => {
+	asset(element.return === 'h1{all:unset;}')
+}])) === 'h1{all:unset;color:red;}'
+```
+
+The middlewares in [src/Middleware.js](src/Middleware.js) dive into tangible examples of how you might implement a middleware, alternatively you could also create your own middleware system as `compile` returns all the nessessary structure to fork from.
 
 ## Benchmark
 
 Stylis is at-least 2X faster than it's predecesor.
+
+### License
+
+Stylis is [MIT licensed](./LICENSE).
