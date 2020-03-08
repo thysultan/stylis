@@ -1,8 +1,20 @@
-import {compile, serialize} from "../index.js"
+import {compile, serialize, stringify} from "../index.js"
 
-const stylis = string => serialize(compile(`.user{${string}}`))
+const stylis = string => serialize(compile(`.user{${string}}`), stringify)
 
 describe('Parser', () => {
+  test('unnested', () => {
+    expect(serialize(compile(`--foo:none;@supports{--bar:none;}`), stringify)).to.equal(`--foo:none;@supports{--bar:none;}`)
+  })
+
+  test('escape', () => {
+    expect(
+      stylis(`
+        height:calc(\\))\t!important;
+     `)
+    ).to.equal(`.user{height:calc(\\))!important;}`)
+  })
+
   test('calc', () => {
     expect(
       stylis(`
@@ -18,6 +30,9 @@ describe('Parser', () => {
   test('at-rules', () => {
     expect(
       stylis(`
+        @page & {
+          invalid:true;
+        }
         @page {
           size:A4 landscape;
         }
@@ -50,6 +65,7 @@ describe('Parser', () => {
         }
       `)
     ).to.equal([
+      `@page &{invalid:true;}`,
       `@page{size:A4 landscape;}`,
       `@document url(://www.w3.org/),url-prefix(//www.w3.org/),domain(mozilla.org),regexp("https:.*"){.user body{color:red;}}`,
       `@viewport{min-width:640px;max-width:800px;}`,
@@ -723,6 +739,10 @@ describe('Parser', () => {
 
   test('does not hang on unterminated block comment (#129)', () => {
     expect(stylis(`/*`)).to.equal(``)
+  })
+
+  test('does not hang on unterminated function', () => {
+    expect(stylis(`(`)).to.equal(``)
   })
 
   test('handles single `/` in a value', () => {
