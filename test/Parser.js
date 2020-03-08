@@ -361,13 +361,29 @@ describe('Parser', () => {
   })
 
   test('quotes', () => {
-   expect(stylis(`
-      .foo:before {
-        content:".hello {world}";
-        content:".hello {world} ' ";
-        content:'.hello {world} " ';
-      }
-     `)).to.equal(`.user .foo:before{content:".hello {world}";content:".hello {world} ' ";content:'.hello {world} " ';}`)
+    expect(
+      stylis(`
+        .foo:before {
+          content:".hello {world}";
+          content:".hello {world} ' ";
+          content:'.hello {world} " ';
+        }
+     `)
+    ).to.equal(`.user .foo:before{content:".hello {world}";content:".hello {world} ' ";content:'.hello {world} " ';}`)
+  })
+
+  test('quotes - escaping', () => {
+    expect(
+      stylis(`
+        .foo:before {
+          content:"\\"";
+          content:"\\\\\\"";
+
+          content:'\\'';
+          content:'\\\\\\'';
+        }
+     `)
+    ).to.equal(`.user .foo:before{content:"\\"";content:"\\\\\\"";content:'\\'';content:'\\\\\\'';}`)
   })
 
   test('remove empty css', () => {
