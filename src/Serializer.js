@@ -1,35 +1,39 @@
-import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {sizeof, strlen} from './Utility.js'
+import {IMPORT, RULESET, DECLARATION} from './Enum.js'
+import {sizeof} from './Utility.js'
 
 /**
  * @param {object[]} children
- * @param {function} callack
+ * @param {function} callback
  * @return {string}
  */
 export function serialize (children, callback) {
 	var output = ''
-	var length = sizeof(children)
 
-	for (var i = 0; i < length; i++)
-		output += callback(children[i], callback) || ''
+	for (var i = 0; i < sizeof(children); i++)
+		output += callback(children[i], i, children, callback) || ''
 
 	return output
 }
 
 /**
  * @param {object} element
+ * @param {number} index
+ * @param {object[]} children
  * @param {function} callback
  * @return {string}
  */
-export function stringify (element, callback) {
-	var output = ''
-	var string = element.value
+export function stringify (element, index, children, callback) {
+	var output = element.return
+	var prefix = element.prefix || ''
 
 	switch (element.type) {
-		case IMPORT: case DECLARATION: return string
-		case COMMENT: return output
-		case RULESET: string = element.props.join(',')
+		case IMPORT: case DECLARATION: return element.return = output || prefix + element.value
+		case RULESET: element.value = element.props.join(',')
 	}
 
-	return strlen(output = serialize(element.children, callback)) ? string + '{' + output + '}' : ''
+	if (!output)
+		if (children = serialize(element.children, callback))
+			output = prefix + element.value + '{' + children + '}'
+
+	return element.prefix === null ? output : element.return = output
 }

@@ -1,45 +1,29 @@
-import {from, trim, strlen, charat, substr, append} from './Utility.js'
+import {from, trim, charat, strlen, substr, append} from './Utility.js'
 
 export var line = 1
 export var column = 1
 export var length = 0
 export var position = 0
 export var character = 0
-export var temporary = ''
-
-/**
- * @param {string[]} children
- * @return {string[]}
- */
-export function tokenize (children) {
-	while (scan())
-		switch (token(character)) {
-			case 0: append(identifier(caret() - 1), children)
-				break
-			case 2: append(delimiter(character), children)
-			case 4:
-				break
-			default: append(from(character), children)
-		}
-
-	return children
-}
+export var characters = ''
 
 /**
  * @param {string} value
+ * @param {string} root
  * @param {string} type
  * @param {string[]} props
  * @param {object[]} children
+ * @param {number} length
  */
-export function node (value, type, props, children) {
-	return {value: value, type: type, props: props, children: children, line: line, column: column, caret: position}
+export function node (value, root, type, props, children, length) {
+	return {value: value, root: root, type: type, props: props, children: children, line: line, column: column, length: length, prefix: '', return: ''}
 }
 
 /**
  * @return {number}
  */
-export function scan () {
-	character = position < length ? charat(temporary, position++) : 0
+export function next () {
+	character = position < length ? charat(characters, position++) : 0
 
 	if (column++, character === 10)
 		column = 1, line++
@@ -51,7 +35,7 @@ export function scan () {
  * @return {number}
  */
 export function peek () {
-	return charat(temporary, position)
+	return charat(characters, position)
 }
 
 /**
@@ -62,26 +46,38 @@ export function caret () {
 }
 
 /**
+ * @param {number} begin
+ * @param {number} end
+ * @return {string}
+ */
+export function slice (begin, end) {
+	return substr(characters, begin, end)
+}
+
+/**
  * @param {number} type
  * @return {number}
  */
 export function token (type) {
 	switch (type) {
-		// * /
+		// * / comment tokens
 		case 42: case 47:
-			return 5
-		// \0 \t \n \s
+			return 6
+		// \0 \t \n \s whitespace tokens
 		case 0: case 9: case 10: case 32:
+			return 5
+		// : accompanied tokens
+		case 58:
 			return 4
-		// ! + , / : > @ ~
-		case 33: case 43: case 44: case 58: case 62: case 64: case 126:
-		// ; { }
+		// ! + , / > @ ~ isolated tokens
+		case 33: case 43: case 44: case 62: case 64: case 126:
+		// ; { } // breakpoint tokens
 		case 59: case 123: case 125:
 			return 3
-		// " ' ( [
+		// " ' ( [ opening delimit tokens
 		case 34: case 39: case 40: case 91:
 			return 2
-		// ) ]
+		// ) ] closing delimit tokens
 		case 41: case 93:
 			return 1
 	}
@@ -90,34 +86,11 @@ export function token (type) {
 }
 
 /**
- * @param {number} type
- * @return {number}
- */
-export function attoken (type) {
-	switch (type) {
-		// - d m s
-		case 45: case 100: case 109: case 115:
-			return 0
-	}
-
-	return 1
-}
-
-/**
- * @param {number} begin
- * @param {number} end
- * @return {string}
- */
-export function slice (begin, end) {
-	return substr(temporary, begin, end)
-}
-
-/**
  * @param {string} value
  * @return {any[]}
  */
 export function alloc (value) {
-	return line = column = 1, length = strlen(temporary = value), position = 0, []
+	return line = column = 1, length = strlen(characters = value), position = 0, []
 }
 
 /**
@@ -125,40 +98,61 @@ export function alloc (value) {
  * @return {any}
  */
 export function dealloc (value) {
-	return temporary = '', value
+	return characters = '', value
 }
 
 /**
  * @param {number} type
  * @return {number}
  */
-export function delimit (type) {
-	while (scan())
-		switch (character) {
-			// \0 ] ) " '
-			case 0: case type:
-				return caret()
-			// " '
-			case 34: case 39:
-				return delimit(type === 34 || type === 39 ? type : character)
-			// (
-			case 40:
-				if (type === 41)
-					delimit(type)
-				break
-			// \
-			case 92:
-				scan()
-				break
+export function comment (type) {
+	while (next())
+		switch (character + type) {
+			// / /n
+			case 47 + 10:
+				return 0
+			// * *
+			case 42 + 42:
+				if (peek() === 47)
+					return next()
 		}
+
+	return 0
 }
 
 /**
  * @param {number} type
  * @return {string}
  */
+export function delimit (type) {
+	return trim(slice(caret() - 1, delimiter(type === 91 ? type + 2 : type === 40 ? type + 1 : type)))
+}
+
+/**
+ * @param {number} type
+ * @return {number}
+ */
 export function delimiter (type) {
-	return trim(slice(caret() - 1, delimit(type === 91 ? type + 2 : type === 40 ? type + 1 : type)))
+	while (next())
+		switch (character) {
+			// ] ) " '
+			case type:
+				return caret()
+			// " '
+			case 34: case 39:
+				return delimiter(type === 34 || type === 39 ? type : character)
+			// (
+			case 40:
+				if (type === 41)
+					delimiter(type)
+				break
+			// \
+			case 92:
+				next()
+				break
+		}
+
+	return caret()
 }
 
 /**
@@ -168,7 +162,7 @@ export function delimiter (type) {
 export function whitespace (type) {
 	while (character = peek())
 		if (character < 33)
-			scan()
+			next()
 		else
 			break
 
@@ -181,7 +175,32 @@ export function whitespace (type) {
  */
 export function identifier (index) {
 	while (!token(peek()))
-		scan()
+		next()
 
 	return slice(index, caret())
+}
+
+/**
+ * @param {string} value
+ * @return {string[]}
+ */
+export function tokenize (value) {
+	return dealloc(tokenizer(alloc(value)))
+}
+
+/**
+ * @param {string[]} children
+ * @return {string[]}
+ */
+export function tokenizer (children) {
+	while (next())
+		switch (token(character)) {
+			case 4: case 0: append(identifier(caret() - 1), children)
+				break
+			case 2: append(delimit(character), children)
+				break
+			default: append(from(character), children)
+		}
+
+	return children
 }

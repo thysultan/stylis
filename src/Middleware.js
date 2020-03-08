@@ -1,20 +1,24 @@
-import {KEYFRAMES, DECLARATION} from './Enum.js'
-import {strlen} from './Utility.js'
+import {RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
+import {test, charat, substr, strlen, sizeof, combine} from './Utility.js'
+import {tokenize} from './Tokenizer.js'
 import {stringify} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
 /**
- * @param {object} element
- * @param {function} callback
- * @return {string}
+ * @param {function[]} collection
+ * @return {function}
  */
-export function prefixer (element, callback) {
-	switch (element.type) {
-		case DECLARATION: return prefix(element.value, strlen(element.props))
-		case KEYFRAMES: return prefix(stringify(element, callback), 10)
-	}
+export function middleware (collection) {
+	var length = sizeof(collection)
 
-	return stringify(element, callback)
+	return function (element, index, children, callback) {
+		var output = ''
+
+		for (var i = 0; i < length; i++)
+			output += collection[i](element, index, children, callback) || ''
+
+		return output
+	}
 }
 
 /**
@@ -23,41 +27,60 @@ export function prefixer (element, callback) {
  */
 export function rulesheet (callback) {
 	return function (element) {
-		if (element = stringify(element, prefixer))
-			callback(element)
+		if (!element.root)
+			if (element = element.return)
+				callback(element)
 	}
 }
 
 /**
+ * @param {object} element
+ * @param {number} index
+ * @param {object[]} children
  * @param {function} callback
- * @return {function}
  */
-export function sourcemap (callback) {
-	return function (element) {
-		callback({line: element.line, column: element.column, caret: element.caret})
-	}
+export function prefixer (element, index, children, callback) {
+	if (element.return === element.prefix)
+		switch (element.type) {
+			case DECLARATION: element.prefix = prefix(element.value, element.length)
+				break
+			case KEYFRAMES: element.prefix = prefix(stringify(element, index, element.prefix = null, callback), 10)
+				break
+			case RULESET:
+				if (element.length)
+					if (test(children = element.value, /:place|:read-/))
+						element.prefix = prefix(stringify(element, index, element.prefix = null, callback), 0)
+				break
+		}
 }
 
-// TODO
 /**
- * @example element.props = cascade(element.props, '[id=uuid]')
- * @param {string[]} selector
- * @param {string} namespace
- * @return {string[]}
+ * @param {object} element
+ * @param {number} index
+ * @param {object[]} children
  */
-export function cascade (selector, namespace) {
-	selector.map(function (value) {
-		// h1 h2 :matches(h1 h2) => h1[uuid] h2[uuid] [uuid]:matches(h1 h2)
-		return dealloc(tokenize(alloc(value))).map(function (value, index, children) {
-			switch (charat(value, 0)) {
-				// :global
-				case 'g':
-					return value
-				case '~': case '>': case '+': case '(':
-					break
-				default:
-					return value + namespace
-			}
-		}).join(' ')
-	})
+export function namespace (element) {
+	switch (element.type) {
+		case RULESET:
+			element.props = element.props.map(function (value) {
+				return combine(tokenize(value), function (value, index, children) {
+					switch (charat(value, 0)) {
+						// \f
+						case 12: value = substr(value, 1, strlen(value))
+						// \0 ( + > ~
+						case 0: case 40: case 43: case 62: case 126:
+							return value
+						// :
+						case 58:
+							if (value === ':global')
+								children[index + 1] = '\f' + substr(children[index + 1], index = 1, -1)
+						// \s
+						case 32:
+							return index === 1 ? '' : value
+						default:
+							return index ? value + element : (element = value, sizeof(children) === 1 ? value : '')
+					}
+				})
+			})
+	}
 }

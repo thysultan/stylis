@@ -11,6 +11,12 @@ export var abs = Math.abs
 export var from = String.fromCharCode
 
 /**
+ * @param {...object}
+ * @return {object}
+ */
+export var assign = Object.assign
+
+/**
  * @param {string} value
  * @param {number} length
  * @return {number}
@@ -29,11 +35,20 @@ export function trim (value) {
 
 /**
  * @param {string} value
- * @param {(string|RegExp)} pattern
+ * @param {RegExp} pattern
  * @return {boolean}
  */
 export function test (value, pattern) {
 	return pattern.test(value)
+}
+
+/**
+ * @param {string} value
+ * @param {RegExp} pattern
+ * @return {string?}
+ */
+export function match (value, pattern) {
+	return pattern.exec(value)[0]
 }
 
 /**
@@ -93,17 +108,17 @@ export function sizeof (value) {
 /**
  * @param {any} value
  * @param {any[]} array
- * @return {void}
+ * @return {any}
  */
 export function append (value, array) {
-	array.push(value)
+	return array.push(value), value
 }
 
 /**
- * @param {any} value
- * @param {any[]} array
- * @return {void}
+ * @param {string[]} array
+ * @param {function} callback
+ * @return {string}
  */
-export function prepend (value, array) {
-	array.unshift(value)
+export function combine (array, callback) {
+	return array.map(callback).join('')
 }

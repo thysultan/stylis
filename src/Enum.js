@@ -1,4 +1,7 @@
-export var COMMENT = 'comment'
+export var MS = '-ms-'
+export var MOZ = '-moz-'
+export var WEBKIT = '-webkit-'
+
 export var RULESET = 'ruleset'
 export var DECLARATION = 'declaration'
 
@@ -10,11 +13,7 @@ export var VIEWPORT = '@viewport'
 export var SUPPORTS = '@supports'
 export var DOCUMENT = '@document'
 export var NAMESPACE = '@namespace'
-export var FONT_FACE = '@font-face'
 export var KEYFRAMES = '@keyframes'
+export var FONT_FACE = '@font-face'
 export var COUNTER_STYLE = '@counter-style'
 export var FONT_FEATURE_VALUES = '@font-feature-values'
-
-export var MS = '-ms-'
-export var MOZ = '-moz-'
-export var WEBKIT = '-webkit-'
