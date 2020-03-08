@@ -639,6 +639,10 @@ describe('Parser', () => {
     ).to.equal(`@media (min-width: 400px){.user div{border-left:1px solid hotpink;}.user span{border-top:none;}}`)
   })
 
+  test('comment - bang at the start (#114)', () => {
+    expect(serialize(compile(`/*! test */body{color:red;}`), stringify)).to.equal('body{color:red;}')
+  })
+
   test('parenthesis in string literal I (#151)', () => {
    expect(
     stylis(`
