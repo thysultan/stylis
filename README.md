@@ -63,8 +63,8 @@ serialize(compile(`...`), stringify)
 ### Compile
 
 ```js
-compile('h1{all:unset}') === {value: 'h1', type: 'ruleset', props: ['h1'], children: [...]}
-compile('--varb:unset;') === {value: '--foo:unset;', type: 'declaration', props: '--foo', children: 'unset'}
+compile('h1{all:unset}') === {value: 'h1', type: 'rule', props: ['h1'], children: [...]}
+compile('--varb:unset;') === {value: '--foo:unset;', type: 'decl', props: '--foo', children: 'unset'}
 ```
 
 ### Tokenize
