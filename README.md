@@ -39,7 +39,7 @@ const ruleset = {
 	value: 'h1,h2',
 	type: 'rule',
 	props: ['h1', 'h2'],
-	children: [...],
+	children: [/* ... */],
 	line: 1, column: 1
 }
 
@@ -47,7 +47,7 @@ const atruleset = {
 	value: '@media (max-width:100), (min-width:100)',
 	type: '@media',
 	props: ['(max-width:100)', '(min-width:100)'],
-	children: [...],
+	children: [/* ... */],
 	line: 1, column: 1
 }
 ```
@@ -57,14 +57,14 @@ const atruleset = {
 ```js
 import {compile, serialize, stringify} from 'stylis'
 
-serialize(compile(`...`), stringify)
+serialize(compile(`h1{all:unset}`), stringify)
 ```
 
 ### Compile
 
 ```js
-compile('h1{all:unset}') === [{value: 'h1', type: 'rule', props: ['h1'], children: [...]}]
-compile('--varb:unset;') === [{value: '--foo:unset;', type: 'decl', props: '--foo', children: 'unset'}]
+compile('h1{all:unset}') === [{value: 'h1', type: 'rule', props: ['h1'], children: [/* ... */]}]
+compile('--foo:unset;') === [{value: '--foo:unset;', type: 'decl', props: '--foo', children: 'unset'}]
 ```
 
 ### Tokenize
@@ -81,7 +81,7 @@ serialize(compile('h1{all:unset}'), stringify)
 
 ## Middleware
 
-The middleware helper is a convinent helper utility, that for all intesive purpose you can do without if you intend to implement your own traversl logic. The `stringify` middleware is one such middleware that can be used in conjuction with it.
+The middleware helper is a convinent helper utility, that for all intensive purposes you can do without if you intend to implement your own traversal logic. The `stringify` middleware is one such middleware that can be used in conjunction with it.
 
 Elements passed to middlewares have a `root` property that is the immediate root/parent of the current element.
 
@@ -89,7 +89,7 @@ Elements passed to middlewares have a `root` property that is the immediate root
 
 ```js
 serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
-	asset(children === element.root.children && children[index] === element.children)
+	assert(children === element.root.children && children[index] === element.children)
 }, stringify])) === 'h1{all:unset;}'
 ```
 
@@ -117,7 +117,7 @@ serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
 
 ```js
 serialize(compile('h1{all:unset}'), middleware([stringify, (element, index, children) => {
-	asset(element.return === 'h1{all:unset;}')
+	assert(element.return === 'h1{all:unset;}')
 }])) === 'h1{all:unset;color:red;}'
 ```
 
