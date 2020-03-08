@@ -3,7 +3,7 @@ import {compile, serialize, stringify} from "../index.js"
 const stylis = string => serialize(compile(`.user{${string}}`), stringify)
 
 describe('Parser', () => {
-  test('unested', () => {
+  test('unnested', () => {
     expect(serialize(compile(`--foo:none;@supports{--bar:none;}`), stringify)).to.equal(`--foo:none;@supports{--bar:none;}`)
   })
 
