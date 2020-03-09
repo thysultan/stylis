@@ -138,6 +138,10 @@ describe('Prefixer', () => {
 		expect(prefix(`background-image:image-set(url(foo.jpg) 2x);`, 16)).to.equal([`background-image:-webkit-image-set(url(foo.jpg) 2x);`].join(''))
 	})
 
+	test('background-clip', () => {
+		expect(prefix(`background-clip:text;`, 15)).to.equal([`-webkit-background-clip:text;`].join(''))
+	})
+
 	test('margin-inline', () => {
 		expect(prefix(`margin-inline-start:20px;`, 19)).to.equal([`-webkit-margin-start:20px;`].join(''))
 		expect(prefix(`margin-inline-end:20px;`, 17)).to.equal([`-webkit-margin-end:20px;`].join(''))
