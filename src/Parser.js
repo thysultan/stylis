@@ -1,6 +1,6 @@
-import {RULESET, DECLARATION} from './Enum.js'
+import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
-import {node, next, peek, caret, token, alloc, dealloc, comment, delimit, whitespace, identifier} from './Tokenizer.js'
+import {node, char, next, peek, caret, token, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -12,7 +12,7 @@ export function compile (value) {
 
 /**
  * @param {string} value
- * @param {string[]} root
+ * @param {object} root
  * @param {string[]} rule
  * @param {string[]} rules
  * @param {string[]} rulesets
@@ -48,7 +48,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 				break
 			// /
 			case 47:
-				token(peek()) > 5 ? comment(next()) : characters += '/'
+				token(peek()) > 5 ? append(comment(commenter(next(), caret()), root), declarations) : characters += '/'
 				break
 			// {
 			case 123 * variable:
@@ -114,7 +114,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 
 /**
  * @param {string} value
- * @param {string[]} root
+ * @param {object} root
  * @param {number} index
  * @param {number} offset
  * @param {string[]} rules
@@ -136,6 +136,16 @@ export function ruleset (value, root, index, offset, rules, points, type, props,
 				props[k++] = z
 
 	return node(value, root, offset === 0 ? RULESET : type, props, children, length)
+}
+
+/**
+ * @param {number} value
+ * @param {string[]} root
+ * @param {number} type
+ * @return {object}
+ */
+export function comment (value, root) {
+	return node(value, root, COMMENT, from(char()), substr(value, 2, -2), 0)
 }
 
 /**

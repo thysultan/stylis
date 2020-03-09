@@ -21,4 +21,10 @@ describe('Middleware', () => {
       `.user{width:0;}`, `p,a{width:1;}`, `h1.user{width:1;}`, `h1.user h2.user:last-child{width:2;}`, `@media{.user{width:1;}}`
     ].join(''))
   })
+
+  test('comments', () => {
+    expect(serialize(compile(`/*@noflip*/ .user{//noflip\n\n}`), middleware([value => value.type === 'comm' ? 'color:red;' : '', stringify]))).to.deep.equal([
+      `color:red;.user{color:red;}`
+    ].join())
+  })
 })

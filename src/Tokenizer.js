@@ -9,7 +9,7 @@ export var characters = ''
 
 /**
  * @param {string} value
- * @param {string} root
+ * @param {object} root
  * @param {string} type
  * @param {string[]} props
  * @param {object[]} children
@@ -17,6 +17,13 @@ export var characters = ''
  */
 export function node (value, root, type, props, children, length) {
 	return {value: value, root: root, type: type, props: props, children: children, line: line, column: column, length: length, prefix: '', return: ''}
+}
+
+/**
+ * @return {number}
+ */
+export function char () {
+	return character
 }
 
 /**
@@ -103,56 +110,18 @@ export function dealloc (value) {
 
 /**
  * @param {number} type
- * @return {number}
- */
-export function comment (type) {
-	while (next())
-		switch (character + type) {
-			// / /n
-			case 47 + 10:
-				return 0
-			// * *
-			case 42 + 42:
-				if (peek() === 47)
-					return next()
-		}
-
-	return 0
-}
-
-/**
- * @param {number} type
  * @return {string}
  */
 export function delimit (type) {
-	return trim(slice(caret() - 1, delimiter(type === 91 ? type + 2 : type === 40 ? type + 1 : type)))
+	return trim(slice(position - 1, delimiter(type === 91 ? type + 2 : type === 40 ? type + 1 : type)))
 }
 
 /**
- * @param {number} type
- * @return {number}
+ * @param {string} value
+ * @return {string[]}
  */
-export function delimiter (type) {
-	while (next())
-		switch (character) {
-			// ] ) " '
-			case type:
-				return caret()
-			// " '
-			case 34: case 39:
-				return delimiter(type === 34 || type === 39 ? type : character)
-			// (
-			case 40:
-				if (type === 41)
-					delimiter(type)
-				break
-			// \
-			case 92:
-				next()
-				break
-		}
-
-	return caret()
+export function tokenize (value) {
+	return dealloc(tokenizer(alloc(value)))
 }
 
 /**
@@ -170,32 +139,13 @@ export function whitespace (type) {
 }
 
 /**
- * @param {number} index
- * @return {string}
- */
-export function identifier (index) {
-	while (!token(peek()))
-		next()
-
-	return slice(index, caret())
-}
-
-/**
- * @param {string} value
- * @return {string[]}
- */
-export function tokenize (value) {
-	return dealloc(tokenizer(alloc(value)))
-}
-
-/**
  * @param {string[]} children
  * @return {string[]}
  */
 export function tokenizer (children) {
 	while (next())
 		switch (token(character)) {
-			case 4: case 0: append(identifier(caret() - 1), children)
+			case 4: case 0: append(identifier(position - 1), children)
 				break
 			case 2: append(delimit(character), children)
 				break
@@ -203,4 +153,59 @@ export function tokenizer (children) {
 		}
 
 	return children
+}
+
+/**
+ * @param {number} type
+ * @return {number}
+ */
+export function delimiter (type) {
+	while (next())
+		switch (character) {
+			// ] ) " '
+			case type:
+				return position
+			// " '
+			case 34: case 39:
+				return delimiter(type === 34 || type === 39 ? type : character)
+			// (
+			case 40:
+				if (type === 41)
+					delimiter(type)
+				break
+			// \
+			case 92:
+				next()
+				break
+		}
+
+	return position
+}
+
+/**
+ * @param {number} type
+ * @param {number} index
+ * @return {number}
+ */
+export function commenter (type, index) {
+	while (next())
+		// //
+		if (type + character === 47 + 10)
+			break
+		// /*
+		else if (type + character === 42 + 42 && peek() === 47)
+			break
+
+	return '/*' + slice(index, position - 1) + '*' + from(type === 47 ? type : next())
+}
+
+/**
+ * @param {number} index
+ * @return {string}
+ */
+export function identifier (index) {
+	while (!token(peek()))
+		next()
+
+	return slice(index, position)
 }

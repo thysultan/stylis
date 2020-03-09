@@ -2,6 +2,7 @@ export var MS = '-ms-'
 export var MOZ = '-moz-'
 export var WEBKIT = '-webkit-'
 
+export var COMMENT = 'comm'
 export var RULESET = 'rule'
 export var DECLARATION = 'decl'
 
