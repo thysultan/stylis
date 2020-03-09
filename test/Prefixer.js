@@ -31,6 +31,10 @@ describe('Prefixer', () => {
 
 	test('cursor', () => {
 		expect(prefix(`cursor:grab;`, 6)).to.equal([`cursor:-webkit-grab;`, `cursor:-moz-grab;`].join(''))
+		expect(prefix(`cursor:image-set(url(foo.jpg) 2x), grab;`, 6)).to.equal([
+			`cursor:-webkit-image-set(url(foo.jpg) 2x), -webkit-grab;`,
+			`cursor:image-set(url(foo.jpg) 2x), -moz-grab;`
+		].join(''))
 	})
 
 	test('backface-visibility', () => {

@@ -48,12 +48,12 @@ export function prefix (value, length) {
 			// transition
 			case 4554:
 				return WEBKIT + replace(value, /([^-])(transform)/g, '$1' + WEBKIT + '$2')
+			// cursor
+			case 6187:
+				value = replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3$1' + MOZ + '$2$3')
 			// background, background-image
 			case 5495: case 3959:
 				return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2')
-			// cursor
-			case 6187:
-				return replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3$1' + MOZ + '$2$3')
 			// justify-content
 			case 4968:
 				return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value
