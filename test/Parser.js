@@ -199,6 +199,16 @@ describe('Parser', () => {
     ).to.equal(`.user:before{color:blue;}`)
   })
 
+  test('& :hover', () => {
+    expect(
+      stylis(`
+        & :hover{
+          color:blue;
+        }
+      `)
+    ).to.equal(`.user :hover{color:blue;}`)
+  })
+
   test('@import', () => {
     expect(stylis(`@import url('http://example.com');`)).to.equal(`@import url('http://example.com');`)
   })
