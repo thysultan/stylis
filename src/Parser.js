@@ -45,7 +45,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 				break
 			// \t \n \s
 			case 9: case 10: case 32:
-				characters += whitespace(previous, strlen(characters))
+				characters += whitespace(previous)
 				break
 			// /
 			case 47:

@@ -126,17 +126,16 @@ export function tokenize (value) {
 
 /**
  * @param {number} type
- * @param {number} len
  * @return {string}
  */
-export function whitespace (type, len) {
+export function whitespace (type) {
 	while (character = peek())
 		if (character < 33)
 			next()
 		else
 			break
 
-	return !len || character !== 58 && (token(type) > 2 || token(character) > 2) ? '' : ' '
+	return token(type) > 2 || token(character) > 3 ? '' : ' '
 }
 
 /**
