@@ -486,8 +486,14 @@ describe('Parser', () => {
         div {
           ${'width:0;    '}
         }
+        .foo {
+          color   :   hotpink;
+        }
       `)
-    ).to.equal(`.user div{width:0;}`)
+    ).to.equal([
+      `.user div{width:0;}`,
+      `.user .foo{color:hotpink;}`
+    ].join(''))
   })
 
   test('no trailing semi-colons', () => {

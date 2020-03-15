@@ -67,24 +67,24 @@ export function slice (begin, end) {
  */
 export function token (type) {
 	switch (type) {
-		// * / comment tokens
+		// * / comment token
 		case 42: case 47:
 			return 6
-		// \0 \t \n \s whitespace tokens
+		// \0 \t \n \s whitespace token
 		case 0: case 9: case 10: case 32:
 			return 5
-		// : accompanied tokens
-		case 58:
-			return 4
-		// ! + , / > @ ~ isolated tokens
+		// ! + , / > @ ~ isolate token
 		case 33: case 43: case 44: case 62: case 64: case 126:
-		// ; { } // breakpoint tokens
+		// ; { } / breakpoint token
 		case 59: case 123: case 125:
+			return 4
+		// : accompanied token
+		case 58:
 			return 3
-		// " ' ( [ opening delimit tokens
+		// " ' ( [ opening delimit token
 		case 34: case 39: case 40: case 91:
 			return 2
-		// ) ] closing delimit tokens
+		// ) ] closing delimit token
 		case 41: case 93:
 			return 1
 	}
@@ -146,7 +146,7 @@ export function whitespace (type, len) {
 export function tokenizer (children) {
 	while (next())
 		switch (token(character)) {
-			case 4: case 0: append(identifier(position - 1), children)
+			case 3: case 0: append(identifier(position - 1), children)
 				break
 			case 2: append(delimit(character), children)
 				break
