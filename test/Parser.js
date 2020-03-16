@@ -209,6 +209,16 @@ describe('Parser', () => {
     ).to.equal(`.user :hover{color:blue;}`)
   })
 
+  test('div :hover', () => {
+    expect(
+      stylis(`
+        div :hover {
+          color:blue;
+        }
+      `)
+    ).to.equal(`.user div :hover{color:blue;}`)
+  })
+
   test('@import', () => {
     expect(stylis(`@import url('http://example.com');`)).to.equal(`@import url('http://example.com');`)
   })
@@ -476,8 +486,14 @@ describe('Parser', () => {
         div {
           ${'width:0;    '}
         }
+        .foo {
+          color   :   hotpink;
+        }
       `)
-    ).to.equal(`.user div{width:0;}`)
+    ).to.equal([
+      `.user div{width:0;}`,
+      `.user .foo{color:hotpink;}`
+    ].join(''))
   })
 
   test('no trailing semi-colons', () => {

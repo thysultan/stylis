@@ -25,6 +25,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 	var offset = 0
 	var length = 0
 	var atrule = 0
+	var property = 0
 	var previous = 0
 	var variable = 1
 	var scanning = 1
@@ -61,7 +62,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 					// ;
 					case 59 + offset:
 						if (length > 0)
-							append(declaration(characters + ';', rule, length), declarations)
+							append(property > 32 ? declaration(characters + ';', rule, length) : declaration(replace(characters, ' ', '') + ';', rule, length - 1), declarations)
 						break
 					// @ ;
 					case 59: characters += ';'
@@ -87,7 +88,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 				break
 			// :
 			case 58:
-				length = strlen(characters)
+				length = strlen(characters), property = previous
 			default:
 				switch (characters += from(character), character * variable) {
 					// &
