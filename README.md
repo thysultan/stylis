@@ -35,6 +35,14 @@ const declaration = {
 	line: 1, column: 1
 }
 
+const comment = {
+	value: '/*@noflip*/',
+	type: 'comm',
+	props: '/',
+	children: '@noflip',
+	line: 1, column: 1
+}
+
 const ruleset = {
 	value: 'h1,h2',
 	type: 'rule',

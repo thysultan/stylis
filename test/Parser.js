@@ -148,7 +148,7 @@ describe('Parser', () => {
       `.user{color:red;}`,
       `.user button{color:blue;}.user button{color:red;}`,
       `.user h1{color:red;color:red;}`
-    ].join(''));
+    ].join(''))
   })
 
   test('&', () => {
@@ -197,6 +197,26 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`.user:before{color:blue;}`)
+  })
+
+  test('& :hover', () => {
+    expect(
+      stylis(`
+        & :hover{
+          color:blue;
+        }
+      `)
+    ).to.equal(`.user :hover{color:blue;}`)
+  })
+
+  test('div :hover', () => {
+    expect(
+      stylis(`
+        div :hover {
+          color:blue;
+        }
+      `)
+    ).to.equal(`.user div :hover{color:blue;}`)
   })
 
   test('@import', () => {
@@ -332,7 +352,7 @@ describe('Parser', () => {
     ).to.equal([
       `.user span,.user h1{color:red;}`,
       `.user h1,.user:after,.user:before{color:red;}`
-   ].join(''))
+    ].join(''))
   })
 
   test('[title="a,b"] and :matches(a,b)', () => {
@@ -466,8 +486,14 @@ describe('Parser', () => {
         div {
           ${'width:0;    '}
         }
+        .foo {
+          color   :   hotpink;
+        }
       `)
-    ).to.equal(`.user div{width:0;}`)
+    ).to.equal([
+      `.user div{width:0;}`,
+      `.user .foo{color:hotpink;}`
+    ].join(''))
   })
 
   test('no trailing semi-colons', () => {
@@ -575,27 +601,27 @@ describe('Parser', () => {
     expect(stylis(`h1{color:red/**}`)).to.equal(`.user h1{color:red;}`)
   })
 
-  test('comments(context character I)', () => {
+  test('context character I', () => {
     expect(stylis(`.a{color:red;/* } */}`)).to.equal(`.user .a{color:red;}`)
   })
 
-  test('comments(context character II)', () => {
+  test('context character II', () => {
     expect(stylis(`.a{color:red;/*}*/}`)).to.equal(`.user .a{color:red;}`)
   })
 
-  test('comments(context character III)', () => {
+  test('context character III', () => {
     expect(stylis(`.a{color:red;/*{*/}`)).to.equal(`.user .a{color:red;}`)
   })
 
-  test('comments(context character IV)', () => {
+  test('context character IV', () => {
     expect(stylis(`.a{/**/color:red}`)).to.equal(`.user .a{color:red;}`)
   })
 
-  test('comments(context character V)', () => {
+  test('context character V', () => {
     expect(stylis(`.a{color:red;/*//color:blue;*/}`)).to.equal(`.user .a{color:red;}`)
   })
 
-  test('comments(context character VI)', () => {
+  test('context character VI', () => {
     expect(
       stylis(
         `background: url("img}.png");.a {background: url("img}.png");}`
@@ -606,7 +632,7 @@ describe('Parser', () => {
     ].join(''))
   })
 
-  test('comments(context character VII)', () => {
+  test('context character VII', () => {
     expect(
       stylis(`background: url(img}.png);.a {background: url(img}.png);}`)
     ).to.equal([
@@ -615,7 +641,7 @@ describe('Parser', () => {
     ].join(''))
   })
 
-  test('comments(context character VIII)', () => {
+  test('context character VIII', () => {
     expect(
       stylis(`background: url[img}.png];.a {background: url[img}.png];}`)
     ).to.equal([

@@ -1,4 +1,4 @@
-import {IMPORT, RULESET, DECLARATION} from './Enum.js'
+import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {sizeof} from './Utility.js'
 
 /**
@@ -28,6 +28,7 @@ export function stringify (element, index, children, callback) {
 
 	switch (element.type) {
 		case IMPORT: case DECLARATION: return element.return = output || prefix + element.value
+		case COMMENT: return output
 		case RULESET: element.value = element.props.join(',')
 	}
 
