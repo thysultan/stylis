@@ -4,8 +4,13 @@ const stack = []
 
 describe('Middleware', () => {
 	test('rulesheet', () => {
-  	serialize(compile(`.user{h1 {width:0;} @media{width:1;}}`), middleware([stringify, rulesheet(value => stack.push(value))]))
-  	expect(stack).to.deep.equal([`.user h1{width:0;}`, `@media{.user{width:1;}}`])
+  	serialize(compile(`.user{h1 {width:0;} @media{width:1;}} @keyframes foo{from{width:0;}to{width:1;}}}`), middleware([prefixer, stringify, rulesheet(value => stack.push(value))]))
+  	expect(stack).to.deep.equal([
+      `.user h1{width:0;}`,
+      `@media{.user{width:1;}}`,
+      '@-webkit-keyframes foo{from{width:0;}to{width:1;}}',
+      '@keyframes foo{from{width:0;}to{width:1;}}}'
+    ])
   })
 
   test('prefixer', () => {
