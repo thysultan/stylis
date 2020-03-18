@@ -135,7 +135,7 @@ export function whitespace (type) {
 		else
 			break
 
-	return token(type) > 2 || token(character) > 3 ? '' : ' '
+	return token(type) > 2 || character !== 42 && token(character) > 3 ? '' : ' '
 }
 
 /**
