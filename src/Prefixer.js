@@ -7,6 +7,8 @@ import {hash, match, charat, strlen, indexof, replace} from './Utility.js'
  * @return {string}
  */
 export function prefix (value, length) {
+	var input = value
+
 	if (length > 0)
 		switch (hash(value, length)) {
 			// @keyframes
@@ -53,7 +55,9 @@ export function prefix (value, length) {
 				value = replace(value, /(.*)(zoom-\w+|grab\w*)(.*)/, '$1' + WEBKIT + '$2$3$1' + MOZ + '$2$3')
 			// background, background-image
 			case 5495: case 3959:
-				return replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2')
+				value = replace(value, /([^-])(image-set\()/, '$1' + WEBKIT + '$2')
+				if (strlen(input) === strlen(value)) break
+				return value
 			// justify-content
 			case 4968:
 				return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value

@@ -31,6 +31,7 @@ describe('Prefixer', () => {
 
 	test('cursor', () => {
 		expect(prefix(`cursor:grab;`, 6)).to.equal([`cursor:-webkit-grab;`, `cursor:-moz-grab;`].join(''))
+		expect(prefix(`cursor:pointer;`, 6)).to.equal('')
 		expect(prefix(`cursor:image-set(url(foo.jpg) 2x), grab;`, 6)).to.equal([
 			`cursor:-webkit-image-set(url(foo.jpg) 2x), -webkit-grab;`,
 			`cursor:image-set(url(foo.jpg) 2x), -moz-grab;`
@@ -135,7 +136,9 @@ describe('Prefixer', () => {
 
 	test('background', () => {
 		expect(prefix(`background:image-set(url(foo.jpg) 2x);`, 10)).to.equal([`background:-webkit-image-set(url(foo.jpg) 2x);`].join(''))
+		expect(prefix(`background:hotpink;`, 10)).to.equal('')
 		expect(prefix(`background-image:image-set(url(foo.jpg) 2x);`, 16)).to.equal([`background-image:-webkit-image-set(url(foo.jpg) 2x);`].join(''))
+		expect(prefix(`background-image:url(foo.jpg);`, 16)).to.equal('')
 	})
 
 	test('background-clip', () => {
