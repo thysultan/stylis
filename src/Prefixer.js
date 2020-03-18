@@ -24,6 +24,9 @@ export function prefix (value, length) {
 			// appearance, user-select, flex, transform, hyphens, text-size-adjust
 			case 5349: case 4246: case 6828: case 4810: case 6968: case 2756:
 				return WEBKIT + value + MOZ + value + MS + value
+			// flex-direction
+			case 4268:
+				return WEBKIT + value + MS + value
 			// order
 			case 6165:
 				return WEBKIT + value + MS + 'flex-' + value

@@ -23,6 +23,7 @@ describe('Prefixer', () => {
 		expect(prefix(`justify-content:space-between;`, 15)).to.equal([`-webkit-box-pack:justify;`, `-webkit-justify-content:space-between;`].join(''))
 		expect(prefix(`justify-items:center;`, 13)).to.equal([].join(''))
 		expect(prefix(`order:flex;`, 5)).to.equal([`-webkit-order:flex;`, `-ms-flex-order:flex;`].join(''))
+		expect(prefix(`flex-direction:column;`, 14)).to.equal([`-webkit-flex-direction:column;`, `-ms-flex-direction:column;`].join(''))
 	})
 
 	test('transform', () => {
