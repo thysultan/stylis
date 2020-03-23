@@ -67,8 +67,8 @@ export function slice (begin, end) {
  */
 export function token (type) {
 	switch (type) {
-		// * / comment token
-		case 42: case 47:
+		// / comment token
+		case 47:
 			return 6
 		// \0 \t \n \s whitespace token
 		case 0: case 9: case 10: case 32:
@@ -135,7 +135,7 @@ export function whitespace (type) {
 		else
 			break
 
-	return token(type) > 2 || character !== 42 && token(character) > 3 ? '' : ' '
+	return token(type) > 2 || token(character) > 3 ? '' : ' '
 }
 
 /**
