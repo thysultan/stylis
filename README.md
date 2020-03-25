@@ -101,24 +101,22 @@ serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
 }, stringify])) === 'h1{all:unset;}'
 ```
 
-### Mutating
-
-```js
-serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
-	if (element.type === 'decl' && element.props === 'all' && element.children === 'unset')
-		children.splice(index + 1, 0, {...element, value: 'color:red;'})
-}, stringify])) === 'h1{all:unset;color:red;}'
-````
-
 The abstract syntax tree also includes two other properties: `prefix, return` for more niche uses.
 
 ### Prefixing
 
 ```js
-serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
+serialize(compile('h1{all:unset}'), middleware([(element, index, children, callback) => {
 	if (element.type === 'decl' && element.props === 'all' && element.children === 'unset')
-		element.prefx = 'color:red;'
-}, stringify])) === 'h1{color:red;unset;}'
+		element.return = 'color:red;' + element.value
+}, stringify])) === 'h1{color:red;all:unset;}'
+```
+
+```js
+serialize(compile('h1{all:unset}'), middleware([(element, index, children, callback) => {
+	if (element.type === 'rule' && element.props.indexOf('h1') > -1)
+		return serialize([{...element, props: ['h2', 'h3']}], callback)
+}, stringify])) === 'h2,h3{all:unset;}h1{all:unset;}'
 ```
 
 ### Reading

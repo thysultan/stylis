@@ -11,6 +11,12 @@ export var abs = Math.abs
 export var from = String.fromCharCode
 
 /**
+ * @param {...object}
+ * @return {object}
+ */
+export var assign = Object.assign
+
+/**
  * @param {string} value
  * @param {number} length
  * @return {number}
@@ -42,7 +48,7 @@ export function test (value, pattern) {
  * @return {string?}
  */
 export function match (value, pattern) {
-	return pattern.exec(value)[0]
+	return test(value, pattern) ? pattern.exec(value)[0] : null
 }
 
 /**

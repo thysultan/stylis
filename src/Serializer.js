@@ -1,5 +1,5 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {sizeof} from './Utility.js'
+import {strlen, sizeof} from './Utility.js'
 
 /**
  * @param {object[]} children
@@ -8,8 +8,9 @@ import {sizeof} from './Utility.js'
  */
 export function serialize (children, callback) {
 	var output = ''
+	var length = sizeof(children)
 
-	for (var i = 0; i < sizeof(children); i++)
+	for (var i = 0; i < length; i++)
 		output += callback(children[i], i, children, callback) || ''
 
 	return output
@@ -23,18 +24,11 @@ export function serialize (children, callback) {
  * @return {string}
  */
 export function stringify (element, index, children, callback) {
-	var output = element.return
-	var prefix = element.prefix || ''
-
 	switch (element.type) {
-		case IMPORT: case DECLARATION: return element.return = output || prefix + element.value
-		case COMMENT: return output
+		case IMPORT: case DECLARATION: return element.return || element.value
+		case COMMENT: return ''
 		case RULESET: element.value = element.props.join(',')
 	}
 
-	if (!output)
-		if (children = serialize(element.children, callback))
-			output = prefix + element.value + '{' + children + '}'
-
-	return element.prefix === null ? output : element.return = output
+	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
 }

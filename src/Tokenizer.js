@@ -16,7 +16,7 @@ export var characters = ''
  * @param {number} length
  */
 export function node (value, root, type, props, children, length) {
-	return {value: value, root: root, type: type, props: props, children: children, line: line, column: column, length: length, prefix: '', return: ''}
+	return {value: value, root: root, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
 }
 
 /**
@@ -67,14 +67,11 @@ export function slice (begin, end) {
  */
 export function token (type) {
 	switch (type) {
-		// * / comment token
-		case 42: case 47:
-			return 6
 		// \0 \t \n \s whitespace token
 		case 0: case 9: case 10: case 32:
 			return 5
 		// ! + , / > @ ~ isolate token
-		case 33: case 43: case 44: case 62: case 64: case 126:
+		case 33: case 43: case 44: case 47: case 62: case 64: case 126:
 		// ; { } / breakpoint token
 		case 59: case 123: case 125:
 			return 4
@@ -145,7 +142,7 @@ export function whitespace (type) {
 export function tokenizer (children) {
 	while (next())
 		switch (token(character)) {
-			case 3: case 0: append(identifier(position - 1), children)
+			case 0: append(identifier(position - 1), children)
 				break
 			case 2: append(delimit(character), children)
 				break

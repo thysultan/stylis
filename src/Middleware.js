@@ -1,7 +1,7 @@
-import {RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {test, charat, substr, strlen, sizeof, combine} from './Utility.js'
+import {MS, MOZ, WEBKIT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
+import {match, charat, substr, strlen, sizeof, assign, replace, combine} from './Utility.js'
 import {tokenize} from './Tokenizer.js'
-import {stringify} from './Serializer.js'
+import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
 /**
@@ -40,18 +40,28 @@ export function rulesheet (callback) {
  * @param {function} callback
  */
 export function prefixer (element, index, children, callback) {
-	if (element.return === element.prefix)
-		switch (element.type) {
-			case DECLARATION: element.prefix = prefix(element.value, element.length)
-				break
-			case KEYFRAMES: element.prefix = prefix(stringify(element, index, element.prefix = null, callback), 10)
-				break
-			case RULESET:
-				if (element.length)
-					if (test(children = element.value, /:place|:read-/))
-						element.prefix = prefix(stringify(element, index, element.prefix = null, callback), 0)
-				break
-		}
+	switch (element.type) {
+		case DECLARATION: element.return = prefix(element.value, element.length)
+			break
+		case KEYFRAMES:
+			return serialize([assign({}, element, {type: '', value: replace(element.value, '@', '@' + WEBKIT)})], callback)
+		case RULESET:
+			if (element.length)
+				return combine(element.props, function (value) {
+					switch (match(value, /(::place.+|:read-.+)/)) {
+						// :read-(only|write)
+						case ':read-only': case ':read-write':
+							return serialize([assign({}, element, {type: '', value: replace(value, /(read.+)/, MOZ + '$1')})], callback)
+						// :placeholder
+						case '::placeholder':
+							return serialize([assign({}, element, {type: '', value: replace(value, /(place.+)/, WEBKIT + 'input-$1')}),
+								assign({}, element, {type: '', value: replace(value, /(place.+)/, MOZ + '$1')}),
+								assign({}, element, {type: '', value: replace(value, /:(place.+)/, MS + 'input-$1')})], callback)
+					}
+
+					return ''
+				})
+	}
 }
 
 /**
@@ -66,19 +76,27 @@ export function namespace (element) {
 				return combine(tokenize(value), function (value, index, children) {
 					switch (charat(value, 0)) {
 						// \f
-						case 12: value = substr(value, 1, strlen(value))
+						case 12:
+							return substr(value, 1, strlen(value))
 						// \0 ( + > ~
 						case 0: case 40: case 43: case 62: case 126:
 							return value
 						// :
 						case 58:
-							if (value === ':global')
-								children[index + 1] = '\f' + substr(children[index + 1], index = 1, -1)
+							if (children[index + 1] === 'global')
+								children[index + 1] = '', children[index + 2] = '\f' + substr(children[index + 2], index = 1, -1)
 						// \s
 						case 32:
 							return index === 1 ? '' : value
 						default:
-							return index ? value + element : (element = value, sizeof(children) === 1 ? value : '')
+							switch (index) {
+								case 0: element = value
+									return sizeof(children) > 1 ? '' : value
+								case index = sizeof(children) - 1: case 2:
+									return index === 2 ? value + element + element : value + element
+								default:
+									return value
+							}
 					}
 				})
 			})

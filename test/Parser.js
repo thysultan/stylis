@@ -81,8 +81,18 @@ describe('Parser', () => {
         * {
           color:red;
         }
+        svg {
+          &, & * {
+            fill: currentColor;
+          }
+        }
+        * * {color:hotpink;}
       `)
-    ).to.equal(`.user *{color:red;}`)
+    ).to.equal([
+      `.user *{color:red;}`,
+      `.user svg,.user svg *{fill:currentColor;}`,
+      `.user * *{color:hotpink;}`
+    ].join(''))
   })
 
   test('flat', () => {
