@@ -48,7 +48,7 @@ export function test (value, pattern) {
  * @return {string?}
  */
 export function match (value, pattern) {
-	return test(value, pattern) ? pattern.exec(value)[0] : null
+	return (value = pattern.exec(value)) ? value[0] : value
 }
 
 /**
