@@ -101,7 +101,7 @@ serialize(compile('h1{all:unset}'), middleware([(element, index, children) => {
 }, stringify])) === 'h1{all:unset;}'
 ```
 
-The abstract syntax tree also includes two other properties: `prefix, return` for more niche uses.
+The abstract syntax tree also includes an additional `return` property for more niche uses.
 
 ### Prefixing
 
