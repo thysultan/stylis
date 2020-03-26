@@ -81,8 +81,8 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 								parse(characters, root, reference, props, rulesets, points, children)
 							else
 								switch (atrule) {
-									// - d m s
-									case 45: case 100: case 109: case 115:
+									// d m s
+									case 100: case 109: case 115:
 										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = []), children), rules, children, points, rule ? props : children, length)
 										break
 									default:
@@ -101,13 +101,17 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 					case 38:
 						ampersand = offset > 0 ? 1 : (characters += '\f', -1)
 						break
-					// @
-					case 64:
-						atrule = peek(), offset = strlen(type = characters += identifier(caret())), character++
-						break
 					// ,
 					case 44:
 						points[index++] = (strlen(characters) - 1) * ampersand, ampersand = 1
+						break
+					// @
+					case 64:
+						// -
+						if (peek() === 45)
+							characters += delimit(next())
+
+						atrule = peek(), offset = strlen(type = characters += identifier(caret())), character++
 						break
 					// -
 					case 45:

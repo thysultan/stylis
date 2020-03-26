@@ -30,6 +30,12 @@ describe('Parser', () => {
   test('at-rules', () => {
     expect(
       stylis(`
+        @-ms-viewport {
+          width:device-width;
+        }
+        @viewport {
+          width:device-width;
+        }
         @page & {
           invalid:true;
         }
@@ -65,6 +71,8 @@ describe('Parser', () => {
         }
       `)
     ).to.equal([
+      `@-ms-viewport{width:device-width;}`,
+      `@viewport{width:device-width;}`,
       `@page &{invalid:true;}`,
       `@page{size:A4 landscape;}`,
       `@document url(://www.w3.org/),url-prefix(//www.w3.org/),domain(mozilla.org),regexp("https:.*"){.user body{color:red;}}`,

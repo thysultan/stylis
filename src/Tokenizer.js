@@ -20,6 +20,15 @@ export function node (value, root, type, props, children, length) {
 }
 
 /**
+ * @param {string} value
+ * @param {object} root
+ * @param {string} type
+ */
+export function copy (value, root, type) {
+	return node(value, root.root, type, root.props, root.children, 0)
+}
+
+/**
  * @return {number}
  */
 export function char () {

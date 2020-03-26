@@ -1,6 +1,6 @@
 import {MS, MOZ, WEBKIT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {match, charat, substr, strlen, sizeof, assign, replace, combine} from './Utility.js'
-import {tokenize} from './Tokenizer.js'
+import {match, charat, substr, strlen, sizeof, replace, combine} from './Utility.js'
+import {copy, tokenize} from './Tokenizer.js'
 import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
@@ -44,19 +44,21 @@ export function prefixer (element, index, children, callback) {
 		case DECLARATION: element.return = prefix(element.value, element.length)
 			break
 		case KEYFRAMES:
-			return serialize([assign({}, element, {type: '', value: replace(element.value, '@', '@' + WEBKIT)})], callback)
+			return serialize([copy(replace(element.value, '@', '@' + WEBKIT), element, '')], callback)
 		case RULESET:
 			if (element.length)
 				return combine(element.props, function (value) {
 					switch (match(value, /(::place.+|:read-.+)/)) {
 						// :read-(only|write)
 						case ':read-only': case ':read-write':
-							return serialize([assign({}, element, {type: '', value: replace(value, /(read.+)/, MOZ + '$1')})], callback)
+							return serialize([copy(replace(value, /(read.+)/, MOZ + '$1'), element, '')], callback)
 						// :placeholder
 						case '::placeholder':
-							return serialize([assign({}, element, {type: '', value: replace(value, /(place.+)/, WEBKIT + 'input-$1')}),
-								assign({}, element, {type: '', value: replace(value, /(place.+)/, MOZ + '$1')}),
-								assign({}, element, {type: '', value: replace(value, /:(place.+)/, MS + 'input-$1')})], callback)
+							return serialize([
+								copy(replace(value, /(plac.+)/, WEBKIT + 'input-$1'), element, ''),
+								copy(replace(value, /(plac.+)/, MOZ + '$1'), element, ''),
+								copy(replace(value, /:(plac.+)/, MS + 'input-$1'), element, '')
+							], callback)
 					}
 
 					return ''
