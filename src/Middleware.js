@@ -40,30 +40,31 @@ export function rulesheet (callback) {
  * @param {function} callback
  */
 export function prefixer (element, index, children, callback) {
-	switch (element.type) {
-		case DECLARATION: element.return = prefix(element.value, element.length)
-			break
-		case KEYFRAMES:
-			return serialize([copy(replace(element.value, '@', '@' + WEBKIT), element, '')], callback)
-		case RULESET:
-			if (element.length)
-				return combine(element.props, function (value) {
-					switch (match(value, /(::place.+|:read-.+)/)) {
-						// :read-(only|write)
-						case ':read-only': case ':read-write':
-							return serialize([copy(replace(value, /(read.+)/, MOZ + '$1'), element, '')], callback)
-						// :placeholder
-						case '::placeholder':
-							return serialize([
-								copy(replace(value, /(plac.+)/, WEBKIT + 'input-$1'), element, ''),
-								copy(replace(value, /(plac.+)/, MOZ + '$1'), element, ''),
-								copy(replace(value, /:(plac.+)/, MS + 'input-$1'), element, '')
-							], callback)
-					}
+	if (!element.return)
+		switch (element.type) {
+			case DECLARATION: element.return = prefix(element.value, element.length)
+				break
+			case KEYFRAMES:
+				return serialize([copy(replace(element.value, '@', '@' + WEBKIT), element, '')], callback)
+			case RULESET:
+				if (element.length)
+					return combine(element.props, function (value) {
+						switch (match(value, /(::place.+|:read-.+)/)) {
+							// :read-(only|write)
+							case ':read-only': case ':read-write':
+								return serialize([copy(replace(value, /(read.+)/, MOZ + '$1'), element, '')], callback)
+							// :placeholder
+							case '::placeholder':
+								return serialize([
+									copy(replace(value, /(plac.+)/, WEBKIT + 'input-$1'), element, ''),
+									copy(replace(value, /(plac.+)/, MOZ + '$1'), element, ''),
+									copy(replace(value, /:(plac.+)/, MS + 'input-$1'), element, '')
+								], callback)
+						}
 
-					return ''
-				})
-	}
+						return ''
+					})
+		}
 }
 
 /**

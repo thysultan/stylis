@@ -131,7 +131,7 @@ The middlewares in [src/Middleware.js](src/Middleware.js) dive into tangible exa
 
 ## Benchmark
 
-Stylis is at-least 2X faster than it's predecesor.
+Stylis is at-least 2X faster than its predecesor.
 
 ### License
 

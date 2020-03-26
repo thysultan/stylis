@@ -30,15 +30,6 @@ export function trim (value) {
 /**
  * @param {string} value
  * @param {RegExp} pattern
- * @return {boolean}
- */
-export function test (value, pattern) {
-	return pattern.test(value)
-}
-
-/**
- * @param {string} value
- * @param {RegExp} pattern
  * @return {string?}
  */
 export function match (value, pattern) {
