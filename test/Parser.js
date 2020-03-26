@@ -471,6 +471,34 @@ describe('Parser', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
+  test('@keyframes', () => {
+    expect(serialize(compile(`
+      @-webkit-keyframes slidein {
+				to { transform:translate(20px); }
+			}
+      @keyframes slidein {
+				to { transform:translate(20px); }
+      }
+      @keyframes hahaha {
+			  0%,
+			  1%{t:0}
+      }
+      @keyframes infinite-spinning {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    `), stringify)).to.equal([
+      `@-webkit-keyframes slidein{to{transform:translate(20px);}}`,
+      `@keyframes slidein{to{transform:translate(20px);}}`,
+      `@keyframes hahaha{0%,1%{t:0;}}`,
+      `@keyframes infinite-spinning{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}`
+    ].join(''))
+  })
+
   test('edge cases', () => {
     expect(
       stylis(`

@@ -31,8 +31,9 @@ describe('Middleware', () => {
       `.user h1:last-child{-webkit-clip-path:none;clip-path:none;}`,
     ].join(''))
 
-    expect(serialize(compile(`@keyframes name{from{width:0;}to{width:1;}}`), middleware([prefixer, stringify]))).to.equal([
-      `@-webkit-keyframes name{from{width:0;}to{width:1;}}`, `@keyframes name{from{width:0;}to{width:1;}}`
+    expect(serialize(compile(`@keyframes name{from{transform: rotate(0deg);}to{transform: rotate(360deg);}}`), middleware([prefixer, stringify]))).to.equal([
+      `@-webkit-keyframes name{from{-webkit-transform:rotate(0deg);-moz-transform:rotate(0deg);-ms-transform:rotate(0deg);transform:rotate(0deg);}to{-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);transform:rotate(360deg);}}`,
+      `@keyframes name{from{-webkit-transform:rotate(0deg);-moz-transform:rotate(0deg);-ms-transform:rotate(0deg);transform:rotate(0deg);}to{-webkit-transform:rotate(360deg);-moz-transform:rotate(360deg);-ms-transform:rotate(360deg);transform:rotate(360deg);}}`
     ].join(''))
 
     expect(serialize(compile(`a:read-only{color:red;}`), middleware([prefixer, stringify]))).to.equal([
