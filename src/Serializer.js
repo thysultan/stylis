@@ -25,7 +25,7 @@ export function serialize (children, callback) {
  */
 export function stringify (element, index, children, callback) {
 	switch (element.type) {
-		case IMPORT: case DECLARATION: return element.return || element.value
+		case IMPORT: case DECLARATION: return element.return = element.return || element.value
 		case COMMENT: return ''
 		case RULESET: element.value = element.props.join(',')
 	}
