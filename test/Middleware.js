@@ -51,14 +51,14 @@ describe('Middleware', () => {
 
   test('compat', () => {
   	expect(serialize(compile([
-      `.user{:hover div,:focus{color:hotpink;}`,
-      `.cls{:last-child{width:2;}:nth-child(3){width:3;}}}`,
+      `.user{:hover div,:focus{color:hotpink;}}`,
+      `.cls{:last-child{width:2;}:nth-child(3){width:3;}}`,
       `.foo,.bar div,.qwe{:first-child,div,span,:last-child{height:0;}}`,
       `.xyz{& :first-child{:first-child{width:0;}}}`
     ].join('')), middleware([compat, stringify]))).to.equal([
       `.user:hover div,.user:focus{color:hotpink;}`,
-      `.user .cls:last-child{width:2;}`,
-      `.user .cls:nth-child(3){width:3;}`,
+      `.cls:last-child{width:2;}`,
+      `.cls:nth-child(3){width:3;}`,
       `.foo:first-child,.bar div:first-child,.qwe:first-child,.foo div,.bar div div,.qwe div,.foo span,.bar div span,.qwe span,.foo:last-child,.bar div:last-child,.qwe:last-child{height:0;}`,
       `.xyz :first-child:first-child{width:0;}`
     ].join(''))
