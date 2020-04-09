@@ -154,7 +154,7 @@ var stylis = new stylis(options)
 var stylis = stylis
 ```
 
-When using the factory pattern the if an object is passed as optional `options` argument, this will be passed to `stylis.set(options)`
+When using the factory pattern, if an object is passed as optional `options` argument, this will be passed to `stylis.set(options)`
 
 #### Set
 
