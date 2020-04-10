@@ -59,5 +59,10 @@ describe('Middleware', () => {
       `div:-moz-read-write span{background-color:green;}`,
       `div:read-write span{background-color:green;}`
     ].join(''))
+
+    expect(serialize(compile(`div:read-write span{background-color:hotpink;}`), middleware([prefixer, stringify]))).to.equal([
+      `div:-moz-read-write span{background-color:hotpink;}`,
+      `div:read-write span{background-color:hotpink;}`
+    ].join(''))
   })
 })

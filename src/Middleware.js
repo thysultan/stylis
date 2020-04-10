@@ -49,16 +49,16 @@ export function prefixer (element, index, children, callback) {
 			case RULESET:
 				if (element.length)
 					return combine(element.props, function (value) {
-						switch (match(value, /(::place.+|:read-.+)/)) {
+						switch (match(value, /(::plac\w+|:read-\w+)/)) {
 							// :read-(only|write)
 							case ':read-only': case ':read-write':
-								return serialize([copy(replace(value, /(read.+)/, MOZ + '$1'), element, '')], callback)
+								return serialize([copy(replace(value, /(read-\w+)/, MOZ + '$1'), element, '')], callback)
 							// :placeholder
 							case '::placeholder':
 								return serialize([
-									copy(replace(value, /(plac.+)/, WEBKIT + 'input-$1'), element, ''),
-									copy(replace(value, /(plac.+)/, MOZ + '$1'), element, ''),
-									copy(replace(value, /:(plac.+)/, MS + 'input-$1'), element, '')
+									copy(replace(value, /(plac\w+)/, WEBKIT + 'input-$1'), element, ''),
+									copy(replace(value, /(plac\w+)/, MOZ + '$1'), element, ''),
+									copy(replace(value, /:(plac\w+)/, MS + 'input-$1'), element, '')
 								], callback)
 						}
 
