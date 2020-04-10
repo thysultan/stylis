@@ -73,5 +73,10 @@ describe('Middleware', () => {
       `.placeholder:-ms-input-placeholder{background-color:hotpink;}`,
       `.read-write:read-write,.read-only:read-only,.placeholder::placeholder{background-color:hotpink;}`,
     ].join(''))
+
+    expect(serialize(compile(`:read-write{background-color:hotpink;}`), middleware([prefixer, stringify]))).to.equal([
+      `:-moz-read-write{background-color:hotpink;}`,
+      `:read-write{background-color:hotpink;}`
+    ].join(''))
   })
 })
