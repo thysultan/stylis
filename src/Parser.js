@@ -7,7 +7,7 @@ import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, iden
  * @return {object[]}
  */
 export function compile (value) {
-	return dealloc(parse('', null, null, [''], value = alloc(value), [0], value))
+	return dealloc(parse('', null, null, [''], value = alloc(value), 0, [0], value))
 }
 
 /**
@@ -16,11 +16,12 @@ export function compile (value) {
  * @param {string[]} rule
  * @param {string[]} rules
  * @param {string[]} rulesets
+ * @param {number} pseudo
  * @param {number[]} points
  * @param {string[]} declarations
  * @return {object}
  */
-export function parse (value, root, rule, rules, rulesets, points, declarations) {
+export function parse (value, root, rule, rules, rulesets, pseudo, points, declarations) {
 	var index = 0
 	var offset = 0
 	var length = 0
@@ -74,19 +75,19 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 					case 59: characters += ';'
 					// { rule/at-rule
 					default:
-						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], length), rulesets)
+						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], length || pseudo), rulesets)
 
 						if (character === 123)
 							if (offset === 0)
-								parse(characters, root, reference, props, rulesets, points, children)
+								parse(characters, root, reference, props, rulesets, length, points, children)
 							else
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
-										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], rule.length), children), rules, children, points, rule ? props : children, length)
+										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], length || pseudo), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
-										parse(characters, reference, reference, [''], children, points, children)
+										parse(characters, reference, reference, [''], children, length, points, children)
 								}
 				}
 

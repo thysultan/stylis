@@ -52,5 +52,12 @@ describe('Middleware', () => {
       `textarea::-webkit-input-placeholder{font-size:14px;}textarea::-moz-placeholder{font-size:14px;}textarea:-ms-input-placeholder{font-size:14px;}textarea::placeholder{font-size:14px;}`,
       `@media{textarea::-webkit-input-placeholder{font-size:16px;}textarea::-moz-placeholder{font-size:16px;}textarea:-ms-input-placeholder{font-size:16px;}textarea::placeholder{font-size:16px;}}`
     ].join(''))
+
+    expect(serialize(compile(`div:read-write{background-color:red;span{background-color:green;}}`), middleware([prefixer, stringify]))).to.equal([
+      `div:-moz-read-write{background-color:red;}`,
+      `div:read-write{background-color:red;}`,
+      `div:-moz-read-write span{background-color:green;}`,
+      `div:read-write span{background-color:green;}`
+    ].join(''))
   })
 })
