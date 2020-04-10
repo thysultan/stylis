@@ -47,5 +47,10 @@ describe('Middleware', () => {
     expect(serialize(compile(`a::placeholder{color:red;}`), middleware([prefixer, stringify]))).to.equal([
       `a::-webkit-input-placeholder{color:red;}`, `a::-moz-placeholder{color:red;}`, `a:-ms-input-placeholder{color:red;}`, `a::placeholder{color:red;}`
     ].join(''))
+
+    expect(serialize(compile(`textarea::placeholder{font-size:14px;@media{font-size:16px;}}`), middleware([prefixer, stringify]))).to.equal([
+      `textarea::-webkit-input-placeholder{font-size:14px;}textarea::-moz-placeholder{font-size:14px;}textarea:-ms-input-placeholder{font-size:14px;}textarea::placeholder{font-size:14px;}`,
+      `@media{textarea::-webkit-input-placeholder{font-size:16px;}textarea::-moz-placeholder{font-size:16px;}textarea:-ms-input-placeholder{font-size:16px;}textarea::placeholder{font-size:16px;}}`
+    ].join(''))
   })
 })

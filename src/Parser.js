@@ -83,7 +83,7 @@ export function parse (value, root, rule, rules, rulesets, points, declarations)
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
-										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = []), children), rules, children, points, rule ? props : children, length)
+										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], rule.length), children), rules, children, points, rule ? props : children, length)
 										break
 									default:
 										parse(characters, reference, reference, [''], children, points, children)
