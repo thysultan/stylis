@@ -64,5 +64,14 @@ describe('Middleware', () => {
       `div:-moz-read-write span{background-color:hotpink;}`,
       `div:read-write span{background-color:hotpink;}`
     ].join(''))
+
+    expect(serialize(compile(`.read-write:read-write,.read-only:read-only,.placeholder::placeholder{background-color:hotpink;}`), middleware([prefixer, stringify]))).to.equal([
+      `.read-write:-moz-read-write{background-color:hotpink;}`,
+      `.read-only:-moz-read-only{background-color:hotpink;}`,
+      `.placeholder::-webkit-input-placeholder{background-color:hotpink;}`,
+      `.placeholder::-moz-placeholder{background-color:hotpink;}`,
+      `.placeholder:-ms-input-placeholder{background-color:hotpink;}`,
+      `.read-write:read-write,.read-only:read-only,.placeholder::placeholder{background-color:hotpink;}`,
+    ].join(''))
   })
 })
