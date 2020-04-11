@@ -16,12 +16,12 @@ export function compile (value) {
  * @param {string[]} rule
  * @param {string[]} rules
  * @param {string[]} rulesets
- * @param {number} pseudo
+ * @param {number} inpseudo
  * @param {number[]} points
  * @param {string[]} declarations
  * @return {object}
  */
-export function parse (value, root, rule, rules, rulesets, pseudo, points, declarations) {
+export function parse (value, root, rule, rules, rulesets, inpseudo, points, declarations) {
 	var index = 0
 	var offset = 0
 	var length = 0
@@ -32,6 +32,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
 	var scanning = 1
 	var ampersand = 1
 	var character = 0
+	var pseudo = 0
 	var type = ''
 	var props = rules
 	var children = rulesets
@@ -75,27 +76,27 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
 					case 59: characters += ';'
 					// { rule/at-rule
 					default:
-						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], length || pseudo), rulesets)
+						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], (pseudo = pseudo || inpseudo)), rulesets)
 
 						if (character === 123)
 							if (offset === 0)
-								parse(characters, root, reference, props, rulesets, length, points, children)
+								parse(characters, root, reference, props, rulesets, pseudo, points, children)
 							else
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
-										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], length || pseudo), children), rules, children, length, points, rule ? props : children)
+										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], pseudo), children), rules, children, pseudo, points, rule ? props : children)
 										break
 									default:
-										parse(characters, reference, reference, [''], children, length, points, children)
+										parse(characters, reference, reference, [''], children, pseudo, points, children)
 								}
 				}
 
-				index = length = offset = 0, variable = ampersand = 1, type = characters = ''
+				index = length = pseudo = offset = 0, variable = ampersand = 1, type = characters = ''
 				break
 			// :
 			case 58:
-				length = strlen(characters), property = previous
+				length = strlen(characters), property = previous, pseudo = 1
 			default:
 				switch (characters += from(character), character * variable) {
 					// &
