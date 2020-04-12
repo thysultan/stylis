@@ -12,6 +12,7 @@ export var characters = ''
  * @param {object} root
  * @param {string} type
  * @param {string[]} props
+ * @param {object|null} parent
  * @param {object[]} children
  * @param {number} length
  */

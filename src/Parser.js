@@ -133,6 +133,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
  * @param {number[]} points
  * @param {string} type
  * @param {string[]} props
+ * @param {object|null} parent
  * @param {string[]} children
  * @param {number} length
  * @return {object}
