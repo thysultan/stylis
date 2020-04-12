@@ -75,7 +75,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
 					case 59: characters += ';'
 					// { rule/at-rule
 					default:
-						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], length), rulesets)
+						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], rule, children = [], length), rulesets)
 
 						if (character === 123)
 							if (offset === 0)
@@ -84,7 +84,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
-										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
+										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, reference, props = [], length), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
 										parse(characters, reference, reference, [''], children, length, points, children)
@@ -137,7 +137,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
  * @param {number} length
  * @return {object}
  */
-export function ruleset (value, root, index, offset, rules, points, type, props, children, length) {
+export function ruleset (value, root, index, offset, rules, points, type, props, parent, children, length) {
 	var post = offset - 1
 	var rule = offset === 0 ? rules : ['']
 	var size = sizeof(rule)
@@ -147,7 +147,7 @@ export function ruleset (value, root, index, offset, rules, points, type, props,
 			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, /&\f/g, rule[x])))
 				props[k++] = z
 
-	return node(value, root, offset === 0 ? RULESET : type, props, children, length)
+	return node(value, root, offset === 0 ? RULESET : type, props, parent, children, length)
 }
 
 /**
@@ -157,7 +157,7 @@ export function ruleset (value, root, index, offset, rules, points, type, props,
  * @return {object}
  */
 export function comment (value, root) {
-	return node(value, root, COMMENT, from(char()), substr(value, 2, -2), 0)
+	return node(value, root, COMMENT, from(char()), root, substr(value, 2, -2), 0)
 }
 
 /**
@@ -167,5 +167,5 @@ export function comment (value, root) {
  * @return {object}
  */
 export function declaration (value, root, length) {
-	return node(value, root, DECLARATION, substr(value, 0, length), substr(value, length + 1, -1), length)
+	return node(value, root, DECLARATION, substr(value, 0, length), root, substr(value, length + 1, -1), length)
 }
