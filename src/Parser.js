@@ -16,15 +16,15 @@ export function compile (value) {
  * @param {string[]} rule
  * @param {string[]} rules
  * @param {string[]} rulesets
- * @param {number} inpseudo
+ * @param {number[]} pseudo
  * @param {number[]} points
  * @param {string[]} declarations
  * @return {object}
  */
-export function parse (value, root, rule, rules, rulesets, inpseudo, points, declarations) {
+export function parse (value, root, rule, rules, rulesets, pseudo, points, declarations) {
 	var index = 0
 	var offset = 0
-	var length = 0
+	var length = pseudo
 	var atrule = 0
 	var property = 0
 	var previous = 0
@@ -32,7 +32,6 @@ export function parse (value, root, rule, rules, rulesets, inpseudo, points, dec
 	var scanning = 1
 	var ampersand = 1
 	var character = 0
-	var pseudo = 0
 	var type = ''
 	var props = rules
 	var children = rulesets
@@ -69,34 +68,34 @@ export function parse (value, root, rule, rules, rulesets, inpseudo, points, dec
 					case 0: case 125: scanning = 0
 					// ;
 					case 59 + offset:
-						if (length > 0)
-							append(property > 32 ? declaration(characters + ';', rule, length) : declaration(replace(characters, ' ', '') + ';', rule, length - 1), declarations)
+						if (property > 0)
+							append(property > 32 ? declaration(characters + ';', rule, length - 1) : declaration(replace(characters, ' ', '') + ';', rule, length - 2), declarations)
 						break
 					// @ ;
 					case 59: characters += ';'
 					// { rule/at-rule
 					default:
-						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], (pseudo = pseudo || inpseudo)), rulesets)
+						append(reference = ruleset(characters, root, index, offset, rules, points, type, props = [], children = [], length), rulesets)
 
 						if (character === 123)
 							if (offset === 0)
-								parse(characters, root, reference, props, rulesets, pseudo, points, children)
+								parse(characters, root, reference, props, rulesets, length, points, children)
 							else
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
-										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], pseudo), children), rules, children, pseudo, points, rule ? props : children)
+										parse(value, reference, rule && append(ruleset(value, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
-										parse(characters, reference, reference, [''], children, pseudo, points, children)
+										parse(characters, reference, reference, [''], children, length, points, children)
 								}
 				}
 
-				index = length = pseudo = offset = 0, variable = ampersand = 1, type = characters = ''
+				index = offset = property = 0, variable = ampersand = 1, type = characters = '', length = pseudo
 				break
 			// :
 			case 58:
-				length = strlen(characters), property = previous, pseudo = 1
+				length = 1 + strlen(characters), property = previous
 			default:
 				switch (characters += from(character), character * variable) {
 					// &
