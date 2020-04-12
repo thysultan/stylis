@@ -25,7 +25,7 @@ export function node (value, root, type, props, parent, children, length) {
  * @param {string} type
  */
 export function copy (value, root, type) {
-	return node(value, root.root, type, root.props, null, root.children, 0)
+	return node(value, root.root, type, root.props, root.parent, root.children, 0)
 }
 
 /**
