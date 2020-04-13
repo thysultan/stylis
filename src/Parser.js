@@ -1,6 +1,6 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
-import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
+import {node, character, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -157,7 +157,7 @@ export function ruleset (value, root, index, offset, rules, points, type, props,
  * @return {object}
  */
 export function comment (value, root) {
-	return node(value, root, COMMENT, from(char()), substr(value, 2, -2), 0)
+	return node(value, root, COMMENT, from(character), substr(value, 2, -2), 0)
 }
 
 /**

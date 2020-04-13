@@ -31,13 +31,6 @@ export function copy (value, root, type) {
 /**
  * @return {number}
  */
-export function char () {
-	return character
-}
-
-/**
- * @return {number}
- */
 export function next () {
 	character = position < length ? charat(characters, position++) : 0
 
