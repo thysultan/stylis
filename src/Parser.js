@@ -35,7 +35,7 @@ export function parse (value, root, rule, rules, rulesets, pseudo, points, decla
 	var type = ''
 	var props = rules
 	var children = rulesets
-	var reference = rule
+	var reference
 	var characters = type
 
 	while (scanning)
