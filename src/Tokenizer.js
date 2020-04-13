@@ -10,7 +10,7 @@ export var characters = ''
 /**
  * @param {string} value
  * @param {object} root
- * @param {object|null} parent
+ * @param {object?} parent
  * @param {string} type
  * @param {string[]} props
  * @param {object[]} children

@@ -13,7 +13,7 @@ export function compile (value) {
 /**
  * @param {string} value
  * @param {object} root
- * @param {object|null} parent
+ * @param {object?} parent
  * @param {string[]} rule
  * @param {string[]} rules
  * @param {string[]} rulesets
@@ -128,7 +128,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 /**
  * @param {string} value
  * @param {object} root
- * @param {object|null} parent
+ * @param {object?} parent
  * @param {number} index
  * @param {number} offset
  * @param {string[]} rules
@@ -155,7 +155,7 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 /**
  * @param {number} value
  * @param {object} root
- * @param {object|null} parent
+ * @param {object?} parent
  * @return {object}
  */
 export function comment (value, root, parent) {
@@ -165,7 +165,7 @@ export function comment (value, root, parent) {
 /**
  * @param {string} value
  * @param {object} root
- * @param {object|null} parent
+ * @param {object?} parent
  * @param {number} length
  * @return {object}
  */
