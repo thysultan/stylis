@@ -1,8 +1,8 @@
 import {join} from 'path'
-import {terser} from "rollup-plugin-terser"
+import {terser} from 'rollup-plugin-terser'
 import size from 'rollup-plugin-size'
 
-const options = {mangle: true, compress: false}
+const options = {mangle: true, compress: false, toplevel: true}
 const defaults = {
 	onwarn(warning, warn) {
 		switch (warning.code) {
@@ -18,6 +18,12 @@ const defaults = {
 
 export default ({configSrc = './', configInput = join(configSrc, 'index.js')}) => {
 	return [
+		{
+			...defaults,
+			input: configInput,
+			output: [{file: join(configSrc, 'dist', 'stylis.cjs'), format: 'cjs', name: 'stylis', freeze: false, sourcemap: true}],
+			plugins: [terser(options), size()]
+		},
 		{
 			...defaults,
 			input: configInput,
