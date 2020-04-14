@@ -10,13 +10,14 @@ export var characters = ''
 /**
  * @param {string} value
  * @param {object} root
+ * @param {object?} parent
  * @param {string} type
  * @param {string[]} props
  * @param {object[]} children
  * @param {number} length
  */
-export function node (value, root, type, props, children, length) {
-	return {value: value, root: root, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
+export function node (value, root, parent, type, props, children, length) {
+	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
 }
 
 /**
@@ -25,7 +26,7 @@ export function node (value, root, type, props, children, length) {
  * @param {string} type
  */
 export function copy (value, root, type) {
-	return node(value, root.root, type, root.props, root.children, 0)
+	return node(value, root.root, root.parent, type, root.props, root.children, 0)
 }
 
 /**
