@@ -14,8 +14,7 @@
   "files": [
     "index.js",
     "dist/",
-    "src/",
-    "typings/"
+    "src/"
   ],
   "scripts": {
     "lint": "eslint ./",
