@@ -8,7 +8,7 @@
   "repository": "https://github.com/thysultan/stylis.js",
   "bugs": "https://github.com/thysultan/stylis.js/issues",
   "type": "module",
-  "main": "dist/stylis.cjs",
+  "main": "dist/stylis.umd.js",
   "module": "dist/stylis.esm.js",
   "exports": {
     "import": "./index.js",
