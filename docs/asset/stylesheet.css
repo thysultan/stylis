@@ -1,0 +1,22 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { background: #F1F1F1; font-family: 'Helvetica Neue', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;}
+p { color: #535353; line-height: 38px; font-size: 17px; text-align: center; }
+a { color: #332E22; font-size: 19px; text-decoration: none; }
+a[title=github] { font-weight: bold; }
+
+.container > .welcome > *:not(pre):not(div), .wrap { max-width: 600px; width: 100%; margin: 0 auto; padding:0 20px; }
+.header { padding-top: 40px; padding-bottom: 14px; min-height: 160px; text-align: center; }
+.logo { margin-bottom: 20px; display: block; }
+.logo a { display: inline-block; width: 194px; height: 76px; cursor: pointer; }
+
+.nav {display: inline-block; font-weight: bold; }
+.nav li { display: inline-block; }
+.nav li:not(:last-child) a { margin-right: 16px; }
+
+.code { position: relative; display: block; margin: 40px auto 0; }
+.code > div { display: flex; flex-direction: row; overflow: auto; tab-size: 4; height: 100%; }
+.code pre { font: 15px/1.8em menlo,monospace; flex: auto; width: 50%; padding: 26px 30px; outline: none; }
+span.selector { color: #AA0C91; }
+span.value { color: #C41913; }
+span.string { color: #007400; }
