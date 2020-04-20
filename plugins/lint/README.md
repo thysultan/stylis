@@ -1,3 +1,0 @@
-# stilynt
-
-A stylis linter

@@ -1,47 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="x-ua-compatible" content="ie=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-		<meta name="description" content="light – weight css preprocessor">
-
+		<meta charset=utf-8>
+		<meta name=viewport content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+		<meta name=description content='light – weight css preprocessor'>
 		<title>stylis</title>
-
-		<link rel="stylesheet" href="assets/stylesheet.css">
-		<link rel="icon" href="favicon.ico" type="image/x-icon">
+		<link rel='stylesheet' href='asset/stylesheet.css'>
 	</head>
 	<body>
-		<div class="header">
-			<div class="wrap">
-				<div class="logo">
-					<a class="./">
-					<img src="assets/logo.svg"></a>
-				</div>
-				<div class="nav">
+		<div class='header'>
+			<div class='wrap'>
+				<div class='logo'><a class=./><img src='asset/logo.svg'></a></div>
+				<div class='nav'>
 					<ul>
-						<li><a href="https://github.com/thysultan/stylis.js">Github</a></li>
-						<li><a href="https://npmjs.com/package/stylis">NPM</a></li>
+						<li><a href='https://github.com/thysultan/stylis.js'>Github</a></li>
+						<li><a href='https://npmjs.com/package/stylis'>NPM</a></li>
 					</ul>
 				</div>
 			</div>
 		</div>
-		<div class="container">
-			<div class="welcome">
+		<div class='container'>
+			<div class='welcome'>
 				<p>light – weight css preprocessor</p>
-				<div class="code">
-					<div spellcheck=false>
-<pre contenteditable id=editor>
-/* @scope .component-x */
-
-:global(h1), html &amp; {
-	font-size: 22px;
-}
-
+				<div class='code'>
+					<div spellcheck='false'>
+<pre contenteditable id='editor'>
 div {
 	display: flex;
 
-	h1 &amp; {
+	@media screen {
 		color: red;
 	}
 }
@@ -49,43 +36,55 @@ div {
 div {
 	transform: translateZ(0);
 
-	h1 {
+	h1, h2 {
 		color: red;
 	}
 }
 </pre>
-<pre id=output>
-h1,html .component-x {
-	font-size: 22px;
-}
-
-.component-x div {
-	display: -webkit-box;
-	display: -webkit-flex;
-	display: -ms-flexbox;
-	display: flex;
-}
-
-div h1 .component-x {
-	color: red;
-}
-
-.component-x div {
-	-webkit-transform: translateZ(0);
-	-ms-transform: translateZ(0);
-	transform: translateZ(0);
-}
-
-.component-x div h1 {
-	color: red;
-}
-</pre>
+<pre id='output'></pre>
 					</div>
 				</div>
 			</div>
 		</div>
+		<script type=module>
+			import {compile, serialize, middleware, prefixer, stringify} from '../index.js'
 
-		<script src="https://unpkg.com/stylis@latest/stylis.min.js"></script>
-		<script src="assets/javascript/editor.js"></script>
+			function tabbed (select, ranged, content) {
+				ranged.deleteContents()
+				ranged.insertNode(content)
+				ranged.setStartAfter(content)
+				select.removeAllRanges()
+				select.addRange(ranged)
+			}
+
+			// update output preview
+			function update (value) {
+				switch (value.keyCode) {
+					// tab indent
+					case 9: tabbed(value = window.getSelection(value.preventDefault()), value.getRangeAt(0), document.createTextNode('\t'))
+						break
+					// formatting
+					default:
+						value = serialize(compile(`[namespace]{${value.target.textContent}}`), middleware([prefixer, stringify]))
+						value = value.replace(/(;|\})/g, (match, group) => group + (group === '}' ? '\n\n' : '\n'))
+						value = value.replace(/(.*?)\{/g, (match, group) => '<span class=selector>' + group.trim() + '</span> {\n')
+						value = value.replace(/:(.*);/g, (match, group) => ': <span class=value>' + group.trim() + '</span>;')
+						value = value.replace(/^[^@].*;$/gm, (match) => '\t' + match)
+						value = value.replace(/\}\n\n\}/g, '}\n}')
+						value = value.replace(/(.*@.*\{)([^}]+\})(\n\})/g, (match, group1, group2, group3) => group1 + group2.split('\n').join('\n\t') + group3)
+						value = value.replace(/['"`].*?['"`]/g, (match) => '<span class=string>'+ match.trim() +'</span>')
+
+						output.innerHTML = value
+				}
+			}
+
+			const target = document.getElementById('editor')
+			const output = document.getElementById('output')
+
+			target.addEventListener('keydown', update)
+			target.addEventListener('input', update)
+
+			update({target})
+		</script>
 	</body>
 </html>
