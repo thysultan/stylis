@@ -15,4 +15,5 @@ npm-debug.log
 coverage
 .nyc_output
 dist/
+types/
 package-lock.json

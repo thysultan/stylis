@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": true,
+    "allowUnusedLabels": true,
+    "allowUmdGlobalAccess": true,
+    "noEmitOnError": false,
+    "declarationDir": "types",
+    "noFallthroughCasesInSwitch": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": false,
+    "noStrictGenericChecks": false,
+    "noUnusedLocals": false
+  },
+  "files": ["index.js"]
+}

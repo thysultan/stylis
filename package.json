@@ -14,8 +14,10 @@
     "import": "./index.js",
     "require": "./dist/stylis.cjs"
   },
+  "types": "types/",
   "files": [
     "index.js",
+    "types/",
     "dist/",
     "src/"
   ],
@@ -24,7 +26,7 @@
     "pretest": "npm run lint && npm run build",
     "test": "nyc npm run spec",
     "spec": "mocha --harmony --require esm script/setup.js --recursive test",
-    "build": "rollup --config script/build.js --configSrc ./",
+    "build": "tsc && rollup --config script/build.js --configSrc ./",
     "start": "rollup --config script/build.js --configSrc ./ --watch",
     "prepare": "npm run build",
     "postversion": "git push --follow-tags && npm publish",
@@ -41,7 +43,8 @@
     "nyc": "15.0.0",
     "rollup": "1.28.0",
     "rollup-plugin-terser": "5.1.3",
-    "rollup-plugin-size": "0.2.1"
+    "rollup-plugin-size": "0.2.1",
+    "typescript": "^3.8.3"
   },
   "nyc": {
     "temp-dir": "./coverage/.nyc_output",
