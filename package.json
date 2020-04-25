@@ -7,6 +7,7 @@
   "author": "Sultan Tarimo <sultantarimo@me.com>",
   "repository": "https://github.com/thysultan/stylis.js",
   "bugs": "https://github.com/thysultan/stylis.js/issues",
+  "sideEffects": false,
   "type": "module",
   "main": "dist/stylis.umd.js",
   "module": "dist/stylis.esm.js",
