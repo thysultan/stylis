@@ -9,11 +9,13 @@
   "bugs": "https://github.com/thysultan/stylis.js/issues",
   "sideEffects": false,
   "type": "module",
-  "main": "dist/stylis.umd.js",
   "module": "dist/stylis.esm.js",
+  "main": "dist/stylis.cjs",
+  "umd:main": "dist/stylis.umd.js",
   "exports": {
     "import": "./index.js",
-    "require": "./dist/stylis.cjs"
+    "require": "./dist/stylis.cjs",
+    "umd": "dist/stylis.umd.js"
   },
   "files": [
     "index.js",
