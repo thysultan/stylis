@@ -529,6 +529,8 @@ describe('Parser', () => {
   test('whitespace', () => {
     expect(
       stylis(`
+        @import\r\n "./a.css";
+
         div {
           ${'width:0;    '}
         }
@@ -537,6 +539,7 @@ describe('Parser', () => {
         }
       `)
     ).to.equal([
+      `@import "./a.css";`,
       `.user div{width:0;}`,
       `.user .foo{color:hotpink;}`
     ].join(''))

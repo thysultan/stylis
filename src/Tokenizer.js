@@ -77,8 +77,8 @@ export function slice (begin, end) {
  */
 export function token (type) {
 	switch (type) {
-		// \0 \t \n \s whitespace token
-		case 0: case 9: case 10: case 32:
+		// \0 \t \n \r \s whitespace token
+		case 0: case 9: case 10: case 13: case 32:
 			return 5
 		// ! + , / > @ ~ isolate token
 		case 33: case 43: case 44: case 47: case 62: case 64: case 126:

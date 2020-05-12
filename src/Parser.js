@@ -45,8 +45,8 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 			case 34: case 39: case 91: case 40:
 				characters += delimit(character)
 				break
-			// \t \n \s
-			case 9: case 10: case 32:
+			// \t \n \r \s
+			case 9: case 10: case 13: case 32:
 				characters += whitespace(previous)
 				break
 			// /
