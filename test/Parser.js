@@ -699,6 +699,22 @@ describe('Parser', () => {
     ].join(''))
   })
 
+  test('`--` in an identifier (#220)', () => {
+    expect(
+      stylis(`
+        .block--modifier {
+          color: hotpink;
+        }
+        .card {
+          color: black;
+        }
+      `)
+    ).to.equal([
+      `.user .block--modifier{color:hotpink;}`,
+      `.user .card{color:black;}`
+    ].join(''))
+  })
+
   test('comments in rules not increasing depth of consecutive rules (#154)', () => {
     expect(
       stylis(`
