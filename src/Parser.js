@@ -117,7 +117,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 						break
 					// -
 					case 45:
-						if (previous === 45)
+						if (previous === 45 && strlen(characters) == 2)
 							variable = 0
 				}
 		}
