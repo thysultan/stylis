@@ -27,7 +27,7 @@
     "spec": "mocha --harmony --require esm script/setup.js --recursive test",
     "prebuild": "rimraf dist",
     "build": "rollup --config script/build.js --configSrc ./",
-    "start": "rollup --config script/build.js --configSrc ./ --watch",
+    "start": "npm run build -- --watch",
     "prepare": "npm run build",
     "postversion": "git push --follow-tags && npm publish",
     "release-major": "npm version major -m '%s'",
