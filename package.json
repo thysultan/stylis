@@ -9,7 +9,7 @@
   "bugs": "https://github.com/thysultan/stylis.js/issues",
   "sideEffects": false,
   "type": "module",
-  "main": "dist/stylis.umd.js",
+  "main": "dist/stylis.cjs",
   "module": "dist/stylis.esm.js",
   "exports": {
     "import": "./index.js",
