@@ -10,7 +10,7 @@
   "sideEffects": false,
   "type": "module",
   "main": "dist/stylis.cjs",
-  "module": "dist/stylis.esm.js",
+  "module": "dist/stylis.mjs",
   "exports": {
     "import": "./index.js",
     "require": "./dist/stylis.cjs"

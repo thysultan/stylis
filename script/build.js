@@ -27,7 +27,7 @@ export default ({configSrc = './', configInput = join(configSrc, 'index.js')}) =
 		{
 			...defaults,
 			input: configInput,
-			output: [{file: join(configSrc, 'dist', 'stylis.esm.js'), format: 'esm', name: 'stylis', freeze: false, sourcemap: true}],
+			output: [{file: join(configSrc, 'dist', 'stylis.mjs'), format: 'esm', name: 'stylis', freeze: false, sourcemap: true}],
 			plugins: [terser(options), size()]
 		}
 	]
