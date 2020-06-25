@@ -21,13 +21,7 @@ export default ({configSrc = './', configInput = join(configSrc, 'index.js')}) =
 		{
 			...defaults,
 			input: configInput,
-			output: [{file: join(configSrc, 'dist', 'stylis.cjs'), format: 'cjs', name: 'stylis', freeze: false, sourcemap: true}],
-			plugins: [terser(options), size()]
-		},
-		{
-			...defaults,
-			input: configInput,
-			output: [{file: join(configSrc, 'dist', 'stylis.umd.js'), format: 'umd', name: 'stylis', freeze: false, sourcemap: true}],
+			output: [{file: join(configSrc, 'dist', 'stylis.cjs'), format: 'umd', name: 'stylis', freeze: false, sourcemap: true}],
 			plugins: [terser(options), size()]
 		},
 		{
