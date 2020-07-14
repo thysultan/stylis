@@ -57,7 +57,7 @@ export function rulesheet (callback) {
 	return function (element) {
 		if (!element.root)
 			if (element = element.return)
-				callback(/** @type {string} */ (element))
+				callback(element)
 	}
 }
 

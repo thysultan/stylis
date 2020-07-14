@@ -10,7 +10,8 @@ import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, iden
  * @return {Rulesets}
  */
 export function compile (value) {
-	return dealloc(parse('', null, null, null, [''], value = alloc(value), 0, [0], value))
+	alloc(value)
+	return dealloc(parse('', null, null, null, [''], [], 0, [0], []))
 }
 
 /**
@@ -138,7 +139,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
  * @param {number[]} points
  * @param {string} type
  * @param {string[]} props
- * @param {string[]} children
+ * @param {Element[]} children
  * @param {number} length
  * @return {Element}
  */
