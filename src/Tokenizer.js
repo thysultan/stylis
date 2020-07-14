@@ -19,7 +19,7 @@ export var characters = ''
  * @param {number} length
  */
 export function node (value, root, parent, type, props, children, length) {
-	return {value, root, parent, type, props, children, line, column, length, return: ''}
+	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
 }
 
 /**
