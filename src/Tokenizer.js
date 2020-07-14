@@ -7,22 +7,24 @@ export var position = 0
 export var character = 0
 export var characters = ''
 
+/** @typedef {import('./Middleware.js').Element} Element */
+
 /**
  * @param {string} value
- * @param {object} root
- * @param {object?} parent
+ * @param {Element} root
+ * @param {Element?} parent
  * @param {string} type
  * @param {string[]} props
- * @param {object[]} children
+ * @param {Element[]} children
  * @param {number} length
  */
 export function node (value, root, parent, type, props, children, length) {
-	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
+	return {value, root, parent, type, props, children, line, column, length, return: ''}
 }
 
 /**
  * @param {string} value
- * @param {object} root
+ * @param {Element} root
  * @param {string} type
  */
 export function copy (value, root, type) {
@@ -101,15 +103,16 @@ export function token (type) {
 
 /**
  * @param {string} value
- * @return {any[]}
+ * @return {[]}
  */
 export function alloc (value) {
 	return line = column = 1, length = strlen(characters = value), position = 0, []
 }
 
 /**
- * @param {any} value
- * @return {any}
+ * @typedef {any} T
+ * @param {T} value
+ * @return {T}
  */
 export function dealloc (value) {
 	return characters = '', value
@@ -192,7 +195,7 @@ export function delimiter (type) {
 /**
  * @param {number} type
  * @param {number} index
- * @return {number}
+ * @return {string}
  */
 export function commenter (type, index) {
 	while (next())

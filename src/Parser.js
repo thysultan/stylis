@@ -2,9 +2,12 @@ import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
 import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
 
+/** @typedef {import('./Middleware.js').Element} Element */
+/** @typedef {string[]} Rulesets */
+
 /**
  * @param {string} value
- * @return {object[]}
+ * @return {Rulesets}
  */
 export function compile (value) {
 	return dealloc(parse('', null, null, null, [''], value = alloc(value), 0, [0], value))
@@ -12,15 +15,15 @@ export function compile (value) {
 
 /**
  * @param {string} value
- * @param {object} root
- * @param {object?} parent
- * @param {string[]} rule
+ * @param {Element} root
+ * @param {Element?} parent
+ * @param {Element | string[]} rule
  * @param {string[]} rules
- * @param {string[]} rulesets
- * @param {number[]} pseudo
+ * @param {Rulesets} rulesets
+ * @param {number} pseudo
  * @param {number[]} points
  * @param {string[]} declarations
- * @return {object}
+ * @return {Rulesets}
  */
 export function parse (value, root, parent, rule, rules, rulesets, pseudo, points, declarations) {
 	var index = 0
@@ -127,8 +130,8 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 
 /**
  * @param {string} value
- * @param {object} root
- * @param {object?} parent
+ * @param {Element} root
+ * @param {Element?} parent
  * @param {number} index
  * @param {number} offset
  * @param {string[]} rules
@@ -137,7 +140,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
  * @param {string[]} props
  * @param {string[]} children
  * @param {number} length
- * @return {object}
+ * @return {Element}
  */
 export function ruleset (value, root, parent, index, offset, rules, points, type, props, children, length) {
 	var post = offset - 1
@@ -153,10 +156,10 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 }
 
 /**
- * @param {number} value
- * @param {object} root
- * @param {object?} parent
- * @return {object}
+ * @param {string} value
+ * @param {Element} root
+ * @param {Element?} parent
+ * @return {Element}
  */
 export function comment (value, root, parent) {
 	return node(value, root, parent, COMMENT, from(char()), substr(value, 2, -2), 0)
@@ -164,10 +167,10 @@ export function comment (value, root, parent) {
 
 /**
  * @param {string} value
- * @param {object} root
- * @param {object?} parent
+ * @param {Element} root
+ * @param {Element?} parent
  * @param {number} length
- * @return {object}
+ * @return {Element}
  */
 export function declaration (value, root, parent, length) {
 	return node(value, root, parent, DECLARATION, substr(value, 0, length), substr(value, length + 1, -1), length)

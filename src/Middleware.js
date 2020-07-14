@@ -5,8 +5,36 @@ import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
 /**
- * @param {function[]} collection
- * @return {function}
+ * @typedef {{
+ * 	children?: Element[],
+ * 	length: number,
+ * 	props: string[],
+ * 	return: string,
+ * 	root: Element,
+ * 	parent?: Element,
+ * 	type: string,
+ * 	value: string,
+ * }} Element
+
+ * @typedef {(
+ *	 value: string,
+ *	 index: number,
+ *	 array: string[],
+ *	) => string
+ * } Callback
+
+ * @typedef {(
+ * 	 element: Element,
+ * 	 index?: number,
+ * 	 children?: Element[],
+ * 	 callback?: Middleware,
+ * 	) => string | void
+ * } Middleware
+ */
+
+/**
+ * @param {Middleware[]} collection
+ * @return {Middleware}
  */
 export function middleware (collection) {
 	var length = sizeof(collection)
@@ -22,22 +50,19 @@ export function middleware (collection) {
 }
 
 /**
- * @param {function} callback
- * @return {function}
+ * @param {(ret: string) => void} callback
+ * @return {Middleware}
  */
 export function rulesheet (callback) {
 	return function (element) {
 		if (!element.root)
 			if (element = element.return)
-				callback(element)
+				callback(/** @type {string} */ (element))
 	}
 }
 
 /**
- * @param {object} element
- * @param {number} index
- * @param {object[]} children
- * @param {function} callback
+ * @type {Middleware}
  */
 export function prefixer (element, index, children, callback) {
 	if (!element.return)
@@ -68,9 +93,7 @@ export function prefixer (element, index, children, callback) {
 }
 
 /**
- * @param {object} element
- * @param {number} index
- * @param {object[]} children
+ * @type {Middleware}
  */
 export function namespace (element) {
 	switch (element.type) {

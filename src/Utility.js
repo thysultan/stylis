@@ -1,3 +1,5 @@
+/** @typedef {import('./Middleware.js').Callback} Callback */
+
 /**
  * @param {number}
  * @return {number}
@@ -30,10 +32,11 @@ export function trim (value) {
 /**
  * @param {string} value
  * @param {RegExp} pattern
- * @return {string?}
+ * @return {string}
  */
 export function match (value, pattern) {
-	return (value = pattern.exec(value)) ? value[0] : value
+	var match = pattern.exec(value)
+	return match ? match[0] : value
 }
 
 /**
@@ -91,9 +94,10 @@ export function sizeof (value) {
 }
 
 /**
- * @param {any} value
+ * @typedef {any} T
+ * @param {T} value
  * @param {any[]} array
- * @return {any}
+ * @return {T}
  */
 export function append (value, array) {
 	return array.push(value), value
@@ -101,7 +105,7 @@ export function append (value, array) {
 
 /**
  * @param {string[]} array
- * @param {function} callback
+ * @param {Callback} callback
  * @return {string}
  */
 export function combine (array, callback) {

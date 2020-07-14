@@ -1,9 +1,12 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {strlen, sizeof} from './Utility.js'
 
+/** @typedef {import('./Middleware.js').Element} Element */
+/** @typedef {import('./Middleware.js').Middleware} Middleware */
+
 /**
- * @param {object[]} children
- * @param {function} callback
+ * @param {Element[]} children
+ * @param {Middleware} callback
  * @return {string}
  */
 export function serialize (children, callback) {
@@ -17,11 +20,7 @@ export function serialize (children, callback) {
 }
 
 /**
- * @param {object} element
- * @param {number} index
- * @param {object[]} children
- * @param {function} callback
- * @return {string}
+ * @type {Middleware}
  */
 export function stringify (element, index, children, callback) {
 	switch (element.type) {
