@@ -32,11 +32,10 @@ export function trim (value) {
 /**
  * @param {string} value
  * @param {RegExp} pattern
- * @return {string}
+ * @return {string?}
  */
 export function match (value, pattern) {
-	var match = pattern.exec(value)
-	return match ? match[0] : value
+	return (value = pattern.exec(value)) ? value[0] : value
 }
 
 /**
