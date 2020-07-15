@@ -3,11 +3,11 @@ import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utilit
 import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
 
 /** @typedef {import('./Middleware.js').Element} Element */
-/** @typedef {string[]} Rulesets */
+/** @typedef {string} Ruleset */
 
 /**
  * @param {string} value
- * @return {Rulesets}
+ * @return {Ruleset[]}
  */
 export function compile (value) {
 	return dealloc(parse('', null, null, null, [''], value = alloc(value), 0, [0], value))
@@ -19,11 +19,11 @@ export function compile (value) {
  * @param {Element?} parent
  * @param {Element | string[]} rule
  * @param {string[]} rules
- * @param {Rulesets} rulesets
+ * @param {Ruleset[]} rulesets
  * @param {number} pseudo
  * @param {number[]} points
  * @param {string[]} declarations
- * @return {Rulesets}
+ * @return {Ruleset[]}
  */
 export function parse (value, root, parent, rule, rules, rulesets, pseudo, points, declarations) {
 	var index = 0
