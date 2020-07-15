@@ -93,7 +93,7 @@ export function sizeof (value) {
 }
 
 /**
- * @typedef {any} T
+ * @template T
  * @param {T} value
  * @param {any[]} array
  * @return {T}

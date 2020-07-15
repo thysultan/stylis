@@ -110,7 +110,7 @@ export function alloc (value) {
 }
 
 /**
- * @typedef {any} T
+ * @template T
  * @param {T} value
  * @return {T}
  */
