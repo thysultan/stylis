@@ -1,4 +1,4 @@
-/** @typedef {import('./Middleware.js').Callback} Callback */
+/** @typedef {import('./Middleware.js').ArrayMapCallback} ArrayMapCallback */
 
 /**
  * @param {number}
@@ -104,7 +104,7 @@ export function append (value, array) {
 
 /**
  * @param {string[]} array
- * @param {Callback} callback
+ * @param {ArrayMapCallback} callback
  * @return {string}
  */
 export function combine (array, callback) {

@@ -6,27 +6,29 @@ import {prefix} from './Prefixer.js'
 
 /**
  * @typedef {{
- * 	children?: Element[],
- * 	length: number,
- * 	props: string[],
- * 	return: string,
- * 	root: Element,
- * 	parent?: Element,
- * 	type: string,
- * 	value: string,
+ * 	 parent?: Element,
+ * 	 children?: Element[] | string,
+ * 	 root: Element,
+ * 	 type: string,
+ * 	 props: string[] | string,
+ * 	 value: string,
+ * 	 length: number,
+ * 	 return: string,
+ * 	 line?: number,
+ * 	 column?: number,
  * }} Element
 
  * @typedef {(
- *	 value: string,
- *	 index: number,
- *	 array: string[],
- *	) => string
- * } Callback
+ * 	 value: string,
+ * 	 index: number,
+ * 	 array: string[],
+ * 	) => string
+ * } ArrayMapCallback
 
  * @typedef {(
  * 	 element: Element,
  * 	 index?: number,
- * 	 children?: Element[],
+ * 	 children?: (Element | string)[],
  * 	 callback?: Middleware,
  * 	) => string | void
  * } Middleware
