@@ -1,11 +1,11 @@
 import {IMPORT, COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {strlen, sizeof} from './Utility.js'
 
-/** @typedef {import('./Middleware.js').Element} Element */
+/** @typedef {import('./Middleware.js').Node} Node */
 /** @typedef {import('./Middleware.js').Middleware} Middleware */
 
 /**
- * @param {Element[]} children
+ * @param {Node[]} children
  * @param {Middleware} callback
  * @return {string}
  */
@@ -29,5 +29,6 @@ export function stringify (element, index, children, callback) {
 		case RULESET: element.value = element.props.join(',')
 	}
 
+	// @ts-ignore
 	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
 }

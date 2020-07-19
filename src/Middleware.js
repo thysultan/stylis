@@ -5,31 +5,118 @@ import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
 /**
- * @typedef {{
- * 	 parent?: Element,
- * 	 children?: Element[] | string,
- * 	 root: Element,
- * 	 type: string,
- * 	 props: string[] | string,
- * 	 value: string,
- * 	 length: number,
- * 	 return: string,
- * 	 line?: number,
- * 	 column?: number,
- * }} Element
+ * @typedef {Object} NodeBase
+ * @property {Node?} parent
+ * @property {Node?} root
+ * @property {string} value
+ * @property {number} length
+ * @property {string} return
+ * @property {number} line
+ * @property {number} column
+
+ * @typedef {NodeBase & {
+	type: 'comm'
+	props: string
+	children: string
+ }} CommentNode
+
+ * @typedef {NodeBase & {
+	type: 'decl'
+	props: string
+	children: string
+ }} DeclarationNode
+
+ * @typedef {NodeBase & {
+	type: 'rule'
+	props: string[]
+	children: Node[]
+ }} RulesetNode
+
+ * @typedef {NodeBase & {
+	type: '@keyframes'
+	props: string[]
+	children: Node[]
+ }} KeyframesNode
+
+* @typedef {NodeBase & {
+	type: '@media'
+	props: string[]
+	children: Node[]
+ }} MediaNode
+
+* @typedef {NodeBase & {
+	type: '@supports'
+	props: string[]
+	children: Node[]
+ }} SupportsNode
+
+ * @typedef {NodeBase & {
+	type: '@import'
+	props: []
+	children: []
+ }} ImportNode
+
+ * @typedef {NodeBase & {
+	type: '@charset'
+	props: []
+	children: []
+ }} CharsetNode
+
+* @typedef {NodeBase & {
+	type: '@counter-style'
+	props: string[]
+	children: DeclarationNode[]
+ }} CounterStyleNode
+
+ * @typedef {NodeBase & {
+	type: '@font-face'
+	props: []
+	children: DeclarationNode[]
+ }} FontFaceNode
+
+ * @typedef {NodeBase & {
+	type: '@page'
+	props: []
+	children: DeclarationNode[]
+ }} PageNode
+
+ * @typedef {NodeBase & {
+	type: '@document'
+	props: string[]
+	children: Node[]
+ }} DocumentNode
+
+ * @typedef {NodeBase & {
+	type: '@viewport'
+	props: []
+	children: DeclarationNode[]
+ }} ViewportNode
+
+ * @typedef {NodeBase & {
+	type: '@-webkit-keyframes'
+	props: string[]
+	children: Node[]
+ }} WebkitKeyframesNode
+
+ * @typedef {NodeBase & {
+	type: '@-moz-document'
+	props: string[]
+	children: Node[]
+ }} MozDocumentNode
+
+ * @typedef {NodeBase & {
+	type: '@-ms-viewport'
+	props: []
+	children: DeclarationNode[]
+ }} MsViewportNode
+
+ * @typedef {CommentNode | DeclarationNode | RulesetNode | KeyframesNode | MediaNode | SupportsNode | ImportNode | CharsetNode | CounterStyleNode | FontFaceNode | ViewportNode | PageNode | DocumentNode | WebkitKeyframesNode | MozDocumentNode | MsViewportNode} Node
 
  * @typedef {(
- * 	 value: string,
+ * 	 element: Node,
  * 	 index: number,
- * 	 array: string[],
- * 	) => string
- * } ArrayMapCallback
-
- * @typedef {(
- * 	 element: Element,
- * 	 index?: number,
- * 	 children?: (Element | string)[],
- * 	 callback?: Middleware,
+ * 	 children: Node[],
+ * 	 callback: Middleware,
  * 	) => string | void
  * } Middleware
  */
@@ -52,13 +139,15 @@ export function middleware (collection) {
 }
 
 /**
- * @param {(ret: string) => void} callback
+ * @param {(rule: string) => void} callback
  * @return {Middleware}
  */
 export function rulesheet (callback) {
 	return function (element) {
 		if (!element.root)
+			// @ts-ignore
 			if (element = element.return)
+				// @ts-ignore
 				callback(element)
 	}
 }
@@ -118,6 +207,7 @@ export function namespace (element) {
 							return index === 1 ? '' : value
 						default:
 							switch (index) {
+								// @ts-ignore
 								case 0: element = value
 									return sizeof(children) > 1 ? '' : value
 								case index = sizeof(children) - 1: case 2:

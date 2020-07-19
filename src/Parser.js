@@ -2,27 +2,30 @@ import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
 import {node, char, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
 
-/** @typedef {import('./Middleware.js').Element} Element */
+/** @typedef {import('./Middleware.js').Node} Node */
+/** @typedef {import('./Middleware.js').CommentNode} CommentNode */
+/** @typedef {import('./Middleware.js').DeclarationNode} DeclarationNode */
 
 /**
  * @param {string} value
- * @return {Element[]}
+ * @return {Node[]}
  */
 export function compile (value) {
+	// @ts-ignore
 	return dealloc(parse('', null, null, null, [''], value = alloc(value), 0, [0], value))
 }
 
 /**
  * @param {string} value
- * @param {Element} root
- * @param {Element?} parent
- * @param {Element[]} rule
+ * @param {Node?} root
+ * @param {Node?} parent
+ * @param {Node?} rule
  * @param {string[]} rules
- * @param {Element[]} rulesets
+ * @param {Node[]} rulesets
  * @param {number} pseudo
  * @param {number[]} points
- * @param {string[]} declarations
- * @return {Element[]}
+ * @param {Node[]} declarations
+ * @return {Node[]}
  */
 export function parse (value, root, parent, rule, rules, rulesets, pseudo, points, declarations) {
 	var index = 0
@@ -87,6 +90,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 								switch (atrule) {
 									// d m s
 									case 100: case 109: case 115:
+										// @ts-ignore
 										parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
@@ -129,17 +133,17 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 
 /**
  * @param {string} value
- * @param {Element} root
- * @param {Element?} parent
+ * @param {Node?} root
+ * @param {Node?} parent
  * @param {number} index
  * @param {number} offset
  * @param {string[]} rules
  * @param {number[]} points
  * @param {string} type
  * @param {string[]} props
- * @param {Element[]} children
+ * @param {Node[]} children
  * @param {number} length
- * @return {Element}
+ * @return {Node}
  */
 export function ruleset (value, root, parent, index, offset, rules, points, type, props, children, length) {
 	var post = offset - 1
@@ -151,14 +155,15 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, /&\f/g, rule[x])))
 				props[k++] = z
 
+	// @ts-ignore
 	return node(value, root, parent, offset === 0 ? RULESET : type, props, children, length)
 }
 
 /**
  * @param {string} value
- * @param {Element} root
- * @param {Element?} parent
- * @return {Element}
+ * @param {Node?} root
+ * @param {Node?} parent
+ * @return {CommentNode}
  */
 export function comment (value, root, parent) {
 	return node(value, root, parent, COMMENT, from(char()), substr(value, 2, -2), 0)
@@ -166,10 +171,10 @@ export function comment (value, root, parent) {
 
 /**
  * @param {string} value
- * @param {Element} root
- * @param {Element?} parent
+ * @param {Node?} root
+ * @param {Node?} parent
  * @param {number} length
- * @return {Element}
+ * @return {DeclarationNode}
  */
 export function declaration (value, root, parent, length) {
 	return node(value, root, parent, DECLARATION, substr(value, 0, length), substr(value, length + 1, -1), length)

@@ -1,14 +1,10 @@
-/** @typedef {import('./Middleware.js').ArrayMapCallback} ArrayMapCallback */
-
 /**
- * @param {number}
- * @return {number}
+ * @type {(x: number) => number}
  */
 export var abs = Math.abs
 
 /**
- * @param {number}
- * @return {string}
+ * @type {(code: number) => string}
  */
 export var from = String.fromCharCode
 
@@ -35,6 +31,7 @@ export function trim (value) {
  * @return {string?}
  */
 export function match (value, pattern) {
+	// @ts-ignore
 	return (value = pattern.exec(value)) ? value[0] : value
 }
 
@@ -50,7 +47,7 @@ export function replace (value, pattern, replacement) {
 
 /**
  * @param {string} value
- * @param {string} value
+ * @param {string} search
  * @return {number}
  */
 export function indexof (value, search) {
@@ -104,7 +101,7 @@ export function append (value, array) {
 
 /**
  * @param {string[]} array
- * @param {ArrayMapCallback} callback
+ * @param {(value: string, index: number, array: string[]) => string} callback
  * @return {string}
  */
 export function combine (array, callback) {

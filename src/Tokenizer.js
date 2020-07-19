@@ -7,28 +7,33 @@ export var position = 0
 export var character = 0
 export var characters = ''
 
-/** @typedef {import('./Middleware.js').Element} Element */
+/** @typedef {import('./Middleware.js').Node} Node */
 
 /**
+ * @template {Node["type"]} T
  * @param {string} value
- * @param {Element} root
- * @param {Element?} parent
- * @param {string} type
- * @param {string[]} props
- * @param {Element[]} children
+ * @param {Node?} root
+ * @param {Node?} parent
+ * @param {T} type
+ * @param {Extract<Node, { type: T }>["props"]} props
+ * @param {Extract<Node, { type: T }>["children"]} children
  * @param {number} length
+ * @return {Extract<Node, { type: T }>}
  */
 export function node (value, root, parent, type, props, children, length) {
+	// @ts-ignore
 	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
 }
 
 /**
  * @param {string} value
- * @param {Element} root
+ * @param {Node} source
  * @param {string} type
+ * @return {Node}
  */
-export function copy (value, root, type) {
-	return node(value, root.root, root.parent, type, root.props, root.children, 0)
+export function copy (value, source, type) {
+	// @ts-ignore
+	return node(value, source.root, source.parent, type, source.props, source.children, 0)
 }
 
 /**
@@ -102,8 +107,9 @@ export function token (type) {
 }
 
 /**
+ * @template T
  * @param {string} value
- * @return {unknown[]}
+ * @return {T[]}
  */
 export function alloc (value) {
 	return line = column = 1, length = strlen(characters = value), position = 0, []
