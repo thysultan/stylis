@@ -95,7 +95,7 @@ export function sizeof (value) {
 /**
  * @template T
  * @param {T} value
- * @param {any[]} array
+ * @param {T[]} array
  * @return {T}
  */
 export function append (value, array) {

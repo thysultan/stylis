@@ -103,7 +103,7 @@ export function token (type) {
 
 /**
  * @param {string} value
- * @return {[]}
+ * @return {unknown[]}
  */
 export function alloc (value) {
 	return line = column = 1, length = strlen(characters = value), position = 0, []
@@ -111,8 +111,8 @@ export function alloc (value) {
 
 /**
  * @template T
- * @param {T} value
- * @return {T}
+ * @param {T[]} value
+ * @return {T[]}
  */
 export function dealloc (value) {
 	return characters = '', value
