@@ -89,7 +89,7 @@ serialize(compile('h1{all:unset}'), stringify)
 
 ## Middleware
 
-The middleware helper is a convinent helper utility, that for all intents and purposes you can do without if you intend to implement your own traversal logic. The `stringify` middleware is one such middleware that can be used in conjunction with it.
+The middleware helper is a convenient helper utility, that for all intents and purposes you can do without if you intend to implement your own traversal logic. The `stringify` middleware is one such middleware that can be used in conjunction with it.
 
 Elements passed to middlewares have a `root` property that is the immediate root/parent of the current element **in the compiled output**, so it references the parent in the already expanded CSS-like structure. Elements have also `parent` property that is the immediate parent of the current element **from the input structure** (structure representing the input string).
 
