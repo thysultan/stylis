@@ -11,6 +11,7 @@
   "type": "module",
   "main": "dist/stylis.cjs",
   "module": "dist/stylis.mjs",
+  "react-native": "./index.js",
   "exports": {
     "import": "./index.js",
     "require": "./dist/stylis.cjs"
