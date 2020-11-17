@@ -14,7 +14,8 @@
   "react-native": "./index.js",
   "exports": {
     "import": "./index.js",
-    "require": "./dist/stylis.cjs"
+    "require": "./dist/stylis.cjs",
+    "./package.json": "./package.json"
   },
   "files": [
     "index.js",
