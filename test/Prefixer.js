@@ -128,6 +128,7 @@ describe('Prefixer', () => {
 		expect(prefix(`width:var(--max-content);`, 5)).to.equal([`width:var(--max-content);`].join(''))
 		expect(prefix(`width:--max-content;`, 5)).to.equal([`width:--max-content;`].join(''))
 		expect(prefix(`width:fit-content;`, 5)).to.equal([`width:-webkit-fit-content;`, `width:-moz-fit-content;`, `width:fit-content;`].join(''))
+		expect(prefix(`width:stackWidth;`, 5)).to.equal([`width:stackWidth;`].join(''))
 		expect(prefix(`min-width:max-content;`, 9)).to.equal([`min-width:-webkit-max-content;`, `min-width:-moz-max-content;`, `min-width:max-content;`].join(''))
 		expect(prefix(`max-width:min-content;`, 9)).to.equal([`max-width:-webkit-min-content;`, `max-width:-moz-min-content;`, `max-width:min-content;`].join(''))
 		expect(prefix(`height:fill-available;`, 6)).to.equal([`height:-webkit-fill-available;`, `height:-moz-available;`, `height:fill-available;`].join(''))
