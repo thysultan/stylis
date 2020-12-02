@@ -1,6 +1,6 @@
 {
   "name": "stylis",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "license": "MIT",
   "description": "A Light–weight CSS Preprocessor",
   "homepage": "https://github.com/thysultan/stylis.js",
@@ -13,7 +13,7 @@
   "module": "dist/stylis.mjs",
   "react-native": "./index.js",
   "exports": {
-    "." : {
+    ".": {
       "import": "./index.js",
       "require": "./dist/umd/stylis.js"
     },
