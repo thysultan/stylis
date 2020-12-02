@@ -13,8 +13,10 @@
   "module": "dist/stylis.mjs",
   "react-native": "./index.js",
   "exports": {
-    "import": "./index.js",
-    "require": "./dist/umd/stylis.js",
+    "." : {
+      "import": "./index.js",
+      "require": "./dist/umd/stylis.js",
+    },
     "./package.json": "./package.json"
   },
   "files": [
