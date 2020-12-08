@@ -69,7 +69,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 					case 0: case 125: scanning = 0
 					// ;
 					case 59 + offset:
-						if (property > 0)
+						if (property > 0 && (strlen(characters) - length))
 							append(property > 32 ? declaration(characters + ';', rule, parent, length - 1) : declaration(replace(characters, ' ', '') + ';', rule, parent, length - 2), declarations)
 						break
 					// @ ;
