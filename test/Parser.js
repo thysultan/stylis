@@ -430,6 +430,13 @@ describe('Parser', () => {
     ).to.equal(``)
   })
 
+  test('remove empty declarations', () => {
+    expect(stylis(`width:`)).to.equal(``)
+    expect(stylis(`height:;`)).to.equal(``)
+    expect(stylis(`max-width:     `)).to.equal(``)
+    expect(stylis(`max-height:     ;`)).to.equal(``)
+  })
+
   test('urls', () => {
     expect(
       stylis(`
