@@ -104,7 +104,7 @@ describe('Prefixer', () => {
 
 	test('position', () => {
 		expect(prefix(`position:relative;`, 8)).to.equal([`position:relative;`].join(''))
-		expect(prefix(`position:sticky;`, 8)).to.equal([`-webkit-position:sticky;`, `position:sticky;`].join(''))
+		expect(prefix(`position:sticky;`, 8)).to.equal([`position:-webkit-sticky;`, `position:sticky;`].join(''))
 	})
 
 	test('box', () => {
