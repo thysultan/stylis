@@ -18,6 +18,14 @@ describe('Middleware', () => {
   	expect(serialize(compile(`.user{width:0; :global(p,a){width:1;} h1 {width:1; h2:last-child {width:2} h2 h3 {width:3}}}`), middleware([namespace, stringify]))).to.equal([
       `.user{width:0;}`, `p,a{width:1;}`, `h1.user.user{width:1;}`, `h1.user h2:last-child.user{width:2;}`, `h1.user h2 h3.user{width:3;}`
     ].join(''))
+
+    expect(serialize(compile(`.user:before{color:red;}`), middleware([namespace, stringify]))).to.equal([
+      `:before.user.user{color:red;}`
+    ].join(''))
+
+    expect(serialize(compile(`.user:global(.bar){color:red;}`), middleware([namespace, stringify]))).to.equal([
+      `.bar{color:red;}`
+    ].join(''))
   })
 
   test('comments', () => {

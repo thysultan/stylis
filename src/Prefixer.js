@@ -8,6 +8,9 @@ import {hash, charat, strlen, indexof, replace} from './Utility.js'
  */
 export function prefix (value, length) {
 	switch (hash(value, length)) {
+		// color-adjust
+		case 5103:
+			return WEBKIT + 'print-' + value + value
 		// animation, animation-(delay|direction|duration|fill-mode|iteration-count|name|play-state|timing-function)
 		case 5737: case 4201: case 3177: case 3433: case 1641: case 4457: case 2921:
 		// text-decoration, filter, clip-path, backface-visibility, column, box-decoration-break

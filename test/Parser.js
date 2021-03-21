@@ -853,6 +853,12 @@ describe('Parser', () => {
       `--cdc-not-top-level:(-->);`,
       `--ampersand-preserved:foo & bar;`
     ].join('') +'}')
+
+    expect(serialize(compile(`.foo { --bar: var(--baz) } .bar{--foo: {} } .foo {--min-height: 66px }`), stringify)).to.equal([
+      `.foo{--bar:var(--baz);}`,
+      `.bar{--foo:{};}`,
+      `.foo{--min-height:66px;}`
+    ].join(''))
   })
 
   test('does not hang on unterminated block comment (#129)', () => {

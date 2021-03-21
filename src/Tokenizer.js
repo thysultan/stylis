@@ -39,6 +39,18 @@ export function char () {
 /**
  * @return {number}
  */
+export function prev () {
+	character = position > 0 ? charat(characters, --position) : 0
+
+	if (column--, character === 10)
+		column = 1, line--
+
+	return character
+}
+
+/**
+ * @return {number}
+ */
 export function next () {
 	character = position < length ? charat(characters, position++) : 0
 

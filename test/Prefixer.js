@@ -106,6 +106,11 @@ describe('Prefixer', () => {
 		expect(prefix(`position:sticky;`, 8)).to.equal([`position:-webkit-sticky;`, `position:sticky;`].join(''))
 	})
 
+	test('color-adjust', () => {
+		expect(prefix(`color:none;`, 5)).to.equal([`color:none;`].join(''))
+		expect(prefix(`color-adjust:none;`, 12)).to.equal([`-webkit-print-color-adjust:none;`, `color-adjust:none;`].join(''))
+	})
+
 	test('box', () => {
 		expect(prefix(`box-decoration-break:slice;`, 20)).to.equal([`-webkit-box-decoration-break:slice;`, `box-decoration-break:slice;`].join(''))
 		expect(prefix(`box-sizing:border-box;`, 10)).to.equal([`box-sizing:border-box;`].join(''))

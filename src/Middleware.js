@@ -86,8 +86,8 @@ export function namespace (element) {
 							return value
 						// :
 						case 58:
-							if (children[index + 1] === 'global')
-								children[index + 1] = '', children[index + 2] = '\f' + substr(children[index + 2], index = 1, -1)
+							if (children[++index] === 'global')
+								children[index] = '', children[++index] = '\f' + substr(children[index], index = 1, -1)
 						// \s
 						case 32:
 							return index === 1 ? '' : value

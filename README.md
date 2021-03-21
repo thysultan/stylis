@@ -129,6 +129,20 @@ serialize(compile('h1{all:unset}'), middleware([stringify, (element, index, chil
 
 The middlewares in [src/Middleware.js](src/Middleware.js) dive into tangible examples of how you might implement a middleware, alternatively you could also create your own middleware system as `compile` returns all the nessessary structure to fork from.
 
+## Variables
+
+CSS variables are supported but a note should be made about the exotic use of css variables. The css spec mentions the following
+
+>The allowed syntax for custom properties is extremely permissive. The <declaration-value> production matches any sequence of one or more tokens, so long as the sequence does not contain <bad-string-token>, <bad-url-token>, unmatched <)-token>, <]-token>, or <}-token>, or top-level <semicolon-token> tokens or <delim-token> tokens with a value of "!".
+
+That is to say css variables according to the spec allows: `--foo: if(x > 5) this.width = 10;` and while this value is obviously useless as a variable, and would be invalid in any normal property, it still might be read and acted on by JavaScript and this is supported by Stylis, however things become slightly undefined when we start to include the `{` and `}` productions in our use of exotic css variables. 
+
+For example consider the following: `--foo: {};`
+
+While this is valid CSS and supported. It is unclear what should happen when the rule collides with the implicit block termination rule that allows i.e `h1{color:red}`(notice the omitted semicolon) to also be a valid CSS production. This results in the following contradiction in: `h1{--example: {}` is it to be treated as `h1{--foo:{;}` or `h1{--foo:{}` the later of which is an unterminated block or in the following: `h1{--foo:{} h1{color:red;}` should it be `h1 {--foo:{}h1{color:red;};` where `{}h1{color:red;` is part of the css variable `--foo` and not a new rule or should it be something else? 
+
+Never the less Stylis still supports the exotic forms highlighted in the spec, however you should consider it as a general rule to delimit such exotic uses of variables in strings or parentheses i.e: `h1{--foo:'{'}` or `h1{--foo:({)}`. 
+
 ## Benchmark
 
 Stylis is at-least 2X faster than its predecesor.
