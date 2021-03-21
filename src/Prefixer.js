@@ -84,8 +84,11 @@ export function prefix (value, length) {
 		// display: (flex|inline-flex|inline-box)
 		case 6444:
 			switch (charat(value, strlen(value) - 3 - (~indexof(value, '!important') && 10))) {
-				// stic(k)y, inline-b(o)x
-				case 107: case 111:
+				// stic(k)y
+				case 107:
+					return replace(value, ':', ':' + WEBKIT) + value
+				// inline-b(o)x
+				case 111:
 					return replace(value, value, WEBKIT + value) + value
 				// (inline-)?fl(e)x
 				case 101:
