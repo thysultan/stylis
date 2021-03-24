@@ -141,6 +141,12 @@ describe('Prefixer', () => {
 		expect(prefix(`width:stretch !important;`, 5)).to.equal([`width:-webkit-fill-available !important;`, `width:-moz-available !important;`, `width:fill-available !important;`, `width:stretch !important;`].join(''))
 		expect(prefix(`min-block-size:max-content;`, 14)).to.equal([`min-block-size:-webkit-max-content;`, `min-block-size:-moz-max-content;`, `min-block-size:max-content;`].join(''))
 		expect(prefix(`min-inline-size:max-content;`, 15)).to.equal([`min-inline-size:-webkit-max-content;`, `min-inline-size:-moz-max-content;`, `min-inline-size:max-content;`].join(''))
+		expect(prefix(`width:max(250px, 100px);`, 5)).to.equal([`width:max(250px, 100px);`].join(''))
+		expect(prefix(`height:min(150px, 200px);`, 6)).to.equal([`height:min(150px, 200px);`].join(''))
+		expect(prefix(`min-width:min(100px, 50px);`, 9)).to.equal([`min-width:min(100px, 50px);`].join(''))
+		expect(prefix(`max-width:max(150px, 200px);`, 9)).to.equal([`max-width:max(150px, 200px);`].join(''))
+		expect(prefix(`min-height:max(100px, 50px);`, 10)).to.equal([`min-height:max(100px, 50px);`].join(''))
+		expect(prefix(`max-height:min(150px, 200px);`, 10)).to.equal([`max-height:min(150px, 200px);`].join(''))
 	})
 
 	test('zoom', () => {

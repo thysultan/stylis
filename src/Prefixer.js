@@ -73,6 +73,9 @@ export function prefix (value, length) {
 					case 102: length = charat(value, length + 3)
 					// (m)ax-content, (m)in-content
 					case 109:
+						// -
+						if (charat(value, length + 4) !== 45)
+							break
 						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (length == 108 ? '$3' : '$2-$3')) + value
 					// (s)tretch
 					case 115:
