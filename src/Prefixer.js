@@ -69,11 +69,14 @@ export function prefix (value, length) {
 			// stretch, max-content, min-content, fill-available
 			if (strlen(value) - 1 - length > 6)
 				switch (charat(value, length + 1)) {
-					// (f)ill-available, (f)it-content
-					case 102: length = charat(value, length + 3)
 					// (m)ax-content, (m)in-content
 					case 109:
-						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (length == 108 ? '$3' : '$2-$3')) + value
+						// -
+						if (charat(value, length + 4) !== 45)
+							break
+					// (f)ill-available, (f)it-content
+					case 102:
+						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (charat(value, length + 3) == 108 ? '$3' : '$2-$3')) + value
 					// (s)tretch
 					case 115:
 						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length) + value : value
