@@ -132,6 +132,16 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
+  test('escape chars in selector identifiers', () => {
+    expect(
+      stylis(`
+        &.B\\&W{color:red;}
+        &.\\@example\\.com{color:blue;}
+        &.owner\\/founder{color:green;}
+     `)
+    ).to.equal(`.user.B\\&W{color:red;}.user.\\@example\\.com{color:blue;}.user.owner\\/founder{color:green;}`)
+  });
+
   test('comments', () => {
     expect(
       stylis(`

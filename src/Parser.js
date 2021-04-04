@@ -94,6 +94,13 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 
 				index = offset = property = 0, variable = ampersand = 1, type = characters = '', length = pseudo
 				break
+			// \
+			case 92:
+				if (from(peek()).match(/[^a-f0-9]/i)) {
+					characters += '\\'
+					characters += from(next())
+				}
+				break
 			// :
 			case 58:
 				length = 1 + strlen(characters), property = previous
