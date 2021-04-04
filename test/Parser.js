@@ -150,6 +150,7 @@ describe('Parser', () => {
         &.B\\26 W{color:blue;}
         &.endsWith\\0000A9  a.childNode{color:green;}
         &.endsWith\\AE  a.childNode{color:yellow;}
+        &.Q\\000026A  a.childNode{color:purple;}
      `)
     ).to.equal([
       '.user.B\\26W{color:red;}',
@@ -158,7 +159,8 @@ describe('Parser', () => {
       // next rules are important because the hex digits terminating space
       // is not the same as a combinator space
       '.user.endsWith\\0000A9  a.childNode{color:green;}',
-      '.user.endsWith\\AE  a.childNode{color:yellow;}'
+      '.user.endsWith\\AE  a.childNode{color:yellow;}',
+      '.user.Q\\000026A a.childNode{color:purple;}',
     ].join(''))
   });
 
