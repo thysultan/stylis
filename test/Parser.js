@@ -132,7 +132,7 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
-  test('escape chars in selector identifiers', () => {
+  test('escaped chars in selector identifiers', () => {
     expect(
       stylis(`
         &.B\\&W{color:red;}
@@ -140,6 +140,26 @@ describe('Parser', () => {
         &.owner\\/founder{color:green;}
      `)
     ).to.equal(`.user.B\\&W{color:red;}.user.\\@example\\.com{color:blue;}.user.owner\\/founder{color:green;}`)
+  });
+
+  test('escaped hex digits in selector identifiers', () => {
+    expect(
+      stylis(`
+        &.B\\26W{color:red;}
+        &.B\\000026W{color:green;}
+        &.B\\26 W{color:blue;}
+        &.endsWith\\0000A9  a.childNode{color:green;}
+        &.endsWith\\AE  a.childNode{color:yellow;}
+     `)
+    ).to.equal([
+      '.user.B\\26W{color:red;}',
+      '.user.B\\000026W{color:green;}',
+      '.user.B\\26 W{color:blue;}',
+      // next rules are important because the hex digits terminating space
+      // is not the same as a combinator space
+      '.user.endsWith\\0000A9  a.childNode{color:green;}',
+      '.user.endsWith\\AE  a.childNode{color:yellow;}'
+    ].join(''))
   });
 
   test('comments', () => {

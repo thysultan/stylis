@@ -99,6 +99,18 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 				if (from(peek()).match(/[^a-f0-9]/i)) {
 					characters += '\\'
 					characters += from(next())
+				} else {
+					characters += '\\';
+					[1,2,3,4,5,6].some(() => {
+						if((from(peek()).match(/[a-f0-9]/i))) {
+							characters += from(next())
+							return false
+						}
+						return true
+					})
+					if((from(peek()).match(/\s/))) {
+						characters += from(next())
+					}
 				}
 				break
 			// :
