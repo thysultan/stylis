@@ -138,8 +138,16 @@ describe('Parser', () => {
         &.B\\&W{color:red;}
         &.\\@example\\.com{color:blue;}
         &.owner\\/founder{color:green;}
+        &.discount\\%  {color:purple;}
      `)
-    ).to.equal(`.user.B\\&W{color:red;}.user.\\@example\\.com{color:blue;}.user.owner\\/founder{color:green;}`)
+    ).to.equal([
+      '.user.B\\&W{color:red;}',
+      '.user.\\@example\\.com{color:blue;}',
+      '.user.owner\\/founder{color:green;}',
+      // while doubel spaces after escaped hex codes need to be preserved,
+      // after an escaped character / code point it need not be preserved 
+      '.user.discount\\%{color:purple;}'
+    ].join(''))
   });
 
   test('escaped hex codes in selector identifiers', () => {
