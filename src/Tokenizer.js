@@ -94,7 +94,7 @@ export function token (type) {
 			return 5
 		// ! + , / > @ ~ isolate token
 		case 33: case 43: case 44: case 47: case 62: case 64: case 126:
-		// ; { } / breakpoint token
+		// ; { } breakpoint token
 		case 59: case 123: case 125:
 			return 4
 		// : accompanied token
@@ -172,6 +172,20 @@ export function tokenizer (children) {
 		}
 
 	return children
+}
+
+/**
+ * @param {number} index
+ * @param {number} count
+ * @return {string}
+ */
+export function escaping (index, count) {
+	while (--count && next())
+		// not 0-9 A-F a-f
+		if (character < 48 || character > 102 || (character > 57 && character < 65) || (character > 70 && character < 97))
+			break
+
+	return slice(index, caret() + (count < 6 && peek() == 32 && next() == 32))
 }
 
 /**
