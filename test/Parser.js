@@ -144,7 +144,7 @@ describe('Parser', () => {
       '.user.B\\&W{color:red;}',
       '.user.\\@example\\.com{color:blue;}',
       '.user.owner\\/founder{color:green;}',
-      // while doubel spaces after escaped hex codes need to be preserved,
+      // while double spaces after escaped hex codes need to be preserved,
       // after an escaped character / code point it need not be preserved 
       '.user.discount\\%{color:purple;}'
     ].join(''))
