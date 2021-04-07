@@ -132,6 +132,56 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
+  test('escaped chars in selector identifiers', () => {
+    expect(
+      stylis(`
+        &.B\\&W{color:red;}
+        &.\\@example\\.com{color:blue;}
+        &.owner\\/founder{color:green;}
+        &.discount\\%  {color:purple;}
+     `)
+    ).to.equal([
+      '.user.B\\&W{color:red;}',
+      '.user.\\@example\\.com{color:blue;}',
+      '.user.owner\\/founder{color:green;}',
+      // while double spaces after escaped hex codes need to be preserved,
+      // after an escaped character / code point it need not be preserved 
+      '.user.discount\\%{color:purple;}'
+    ].join(''))
+  });
+
+  test('escaped hex codes in selector identifiers', () => {
+    expect(
+      stylis(`
+        &.B\\26W{color:red;}
+        &.B\\000026W{color:green;}
+        &.B\\26 W{color:blue;}
+     `)
+    ).to.equal([
+      '.user.B\\26W{color:red;}',
+      '.user.B\\000026W{color:green;}',
+      '.user.B\\26 W{color:blue;}',
+    ].join(''))
+  });
+
+  test('double spaces after escaped hex codes in selector identifiers', () => {
+    expect(
+      stylis(`
+        &.endsWith\\0000A9  a.childNode{color:green;}
+        &.endsWith\\AE  a.childNode{color:yellow;}
+        &.Q\\000026A  a.childNode{color:purple;}
+     `)
+    ).to.equal([
+      // next rules are important because the hex digits terminating space
+      // is not the same as a combinator space
+      '.user.endsWith\\0000A9  a.childNode{color:green;}',
+      '.user.endsWith\\AE  a.childNode{color:yellow;}',
+      // max 6 hex chars in escape sequence - whitespace after 7th char
+      // is just normal whitespace and can be collapsed
+      '.user.Q\\000026A a.childNode{color:purple;}',
+    ].join(''))
+  });
+
   test('comments', () => {
     expect(
       stylis(`

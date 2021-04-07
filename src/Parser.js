@@ -1,6 +1,6 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
-import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, identifier, commenter} from './Tokenizer.js'
+import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -49,6 +49,10 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 			case 9: case 10: case 13: case 32:
 				characters += whitespace(previous)
 				break
+			// \
+			case 92:
+				characters += escaping(caret() - 1, 7)
+				continue
 			// /
 			case 47:
 				switch (peek()) {
@@ -98,13 +102,11 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 			case 58:
 				length = 1 + strlen(characters), property = previous
 			default:
-				if (variable < 1) {
-					if (character == 123) {
+				if (variable < 1)
+					if (character == 123)
 						--variable
-					} else if (character == 125 && variable++ == 0 && prev() == 125) {
+					else if (character == 125 && variable++ == 0 && prev() == 125)
 						continue
-					}
-				}
 
 				switch (characters += from(character), character * variable) {
 					// &
