@@ -45,7 +45,8 @@ export function prefixer (element, index, children, callback) {
 			case DECLARATION: element.return = prefix(element.value, element.length)
 				break
 			case KEYFRAMES:
-				return serialize([copy(replace(element.value, '@', '@' + WEBKIT), element, '')], callback)
+				if (match(element.value, new RegExp('^@' + WEBKIT))) break
+				return serialize([copy(replace(element.value, '@', '@' + WEBKIT), element, KEYFRAMES)], callback)
 			case RULESET:
 				if (element.length)
 					return combine(element.props, function (value) {
