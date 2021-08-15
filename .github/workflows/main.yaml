@@ -8,9 +8,9 @@ jobs:
         node-version: [11.4.0]
     steps:
     - name: checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
     - name: setup ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
     - name: test
@@ -18,7 +18,7 @@ jobs:
         npm install
         npm test
     - name: report
-      uses: coverallsapp/github-action@v1.0.1
+      uses: coverallsapp/github-action@1.1.3
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: ./coverage/lcov.info
