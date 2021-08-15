@@ -48,7 +48,7 @@ export function replace (value, pattern, replacement) {
 
 /**
  * @param {string} value
- * @param {string} value
+ * @param {string} search
  * @return {number}
  */
 export function indexof (value, search) {
