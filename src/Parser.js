@@ -1,6 +1,6 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
-import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
+import {abs, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
+import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter, slice} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -38,11 +38,28 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 	var children = rulesets
 	var reference = rule
 	var characters = type
+	var colon = -1
 
 	while (scanning)
 		switch (previous = character, character = next()) {
-			// " ' [ (
-			case 34: case 39: case 91: case 40:
+			// (
+			case 40:
+				if (colon > 0) {
+					switch (slice(colon, caret() - 1)) {
+						case 'matches':
+						case 'is':
+						case 'not':
+						case 'any':
+						case 'where':
+						case 'has':
+							colon = delimit(character)
+							indexof(colon, '&') > 0 ? (ampersand = -1, characters += replace(colon, /&/g, '&\f')) : characters += colon
+							colon = -1
+							continue
+					}
+				}
+			// " ' [
+			case 34: case 39: case 91:
 				characters += delimit(character)
 				break
 			// \t \n \r \s
@@ -100,7 +117,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 				break
 			// :
 			case 58:
-				length = 1 + strlen(characters), property = previous
+				length = 1 + strlen(characters), property = previous, colon = caret()
 			default:
 				if (variable < 1)
 					if (character == 123)
