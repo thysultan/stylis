@@ -590,6 +590,16 @@ describe('Parser', () => {
     ).to.equal(`h1:matches(.a,.b,:not(.user)){display:none;}`)
   })
 
+  test('pseudo-selector with & in a string', () => {
+    expect(
+      stylis(`
+        h1:matches(&,[href="https://css-tricks.com?a=1&b=2"]) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches(.user,[href="https://css-tricks.com?a=1&b=2"]){display:none;}`)
+  });
+
   test('@keyframes', () => {
     expect(serialize(compile(`
       @-webkit-keyframes slidein {

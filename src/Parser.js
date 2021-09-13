@@ -1,5 +1,5 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {abs, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
+import {abs, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
 import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter, slice} from './Tokenizer.js'
 
 /**
@@ -39,25 +39,10 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 	var reference = rule
 	var characters = type
 	var colon = -1
+	var pseudoselector = 0
 
 	while (scanning)
 		switch (previous = character, character = next()) {
-			// (
-			case 40:
-				if (colon > 0) {
-					switch (slice(colon, caret() - 1)) {
-						case 'matches':
-						case 'is':
-						case 'not':
-						case 'any':
-						case 'where':
-						case 'has':
-							colon = delimit(character)
-							indexof(colon, '&') > 0 ? (ampersand = -1, characters += replace(colon, /&/g, '&\f')) : characters += colon
-							colon = -1
-							continue
-					}
-				}
 			// " ' [
 			case 34: case 39: case 91:
 				characters += delimit(character)
@@ -119,6 +104,26 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 			case 58:
 				length = 1 + strlen(characters), property = previous, colon = caret()
 			default:
+				// (
+				if (character === 40) {
+					if (colon > 0) {
+						switch (slice(colon, caret() - 1)) {
+							case 'matches':
+							case 'is':
+							case 'not':
+							case 'any':
+							case 'where':
+							case 'has':
+								pseudoselector = 1
+						}
+					}
+					if (!pseudoselector) {
+						characters += delimit(character)
+						colon = -1
+						break
+					}
+				}
+
 				if (variable < 1)
 					if (character == 123)
 						--variable
@@ -130,9 +135,16 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 					case 38:
 						ampersand = offset > 0 ? 1 : (characters += '\f', -1)
 						break
+					// )
+					case 41:
+						colon = -1
+						pseudoselector = 0
+						break
 					// ,
 					case 44:
-						points[index++] = (strlen(characters) - 1) * ampersand, ampersand = 1
+						if (!pseudoselector) {
+							points[index++] = (strlen(characters) - 1) * ampersand, ampersand = 1
+						}
 						break
 					// @
 					case 64:
