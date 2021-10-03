@@ -9,11 +9,11 @@ export var characters = ''
 
 /**
  * @param {string} value
- * @param {object} root
- * @param {object?} parent
+ * @param {object | null} root
+ * @param {object | null} parent
  * @param {string} type
- * @param {string[]} props
- * @param {object[]} children
+ * @param {string[] | string} props
+ * @param {object[] | string} children
  * @param {number} length
  */
 export function node (value, root, parent, type, props, children, length) {
