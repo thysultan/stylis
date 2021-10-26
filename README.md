@@ -87,6 +87,15 @@ tokenize('h1 h2 h3 [h4 h5] fn(args) "a b c"') === ['h1', 'h2', 'h3', '[h4 h5]', 
 serialize(compile('h1{all:unset}'), stringify)
 ```
 
+### Vendor Prefixing
+
+```js
+import {compile, serialize, stringify, middleware, prefixer } from 'stylis';
+
+serialize(compile('div{display:flex;}'), middleware([prefixer, stringify]))
+```
+
+
 ## Middleware
 
 The middleware helper is a convenient helper utility, that for all intents and purposes you can do without if you intend to implement your own traversal logic. The `stringify` middleware is one such middleware that can be used in conjunction with it.
