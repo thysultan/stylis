@@ -92,7 +92,7 @@ serialize(compile('h1{all:unset}'), stringify)
 ```js
 import {compile, serialize, stringify, middleware, prefixer } from 'stylis';
 
-serialize(compile('h1{all:unset}'), middleware([prefixer, stringify]))
+serialize(compile('div{display:flex;}'), middleware([prefixer, stringify]))
 ```
 
 
