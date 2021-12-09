@@ -11,6 +11,12 @@ export var abs = Math.abs
 export var from = String.fromCharCode
 
 /**
+ * @param {object}
+ * @return {object}
+ */
+export var assign = Object.assign
+
+/**
  * @param {string} value
  * @param {number} length
  * @return {number}

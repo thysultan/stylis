@@ -528,6 +528,78 @@ describe('Parser', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
+  test('pseudo-selectors', () => {
+    expect(
+      stylis(`
+        :not(&) {
+          color: red;
+        }
+        :matches(&) {
+          color: red;
+        }
+        :is(&) {
+          color: red;
+        }
+        :any(&) {
+          color: red;
+        }
+        :where(&) {
+          color: red;
+        }
+        :has(&) {
+          color: red;
+        }
+      `)
+    ).to.equal([
+      `:not(.user){color:red;}`,
+      `:matches(.user){color:red;}`,
+      `:is(.user){color:red;}`,
+      `:any(.user){color:red;}`,
+      `:where(.user){color:red;}`,
+      `:has(.user){color:red;}`
+    ].join(''))
+  })
+
+  test('nested pseudo-selectors', () => {
+    expect(
+      stylis(`
+        :not(&) {
+          :matches(&) {
+            :is(&) {
+              :any(&) {
+                :where(&) {
+                  :has(&) {
+                    color: red;
+                  }
+                }
+              }
+            }
+          }
+        }
+      `)
+    ).to.equal(`:has(:where(:any(:is(:matches(:not(.user)))))){color:red;}`);
+  })
+
+  test('pseudo-selector inside pseudo-selector', () => {
+    expect(
+      stylis(`
+        h1:matches(.a,.b,:not(&)) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches(.a,.b,:not(.user)){display:none;}`)
+  })
+
+  test('pseudo-selector with & in a string', () => {
+    expect(
+      stylis(`
+        h1:matches(&,[href="https://css-tricks.com?a=1&b=2"]) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches(.user,[href="https://css-tricks.com?a=1&b=2"]){display:none;}`)
+  })
+
   test('@keyframes', () => {
     expect(serialize(compile(`
       @-webkit-keyframes slidein {

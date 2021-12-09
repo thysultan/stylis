@@ -1,4 +1,4 @@
-import {from, trim, charat, strlen, substr, append} from './Utility.js'
+import {from, trim, charat, strlen, substr, append, assign} from './Utility.js'
 
 export var line = 1
 export var column = 1
@@ -21,12 +21,12 @@ export function node (value, root, parent, type, props, children, length) {
 }
 
 /**
- * @param {string} value
  * @param {object} root
- * @param {string} type
+ * @param {object} props
+ * @return {object}
  */
-export function copy (value, root, type) {
-	return node(value, root.root, root.parent, type, root.props, root.children, 0)
+export function copy (root, props) {
+	return assign({}, root, {length: -root.length}, props)
 }
 
 /**
@@ -200,7 +200,9 @@ export function delimiter (type) {
 				return position
 			// " '
 			case 34: case 39:
-				return delimiter(type === 34 || type === 39 ? type : character)
+				if (type !== 34 && type !== 39)
+					delimiter(character)
+				break
 			// (
 			case 40:
 				if (type === 41)
