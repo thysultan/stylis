@@ -99,7 +99,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 										parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
-										parse(characters, reference, reference, reference, [''], children, length, points, children)
+										parse(characters, reference, reference, reference, [''], children, 0, points, children)
 								}
 				}
 
