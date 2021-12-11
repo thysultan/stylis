@@ -26,7 +26,7 @@ export function node (value, root, parent, type, props, children, length) {
  * @return {object}
  */
 export function copy (root, props) {
-	return assign({}, root, {length: -root.length}, props)
+	return assign(node('', null, null, '', null, null, 0), root, {length: -root.length}, props)
 }
 
 /**
