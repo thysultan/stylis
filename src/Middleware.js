@@ -97,7 +97,7 @@ export function namespace (element) {
 								case 0: element = value
 									return sizeof(children) > 1 ? '' : value
 								case index = sizeof(children) - 1: case 2:
-									return index === 2 ? value + element + element : value + element
+									return value + element
 								default:
 									return value
 							}
