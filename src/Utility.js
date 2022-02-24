@@ -53,7 +53,7 @@ export function replace (value, pattern, replacement) {
 }
 
 /**
- * @param {string | string[]} value
+ * @param {string} value
  * @param {string} search
  * @return {number}
  */

@@ -36,7 +36,7 @@ export function prefix(value, length) {
 		case 5443:
 			// center, end, start, stretch
 			return (
-				~indexof(['stretch', 'center', 'end', 'start'], substr(value, length + 1, sizeof(value) - 1))
+				match(substr(value, length + 1, sizeof(value) - 1), /^(center|end|start|stretch)$/)
 			)
 				? WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + MS + 'grid-row-' + replace(value, /flex-|-self/, '') + value
 				: WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + value
@@ -68,7 +68,7 @@ export function prefix(value, length) {
 		case 4200:
 			// center, end, start, stretch
 			if (
-				~indexof(['stretch', 'center', 'end', 'start'], substr(value, length + 1, sizeof(value) - 1))
+				match(substr(value, length + 1, sizeof(value) - 1), /^(center|end|start|stretch)$/)
 			) {
 				return MS + 'grid-column-align' + substr(value, length) + value
 			}
