@@ -113,19 +113,3 @@ export function append (value, array) {
 export function combine (array, callback) {
 	return array.map(callback).join('')
 }
-
-/**
- * @param {string} string
- * @return {boolean}
- */
-export function ispurenumber (string) {
-	return /^\d+$/.test(string)
-}
-
-/**
- * @param {string} string
- * @return {number}
- */
-export function tonumber (string) {
-	return +string
-}
