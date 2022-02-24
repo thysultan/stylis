@@ -186,4 +186,9 @@ describe('Prefixer', () => {
 			`animation-timing-function:cubic-bezier(0.1,0.7,1.0,0.1);`
 		].join(''))
 	})
+
+	test('grid', () => {
+		expect(prefix('display:grid;', 7)).to.equal([`display:-ms-grid;`, `display:grid;`].join(''))
+		expect(prefix('display:inline-grid;', 7)).to.equal([`display:-ms-inline-grid;`, `display:inline-grid;`].join(''))
+	})
 })

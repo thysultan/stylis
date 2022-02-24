@@ -87,7 +87,7 @@ export function prefix (value, length) {
 			// (s)ticky?
 			if (charat(value, length + 1) !== 115)
 				break
-		// display: (flex|inline-flex)
+		// display: (flex|inline-flex|grid|inline-grid)
 		case 6444:
 			switch (charat(value, strlen(value) - 3 - (~indexof(value, '!important') && 10))) {
 				// stic(k)y
@@ -96,6 +96,9 @@ export function prefix (value, length) {
 				// (inline-)?fl(e)x
 				case 101:
 					return replace(value, /(.+:)([^;!]+)(;|!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
+				// (inline-)?grid
+				case 105:
+					return replace(value, ':', ':' + MS) + value
 			}
 			break
 		// writing-mode
