@@ -192,5 +192,6 @@ describe('Prefixer', () => {
 		expect(prefix('display:inline-grid;', 7)).to.equal([`display:-ms-inline-grid;`, `display:inline-grid;`].join(''))
 		expect(prefix('align-self:stretch;', 10)).to.equal([`-webkit-align-self:stretch;`, `-ms-flex-item-align:stretch;`, `-ms-grid-row-align:stretch;`, `align-self:stretch;`].join(''))
 		expect(prefix('justify-self:end;', 12)).to.equal([`-ms-grid-column-align:end;`, `justify-self:end;`].join(''))
+		expect(prefix('grid-template-columns:1fr auto;', 21)).to.equal([`-ms-grid-columns:1fr auto;`, `grid-template-columns:1fr auto;`].join(''))
 	})
 })
