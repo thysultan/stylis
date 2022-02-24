@@ -1,12 +1,12 @@
-import {MS, MOZ, WEBKIT} from './Enum.js'
-import {hash, charat, strlen, indexof, replace} from './Utility.js'
+import { MS, MOZ, WEBKIT } from './Enum.js'
+import { hash, charat, strlen, indexof, replace, substr } from './Utility.js'
 
 /**
  * @param {string} value
  * @param {number} length
  * @return {string}
  */
-export function prefix (value, length) {
+export function prefix(value, length) {
 	switch (hash(value, length)) {
 		// color-adjust
 		case 5103:
@@ -34,7 +34,12 @@ export function prefix (value, length) {
 			return WEBKIT + value + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2' + MS + 'flex-$1$2') + value
 		// align-self
 		case 5443:
-			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + value
+			// center, end, start, stretch
+			return (
+				~indexof(['stretch', 'center', 'end', 'start'], substr(value, length + 1, value.length - 1))
+			)
+				? WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + MS + 'grid-row-' + replace(value, /flex-|-self/, '') + value
+				: WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + value
 		// align-content
 		case 4675:
 			return WEBKIT + value + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + value
@@ -59,6 +64,14 @@ export function prefix (value, length) {
 		// justify-content
 		case 4968:
 			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value + value
+		// justify-self
+		case 4200:
+			// center, end, start, stretch
+			if (
+				~indexof(['stretch', 'center', 'end', 'start'], substr(value, length + 1, value.length - 1))
+			) {
+				return MS + 'grid-column-align' + substr(value, length) + value
+			}
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
 			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + value

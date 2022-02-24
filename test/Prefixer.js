@@ -190,5 +190,7 @@ describe('Prefixer', () => {
 	test('grid', () => {
 		expect(prefix('display:grid;', 7)).to.equal([`display:-ms-grid;`, `display:grid;`].join(''))
 		expect(prefix('display:inline-grid;', 7)).to.equal([`display:-ms-inline-grid;`, `display:inline-grid;`].join(''))
+		expect(prefix('align-self:stretch;', 10)).to.equal([`-webkit-align-self:stretch;`, `-ms-flex-item-align:stretch;`, `-ms-grid-row-align:stretch;`, `align-self:stretch;`].join(''))
+		expect(prefix('justify-self:end;', 12)).to.equal([`-ms-grid-column-align:end;`, `justify-self:end;`].join(''))
 	})
 })
