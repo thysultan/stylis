@@ -193,5 +193,7 @@ describe('Prefixer', () => {
 		expect(prefix('align-self:stretch;', 10)).to.equal([`-webkit-align-self:stretch;`, `-ms-flex-item-align:stretch;`, `-ms-grid-row-align:stretch;`, `align-self:stretch;`].join(''))
 		expect(prefix('justify-self:end;', 12)).to.equal([`-ms-grid-column-align:end;`, `justify-self:end;`].join(''))
 		expect(prefix('grid-template-columns:1fr auto;', 21)).to.equal([`-ms-grid-columns:1fr auto;`, `grid-template-columns:1fr auto;`].join(''))
+		expect(prefix('grid-template-columns:1fr [header content] auto;', 21)).to.equal([`-ms-grid-columns:1fr [header content] auto;`, `grid-template-columns:1fr [header content] auto;`].join(''))
+		expect(prefix('grid-template-rows:1fr auto;', 18)).to.equal([`-ms-grid-rows:1fr auto;`, `grid-template-rows:1fr auto;`].join(''))
 	})
 })

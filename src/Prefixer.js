@@ -72,8 +72,8 @@ export function prefix(value, length) {
 			) {
 				return MS + 'grid-column-align' + substr(value, length) + value
 			}
-		// grid-template-columns
-		case 2592:
+		// grid-template-(columns|rows)
+		case 2592: case 3360:
 			return MS + replace(value, 'template-', '') + value
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
