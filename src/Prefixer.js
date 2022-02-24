@@ -1,5 +1,5 @@
 import { MS, MOZ, WEBKIT } from './Enum.js'
-import { hash, charat, strlen, indexof, replace, substr, sizeof } from './Utility.js'
+import { hash, charat, strlen, indexof, replace, substr, sizeof, ispurenumber } from './Utility.js'
 
 /**
  * @param {string} value
@@ -98,6 +98,12 @@ export function prefix(value, length) {
 						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length) + value : value
 				}
 			break
+		// grid-(column|row)
+		case 5152: case 5920:
+			// simple position value
+			if (ispurenumber(substr(value, length + 1, sizeof(value) - 1))) {
+				return MS + value + value
+			}
 		// position: sticky
 		case 4949:
 			// (s)ticky?

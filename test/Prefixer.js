@@ -1,4 +1,4 @@
-import {prefix} from "../index.js"
+import { prefix } from "../index.js"
 
 describe('Prefixer', () => {
 	test('flex-box', () => {
@@ -195,5 +195,11 @@ describe('Prefixer', () => {
 		expect(prefix('grid-template-columns:1fr auto;', 21)).to.equal([`-ms-grid-columns:1fr auto;`, `grid-template-columns:1fr auto;`].join(''))
 		expect(prefix('grid-template-columns:1fr [header content] auto;', 21)).to.equal([`-ms-grid-columns:1fr [header content] auto;`, `grid-template-columns:1fr [header content] auto;`].join(''))
 		expect(prefix('grid-template-rows:1fr auto;', 18)).to.equal([`-ms-grid-rows:1fr auto;`, `grid-template-rows:1fr auto;`].join(''))
+		// grid-column - simple position value
+		expect(prefix('grid-column:5;', 11)).to.equal([`-ms-grid-column:5;`, `grid-column:5;`].join(''))
+		expect(prefix('grid-column:20;', 11)).to.equal([`-ms-grid-column:20;`, `grid-column:20;`].join(''))
+		// grid-row - simple position value
+		expect(prefix('grid-row:3;', 8)).to.equal([`-ms-grid-row:3;`, `grid-row:3;`].join(''))
+		expect(prefix('grid-row:17;', 8)).to.equal([`-ms-grid-row:17;`, `grid-row:17;`].join(''))
 	})
 })

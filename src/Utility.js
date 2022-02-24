@@ -53,7 +53,7 @@ export function replace (value, pattern, replacement) {
 }
 
 /**
- * @param {string} value
+ * @param {string | string[]} value
  * @param {string} search
  * @return {number}
  */
@@ -112,4 +112,12 @@ export function append (value, array) {
  */
 export function combine (array, callback) {
 	return array.map(callback).join('')
+}
+
+/**
+ * @param {string} string
+ * @return {boolean}
+ */
+export function ispurenumber (string) {
+	return /^\d+$/.test(string)
 }
