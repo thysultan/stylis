@@ -195,11 +195,18 @@ describe('Prefixer', () => {
 		expect(prefix('grid-template-columns:1fr auto;', 21)).to.equal([`-ms-grid-columns:1fr auto;`, `grid-template-columns:1fr auto;`].join(''))
 		expect(prefix('grid-template-columns:1fr [header content] auto;', 21)).to.equal([`-ms-grid-columns:1fr [header content] auto;`, `grid-template-columns:1fr [header content] auto;`].join(''))
 		expect(prefix('grid-template-rows:1fr auto;', 18)).to.equal([`-ms-grid-rows:1fr auto;`, `grid-template-rows:1fr auto;`].join(''))
-		// grid-column - simple position value
+		// grid-(column|row) - simple position value
 		expect(prefix('grid-column:5;', 11)).to.equal([`-ms-grid-column:5;`, `grid-column:5;`].join(''))
 		expect(prefix('grid-column:20;', 11)).to.equal([`-ms-grid-column:20;`, `grid-column:20;`].join(''))
-		// grid-row - simple position value
 		expect(prefix('grid-row:3;', 8)).to.equal([`-ms-grid-row:3;`, `grid-row:3;`].join(''))
 		expect(prefix('grid-row:17;', 8)).to.equal([`-ms-grid-row:17;`, `grid-row:17;`].join(''))
+		// grid-(column|row) - expand short hand
+		expect(prefix('grid-column:3 / 5;', 11)).to.equal([`-ms-grid-column:3;`, `-ms-grid-column-span:2;`, `grid-column:3 / 5;`].join(''))
+		expect(prefix('grid-column:3 / span 1;', 11)).to.equal([`-ms-grid-column:3;`, `-ms-grid-column-span:1;`, `grid-column:3 / span 1;`].join(''))
+		expect(prefix('grid-row:2 / 7;', 8)).to.equal([`-ms-grid-row:2;`, `-ms-grid-row-span:5;`, `grid-row:2 / 7;`].join(''))
+		expect(prefix('grid-row:2 / span 3;', 8)).to.equal([`-ms-grid-row:2;`, `-ms-grid-row-span:3;`, `grid-row:2 / span 3;`].join(''))
+		// grid-column - ignore non-numeric values (IE11 doesn't support line-names)
+		expect(prefix('grid-column:main-start / main-end;', 11)).to.equal([`grid-column:main-start / main-end;`].join(''))
+		expect(prefix('grid-row:main-start / main-end;', 11)).to.equal([`grid-row:main-start / main-end;`].join(''))
 	})
 })

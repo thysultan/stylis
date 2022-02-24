@@ -121,3 +121,11 @@ export function combine (array, callback) {
 export function ispurenumber (string) {
 	return /^\d+$/.test(string)
 }
+
+/**
+ * @param {string} string
+ * @return {number}
+ */
+export function tonumber (string) {
+	return +string
+}

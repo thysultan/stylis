@@ -1,5 +1,5 @@
 import { MS, MOZ, WEBKIT } from './Enum.js'
-import { hash, charat, strlen, indexof, replace, substr, sizeof, ispurenumber } from './Utility.js'
+import { hash, charat, strlen, indexof, replace, substr, sizeof, ispurenumber, match } from './Utility.js'
 
 /**
  * @param {string} value
@@ -103,6 +103,8 @@ export function prefix(value, length) {
 			// simple position value
 			if (ispurenumber(substr(value, length + 1, sizeof(value) - 1))) {
 				return MS + value + value
+			} else if (match(substr(value, length + 1, sizeof(value) - 1), /(\d)+\s*\/( ?span)?\s*(\d)+/)) {
+				return replace(substr(value, length + 1, sizeof(value) - 1), /(\d)+\s*\/( ?span)?\s*(\d)+/, (_, $1, $span, $3) => MS + substr(value, 0, length + 1) + $1 + ';' + MS + substr(value, 0, length) + '-span:' + ($span ? $3 : +$3 - +$1) + ';') + value
 			}
 		// position: sticky
 		case 4949:
