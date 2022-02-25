@@ -88,5 +88,26 @@ describe('Middleware', () => {
       `:-moz-read-write{background-color:hotpink;}`,
       `:read-write{background-color:hotpink;}`
     ].join(''))
+
+    // grid-(column|row)-(start|end)
+    expect(serialize(compile(`.test{grid-row-start:3;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{-ms-grid-row:3;grid-row-start:3;}`
+    ].join(''))
+    expect(serialize(compile(`.test{grid-row-start:span 3;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{-ms-grid-row:span 3;grid-row-start:span 3;}`
+    ].join(''))
+    expect(serialize(compile(`.test{grid-row-end:3;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{-ms-grid-row-span:3;grid-row-end:3;}`
+    ].join(''))
+    expect(serialize(compile(`.test{grid-row-end:span 3;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{-ms-grid-row-span:3;grid-row-end:span 3;}`
+    ].join(''))
+    expect(serialize(compile(`.test{grid-row-start:3;grid-row-end:5;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{-ms-grid-row:3;grid-row-start:3;-ms-grid-row-span:2;grid-row-end:5;}`
+    ].join(''))
+    // should not prefix a cell with non-numerical position values
+    expect(serialize(compile(`.test{grid-row-start:span 3;grid-row-end:5;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{grid-row-start:span 3;grid-row-end:5;}`
+    ].join(''))
   })
 })
