@@ -34,12 +34,14 @@ export function prefix(value, length) {
 			return WEBKIT + value + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2' + MS + 'flex-$1$2') + value
 		// align-self
 		case 5443:
-			// center, end, start, stretch
-			return (
-				match(substr(value, length + 1, sizeof(value) - 1), /^(center|end|start|stretch)$/)
-			)
-				? WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + MS + 'grid-row-' + replace(value, /flex-|-self/, '') + value
-				: WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + value
+			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '')
+				+ (
+					// center, end, start, stretch
+					match(substr(value, length + 1, sizeof(value) - 1), /^(center|end|start|stretch)$/)
+						? MS + 'grid-row-' + replace(value, /flex-|-self/, '')
+						: ''
+				)
+				+ value
 		// align-content
 		case 4675:
 			return WEBKIT + value + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + value
@@ -69,9 +71,7 @@ export function prefix(value, length) {
 			// center, end, start, stretch
 			if (
 				match(substr(value, length + 1, sizeof(value) - 1), /^(center|end|start|stretch)$/)
-			) {
-				return MS + 'grid-column-align' + substr(value, length) + value
-			}
+			) return MS + 'grid-column-align' + substr(value, length) + value
 		// grid-template-(columns|rows)
 		case 2592: case 3360:
 			return MS + replace(value, 'template-', '') + value
