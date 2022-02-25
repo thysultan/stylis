@@ -43,7 +43,37 @@ export function prefixer (element, index, children, callback) {
 	if (element.length > -1)
 		if (!element.return)
 			switch (element.type) {
-				case DECLARATION: element.return = prefix(element.value, element.length)
+				case DECLARATION:
+					switch (element.props) {
+						case 'grid-row-start': case 'grid-column-start':
+							var end
+							if (
+								end = element	&& element.parent && element.parent.children && element.parent.children.find(
+									item => item.type === DECLARATION && match(item.props, /grid-(row|column)-end/)
+								)
+							) {
+								element.return = match(element.value, /span/)
+									? element.value
+									: (
+										MS + replace(element.value, '-start', '')
+										+ element.value
+										+ MS + 'grid-row-span:' + (+match(end.value, /\d+/) - +match(element.value, /\d+/)) + ';'
+									)
+							} else {
+								element.return = MS + replace(element.value, '-start', '') + element.value
+							}
+							break
+						case 'grid-row-end': case 'grid-column-end':
+							element.return = element && element.parent && element.parent.children && element.parent.children.some(
+								item => item.type === DECLARATION && match(item.props, /grid-(row|column)-start/)
+							)
+								? element.value
+								: MS + replace(replace(element.value, '-end', '-span'), 'span ', '') + element.value
+							break
+						default:
+							element.return = prefix(element.value, element.length)
+							break
+					}
 					break
 				case KEYFRAMES:
 					return serialize([copy(element, {value: replace(element.value, '@', '@' + WEBKIT)})], callback)
