@@ -1,12 +1,12 @@
-import {MS, MOZ, WEBKIT} from './Enum.js'
-import {hash, charat, strlen, indexof, replace} from './Utility.js'
+import { MS, MOZ, WEBKIT } from './Enum.js'
+import { hash, charat, strlen, indexof, replace } from './Utility.js'
 
 /**
  * @param {string} value
  * @param {number} length
  * @return {string}
  */
-export function prefix (value, length) {
+export function prefix(value, length) {
 	switch (hash(value, length)) {
 		// color-adjust
 		case 5103:
@@ -113,6 +113,12 @@ export function prefix (value, length) {
 			}
 
 			return WEBKIT + value + MS + value + value
+		// scroll-snap-type
+		case 2903:
+			return WEBKIT + value + MS + value + value
+		// scroll-margin, scroll-margin-(top|right|bottom|left)
+		case 5719: case 2647: case 2135: case 3927: case 2391:
+			return replace(value, 'scroll-margin', 'scroll-snap-margin') + value
 	}
 
 	return value
