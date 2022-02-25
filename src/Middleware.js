@@ -1,5 +1,5 @@
 import {MS, MOZ, WEBKIT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {match, charat, substr, strlen, sizeof, replace, combine} from './Utility.js'
+import {match, charat, substr, strlen, sizeof, replace, combine, indexof} from './Utility.js'
 import {copy, tokenize} from './Tokenizer.js'
 import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
@@ -47,17 +47,22 @@ export function prefixer (element, index, children, callback) {
 					switch (element.props) {
 						case 'grid-row-start': case 'grid-column-start':
 							var end
+							// has corresponding grid-(column|row)-end
 							if (
-								end = element	&& element.parent && element.parent.children && element.parent.children.find(
+								end = element && element.parent && element.parent.children && element.parent.children.find(
 									item => item.type === DECLARATION && match(item.props, /grid-(row|column)-end/)
 								)
 							) {
-								element.return = match(element.value, /span/)
-									? element.value
+								element.return = ~indexof(element.value + end.value, 'span')
+									? element.value // do not prefix a cell with non-numerical position values
 									: (
 										MS + replace(element.value, '-start', '')
 										+ element.value
-										+ MS + 'grid-row-span:' + (+match(end.value, /\d+/) - +match(element.value, /\d+/)) + ';'
+										+ MS + 'grid-row-span:' + (
+											~indexof(end.value, 'span')
+												? match(end.value, /\d+/)
+												: +match(end.value, /\d+/) - +match(element.value, /\d+/)
+										) + ';'
 									)
 							} else {
 								element.return = MS + replace(element.value, '-start', '') + element.value
@@ -67,7 +72,7 @@ export function prefixer (element, index, children, callback) {
 							element.return = element && element.parent && element.parent.children && element.parent.children.some(
 								item => item.type === DECLARATION && match(item.props, /grid-(row|column)-start/)
 							)
-								? element.value
+								? element.value // has corresponding grid-(column|row)-start, where -ms-grid-(row|column)-span will be handle
 								: MS + replace(replace(element.value, '-end', '-span'), 'span ', '') + element.value
 							break
 						default:

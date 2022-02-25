@@ -106,6 +106,9 @@ describe('Middleware', () => {
       `.test{-ms-grid-row:3;grid-row-start:3;-ms-grid-row-span:2;grid-row-end:5;}`
     ].join(''))
     // should not prefix a cell with non-numerical position values
+    expect(serialize(compile(`.test{grid-row-start:3;grid-row-end:span 5;}`), middleware([prefixer, stringify]))).to.equal([
+      `.test{grid-row-start:3;grid-row-end:span 5;}`
+    ].join(''))
     expect(serialize(compile(`.test{grid-row-start:span 3;grid-row-end:5;}`), middleware([prefixer, stringify]))).to.equal([
       `.test{grid-row-start:span 3;grid-row-end:5;}`
     ].join(''))
