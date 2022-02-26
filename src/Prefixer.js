@@ -118,7 +118,7 @@ export function prefix(value, length) {
 			return WEBKIT + value + MS + value + value
 		// scroll-margin, scroll-margin-(top|right|bottom|left)
 		case 5719: case 2647: case 2135: case 3927: case 2391:
-			return replace(value, 'scroll-margin', 'scroll-snap-margin') + value
+			return replace(value, 'scroll-', 'scroll-snap-') + value
 	}
 
 	return value
