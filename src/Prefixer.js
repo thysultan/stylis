@@ -1,5 +1,5 @@
 import { MS, MOZ, WEBKIT } from './Enum.js'
-import { hash, charat, strlen, indexof, replace, substr, sizeof, match } from './Utility.js'
+import { hash, charat, strlen, indexof, replace, substr, match } from './Utility.js'
 
 /**
  * @param {string} value
@@ -100,12 +100,34 @@ export function prefix(value, length) {
 			break
 		// grid-(column|row)
 		case 5152: case 5920:
-			// simple position value
-			if (match(substr(value, length + 1, sizeof(value) - 1), /^\d+$/)) {
-				return MS + value + value
-			} else if (match(substr(value, length + 1, sizeof(value) - 1), /(\d)+\s*\/( ?span)?\s*(\d)+/)) {
-				return replace(substr(value, length + 1, sizeof(value) - 1), /(\d)+\s*\/( ?span)?\s*(\d)+/, (_, $1, $span, $3) => MS + substr(value, 0, length + 1) + $1 + ';' + MS + substr(value, 0, length) + '-span:' + ($span ? $3 : +$3 - +$1) + ';') + value
-			}
+			return (
+				match(value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/) // only prefix if it matches the prefixable syntax
+					? (
+						MS + replace(
+							value,
+							/(\d+)(\s*\/\s*(span)?\s*(\d+))?/,
+							// $1: (3) / span 5 - simple position or the first part of the complex position
+							// $2: 3( / span 5) - is complex position
+							// $3: 3 / (span) 5 - has span in the complex position
+							// $4: 3 / span (5) - the second part of the complex position
+							(_, $1, $2, $3, $4) => $1
+								+ (
+									$2
+										// is complex position
+										? (
+											';' + MS + substr(value, 0, length) + '-span:' + (
+												$3
+													? $4 // has span
+													: +$4 - +$1 // has no span
+											)
+										)
+										// is simple position value (pure number)
+										: ''
+								)
+						)
+					)
+					: ''
+			)	+ value
 		// position: sticky
 		case 4949:
 			// (s)ticky?
