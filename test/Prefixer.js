@@ -1,4 +1,4 @@
-import { prefix } from "../index.js"
+import {prefix} from "../index.js"
 
 describe('Prefixer', () => {
 	test('flex-box', () => {
