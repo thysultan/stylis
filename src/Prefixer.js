@@ -34,14 +34,7 @@ export function prefix (value, length) {
 			return WEBKIT + value + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2' + MS + 'flex-$1$2') + value
 		// align-self
 		case 5443:
-			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/g, '')
-				+ (
-					// center, end, start, stretch
-					match(value, /(cen|end|sta|str)/) && !~indexof(value, 'flex-')
-						? MS + 'grid-row-' + replace(value, /flex-|-self/g, '')
-						: ''
-				)
-				+ value
+			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/g, '') + (match(value, /(center|end|start|stretch)/) && !~indexof(value, 'flex-') ? MS + 'grid-row-' + replace(value, /flex-|-self/g, '') : '') + value
 		// align-content
 		case 4675:
 			return WEBKIT + value + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/g, '') + value
@@ -68,10 +61,8 @@ export function prefix (value, length) {
 			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value + value
 		// justify-self
 		case 4200:
-			// center, end, start, stretch
-			if (
-				match(value, /(cen|end|sta|str)/) && !~indexof(value, 'flex-')
-			) return MS + 'grid-column-align' + substr(value, length) + value
+			if (match(value, /(center|end|start|stretch)/) && !~indexof(value, 'flex-')) return MS + 'grid-column-align' + substr(value, length) + value
+			break
 		// grid-template-(columns|rows)
 		case 2592: case 3360:
 			return MS + replace(value, 'template-', '') + value
@@ -100,6 +91,9 @@ export function prefix (value, length) {
 			break
 		// grid-(column|row)
 		case 5152: case 5920:
+			// commented also has the same issue
+			// return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':') + b + (c ? (';' + MS + a + '-span:' + (d ? e : +e - +b)) : '') + f + value })
+			// return replace(MS + value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/, function (_, a, b, c, d) { return a + (b ? (';' + MS + substr(value, 0, length) + '-span:' + (c ? d : +d - +a)) : '') }) + value
 			return (
 				match(value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/) // only prefix if it matches the prefixable syntax
 					? (
