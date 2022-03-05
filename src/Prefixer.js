@@ -91,10 +91,10 @@ export function prefix (value, length) {
 			break
 		// grid-(column|row)
 		case 5152: case 5920:
+			return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':' + b + f) + (c ? (MS + a + '-span:' + (d ? e : +e - +b)) + f : '') + value })
 			// commented also has the same issue
-			// return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':') + b + (c ? (';' + MS + a + '-span:' + (d ? e : +e - +b)) : '') + f + value })
 			// return replace(MS + value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/, function (_, a, b, c, d) { return a + (b ? (';' + MS + substr(value, 0, length) + '-span:' + (c ? d : +d - +a)) : '') }) + value
-			return (
+			/*return (
 				match(value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/) // only prefix if it matches the prefixable syntax
 					? (
 						MS + replace(
@@ -121,7 +121,7 @@ export function prefix (value, length) {
 						)
 					)
 					: ''
-			)	+ value
+			)	+ value*/
 		// position: sticky
 		case 4949:
 			// (s)ticky?
