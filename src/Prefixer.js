@@ -92,36 +92,6 @@ export function prefix (value, length) {
 		// grid-(column|row)
 		case 5152: case 5920:
 			return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':' + b + f) + (c ? (MS + a + '-span:' + (d ? e : +e - +b)) + f : '') + value })
-			// commented also has the same issue
-			// return replace(MS + value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/, function (_, a, b, c, d) { return a + (b ? (';' + MS + substr(value, 0, length) + '-span:' + (c ? d : +d - +a)) : '') }) + value
-			/*return (
-				match(value, /(\d+)(\s*\/\s*(span)?\s*(\d+))?/) // only prefix if it matches the prefixable syntax
-					? (
-						MS + replace(
-							value,
-							/(\d+)(\s*\/\s*(span)?\s*(\d+))?/,
-							// $1: (3) / span 5 - simple position or the first part of the complex position
-							// $2: 3( / span 5) - is complex position
-							// $3: 3 / (span) 5 - has span in the complex position
-							// $4: 3 / span (5) - the second part of the complex position
-							(_, $1, $2, $3, $4) => $1
-								+ (
-									$2
-										// is complex position
-										? (
-											';' + MS + substr(value, 0, length) + '-span:' + (
-												$3
-													? $4 // has span
-													: +$4 - +$1 // has no span
-											)
-										)
-										// is simple position value (pure number)
-										: ''
-								)
-						)
-					)
-					: ''
-			)	+ value*/
 		// position: sticky
 		case 4949:
 			// (s)ticky?
