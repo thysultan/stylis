@@ -219,6 +219,14 @@ describe('Prefixer', () => {
 		expect(prefix('grid-column:main-start / main-end;', 11)).to.equal([`grid-column:main-start / main-end;`].join(''))
 		expect(prefix('grid-row:main-start / main-end;', 11)).to.equal([`grid-row:main-start / main-end;`].join(''))
 		expect(prefix('grid-row:main-start / main-end!important;', 11)).to.equal([`grid-row:main-start / main-end!important;`].join(''))
+	})
 
+	test('scroll-snap', () => {
+		expect(prefix(`scroll-snap-type:none;`, 16)).to.equal([`-webkit-scroll-snap-type:none;`, `-ms-scroll-snap-type:none;`, `scroll-snap-type:none;`].join(''))
+		expect(prefix(`scroll-margin:0;`, 13)).to.equal([`scroll-snap-margin:0;`, `scroll-margin:0;`].join(''))
+		expect(prefix(`scroll-margin-top:0;`, 17)).to.equal([`scroll-snap-margin-top:0;`, `scroll-margin-top:0;`].join(''))
+		expect(prefix(`scroll-margin-right:0;`, 19)).to.equal([`scroll-snap-margin-right:0;`, `scroll-margin-right:0;`].join(''))
+		expect(prefix(`scroll-margin-bottom:0;`, 20)).to.equal([`scroll-snap-margin-bottom:0;`, `scroll-margin-bottom:0;`].join(''))
+		expect(prefix(`scroll-margin-left:0;`, 18)).to.equal([`scroll-snap-margin-left:0;`, `scroll-margin-left:0;`].join(''))
 	})
 })
