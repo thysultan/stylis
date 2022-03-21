@@ -1,5 +1,5 @@
 import {MS, MOZ, WEBKIT} from './Enum.js'
-import {hash, charat, strlen, indexof, replace} from './Utility.js'
+import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.js'
 
 /**
  * @param {string} value
@@ -34,10 +34,10 @@ export function prefix (value, length) {
 			return WEBKIT + value + replace(value, /(\w+).+(:[^]+)/, WEBKIT + 'box-$1$2' + MS + 'flex-$1$2') + value
 		// align-self
 		case 5443:
-			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/, '') + value
+			return WEBKIT + value + MS + 'flex-item-' + replace(value, /flex-|-self/g, '') + (!match(value, /flex-|baseline/) ? MS + 'grid-row-' + replace(value, /flex-|-self/g, '') : '') + value
 		// align-content
 		case 4675:
-			return WEBKIT + value + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/, '') + value
+			return WEBKIT + value + MS + 'flex-line-pack' + replace(value, /align-content|flex-|-self/g, '') + value
 		// flex-shrink
 		case 5548:
 			return WEBKIT + value + MS + replace(value, 'shrink', 'negative') + value
@@ -59,6 +59,13 @@ export function prefix (value, length) {
 		// justify-content
 		case 4968:
 			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value + value
+		// justify-self
+		case 4200:
+			if (!match(value, /flex-|baseline/)) return MS + 'grid-column-align' + substr(value, length) + value
+			break
+		// grid-template-(columns|rows)
+		case 2592: case 3360:
+			return MS + replace(value, 'template-', '') + value
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
 			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + value
@@ -82,12 +89,15 @@ export function prefix (value, length) {
 						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length) + value : value
 				}
 			break
+		// grid-(column|row)
+		case 5152: case 5920:
+			return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':' + b + f) + (c ? (MS + a + '-span:' + (d ? e : +e - +b)) + f : '') + value })
 		// position: sticky
 		case 4949:
 			// (s)ticky?
 			if (charat(value, length + 1) !== 115)
 				break
-		// display: (flex|inline-flex)
+		// display: (flex|inline-flex|grid|inline-grid)
 		case 6444:
 			switch (charat(value, strlen(value) - 3 - (~indexof(value, '!important') && 10))) {
 				// stic(k)y
@@ -96,6 +106,9 @@ export function prefix (value, length) {
 				// (inline-)?fl(e)x
 				case 101:
 					return replace(value, /(.+:)([^;!]+)(;|!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
+				// (inline-)?grid
+				case 105:
+					return replace(value, ':', ':' + MS) + value
 			}
 			break
 		// writing-mode
