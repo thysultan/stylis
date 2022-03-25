@@ -219,29 +219,6 @@ describe('Prefixer', () => {
 		expect(prefix('grid-column:main-start / main-end;', 11)).to.equal([`grid-column:main-start / main-end;`].join(''))
 		expect(prefix('grid-row:main-start / main-end;', 11)).to.equal([`grid-row:main-start / main-end;`].join(''))
 		expect(prefix('grid-row:main-start / main-end!important;', 11)).to.equal([`grid-row:main-start / main-end!important;`].join(''))
-		// grid-(column|row)-(start|end)
-		expect(prefix(`.test{grid-row-start:3;}`)).to.equal([
-			`.test{-ms-grid-row:3;grid-row-start:3;}`
-		].join(''))
-		expect(prefix(`.test{grid-row-start:span 3;}`)).to.equal([
-			`.test{-ms-grid-row:span 3;grid-row-start:span 3;}`
-		].join(''))
-		expect(prefix(`.test{grid-row-end:3;}`)).to.equal([
-			`.test{-ms-grid-row-span:3;grid-row-end:3;}`
-		].join(''))
-		expect(prefix(`.test{grid-row-end:span 3;}`)).to.equal([
-			`.test{-ms-grid-row-span:3;grid-row-end:span 3;}`
-		].join(''))
-		expect(prefix(`.test{grid-row-start:3;grid-row-end:5;}`)).to.equal([
-			`.test{-ms-grid-row:3;grid-row-start:3;-ms-grid-row-span:2;grid-row-end:5;}`
-		].join(''))
-		// should not prefix a cell with non-numerical position values
-		expect(prefix(`.test{grid-row-start:3;grid-row-end:span 5;}`)).to.equal([
-			`.test{grid-row-start:3;grid-row-end:span 5;}`
-		].join(''))
-		expect(prefix(`.test{grid-row-start:span 3;grid-row-end:5;}`)).to.equal([
-			`.test{grid-row-start:span 3;grid-row-end:5;}`
-		].join(''))
 	})
 
 	test('scroll-snap', () => {
