@@ -64,23 +64,20 @@ export function prefix (value, length, element) {
 		case 4200:
 			if (!match(value, /flex-|baseline/)) return MS + 'grid-column-align' + substr(value, length) + value
 			break
-		// grid-template-(columns|rows)
-		case 2592: case 3360:
-			// TODO convert to hashes, remove arrow functions, general improvements for size
-			switch (element ? value : 0) {
-				// grid-(row|column)-start
-				case 'grid-row-start': case 'grid-column-start':
-					var end
-					// has corresponding grid-(column|row)-end
-					if (end = element && element.parent && element.parent.children && element.parent.children.find(item => item.type === DECLARATION && match(item.props, /grid-(row|column)-end/))) {
-						// do not prefix a cell with non-numerical position values
-						return ~indexof(value + end.value, 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(end.value, 'span') ? match(end.value, /\d+/) : +match(end.value, /\d+/) - +match(value, /\d+/)) + ';')
+		// grid-(row|column)-(start|end), grid-template-(columns|rows)
+		case 2592: case 3360: element = element.parent.children
+			switch (charat(value, length - 1)) {
+				// grid-(row|column)-star(t)
+				case 116:
+					if (element = element.find(function (element) { return match(element.props, /grid-(row|column)-end/) })) {
+						return ~indexof(value + (element = element.value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(element, 'span') ? match(element, /\d+/) : +match(element, /\d+/) - +match(value, /\d+/)) + ';')
 					} else {
 						return MS + replace(value, '-start', '') + value
 					}
-				// grid-(row|column)-end
-				case 'grid-row-end': case 'grid-column-end': // has corresponding grid-(column|row)-start, where -ms-grid-(row|column)-span will be handle
-					return element && element.parent && element.parent.children && element.parent.children.some(item => item.type === DECLARATION && match(item.props, /grid-(row|column)-start/)) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
+				// grid-(row|column)-en(d)
+				case 100:
+					return element.some(function (element) { return match(element.props, /grid-(row|column)-start/) }) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
+				// grid-template-(column|rows)
 				default:
 					return MS + replace(value, 'template-', '') + value
 			}
