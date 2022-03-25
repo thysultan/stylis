@@ -1,4 +1,4 @@
-import {MS, MOZ, WEBKIT} from './Enum.js'
+import {MS, MOZ, WEBKIT, DECLARATION} from './Enum.js'
 import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.js'
 
 /**
