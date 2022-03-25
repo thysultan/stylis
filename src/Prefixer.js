@@ -4,10 +4,10 @@ import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.j
 /**
  * @param {string} value
  * @param {number} length
- * @param {object} element
+ * @param {object[]} children
  * @return {string}
  */
-export function prefix (value, length, element) {
+export function prefix (value, length, children) {
 	switch (hash(value, length)) {
 		// color-adjust
 		case 5103:
@@ -65,18 +65,18 @@ export function prefix (value, length, element) {
 			if (!match(value, /flex-|baseline/)) return MS + 'grid-column-align' + substr(value, length) + value
 			break
 		// grid-(row|column)-(start|end), grid-template-(columns|rows)
-		case 2592: case 3360: element = element.parent.children
+		case 2592: case 3360:
 			switch (charat(value, length - 1)) {
 				// grid-(row|column)-star(t)
 				case 116:
-					if (element = element.find(function (element) { return match(element.props, /grid-(row|column)-end/) })) {
-						return ~indexof(value + (element = element.value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(element, 'span') ? match(element, /\d+/) : +match(element, /\d+/) - +match(value, /\d+/)) + ';')
+					if (children = children.find(function (element) { return match(element.props, /grid-(row|column)-end/) })) {
+						return ~indexof(value + (children = children.value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
 					} else {
 						return MS + replace(value, '-start', '') + value
 					}
 				// grid-(row|column)-en(d)
 				case 100:
-					return element.some(function (element) { return match(element.props, /grid-(row|column)-start/) }) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
+					return children.some(function (element) { return match(element.props, /grid-(row|column)-start/) }) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
 				// grid-template-(column|rows)
 				default:
 					return MS + replace(value, 'template-', '') + value
@@ -101,7 +101,7 @@ export function prefix (value, length, element) {
 						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (charat(value, length + 3) == 108 ? '$3' : '$2-$3')) + value
 					// (s)tretch
 					case 115:
-						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length) + value : value
+						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length, children) + value : value
 				}
 			break
 		// grid-(column|row)
