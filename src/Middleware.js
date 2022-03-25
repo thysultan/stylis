@@ -43,42 +43,7 @@ export function prefixer (element, index, children, callback) {
 	if (element.length > -1)
 		if (!element.return)
 			switch (element.type) {
-				case DECLARATION:
-					switch (element.props) {
-						case 'grid-row-start': case 'grid-column-start':
-							var end
-							// has corresponding grid-(column|row)-end
-							if (
-								end = element && element.parent && element.parent.children && element.parent.children.find(
-									item => item.type === DECLARATION && match(item.props, /grid-(row|column)-end/)
-								)
-							) {
-								element.return = ~indexof(element.value + end.value, 'span')
-									? element.value // do not prefix a cell with non-numerical position values
-									: (
-										MS + replace(element.value, '-start', '')
-										+ element.value
-										+ MS + 'grid-row-span:' + (
-											~indexof(end.value, 'span')
-												? match(end.value, /\d+/)
-												: +match(end.value, /\d+/) - +match(element.value, /\d+/)
-										) + ';'
-									)
-							} else {
-								element.return = MS + replace(element.value, '-start', '') + element.value
-							}
-							break
-						case 'grid-row-end': case 'grid-column-end':
-							element.return = element && element.parent && element.parent.children && element.parent.children.some(
-								item => item.type === DECLARATION && match(item.props, /grid-(row|column)-start/)
-							)
-								? element.value // has corresponding grid-(column|row)-start, where -ms-grid-(row|column)-span will be handle
-								: MS + replace(replace(element.value, '-end', '-span'), 'span ', '') + element.value
-							break
-						default:
-							element.return = prefix(element.value, element.length)
-							break
-					}
+				case DECLARATION: element.return = prefix(element.value, element.length, element)
 					break
 				case KEYFRAMES:
 					return serialize([copy(element, {value: replace(element.value, '@', '@' + WEBKIT)})], callback)
