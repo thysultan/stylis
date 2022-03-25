@@ -1,5 +1,5 @@
 import {MS, MOZ, WEBKIT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {match, charat, substr, strlen, sizeof, replace, combine, indexof} from './Utility.js'
+import {match, charat, substr, strlen, sizeof, replace, combine} from './Utility.js'
 import {copy, tokenize} from './Tokenizer.js'
 import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
