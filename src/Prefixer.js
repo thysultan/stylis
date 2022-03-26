@@ -67,16 +67,16 @@ export function prefix (value, length, children) {
 		// grid-template-(columns|rows)
 		case 2592: case 3360:
 			return MS + replace(value, 'template-', '') + value
-		// grid-row-start, grid-column-start
+		// grid-(row|column)-start
 		case 4384: case 3616:
-			if (children = children && children.find(function (element) { return match(element.props, /grid-(row|column)-end/) })) {
+			if (children = children && children.find(function (element) { return match(element.props, /grid-\w+-end/) })) {
 				return ~indexof(value + (children = children.value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
 			} else {
 				return MS + replace(value, '-start', '') + value
 			}
-		// grid-row-end, grid-column-end
+		// grid-(row|column)-end
 		case 4896: case 4128:
-			return (children && children.some(function (element) { return match(element.props, /grid-(row|column)-start/) })) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
+			return (children && children.some(function (element) { return match(element.props, /grid-\w+-start/) })) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
 			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + value
@@ -135,8 +135,6 @@ export function prefix (value, length, children) {
 				case 45:
 					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + value
 			}
-
-			return WEBKIT + value + MS + value + value
 		// scroll-snap-type
 		case 2903:
 			return WEBKIT + value + MS + value + value
