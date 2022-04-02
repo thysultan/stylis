@@ -4,9 +4,10 @@ import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.j
 /**
  * @param {string} value
  * @param {number} length
+ * @param {object[]} children
  * @return {string}
  */
-export function prefix (value, length) {
+export function prefix (value, length, children) {
 	switch (hash(value, length)) {
 		// color-adjust
 		case 5103:
@@ -66,6 +67,16 @@ export function prefix (value, length) {
 		// grid-template-(columns|rows)
 		case 2592: case 3360:
 			return MS + replace(value, 'template-', '') + value
+		// grid-(row|column)-start
+		case 4384: case 3616:
+			if (children && children.some(function (element, index) { return length = index, match(element.props, /grid-\w+-end/) })) {
+				return ~indexof(value + (children = children[length].value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
+			} else {
+				return MS + replace(value, '-start', '') + value
+			}
+		// grid-(row|column)-end
+		case 4896: case 4128:
+			return (children && children.some(function (element) { return match(element.props, /grid-\w+-start/) })) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
 		// (margin|padding)-inline-(start|end)
 		case 4095: case 3583: case 4068: case 2532:
 			return replace(value, /(.+)-inline(.+)/, WEBKIT + '$1$2') + value
@@ -86,7 +97,7 @@ export function prefix (value, length) {
 						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (charat(value, length + 3) == 108 ? '$3' : '$2-$3')) + value
 					// (s)tretch
 					case 115:
-						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length) + value : value
+						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length, children) + value : value
 				}
 			break
 		// grid-(column|row)
@@ -124,8 +135,6 @@ export function prefix (value, length) {
 				case 45:
 					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + value
 			}
-
-			return WEBKIT + value + MS + value + value
 		// scroll-snap-type
 		case 2903:
 			return WEBKIT + value + MS + value + value
