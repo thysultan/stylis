@@ -69,8 +69,8 @@ export function prefix (value, length, children) {
 			return MS + replace(value, 'template-', '') + value
 		// grid-(row|column)-start
 		case 4384: case 3616:
-			if (children = children && children.find(function (element) { return match(element.props, /grid-\w+-end/) })) {
-				return ~indexof(value + (children = children.value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
+			if (children && children.some(function (element, index) { return length = index, match(element.props, /grid-\w+-end/) })) {
+				return ~indexof(value + (children = children[length].value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
 			} else {
 				return MS + replace(value, '-start', '') + value
 			}
