@@ -8,6 +8,7 @@ describe('Prefixer', () => {
 
 		expect(prefix(`display:flex!important;`, 7)).to.equal([`display:-webkit-box!important;`, `display:-webkit-flex!important;`, `display:-ms-flexbox!important;`, `display:flex!important;`].join(''))
 		expect(prefix(`display:flex !important;`, 7)).to.equal([`display:-webkit-box !important;`, `display:-webkit-flex !important;`, `display:-ms-flexbox !important;`, `display:flex !important;`].join(''))
+		expect(prefix(`display:flex     !important;`, 7)).to.equal([`display:-webkit-box     !important;`, `display:-webkit-flex     !important;`, `display:-ms-flexbox     !important;`, `display:flex     !important;`].join(''))
 		expect(prefix(`display:inline-flex;`, 7)).to.equal([`display:-webkit-inline-box;`, `display:-webkit-inline-flex;`, `display:-ms-inline-flexbox;`, `display:inline-flex;`].join(''))
 		expect(prefix(`flex:inherit;`, 4)).to.equal([`-webkit-flex:inherit;`, `-ms-flex:inherit;`, `flex:inherit;`].join(''))
 		expect(prefix(`flex-grow:none;`, 9)).to.equal([`-webkit-box-flex:none;`, `-webkit-flex-grow:none;`, `-ms-flex-positive:none;`, `flex-grow:none;`].join(''))
