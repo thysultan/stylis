@@ -110,13 +110,13 @@ export function prefix (value, length, children) {
 				break
 		// display: (flex|inline-flex|grid|inline-grid)
 		case 6444:
-			switch (charat(value, strlen(value) - 3 - (~indexof(value, '!important') && 10))) {
+			switch (charat(value, strlen(value) - 3 - (~indexof(value, ' !important') ? 11 : ~indexof(value, '!important') && 10))) {
 				// stic(k)y
 				case 107:
 					return replace(value, ':', ':' + WEBKIT) + value
 				// (inline-)?fl(e)x
 				case 101:
-					return replace(value, /(.+:)([^;!]+)(;|!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
+					return replace(value, /(.+:)([^;\s!]+)(;|\s?!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
 				// (inline-)?grid
 				case 105:
 					return replace(value, ':', ':' + MS) + value
