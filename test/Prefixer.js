@@ -1,8 +1,11 @@
 import {compile, serialize, stringify, middleware, prefixer, prefix} from "../index.js"
 
+const globalCssValues = ['inherit', 'initial', 'unset', 'revert', 'revert-layer']
+
 describe('Prefixer', () => {
 	test('flex-box', () => {
-		expect(prefix(`display:block;`, 7)).to.equal(['display:block;'].join())
+		globalCssValues.forEach(v => expect(prefix(`display:${v};`, 7)).to.equal([`display:${v};`].join()))
+
 		expect(prefix(`display:flex!important;`, 7)).to.equal([`display:-webkit-box!important;`, `display:-webkit-flex!important;`, `display:-ms-flexbox!important;`, `display:flex!important;`].join(''))
 		expect(prefix(`display:flex !important;`, 7)).to.equal([`display:-webkit-box !important;`, `display:-webkit-flex !important;`, `display:-ms-flexbox !important;`, `display:flex !important;`].join(''))
 		expect(prefix(`display:inline-flex;`, 7)).to.equal([`display:-webkit-inline-box;`, `display:-webkit-inline-flex;`, `display:-ms-inline-flexbox;`, `display:inline-flex;`].join(''))
@@ -108,11 +111,7 @@ describe('Prefixer', () => {
 		expect(prefix(`position:static;`, 8)).to.equal([`position:static;`].join(''))
 		expect(prefix(`position:fixed;`, 8)).to.equal([`position:fixed;`].join(''))
 		expect(prefix(`position:absolute;`, 8)).to.equal([`position:absolute;`].join(''))
-		expect(prefix(`position:inherit;`, 8)).to.equal([`position:inherit;`].join(''))
-		expect(prefix(`position:initial;`, 8)).to.equal([`position:initial;`].join(''))
-		expect(prefix(`position:revert;`, 8)).to.equal([`position:revert;`].join(''))
-		expect(prefix(`position:revert-layer;`, 8)).to.equal([`position:revert-layer;`].join(''))
-		expect(prefix(`position:unset;`, 8)).to.equal([`position:unset;`].join(''))
+		globalCssValues.forEach(v => expect(prefix(`position:${v};`, 8)).to.equal([`position:${v};`].join()))
 
 		expect(prefix(`position:sticky;`, 8)).to.equal([`position:-webkit-sticky;`, `position:sticky;`].join(''))
 		expect(prefix(`position:sticky!important;`, 8)).to.equal([`position:-webkit-sticky!important;`, `position:sticky!important;`].join(''))
