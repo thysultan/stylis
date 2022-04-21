@@ -252,4 +252,8 @@ describe('Prefixer', () => {
 		expect(prefix(`scroll-margin-bottom:0;`, 20)).to.equal([`scroll-snap-margin-bottom:0;`, `scroll-margin-bottom:0;`].join(''))
 		expect(prefix(`scroll-margin-left:0;`, 18)).to.equal([`scroll-snap-margin-left:0;`, `scroll-margin-left:0;`].join(''))
 	})
+
+	test('tab-size', () => {
+		expect(prefix(`tab-size:1;`, 8)).to.equal([`-moz-tab-size:1;`, `tab-size:1;`].join(''))
+	})
 })
