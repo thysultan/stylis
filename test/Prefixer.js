@@ -4,7 +4,7 @@ const globalCssValues = ['inherit', 'initial', 'unset', 'revert', 'revert-layer'
 
 describe('Prefixer', () => {
 	test('flex-box', () => {
-		globalCssValues.forEach(v => expect(prefix(`display:${v};`, 7)).to.equal([`display:${v};`].join()))
+		globalCssValues.concat(['block', 'inline', 'inline-block', 'flow-root', 'none', 'contents', 'table', 'table-row', 'list-item']).forEach(v => expect(prefix(`display:${v};`, 7)).to.equal([`display:${v};`].join()))
 
 		expect(prefix(`display:flex!important;`, 7)).to.equal([`display:-webkit-box!important;`, `display:-webkit-flex!important;`, `display:-ms-flexbox!important;`, `display:flex!important;`].join(''))
 		expect(prefix(`display:flex !important;`, 7)).to.equal([`display:-webkit-box !important;`, `display:-webkit-flex !important;`, `display:-ms-flexbox !important;`, `display:flex !important;`].join(''))
