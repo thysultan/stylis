@@ -27,8 +27,22 @@ export function prefix (value, length, children) {
 		// appearance, user-select, transform, hyphens, text-size-adjust
 		case 5349: case 4246: case 4810: case 6968: case 2756:
 			return WEBKIT + value + MOZ + value + MS + value + value
-		// flex, flex-direction
-		case 6828: case 4268:
+		// writing-mode
+		case 5936:
+			switch (charat(value, length + 11)) {
+				// vertical-l(r)
+				case 114:
+					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + value
+				// vertical-r(l)
+				case 108:
+					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl') + value
+				// horizontal(-)tb
+				case 45:
+					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + value
+				// default: fallthrough to below
+			}
+		// flex, flex-direction, scroll-snap-type, writing-mode
+		case 6828: case 4268: case 2903:
 			return WEBKIT + value + MS + value + value
 		// order
 		case 6165:
@@ -123,22 +137,6 @@ export function prefix (value, length, children) {
 					return replace(value, ':', ':' + MS) + value
 			}
 			break
-		// writing-mode
-		case 5936:
-			switch (charat(value, length + 11)) {
-				// vertical-l(r)
-				case 114:
-					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb') + value
-				// vertical-r(l)
-				case 108:
-					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'tb-rl') + value
-				// horizontal(-)tb
-				case 45:
-					return WEBKIT + value + MS + replace(value, /[svh]\w+-[tblr]{2}/, 'lr') + value
-			}
-		// scroll-snap-type
-		case 2903:
-			return WEBKIT + value + MS + value + value
 		// scroll-margin, scroll-margin-(top|right|bottom|left)
 		case 5719: case 2647: case 2135: case 3927: case 2391:
 			return replace(value, 'scroll-', 'scroll-snap-') + value
