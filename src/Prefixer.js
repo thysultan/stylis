@@ -108,20 +108,18 @@ export function prefix (value, length, children) {
 			return replace(value, /(.+?):(\d+)(\s*\/\s*(span)?\s*(\d+))?(.*)/, function (_, a, b, c, d, e, f) { return (MS + a + ':' + b + f) + (c ? (MS + a + '-span:' + (d ? e : +e - +b)) + f : '') + value })
 		// position: sticky
 		case 4949:
-			// (s)ticky?
-			if (charat(value, length + 1) !== 115)
-				break
+			// stick(y)?
+			if (charat(value, length + 6) === 121)
+				return replace(value, ':', ':' + WEBKIT) + value
+			break
 		// display: (flex|inline-flex|grid|inline-grid)
 		case 6444:
-			switch (charat(value, strlen(value) - 3 - (~indexof(value, '!important') && 10))) {
-				// stic(k)y
-				case 107:
-					return replace(value, ':', ':' + WEBKIT) + value
-				// (inline-)?fl(e)x
-				case 101:
-					return replace(value, /(.+:)([^;!]+)(;|!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
-				// (inline-)?grid
-				case 105:
+			switch (charat(value, charat(value, 14) === 45 ? 18 : 11)) {
+				// (inline-)?fle(x)
+				case 120:
+					return replace(value, /(.+:)([^;\s!]+)(;|(\s+)?!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
+				// (inline-)?gri(d)
+				case 100:
 					return replace(value, ':', ':' + MS) + value
 			}
 			break

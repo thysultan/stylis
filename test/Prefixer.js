@@ -1,9 +1,14 @@
 import {compile, serialize, stringify, middleware, prefixer, prefix} from "../index.js"
 
+const globalCssValues = ['inherit', 'initial', 'unset', 'revert', 'revert-layer']
+
 describe('Prefixer', () => {
 	test('flex-box', () => {
-		expect(prefix(`display:block;`, 7)).to.equal(['display:block;'].join())
+		globalCssValues.concat(['block', 'inline', 'inline-block', 'flow-root', 'none', 'contents', 'table', 'table-row', 'list-item']).forEach(v => expect(prefix(`display:${v};`, 7)).to.equal([`display:${v};`].join()))
+
 		expect(prefix(`display:flex!important;`, 7)).to.equal([`display:-webkit-box!important;`, `display:-webkit-flex!important;`, `display:-ms-flexbox!important;`, `display:flex!important;`].join(''))
+		expect(prefix(`display:flex !important;`, 7)).to.equal([`display:-webkit-box !important;`, `display:-webkit-flex !important;`, `display:-ms-flexbox !important;`, `display:flex !important;`].join(''))
+		expect(prefix(`display:flex     !important;`, 7)).to.equal([`display:-webkit-box     !important;`, `display:-webkit-flex     !important;`, `display:-ms-flexbox     !important;`, `display:flex     !important;`].join(''))
 		expect(prefix(`display:inline-flex;`, 7)).to.equal([`display:-webkit-inline-box;`, `display:-webkit-inline-flex;`, `display:-ms-inline-flexbox;`, `display:inline-flex;`].join(''))
 		expect(prefix(`flex:inherit;`, 4)).to.equal([`-webkit-flex:inherit;`, `-ms-flex:inherit;`, `flex:inherit;`].join(''))
 		expect(prefix(`flex-grow:none;`, 9)).to.equal([`-webkit-box-flex:none;`, `-webkit-flex-grow:none;`, `-ms-flex-positive:none;`, `flex-grow:none;`].join(''))
@@ -104,7 +109,15 @@ describe('Prefixer', () => {
 
 	test('position', () => {
 		expect(prefix(`position:relative;`, 8)).to.equal([`position:relative;`].join(''))
+		expect(prefix(`position:static;`, 8)).to.equal([`position:static;`].join(''))
+		expect(prefix(`position:fixed;`, 8)).to.equal([`position:fixed;`].join(''))
+		expect(prefix(`position:absolute;`, 8)).to.equal([`position:absolute;`].join(''))
+		globalCssValues.forEach(v => expect(prefix(`position:${v};`, 8)).to.equal([`position:${v};`].join()))
+
 		expect(prefix(`position:sticky;`, 8)).to.equal([`position:-webkit-sticky;`, `position:sticky;`].join(''))
+		expect(prefix(`position:sticky!important;`, 8)).to.equal([`position:-webkit-sticky!important;`, `position:sticky!important;`].join(''))
+		expect(prefix(`position:sticky !important;`, 8)).to.equal([`position:-webkit-sticky !important;`, `position:sticky !important;`].join(''))
+		expect(prefix(`position:sticky      !important;`, 8)).to.equal([`position:-webkit-sticky      !important;`, `position:sticky      !important;`].join(''))
 	})
 
 	test('color-adjust', () => {
@@ -191,6 +204,8 @@ describe('Prefixer', () => {
 	test('grid', () => {
 		expect(prefix('display:grid;', 7)).to.equal([`display:-ms-grid;`, `display:grid;`].join(''))
 		expect(prefix('display:inline-grid;', 7)).to.equal([`display:-ms-inline-grid;`, `display:inline-grid;`].join(''))
+		expect(prefix('display:inline-grid!important;', 7)).to.equal([`display:-ms-inline-grid!important;`, `display:inline-grid!important;`].join(''))
+		expect(prefix('display:inline-grid !important;', 7)).to.equal([`display:-ms-inline-grid !important;`, `display:inline-grid !important;`].join(''))
 		expect(prefix(`align-self:value;`, 10)).to.equal([`-webkit-align-self:value;`, `-ms-flex-item-align:value;`, `-ms-grid-row-align:value;`, `align-self:value;`].join(''))
 		expect(prefix(`align-self:safe center;`, 10)).to.equal([`-webkit-align-self:safe center;`, `-ms-flex-item-align:safe center;`, `-ms-grid-row-align:safe center;`, `align-self:safe center;`].join(''))
 		expect(prefix('align-self:stretch;', 10)).to.equal([`-webkit-align-self:stretch;`, `-ms-flex-item-align:stretch;`, `-ms-grid-row-align:stretch;`, `align-self:stretch;`].join(''))
