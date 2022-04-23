@@ -21,6 +21,9 @@ export function prefix (value, length, children) {
 		// background-clip, columns, column-(count|fill|gap|rule|rule-color|rule-style|rule-width|span|width)
 		case 4215: case 6389: case 5109: case 5365: case 5621: case 3829:
 			return WEBKIT + value + value
+		// tab-size
+		case 4789:
+			return MOZ + value + value
 		// appearance, user-select, transform, hyphens, text-size-adjust
 		case 5349: case 4246: case 4810: case 6968: case 2756:
 			return WEBKIT + value + MOZ + value + MS + value + value
