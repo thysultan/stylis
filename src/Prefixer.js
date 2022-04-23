@@ -111,7 +111,7 @@ export function prefix (value, length, children) {
 			break
 		// display: (flex|inline-flex|grid|inline-grid)
 		case 6444:
-			switch (charat(value, 14) === 45 ? charat(value, 18) : charat(value, 11)) {
+			switch (charat(value, charat(value, 14) === 45 ? 18 : 11)) {
 				// (inline-)?fle(x)
 				case 120:
 					return replace(value, /(.+:)([^;\s!]+)(;|(\s+)?!.+)?/, '$1' + WEBKIT + (charat(value, 14) === 45 ? 'inline-' : '') + 'box$3' + '$1' + WEBKIT + '$2$3' + '$1' + MS + '$2box$3') + value
