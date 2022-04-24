@@ -10,6 +10,9 @@ describe('Utility', () => {
       return map
     }, {})
 
-    expect(Object.fromEntries(Object.entries(hashMap).filter(([, value]) => value.length > 1))).to.deep.equal({})
+    expect((Object.entries(hashMap).filter(([, value]) => value.length > 1)).reduce((obj, [key, val]) => {
+      obj[key] = val
+      return obj
+    }, {})).to.deep.equal({})
   })
 })
