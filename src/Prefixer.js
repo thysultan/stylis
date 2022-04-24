@@ -88,9 +88,8 @@ export function prefix (value, length, children) {
 		case 4384: case 3616:
 			if (children && children.some(function (element, index) { return length = index, match(element.props, /grid-\w+-end/) })) {
 				return ~indexof(value + (children = children[length].value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
-			} else {
-				return MS + replace(value, '-start', '') + value
 			}
+			return MS + replace(value, '-start', '') + value
 		// grid-(row|column)-end
 		case 4896: case 4128:
 			return (children && children.some(function (element) { return match(element.props, /grid-\w+-start/) })) ? value : MS + replace(replace(value, '-end', '-span'), 'span ', '') + value
