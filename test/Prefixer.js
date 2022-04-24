@@ -90,16 +90,16 @@ describe('Prefixer', () => {
 	})
 
 	test('mask', () => {
-		expect(prefix(`mask:none;`, 10)).to.equal([`-webkit-mask:none;`, `mask:none;`].join(''))
+		expect(prefix(`mask:none;`, 4)).to.equal([`-webkit-mask:none;`, `mask:none;`].join(''))
 		expect(prefix(`mask-image:none;`, 10)).to.equal([`-webkit-mask-image:none;`, `mask-image:none;`].join(''))
 		expect(prefix(`mask-image:linear-gradient(#fff);`, 10)).to.equal([`-webkit-mask-image:linear-gradient(#fff);`, `mask-image:linear-gradient(#fff);`].join(''))
-		expect(prefix(`mask-mode:none;`, 10)).to.equal([`-webkit-mask-mode:none;`, `mask-mode:none;`].join(''))
-		expect(prefix(`mask-clip:none;`, 10)).to.equal([`-webkit-mask-clip:none;`, `mask-clip:none;`].join(''))
-		expect(prefix(`mask-size:none;`, 10)).to.equal([`-webkit-mask-size:none;`, `mask-size:none;`].join(''))
-		expect(prefix(`mask-repeat:none;`, 10)).to.equal([`-webkit-mask-repeat:none;`, `mask-repeat:none;`].join(''))
-		expect(prefix(`mask-origin:none;`, 10)).to.equal([`-webkit-mask-origin:none;`, `mask-origin:none;`].join(''))
-		expect(prefix(`mask-position:none;`, 10)).to.equal([`-webkit-mask-position:none;`, `mask-position:none;`].join(''))
-		expect(prefix(`mask-composite:none;`, 10)).to.equal([`-webkit-mask-composite:none;`, `mask-composite:none;`].join(''))
+		expect(prefix(`mask-mode:none;`, 9)).to.equal([`-webkit-mask-mode:none;`, `mask-mode:none;`].join(''))
+		expect(prefix(`mask-clip:none;`, 9)).to.equal([`-webkit-mask-clip:none;`, `mask-clip:none;`].join(''))
+		expect(prefix(`mask-size:none;`, 9)).to.equal([`-webkit-mask-size:none;`, `mask-size:none;`].join(''))
+		expect(prefix(`mask-repeat:none;`, 11)).to.equal([`-webkit-mask-repeat:none;`, `mask-repeat:none;`].join(''))
+		expect(prefix(`mask-origin:none;`, 11)).to.equal([`-webkit-mask-origin:none;`, `mask-origin:none;`].join(''))
+		expect(prefix(`mask-position:none;`, 13)).to.equal([`-webkit-mask-position:none;`, `mask-position:none;`].join(''))
+		expect(prefix(`mask-composite:none;`, 14)).to.equal([`-webkit-mask-composite:none;`, `mask-composite:none;`].join(''))
 	})
 
 	test('filter', () => {
