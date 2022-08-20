@@ -48,6 +48,9 @@ div {
 		</div>
 		<script type=module>
 			import {compile, serialize, middleware, prefixer, stringify} from 'https://unpkg.com/stylis?module'
+			import * as stylis from 'https://unpkg.com/stylis?module'
+			
+			window.stylis = stylis
 
 			function tabbed (select, ranged, content) {
 				ranged.deleteContents()
