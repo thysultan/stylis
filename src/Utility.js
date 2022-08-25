@@ -16,13 +16,19 @@ export var from = String.fromCharCode
  */
 export var assign = Object.assign
 
-/**
+
+/** A djb2 hash implementation
+ *
  * @param {string} value
  * @param {number} length
  * @return {number}
  */
 export function hash (value, length) {
-	return (((((((length << 2) ^ charat(value, 0)) << 2) ^ charat(value, 1)) << 2) ^ charat(value, 2)) << 2) ^ charat(value, 3)
+	var h = 5381
+	for (var i = 0; i < length; i++) {
+		h = ((h << 5) + h) + charat(value, i)
+	}
+	return h
 }
 
 /**
