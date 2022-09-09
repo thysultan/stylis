@@ -1,5 +1,5 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {abs, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
+import {abs, charat, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
 import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
 
 /**
@@ -43,7 +43,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 		switch (previous = character, character = next()) {
 			// (
 			case 40:
-				if (previous != 108 && characters.charCodeAt(length - 1) == 58) {
+				if (previous != 108 && charat(characters, length - 1) == 58) {
 					if (indexof(characters += replace(delimit(character), '&', '&\f'), '&\f') != -1)
 						ampersand = -1
 					break
