@@ -271,4 +271,8 @@ describe('Prefixer', () => {
 	test('tab-size', () => {
 		expect(prefix(`tab-size:1;`, 8)).to.equal([`-moz-tab-size:1;`, `tab-size:1;`].join(''))
 	})
+
+	test('css variables', () => {
+		expect(prefix(`--CircularProgress-animation:0.5s linear;`, 28)).to.equal('--CircularProgress-animation:0.5s linear;')
+	})
 })
