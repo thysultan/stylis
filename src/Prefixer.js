@@ -8,7 +8,7 @@ import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.j
  * @return {string}
  */
 export function prefix (value, length, children) {
-	switch (charat(value, 0) != 45 && charat(value, 1) != 45 && hash(value, length)) {
+	switch (hash(value, length)) {
 		// color-adjust
 		case 5103:
 			return WEBKIT + 'print-' + value + value
