@@ -731,6 +731,26 @@ describe('Parser', () => {
     ).to.equal(`.user a a a a a a a a a a a a{color:red;}`)
   })
 
+  test('nesting @container multiple levels', () => {
+    expect(
+      stylis(`
+        div {
+          @container {
+            a {
+              color:red;
+
+        @container {
+                h1 {
+                  color:hotpink;
+                }
+              }
+            }
+          }
+        }
+      `)
+    ).to.equal([`@container{.user div a{color:red;}`, `@container{.user div a h1{color:hotpink;}}}`].join(''))
+  })
+
   test('nesting @media multiple levels', () => {
     expect(
       stylis(`
@@ -873,6 +893,21 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`@media (min-width: 400px){.user div{border-left:1px solid hotpink;}.user span{border-top:none;}}`)
+  })
+
+  test('comment in a group of selectors inside a container query', () => {
+    expect(
+      stylis(`
+        @container (min-width: 400px) {
+          div /* comment */ {
+            border-left:1px solid hotpink;
+          }
+          span {
+            border-top:none;
+          }
+        }
+      `)
+    ).to.equal(`@container (min-width: 400px){.user div{border-left:1px solid hotpink;}.user span{border-top:none;}}`)
   })
 
   test('comment - bang at the start (#114)', () => {
@@ -1032,6 +1067,9 @@ describe('Parser', () => {
         @media {
           color:blue;
         }
+        @container (min-width: 250px) {
+          color:green;
+        }
       }
 
       &.foo {
@@ -1058,6 +1096,7 @@ describe('Parser', () => {
       `.user h1 header,.user div header{font-size:12px;}`+
       `@media{.user h1,.user div{color:red;}}`+
       `@media{.user h1,.user div{color:blue;}}`+
+      `@container (min-width: 250px){.user h1,.user div{color:green;}}`+
       `.user.foo.bar{color:orange;}`+
       `.user.foo.bar.barbar{color:orange;}`
     ].join(''))
