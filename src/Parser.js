@@ -93,7 +93,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 							if (offset === 0)
 								parse(characters, root, reference, reference, props, rulesets, length, points, children)
 							else
-								switch (atrule) {
+								switch (atrule === 99 && charat(characters, 3) === 110 ? 100 : atrule) {
 									// d m s
 									case 100: case 109: case 115:
 										parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
