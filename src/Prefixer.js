@@ -1,5 +1,5 @@
-import { MOZ, MS, WEBKIT } from './Enum.js';
-import { charat, hash, indexof, match, replace, strlen, substr } from './Utility.js';
+import {MS, MOZ, WEBKIT} from './Enum.js'
+import {hash, charat, strlen, indexof, replace, substr, match} from './Utility.js'
 
 /**
  * @param {string} value
@@ -23,12 +23,7 @@ export function prefix (value, length, children) {
 			return WEBKIT + value + value
 		// mask-composite
 		case 4855:
-			const webkitValue = value
-        .replaceAll("add", "source-over")
-        .replaceAll("substract", "source-out")
-        .replaceAll("intersect", "source-in")
-        .replaceAll("exclude", "xor");
-      return WEBKIT + webkitValue + value;
+      return WEBKIT + value.replace('add', 'source-over').replace('substract', 'source-out').replace('intersect', 'source-in').replace('exclude', 'xor') + value;
 		// tab-size
 		case 4789:
 			return MOZ + value + value
