@@ -19,11 +19,11 @@ export function prefix (value, length, children) {
 		// background-clip, columns, column-(count|fill|gap|rule|rule-color|rule-style|rule-width|span|width)
 		case 4215: case 6389: case 5109: case 5365: case 5621: case 3829:
 		// mask, mask-image, mask-(mode|clip|size), mask-(repeat|origin), mask-position
-		case 6391: case 5879: case 5623: case 6135: case 4599: 
+		case 6391: case 5879: case 5623: case 6135: case 4599:
 			return WEBKIT + value + value
 		// mask-composite
 		case 4855:
-      return WEBKIT + value.replace('add', 'source-over').replace('substract', 'source-out').replace('intersect', 'source-in').replace('exclude', 'xor') + value;
+			return WEBKIT + value.replace('add', 'source-over').replace('substract', 'source-out').replace('intersect', 'source-in').replace('exclude', 'xor') + value
 		// tab-size
 		case 4789:
 			return MOZ + value + value
