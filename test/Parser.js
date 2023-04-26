@@ -122,6 +122,16 @@ describe('Parser', () => {
     ).to.equal(`.user{color:red;}`)
   })
 
+  test('& in value in a nested function', () => {
+    const urlOneX = "https://images.ctfassets.net/test.jpg?fm=webp&q=70&w=1000";
+    const urlTwoX = "https://images.ctfassets.net/test.jpg?fm=webp&q=70&w=2000";
+    expect(
+      stylis(`
+        background-image: image-set(url(${urlOneX}) 1x, url(${urlTwoX}) 2x);
+     `)
+    ).to.equal(`.user{background-image:image-set(url(${urlOneX}) 1x, url(${urlTwoX}) 2x);}`)
+  })
+
   test('& in a string', () => {
     expect(
       stylis(`
@@ -145,7 +155,7 @@ describe('Parser', () => {
       '.user.\\@example\\.com{color:blue;}',
       '.user.owner\\/founder{color:green;}',
       // while double spaces after escaped hex codes need to be preserved,
-      // after an escaped character / code point it need not be preserved 
+      // after an escaped character / code point it need not be preserved
       '.user.discount\\%{color:purple;}'
     ].join(''))
   });
