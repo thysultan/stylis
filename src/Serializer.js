@@ -31,6 +31,7 @@ export function stringify (element, index, children, callback) {
 		case RULESET: element.value = element.props.join(',')
 	}
 
+	// @layer utilties; (declaration, no attached rules)
 	if (element.type === LAYER && !element.children.length) return element.return = element.return || element.value
 
 	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
