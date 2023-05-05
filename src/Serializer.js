@@ -25,14 +25,13 @@ export function serialize (children, callback) {
  */
 export function stringify (element, index, children, callback) {
 	switch (element.type) {
+		case LAYER:
+			if (element.children.length) break
 		case IMPORT: case DECLARATION: return element.return = element.return || element.value
 		case COMMENT: return ''
 		case KEYFRAMES: return element.return = element.value + '{' + serialize(element.children, callback) + '}'
 		case RULESET: element.value = element.props.join(',')
 	}
-
-	// @layer utilties; (declaration, no attached rules)
-	if (element.type === LAYER && !element.children.length) return element.return = element.return || element.value
 
 	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
 }
