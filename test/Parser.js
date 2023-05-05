@@ -1111,4 +1111,105 @@ describe('Parser', () => {
       `.user.foo.bar.barbar{color:orange;}`
     ].join(''))
   })
+
+  test('cascade @layer (#312)', () => {
+    expect(
+      stylis(`
+        @layer base {
+          border-left:1px solid hotpink;
+        }
+      `)
+    ).to.equal(`@layer base{.user{border-left:1px solid hotpink;}}`);
+
+    expect(
+      stylis(`
+        @layer base {
+          @layer layout {
+            border-left:1px solid hotpink;
+          }
+        }
+      `)
+    ).to.equal(`@layer base{@layer layout{.user{border-left:1px solid hotpink;}}}`);
+
+    expect(
+      stylis(`
+        @layer framework.layout {
+          border-left:1px solid hotpink;
+        }
+      `)
+    ).to.equal(`@layer framework.layout{.user{border-left:1px solid hotpink;}}`);
+
+    expect(
+      stylis(`
+        @import "theme.css" layer(utilties);
+      `)
+    ).to.equal(`@import "theme.css" layer(utilties);`);
+
+    expect(
+      stylis(`
+        @import "foo";
+      `)
+    ).to.equal(`@import "foo";`);
+
+    expect(
+      stylis(`
+        @layer utilities;
+      `)
+    ).to.equal(`@layer utilities;`);
+
+    expect(
+      stylis(`
+        @layer theme, layout, utilities;
+      `)
+    ).to.equal(`@layer theme,layout,utilities;`);
+
+    expect(
+      stylis(`
+        @media (min-width: 30em) {
+          @layer layout {
+            .title { font-size: x-large; }
+          }
+        }
+
+        @layer theme {
+          @media (prefers-color-scheme: dark) {
+            .title { color: white; }
+          }
+        }
+      `)
+    ).to.equal([
+      `@media (min-width: 30em){@layer layout{.user .title{font-size:x-large;}}}`,
+      `@layer theme{@media (prefers-color-scheme: dark){.user .title{color:white;}}}`
+    ].join(''));
+
+    expect(
+      stylis(`
+        @media (min-width: 30em) {
+          @layer layout {
+            .title { font-size: x-large; }
+          }
+        }
+
+        @layer theme {
+          @media (prefers-color-scheme: dark) {
+            .title { color: white; }
+          }
+        }
+      `)
+    ).to.equal([
+      `@media (min-width: 30em){@layer layout{.user .title{font-size:x-large;}}}`,
+      `@layer theme{@media (prefers-color-scheme: dark){.user .title{color:white;}}}`
+    ].join(''));
+
+    expect(
+      stylis(`
+        @layer framework {
+          @keyframes slide-left {
+            from { margin-left: 0; }
+            to { margin-left: -100%; }
+          }
+        }
+      `)
+    ).to.equal(`@layer framework{@keyframes slide-left{from{margin-left:0;}to{margin-left:-100%;}}}`);
+  });
 })
