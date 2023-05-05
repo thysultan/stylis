@@ -18,7 +18,7 @@ jobs:
         npm install
         npm test
     - name: report
-      uses: coverallsapp/github-action@v1.0.1
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
-        path-to-lcov: ./coverage/lcov.info
+        file: ./coverage/lcov.info
