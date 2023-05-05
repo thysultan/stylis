@@ -1181,5 +1181,35 @@ describe('Parser', () => {
       `@media (min-width: 30em){@layer layout{.user .title{font-size:x-large;}}}`,
       `@layer theme{@media (prefers-color-scheme: dark){.user .title{color:white;}}}`
     ].join(''));
+
+    expect(
+      stylis(`
+        @media (min-width: 30em) {
+          @layer layout {
+            .title { font-size: x-large; }
+          }
+        }
+
+        @layer theme {
+          @media (prefers-color-scheme: dark) {
+            .title { color: white; }
+          }
+        }
+      `)
+    ).to.equal([
+      `@media (min-width: 30em){@layer layout{.user .title{font-size:x-large;}}}`,
+      `@layer theme{@media (prefers-color-scheme: dark){.user .title{color:white;}}}`
+    ].join(''));
+
+    expect(
+      stylis(`
+        @layer framework {
+          @keyframes slide-left {
+            from { margin-left: 0; }
+            to { margin-left: -100%; }
+          }
+        }
+      `)
+    ).to.equal(`@layer framework{@keyframes slide-left{from{margin-left:0;}to{margin-left:-100%;}}}`);
   });
 })
