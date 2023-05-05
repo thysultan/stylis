@@ -1148,14 +1148,20 @@ describe('Parser', () => {
 
     expect(
       stylisUnscoped(`
-        @layer utilties;
+        @import "foo";
       `)
-    ).to.equal(`@layer utilties;`);
+    ).to.equal(`@import "foo";`);
+
+    expect(
+      stylisUnscoped(`
+        @layer utilities;
+      `)
+    ).to.equal(`@layer utilities;`);
 
     expect(
       stylisUnscoped(`
         @layer theme, layout, utilities;
       `)
-    ).to.equal(`@layer theme, layout, utilities;`);
+    ).to.equal(`@layer theme,layout,utilities;`);
   });
 })

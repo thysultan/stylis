@@ -1,4 +1,4 @@
-import {IMPORT, COMMENT, RULESET, DECLARATION, KEYFRAMES} from './Enum.js'
+import {IMPORT, LAYER, COMMENT, RULESET, DECLARATION, KEYFRAMES} from './Enum.js'
 import {strlen, sizeof} from './Utility.js'
 
 /**
@@ -30,6 +30,8 @@ export function stringify (element, index, children, callback) {
 		case KEYFRAMES: return element.return = element.value + '{' + serialize(element.children, callback) + '}'
 		case RULESET: element.value = element.props.join(',')
 	}
+
+	if (element.type === LAYER && !element.children.length) return element.return = element.return || element.value
 
 	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
 }
