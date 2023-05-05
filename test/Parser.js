@@ -1162,5 +1162,24 @@ describe('Parser', () => {
         @layer theme, layout, utilities;
       `)
     ).to.equal(`@layer theme,layout,utilities;`);
+
+    expect(
+      stylis(`
+        @media (min-width: 30em) {
+          @layer layout {
+            .title { font-size: x-large; }
+          }
+        }
+
+        @layer theme {
+          @media (prefers-color-scheme: dark) {
+            .title { color: white; }
+          }
+        }
+      `)
+    ).to.equal([
+      `@media (min-width: 30em){@layer layout{.user .title{font-size:x-large;}}}`,
+      `@layer theme{@media (prefers-color-scheme: dark){.user .title{color:white;}}}`
+    ].join(''));
   });
 })
