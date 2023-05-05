@@ -1,6 +1,7 @@
 import {compile, serialize, stringify} from "../index.js"
 
 const stylis = string => serialize(compile(`.user{${string}}`), stringify)
+const stylisUnscoped = string => serialize(compile(`${string}`), stringify)
 
 describe('Parser', () => {
   test('unnested', () => {
@@ -1120,5 +1121,29 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`@layer base{.user{border-left:1px solid hotpink;}}`);
+
+    expect(
+      stylis(`
+        @layer base {
+          @layer layout {
+            border-left:1px solid hotpink;
+          }
+        }
+      `)
+    ).to.equal(`@layer base{@layer layout{.user{border-left:1px solid hotpink;}}}`);
+
+    expect(
+      stylis(`
+        @layer framework.layout {
+          border-left:1px solid hotpink;
+        }
+      `)
+    ).to.equal(`@layer framework.layout{.user{border-left:1px solid hotpink;}}`);
+
+    expect(
+      stylisUnscoped(`
+        @import "theme.css" layer(utilties);
+      `)
+    ).to.equal(`@import "theme.css" layer(utilties);`);
   });
 })
