@@ -1112,7 +1112,7 @@ describe('Parser', () => {
     ].join(''))
   })
 
-  test('@layer query (#312)', () => {
+  test('cascade @layer (#312)', () => {
     expect(
       stylis(`
         @layer base {
