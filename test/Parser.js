@@ -1145,5 +1145,17 @@ describe('Parser', () => {
         @import "theme.css" layer(utilties);
       `)
     ).to.equal(`@import "theme.css" layer(utilties);`);
+
+    expect(
+      stylisUnscoped(`
+        @layer utilties;
+      `)
+    ).to.equal(`@layer utilties;`);
+
+    expect(
+      stylisUnscoped(`
+        @layer theme, layout, utilities;
+      `)
+    ).to.equal(`@layer theme, layout, utilities;`);
   });
 })
