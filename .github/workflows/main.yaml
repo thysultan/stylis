@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: ['18.x']
+        node-version: ['16.x']
     steps:
     - name: checkout
       uses: actions/checkout@v3
@@ -18,6 +18,6 @@ jobs:
         npm install
         npm test
     - name: report
-      uses: coverallsapp/github-action@v2
+      uses: coverallsapp/github-action@v1
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
