@@ -4,7 +4,7 @@ const stack = []
 
 describe('Middleware', () => {
 	test('rulesheet', () => {
-  	serialize(compile(`@import url('something.com/file.css');.user{ h1 {width:0;} @media{width:1;}@keyframes name{from{width:0;}to{width:1;}}}@keyframes empty{}`), middleware([prefixer, stringify, rulesheet(value => stack.push(value))]))
+  	serialize(compile(`@import url('something.com/file.css');.user{ h1 {width:0;} @media{width:1;}@keyframes name{from{width:0;}to{width:1;}}}@keyframes empty{}@media (min-width: 500px){.a::placeholder{color: red;}}`), middleware([prefixer, stringify, rulesheet(value => stack.push(value))]))
   	expect(stack).to.deep.equal([
       `@import url('something.com/file.css');`,
       `.user h1{width:0;}`,
@@ -13,6 +13,10 @@ describe('Middleware', () => {
       `@keyframes name{from{width:0;}to{width:1;}}`,
       '@-webkit-keyframes empty{}',
       '@keyframes empty{}',
+      '@media (min-width: 500px){.a::-webkit-input-placeholder{color:red;}}',
+      '@media (min-width: 500px){.a::-moz-placeholder{color:red;}}',
+      '@media (min-width: 500px){.a:-ms-input-placeholder{color:red;}}',
+      '@media (min-width: 500px){.a::placeholder{color:red;}}',
     ])
   })
 
