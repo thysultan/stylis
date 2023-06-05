@@ -1,11 +1,28 @@
 import {compile, serialize, stringify, middleware, rulesheet, prefixer, namespace} from "../index.js"
 
-const stack = []
-
 describe('Middleware', () => {
-	test('rulesheet', () => {
-  	serialize(compile(`@import url('something.com/file.css');.user{ h1 {width:0;} @media{width:1;}@keyframes name{from{width:0;}to{width:1;}}}@keyframes empty{}@media (min-width: 500px){.a::placeholder{color: red;}}`), middleware([prefixer, stringify, rulesheet(value => stack.push(value))]))
-  	expect(stack).to.deep.equal([
+  test('rulesheet', () => {
+    const stack = []
+    serialize(
+        compile(`
+          @import url('something.com/file.css');
+          .user{ h1 {width:0;}
+          @media{width:1;}
+          @keyframes name{from{width:0;}to{width:1;}}}
+          @keyframes empty{}
+          @supports (display: grid) {
+            @media (min-width: 500px){
+              .a::placeholder{color: red;}
+            }
+          }
+          @media (min-width: 500px) {
+            a:read-only{color:red;}
+          }
+        `),
+        middleware([prefixer, stringify, rulesheet(value => stack.push(value))]
+      )
+    )
+    expect(stack).to.deep.equal([
       `@import url('something.com/file.css');`,
       `.user h1{width:0;}`,
       `@media{.user{width:1;}}`,
@@ -13,15 +30,17 @@ describe('Middleware', () => {
       `@keyframes name{from{width:0;}to{width:1;}}`,
       '@-webkit-keyframes empty{}',
       '@keyframes empty{}',
-      '@media (min-width: 500px){.a::-webkit-input-placeholder{color:red;}}',
-      '@media (min-width: 500px){.a::-moz-placeholder{color:red;}}',
-      '@media (min-width: 500px){.a:-ms-input-placeholder{color:red;}}',
-      '@media (min-width: 500px){.a::placeholder{color:red;}}',
+      '@supports (display: grid){@media (min-width: 500px){.a::-webkit-input-placeholder{color:red;}}}',
+      '@supports (display: grid){@media (min-width: 500px){.a::-moz-placeholder{color:red;}}}',
+      '@supports (display: grid){@media (min-width: 500px){.a:-ms-input-placeholder{color:red;}}}',
+      '@supports (display: grid){@media (min-width: 500px){.a::placeholder{color:red;}}}',
+      '@media (min-width: 500px){a:-moz-read-only{color:red;}}',
+      '@media (min-width: 500px){a:read-only{color:red;}}',
     ])
   })
 
   test('namespace', () => {
-  	expect(serialize(compile(`.user{width:0; :global(p,a){width:1;} h1 {width:1; h2:last-child {width:2} h2 h3 {width:3}}}`), middleware([namespace, stringify]))).to.equal([
+    expect(serialize(compile(`.user{width:0; :global(p,a){width:1;} h1 {width:1; h2:last-child {width:2} h2 h3 {width:3}}}`), middleware([namespace, stringify]))).to.equal([
       `.user{width:0;}`, `p,a{width:1;}`, `h1.user.user{width:1;}`, `h1.user h2:last-child.user{width:2;}`, `h1.user h2 h3.user{width:3;}`
     ].join(''))
 

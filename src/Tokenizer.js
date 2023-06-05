@@ -21,12 +21,24 @@ export function node (value, root, parent, type, props, children, length) {
 }
 
 /**
- * @param {object} root
+ * @param {object} element
  * @param {object} props
  * @return {object}
  */
-export function copy (root, props) {
-	return assign(node('', null, null, '', null, null, 0), root, {length: -root.length}, props)
+export function copy (element, props) {
+	return assign(node('', null, null, '', null, null, 0), element, {length: -element.length}, props)
+}
+
+/**
+ * @param {object} element
+ * @param {object} props
+ * @return {object}
+ */
+export function copyrec (element, props) {
+	var root = copy(element, props)
+	while (root.root)
+		root = copy(root.root, {children: [root]})
+	return root
 }
 
 /**
