@@ -28,8 +28,9 @@ export function stringify (element, index, children, callback) {
 		case IMPORT: case DECLARATION: return element.return = element.return || element.value
 		case COMMENT: return ''
 		case KEYFRAMES: return element.return = element.value + '{' + serialize(element.children, callback) + '}'
-		case RULESET: element.value = element.props.join(',')
+		case RULESET: if (element.return === undefined) return element.return = ''
+			element.value = element.props.join(',')
 	}
 
-	return strlen(children = serialize(element.children, callback)) ? element.return = element.value + '{' + children + '}' : ''
+	return strlen(children = serialize(element.children, callback)) && element.value ? element.return = element.value + '{' + children + '}' : ''
 }

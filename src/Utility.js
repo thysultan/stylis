@@ -113,3 +113,12 @@ export function append (value, array) {
 export function combine (array, callback) {
 	return array.map(callback).join('')
 }
+
+/**
+ * @param {string[]} array
+ * @param {RegExp} pattern
+ * @return {string[]}
+ */
+export function filter (array, pattern) {
+	return array.filter(function (value) { return !match(value, pattern) })
+}
