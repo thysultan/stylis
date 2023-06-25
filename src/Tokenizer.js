@@ -14,31 +14,31 @@ export var characters = ''
  * @param {string} type
  * @param {string[] | string} props
  * @param {object[] | string} children
+ * @param {object[]} siblings
  * @param {number} length
  */
-export function node (value, root, parent, type, props, children, length) {
-	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
+export function node (value, root, parent, type, props, children, length, siblings) {
+	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: '', siblings: siblings}
 }
 
 /**
- * @param {object} element
+ * @param {object} root
  * @param {object} props
  * @return {object}
  */
-export function copy (element, props) {
-	return assign(node('', null, null, '', null, null, 0), element, {length: -element.length}, props)
+export function copy (root, props) {
+	return assign(node('', null, null, '', null, null, 0, root.siblings), root, {length: -root.length}, props)
 }
 
 /**
- * @param {object} element
- * @param {object} props
+ * @param {object} root
  * @return {object}
  */
-export function copyrec (element, props) {
-	var root = copy(element, props)
+export function lift (root) {
 	while (root.root)
 		root = copy(root.root, {children: [root]})
-	return root
+
+	return append(root, root.siblings)
 }
 
 /**

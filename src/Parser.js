@@ -64,7 +64,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 			case 47:
 				switch (peek()) {
 					case 42: case 47:
-						append(comment(commenter(next(), caret()), root, parent), declarations)
+						append(comment(commenter(next(), caret()), root, parent, declarations), declarations)
 						break
 					default:
 						characters += '/'
@@ -81,13 +81,13 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 					// ;
 					case 59 + offset: if (ampersand == -1) characters = replace(characters, /\f/g, '')
 						if (property > 0 && (strlen(characters) - length))
-							append(property > 32 ? declaration(characters + ';', rule, parent, length - 1) : declaration(replace(characters, ' ', '') + ';', rule, parent, length - 2), declarations)
+							append(property > 32 ? declaration(characters + ';', rule, parent, length - 1, declarations) : declaration(replace(characters, ' ', '') + ';', rule, parent, length - 2, declarations), declarations)
 						break
 					// @ ;
 					case 59: characters += ';'
 					// { rule/at-rule
 					default:
-						append(reference = ruleset(characters, root, parent, index, offset, rules, points, type, props = [], children = [], length), rulesets)
+						append(reference = ruleset(characters, root, parent, index, offset, rules, points, type, props = [], children = [], length, rulesets), rulesets)
 
 						if (character === 123)
 							if (offset === 0)
@@ -96,7 +96,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 								switch (atrule === 99 && charat(characters, 3) === 110 ? 100 : atrule) {
 									// d l m s
 									case 100: case 108: case 109: case 115:
-										parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length), children), rules, children, length, points, rule ? props : children)
+										parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length, children), children), rules, children, length, points, rule ? props : children)
 										break
 									default:
 										parse(characters, reference, reference, reference, [''], children, 0, points, children)
@@ -154,9 +154,10 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
  * @param {string[]} props
  * @param {string[]} children
  * @param {number} length
+ * @param {object[]} siblings
  * @return {object}
  */
-export function ruleset (value, root, parent, index, offset, rules, points, type, props, children, length) {
+export function ruleset (value, root, parent, index, offset, rules, points, type, props, children, length, siblings) {
 	var post = offset - 1
 	var rule = offset === 0 ? rules : ['']
 	var size = sizeof(rule)
@@ -166,17 +167,18 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, /&\f/g, rule[x])))
 				props[k++] = z
 
-	return node(value, root, parent, offset === 0 ? RULESET : type, props, children, length)
+	return node(value, root, parent, offset === 0 ? RULESET : type, props, children, length, siblings)
 }
 
 /**
  * @param {number} value
  * @param {object} root
  * @param {object?} parent
+ * @param {object[]} siblings
  * @return {object}
  */
-export function comment (value, root, parent) {
-	return node(value, root, parent, COMMENT, from(char()), substr(value, 2, -2), 0)
+export function comment (value, root, parent, siblings) {
+	return node(value, root, parent, COMMENT, from(char()), substr(value, 2, -2), 0, siblings)
 }
 
 /**
@@ -184,8 +186,9 @@ export function comment (value, root, parent) {
  * @param {object} root
  * @param {object?} parent
  * @param {number} length
+ * @param {object[]} siblings
  * @return {object}
  */
-export function declaration (value, root, parent, length) {
-	return node(value, root, parent, DECLARATION, substr(value, 0, length), substr(value, length + 1, -1), length)
+export function declaration (value, root, parent, length, siblings) {
+	return node(value, root, parent, DECLARATION, substr(value, 0, length), substr(value, length + 1, -1), length, siblings)
 }

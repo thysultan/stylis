@@ -1,5 +1,5 @@
 import {IMPORT, LAYER, COMMENT, RULESET, DECLARATION, KEYFRAMES} from './Enum.js'
-import {strlen, sizeof} from './Utility.js'
+import {strlen} from './Utility.js'
 
 /**
  * @param {object[]} children
@@ -8,9 +8,8 @@ import {strlen, sizeof} from './Utility.js'
  */
 export function serialize (children, callback) {
 	var output = ''
-	var length = sizeof(children)
 
-	for (var i = 0; i < length; i++)
+	for (var i = 0; i < children.length; i++)
 		output += callback(children[i], i, children, callback) || ''
 
 	return output
