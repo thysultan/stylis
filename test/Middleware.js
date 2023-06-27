@@ -3,8 +3,8 @@ import {compile, serialize, stringify, middleware, rulesheet, prefixer, namespac
 const stack = []
 
 describe('Middleware', () => {
-	test('rulesheet', () => {
-  	serialize(compile(`
+  test('rulesheet', () => {
+    serialize(compile(`
       @import url('something.com/file.css');
       .user{ h1 {width:0;}
       @media{width:1;}
@@ -19,7 +19,7 @@ describe('Middleware', () => {
         a:read-only{color:red;}
       }
     `), middleware([prefixer, stringify, rulesheet(value => stack.push(value))]))
-  	expect(stack).to.deep.equal([
+    expect(stack).to.deep.equal([
       `@import url('something.com/file.css');`,
       `.user h1{width:0;}`,
       `@media{.user{width:1;}}`,
@@ -37,7 +37,7 @@ describe('Middleware', () => {
   })
 
   test('namespace', () => {
-  	expect(serialize(compile(`.user{width:0; :global(p,a){width:1;} h1 {width:1; h2:last-child {width:2} h2 h3 {width:3}}}`), middleware([namespace, stringify]))).to.equal([
+    expect(serialize(compile(`.user{width:0; :global(p,a){width:1;} h1 {width:1; h2:last-child {width:2} h2 h3 {width:3}}}`), middleware([namespace, stringify]))).to.equal([
       `.user{width:0;}`, `p,a{width:1;}`, `h1.user.user{width:1;}`, `h1.user h2:last-child.user{width:2;}`, `h1.user h2 h3.user{width:3;}`
     ].join(''))
 
