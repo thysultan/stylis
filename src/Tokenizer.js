@@ -14,10 +14,11 @@ export var characters = ''
  * @param {string} type
  * @param {string[] | string} props
  * @param {object[] | string} children
+ * @param {object[]} siblings
  * @param {number} length
  */
-export function node (value, root, parent, type, props, children, length) {
-	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: ''}
+export function node (value, root, parent, type, props, children, length, siblings) {
+	return {value: value, root: root, parent: parent, type: type, props: props, children: children, line: line, column: column, length: length, return: '', siblings: siblings}
 }
 
 /**
@@ -26,7 +27,17 @@ export function node (value, root, parent, type, props, children, length) {
  * @return {object}
  */
 export function copy (root, props) {
-	return assign(node('', null, null, '', null, null, 0), root, {length: -root.length}, props)
+	return assign(node('', null, null, '', null, null, 0, root.siblings), root, {length: -root.length}, props)
+}
+
+/**
+ * @param {object} root
+ */
+export function lift (root) {
+	while (root.root)
+		root = copy(root.root, {children: [root]})
+
+	append(root, root.siblings)
 }
 
 /**

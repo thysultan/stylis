@@ -1,6 +1,6 @@
 import {MS, MOZ, WEBKIT, RULESET, KEYFRAMES, DECLARATION} from './Enum.js'
-import {match, charat, substr, strlen, sizeof, replace, combine} from './Utility.js'
-import {copy, tokenize} from './Tokenizer.js'
+import {match, charat, substr, strlen, sizeof, replace, combine, filter, assign} from './Utility.js'
+import {copy, lift, tokenize} from './Tokenizer.js'
 import {serialize} from './Serializer.js'
 import {prefix} from './Prefixer.js'
 
@@ -49,18 +49,22 @@ export function prefixer (element, index, children, callback) {
 					return serialize([copy(element, {value: replace(element.value, '@', '@' + WEBKIT)})], callback)
 				case RULESET:
 					if (element.length)
-						return combine(element.props, function (value) {
-							switch (match(value, /(::plac\w+|:read-\w+)/)) {
+						return combine(children = element.props, function (value) {
+							switch (match(value, callback = /(::plac\w+|:read-\w+)/)) {
 								// :read-(only|write)
 								case ':read-only': case ':read-write':
-									return serialize([copy(element, {props: [replace(value, /:(read-\w+)/, ':' + MOZ + '$1')]})], callback)
+									lift(copy(element, {props: [replace(value, /:(read-\w+)/, ':' + MOZ + '$1')]}))
+									lift(copy(element, {props: [value]}))
+									assign(element, {props: filter(children, callback)})
+									break
 								// :placeholder
 								case '::placeholder':
-									return serialize([
-										copy(element, {props: [replace(value, /:(plac\w+)/, ':' + WEBKIT + 'input-$1')]}),
-										copy(element, {props: [replace(value, /:(plac\w+)/, ':' + MOZ + '$1')]}),
-										copy(element, {props: [replace(value, /:(plac\w+)/, MS + 'input-$1')]})
-									], callback)
+									lift(copy(element, {props: [replace(value, /:(plac\w+)/, ':' + WEBKIT + 'input-$1')]}))
+									lift(copy(element, {props: [replace(value, /:(plac\w+)/, ':' + MOZ + '$1')]}))
+									lift(copy(element, {props: [replace(value, /:(plac\w+)/, MS + 'input-$1')]}))
+									lift(copy(element, {props: [value]}))
+									assign(element, {props: filter(children, callback)})
+									break
 							}
 
 							return ''
