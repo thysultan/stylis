@@ -37,7 +37,7 @@ export function lift (root) {
 	while (root.root)
 		root = copy(root.root, {children: [root]})
 
-	append(root, root.siblings)
+	append(root ?? [], root?.siblings ?? [])
 }
 
 /**
