@@ -7,7 +7,7 @@ A Light–weight CSS Preprocessor.
 [![Coverage](https://coveralls.io/repos/github/thysultan/stylis.js/badge.svg?branch=master)](https://coveralls.io/github/thysultan/stylis.js)
 [![Size](https://badgen.net/bundlephobia/minzip/stylis)](https://bundlephobia.com/result?p=stylis)
 [![Licence](https://badgen.net/badge/license/MIT/blue)](https://github.com/thysultan/stylis.js/blob/master/LICENSE)
-[![NPM](https://badgen.net/npm/v/dyo)](https://www.npmjs.com/package/stylis)
+[![NPM](https://badgen.net/npm/v/stylis)](https://www.npmjs.com/package/stylis)
 
 ## Installation
 
