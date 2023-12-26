@@ -43,7 +43,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 		switch (previous = character, character = next()) {
 			// (
 			case 40:
-				if (charat(characters, length - 1) == 58) {
+				if (previous != 108 && charat(characters, length - 1) == 58) {
 					if (indexof(characters += replace(delimit(character), '&', '&\f'), '&\f', abs(index ? points[index - 1] : 0)) != -1)
 						ampersand = -1
 					break
