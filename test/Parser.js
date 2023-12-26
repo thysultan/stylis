@@ -873,6 +873,15 @@ describe('Parser', () => {
     ].join(''))
   })
 
+  test('context character IX', () => {
+    expect(
+      stylis(`background: url(i&m&g.png);.a {background: url(i&m&g.png);}`)
+    ).to.equal([
+      `.user{background:url(i&m&g.png);}`,
+      `.user .a{background:url(i&m&g.png);}`
+    ].join(''))
+  })
+
   test('`--` in an identifier (#220)', () => {
     expect(
       stylis(`
