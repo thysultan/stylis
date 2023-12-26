@@ -87,7 +87,7 @@ export function prefix (value, length, children) {
 		// grid-(row|column)-start
 		case 4384: case 3616:
 			if (children && children.some(function (element, index) { return length = index, match(element.props, /grid-\w+-end/) })) {
-				return ~indexof(value + (children = children[length].value), 'span') ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span') ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
+				return ~indexof(value + (children = children[length].value), 'span', 0) ? value : (MS + replace(value, '-start', '') + value + MS + 'grid-row-span:' + (~indexof(children, 'span', 0) ? match(children, /\d+/) : +match(children, /\d+/) - +match(value, /\d+/)) + ';')
 			}
 			return MS + replace(value, '-start', '') + value
 		// grid-(row|column)-end
@@ -113,7 +113,7 @@ export function prefix (value, length, children) {
 						return replace(value, /(.+:)(.+)-([^]+)/, '$1' + WEBKIT + '$2-$3' + '$1' + MOZ + (charat(value, length + 3) == 108 ? '$3' : '$2-$3')) + value
 					// (s)tretch
 					case 115:
-						return ~indexof(value, 'stretch') ? prefix(replace(value, 'stretch', 'fill-available'), length, children) + value : value
+						return ~indexof(value, 'stretch', 0) ? prefix(replace(value, 'stretch', 'fill-available'), length, children) + value : value
 				}
 			break
 		// grid-(column|row)
