@@ -142,6 +142,21 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
+  test('& in first selector within a comma-separated list', () => {
+    expect(
+      stylis(`
+        div {
+          display: flex;
+
+          &.foo,
+          p:not(:last-child) {
+            background: red;
+          }
+        }
+      `)
+    ).to.equal(`.user div{display:flex;}.user div.foo,.user div p:not(:last-child){background:red;}`)
+  });
+
   test('escaped chars in selector identifiers', () => {
     expect(
       stylis(`
@@ -855,6 +870,15 @@ describe('Parser', () => {
     ).to.equal([
       `.user{background:url[img}.png];}`,
       `.user .a{background:url[img}.png];}`
+    ].join(''))
+  })
+
+  test('context character IX', () => {
+    expect(
+      stylis(`background: url(i&m&g.png);.a {background: url(i&m&g.png);}`)
+    ).to.equal([
+      `.user{background:url(i&m&g.png);}`,
+      `.user .a{background:url(i&m&g.png);}`
     ].join(''))
   })
 
