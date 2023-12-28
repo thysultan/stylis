@@ -69,6 +69,7 @@ div {
 					// formatting
 					default:
 						value = serialize(compile(`[namespace]{${value.target.textContent}}`), middleware([prefixer, stringify]))
+						value = value.replace(/</g, '&lt;').replace(/>/g, '&gt;')
 						value = value.replace(/(;|\})/g, (match, group) => group + (group === '}' ? '\n\n' : '\n'))
 						value = value.replace(/(.*?)\{/g, (match, group) => '<span class=selector>' + group.trim() + '</span> {\n')
 						value = value.replace(/:(.*);/g, (match, group) => ': <span class=value>' + group.trim() + '</span>;')
