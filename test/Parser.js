@@ -1,6 +1,6 @@
 import {compile, serialize, stringify} from "../index.js"
 
-const stylis = string => serialize(compile(`.user{${string}}`), stringify)
+const stylis = (declarations, selectors = '.user') => serialize(compile(`${selectors}{${declarations}}`), stringify)
 
 describe('Parser', () => {
   test('unnested', () => {
@@ -140,6 +140,22 @@ describe('Parser', () => {
         }
      `)
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
+  })
+
+  test('& no-op', () => {
+    expect(
+      stylis(`
+        color:red;
+     `, '&')
+    ).to.equal(`&{color:red;}`)
+  })
+
+  test('noop removal of empty variables', () => {
+    expect(
+      stylis(`
+        --tw-brightness:/*!*/;
+     `, '&')
+    ).to.equal(`&{--tw-brightness:;}`)
   })
 
   test('& in first selector within a comma-separated list', () => {
