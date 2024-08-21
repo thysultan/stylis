@@ -76,7 +76,7 @@ export function prefix (value, length, children) {
 			return replace(value, /(image-set\([^]*)/, WEBKIT + '$1' + '$`$1')
 		// justify-content
 		case 4968:
-			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /s.+-b[^;]+/, 'justify') + WEBKIT + value + value
+			return replace(replace(value, /(.+:)(flex-)?(.*)/, WEBKIT + 'box-pack:$3' + MS + 'flex-pack:$3'), /space-between/, 'justify') + WEBKIT + value + value
 		// justify-self
 		case 4200:
 			if (!match(value, /flex-|baseline/)) return MS + 'grid-column-align' + substr(value, length) + value
