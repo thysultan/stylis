@@ -164,7 +164,7 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 
 	for (var i = 0, j = 0, k = 0; i < index; ++i)
 		for (var x = 0, y = substr(value, post + 1, post = abs(j = points[i])), z = value; x < size; ++x)
-			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, /&\f/g, rule[x])))
+			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, parent ? /&\f/g : /\f/g, rule[x])))
 				props[k++] = z
 
 	return node(value, root, parent, offset === 0 ? RULESET : type, props, children, length, siblings)
