@@ -142,20 +142,28 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
-  test('& no-op', () => {
+  test('& root should be removed', () => {
     expect(
       stylis(`
         color:red;
      `, '&')
-    ).to.equal(`&{color:red;}`)
+    ).to.equal(``)
+  })
+
+  test('& root should be removed, issue: #333', () => {
+    expect(
+      stylis(`
+        color: red;
+     `, ':where(.cls)& span')
+    ).to.equal(`:where(.cls) span{color:red;}`)
   })
 
   test('noop removal of empty variables', () => {
     expect(
       stylis(`
         --tw-brightness:/*!*/;
-     `, '&')
-    ).to.equal(`&{--tw-brightness:;}`)
+     `)
+    ).to.equal(`.user{--tw-brightness:;}`)
   })
 
   test('& in first selector within a comma-separated list', () => {

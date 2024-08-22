@@ -1,6 +1,6 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
 import {abs, charat, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
-import {node, char, prev, next, peek, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
+import {node, char, prev, next, peek, token, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
 
 /**
  * @param {string} value
@@ -65,6 +65,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 				switch (peek()) {
 					case 42: case 47:
 						append(comment(commenter(next(), caret()), root, parent, declarations), declarations)
+						if ((token(previous || 1) == 5 || token(peek() || 1) == 5) && strlen(characters) && substr(characters, -1, void 0) !== ' ') characters += ' '
 						break
 					default:
 						characters += '/'
@@ -80,7 +81,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 					case 0: case 125: scanning = 0
 					// ;
 					case 59 + offset: if (ampersand == -1) characters = replace(characters, /\f/g, '')
-						if (property > 0 && (strlen(characters) - length || (variable == 0 && previous == 47)))
+						if (property > 0 && (strlen(characters) - length || (variable === 0 && previous === 47)))
 							append(property > 32 ? declaration(characters + ';', rule, parent, length - 1, declarations) : declaration(replace(characters, ' ', '') + ';', rule, parent, length - 2, declarations), declarations)
 						break
 					// @ ;
@@ -164,7 +165,7 @@ export function ruleset (value, root, parent, index, offset, rules, points, type
 
 	for (var i = 0, j = 0, k = 0; i < index; ++i)
 		for (var x = 0, y = substr(value, post + 1, post = abs(j = points[i])), z = value; x < size; ++x)
-			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, parent ? /&\f/g : /\f/g, rule[x])))
+			if (z = trim(j > 0 ? rule[x] + ' ' + y : replace(y, /&\f/g, rule[x])))
 				props[k++] = z
 
 	return node(value, root, parent, offset === 0 ? RULESET : type, props, children, length, siblings)
