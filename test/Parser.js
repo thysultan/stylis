@@ -1259,5 +1259,11 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`@layer framework{@keyframes slide-left{from{margin-left:0;}to{margin-left:-100%;}}}`);
+
+  });
+
+  test('cascade @layer: empty braces', () => {
+    // `@layer base {}` should be parsed as `@layer base{}`. 
+    expect(stylis('', '@layer base')).to.equal(`@layer base{}`);
   });
 })
