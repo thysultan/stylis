@@ -68,6 +68,12 @@ describe('Parser', () => {
             margin-right: 1cm;
           }
           width: none;
+          @right-bottom {
+            content: "Content";
+          }
+          @left-bottom {
+            content: "Content";
+          }
         }
       `)
     ).to.equal([
@@ -79,7 +85,7 @@ describe('Parser', () => {
       `@viewport{min-width:640px;max-width:800px;}`,
       `@counter-style list{system:fixed;symbols:url();suffix:" ";}`,
       `@-moz-document url-prefix(){.user .selector{color:lime;}}`,
-      `@page{color:red;@bottom-right{content:counter(pages);margin-right:1cm;}width:none;}`
+      `@page{color:red;@bottom-right{content:counter(pages);margin-right:1cm;}width:none;@right-bottom{content:"Content";}@left-bottom{content:"Content";}}`
     ].join(''))
   })
 
