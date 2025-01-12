@@ -97,16 +97,14 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 								switch (atrule) {
 									// c(ontainer)
 									case 99:
-										if (charat(characters, 3) !== 110) offset = 0
-										break
+										if (charat(characters, 3) === 110) break
 									// l(ayer)
 									case 108:
-										if (charat(characters, 2) !== 97) offset = 0
-										break
+										if (charat(characters, 2) === 97) break
+									default:
+										offset = 0
 									// d(ocument) m(edia) s(upports)
 									case 100: case 109: case 115:
-										break
-									default: offset = 0
 								}
 								if (offset) parse(value, reference, reference, rule && append(ruleset(value, reference, reference, 0, 0, rules, points, type, rules, props = [], length, children), children), rules, children, length, points, rule ? props : children)
 								else parse(characters, reference, reference, reference, [''], children, 0, points, children)
