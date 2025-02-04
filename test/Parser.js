@@ -346,6 +346,30 @@ describe('Parser', () => {
     expect(stylis(`@import url('http://example.com');`)).to.equal(`@import url('http://example.com');`)
   })
 
+  test('@namespace', () => {
+    expect(
+      stylis(`
+        @namespace svg url('http://www.w3.org/2000/svg');
+
+        a {
+          color: orangered;
+          text-decoration: underline dashed;
+          font-weight: bold;
+        }
+
+        svg|a {
+          fill: blueviolet;
+          text-decoration: underline solid;
+          text-transform: uppercase;
+        }
+      `)
+    ).to.equal([
+      `@namespace svg url('http://www.w3.org/2000/svg');`,
+      `.user a{color:orangered;text-decoration:underline dashed;font-weight:bold;}`,
+      `.user svg|a{fill:blueviolet;text-decoration:underline solid;text-transform:uppercase;}`
+    ].join(''))
+  })
+
   test('@supports', () => {
     expect(
       stylis(`
