@@ -83,6 +83,7 @@ describe('Prefixer', () => {
 
 	test('text', () => {
 		expect(prefix(`text-align:left;`, 10)).to.equal([`text-align:left;`].join(''))
+		expect(prefix(`text-align:match-parent;`, 10)).to.equal([`text-align:-webkit-match-parent;`, `text-align:match-parent;`].join(''))
 		expect(prefix(`text-transform:none;`, 14)).to.equal([`text-transform:none;`].join(''))
 		expect(prefix(`text-shadow:none;`, 11)).to.equal([`text-shadow:none;`].join(''))
 		expect(prefix(`text-size-adjust:none;`, 16)).to.equal([`-webkit-text-size-adjust:none;`, `-moz-text-size-adjust:none;`, `-ms-text-size-adjust:none;`, `text-size-adjust:none;`].join(''))
