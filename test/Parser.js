@@ -148,6 +148,26 @@ describe('Parser', () => {
     ).to.equal(`.user [href="https://css-tricks.com?a=1&b=2"]{color:red;}`)
   })
 
+  test('multiple & references inside selector pseudo functions (#350)', () => {
+    expect(
+      stylis(`
+        :is(&:hover, .other:hover &, [href="a&b"]) .target {
+          color:red;
+        }
+        :where(&:focus, .other:focus &) .target {
+          color:blue;
+        }
+        :has(> &, + &) {
+          color:green;
+        }
+     `, '.parent .child')
+    ).to.equal([
+      `:is(.parent .child:hover, .other:hover .parent .child, [href="a&b"]) .target{color:red;}`,
+      `:where(.parent .child:focus, .other:focus .parent .child) .target{color:blue;}`,
+      `:has(> .parent .child, + .parent .child){color:green;}`
+    ].join(''))
+  })
+
   test('& root should be removed', () => {
     expect(
       stylis(`
@@ -677,6 +697,14 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`h1:matches(.user,[href="https://css-tricks.com?a=1&b=2"]){display:none;}`)
+
+    expect(
+      stylis(`
+        h1:matches([href="https://css-tricks.com?a=1&b=2"], &) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches([href="https://css-tricks.com?a=1&b=2"], .user){display:none;}`)
   })
 
   test('@keyframes', () => {
@@ -1083,6 +1111,7 @@ describe('Parser', () => {
         --cdo-at-top-level: <!--;
         --cdc-at-top-level: -->;
         --semicolon-not-top-level: (;);
+        --curly-not-top-level: foo({bar});
         --cdo-not-top-level: (<!--);
         --cdc-not-top-level: (-->);
         --ampersand-preserved: foo & bar;
@@ -1094,6 +1123,7 @@ describe('Parser', () => {
       `--cdo-at-top-level:<!--;`,
       `--cdc-at-top-level:-->;`,
       `--semicolon-not-top-level:(;);`,
+      `--curly-not-top-level:foo({bar});`,
       `--cdo-not-top-level:(<!--);`,
       `--cdc-not-top-level:(-->);`,
       `--ampersand-preserved:foo & bar;`

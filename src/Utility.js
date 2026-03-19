@@ -55,11 +55,10 @@ export function replace (value, pattern, replacement) {
 /**
  * @param {string} value
  * @param {string} search
- * @param {number} position
  * @return {number}
  */
-export function indexof (value, search, position) {
-	return value.indexOf(search, position)
+export function indexof (value, search) {
+	return value.indexOf(search)
 }
 
 /**

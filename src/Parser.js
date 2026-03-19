@@ -1,5 +1,5 @@
 import {COMMENT, RULESET, DECLARATION} from './Enum.js'
-import {abs, charat, trim, from, sizeof, strlen, substr, append, replace, indexof} from './Utility.js'
+import {abs, charat, trim, from, sizeof, strlen, substr, append, replace} from './Utility.js'
 import {node, char, prev, next, peek, token, caret, alloc, dealloc, delimit, whitespace, escaping, identifier, commenter} from './Tokenizer.js'
 
 /**
@@ -32,6 +32,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 	var variable = 1
 	var scanning = 1
 	var ampersand = 1
+	var parens = 0
 	var character = 0
 	var type = ''
 	var props = rules
@@ -43,17 +44,23 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 		switch (previous = character, character = next()) {
 			// (
 			case 40:
-				if (previous != 108 && charat(characters, length - 1) == 58) {
-					if (indexof(characters += replace(delimit(character), '&', '&\f'), '&\f', abs(index ? points[index - 1] : 0)) != -1)
-						ampersand = -1
-					break
-				}
+				if (previous != 108 && charat(characters, length - 1) == 58) parens++, characters += '('
+				else characters += delimit(character)
+				break
+			// )
+			case 41:
+				parens--, characters += ')'
+				break
 			// " ' [
 			case 34: case 39: case 91:
 				characters += delimit(character)
 				break
 			// \t \n \r \s
 			case 9: case 10: case 13: case 32:
+				if (parens > 0) {
+					characters += from(character)
+					break
+				}
 				characters += whitespace(previous)
 				break
 			// \
@@ -76,6 +83,10 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 				points[index++] = strlen(characters) * ampersand
 			// } ; \0
 			case 125 * variable: case 59: case 0:
+				if (parens > 0 && character) {
+					characters += from(character)
+					break
+				}
 				switch (character) {
 					// \0 }
 					case 0: case 125: scanning = 0
@@ -130,6 +141,7 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 						break
 					// ,
 					case 44:
+						if (parens > 0) break
 						points[index++] = (strlen(characters) - 1) * ampersand, ampersand = 1
 						break
 					// @
