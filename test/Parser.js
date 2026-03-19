@@ -170,6 +170,33 @@ describe('Parser', () => {
         --tw-brightness:/*!*/;
      `)
     ).to.equal(`.user{--tw-brightness:;}`)
+
+    expect(
+      stylis(`
+        --x:;
+        --y: ;
+      `)
+    ).to.equal(`.user{--x:;--y:;}`)
+
+    expect(
+      serialize(compile(`@keyframes foo{from{--x:red;}to{--x:;}}`), stringify)
+    ).to.equal(`@keyframes foo{from{--x:red;}to{--x:;}}`)
+
+    expect(
+      serialize(compile(`@keyframes foo{from{--x:red;}to{--x: ;}}`), stringify)
+    ).to.equal(`@keyframes foo{from{--x:red;}to{--x:;}}`)
+
+    expect(
+      stylis(`
+        .box { transform: translateX(20px) var(--extra-transform); }
+        .on { --extra-transform: scale(1.2); }
+        .off { --extra-transform: ; }
+      `)
+    ).to.equal([
+      `.user .box{transform:translateX(20px) var(--extra-transform);}`,
+      `.user .on{--extra-transform:scale(1.2);}`,
+      `.user .off{--extra-transform:;}`
+    ].join(''))
   })
 
   test('& in first selector within a comma-separated list', () => {
