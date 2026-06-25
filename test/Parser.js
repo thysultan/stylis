@@ -184,6 +184,15 @@ describe('Parser', () => {
     ).to.equal(`:where(.cls) span{color:red;}`)
   })
 
+  test('& root inside functional pseudo should be removed', () => {
+    expect(serialize(compile(`:is(&, .c){color:red}`), stringify)).to.equal(`:is(.c){color:red;}`)
+    expect(serialize(compile(`:is(.c, &){color:red}`), stringify)).to.equal(`:is(.c){color:red;}`)
+    expect(serialize(compile(`:is(.a, &, .b){color:red}`), stringify)).to.equal(`:is(.a, .b){color:red;}`)
+    expect(serialize(compile(`:is(&){color:red}`), stringify)).to.equal(`:is(){color:red;}`)
+    expect(serialize(compile(`:where(&){color:red}`), stringify)).to.equal(`:where(){color:red;}`)
+    expect(serialize(compile(`:not(&){color:red}`), stringify)).to.equal(`:not(){color:red;}`)
+  })
+
   test('noop removal of empty variables', () => {
     expect(
       stylis(`
