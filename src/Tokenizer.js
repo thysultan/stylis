@@ -156,14 +156,20 @@ export function tokenize (value) {
 
 /**
  * @param {number} type
+ * @param {number} parens
  * @return {string}
  */
-export function whitespace (type) {
+export function whitespace (type, parens) {
 	while (character = peek())
 		if (character < 33)
 			next()
 		else
 			break
+
+	// inside ( ) whitespace can be required, e.g. `calc(1px + 2px)` or `:is(.a .b)`, so it
+	// is only dropped next to 40 ( or 44 , before it and 41 ) or 44 , after it
+	if (parens > 0)
+		return type === 40 || type === 44 || character === 41 || character === 44 ? '' : ' '
 
 	return token(type) > 2 || token(character) > 3 ? '' : ' '
 }
