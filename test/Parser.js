@@ -24,7 +24,38 @@ describe('Parser', () => {
           1px
         );
      `)
-    ).to.equal(`.user{height:calc( 100vh - 1px );height:calc(\n      100vh -\n          1px\n        );}`)
+    ).to.equal(`.user{height:calc(100vh - 1px);height:calc(100vh - 1px);}`)
+  })
+
+  test('minify whitespace inside functions (#306)', () => {
+    expect(
+      stylis(`
+        background:repeating-linear-gradient(
+          -45deg,
+          red,
+          red 5px,
+          blue 5px,
+          blue 10px
+        );
+     `)
+    ).to.equal(`.user{background:repeating-linear-gradient(-45deg,red,red 5px,blue 5px,blue 10px);}`)
+
+    expect(stylis(`color:rgba(0, 0, 0, .5);`)).to.equal(`.user{color:rgba(0,0,0,.5);}`)
+    expect(stylis(`grid-template-columns:repeat(auto-fill, minmax(\n100px,\n1fr\n));`)).to.equal(`.user{grid-template-columns:repeat(auto-fill,minmax(100px,1fr));}`)
+    expect(stylis(`transform:translate(\n10px,\n20px\n) rotate(3deg);`)).to.equal(`.user{transform:translate(10px,20px) rotate(3deg);}`)
+    expect(stylis(`--x:linear-gradient(\n  red,\n  blue\n);`)).to.equal(`.user{--x:linear-gradient(red,blue);}`)
+  })
+
+  test('preserve significant whitespace inside functions (#306)', () => {
+    // whitespace around math operators is required, `calc(1px+2px)` is invalid
+    expect(stylis(`width:calc(1px + 2px);`)).to.equal(`.user{width:calc(1px + 2px);}`)
+    expect(stylis(`width:calc(\n  100%\n  -\n  10px\n);`)).to.equal(`.user{width:calc(100% - 10px);}`)
+    expect(stylis(`width:calc(calc(1px + 2px) * 3);`)).to.equal(`.user{width:calc(calc(1px + 2px) * 3);}`)
+    // a descendant combinator inside a functional pseudo-class is significant
+    expect(stylis(`color:red;`, `.user:is(.a .b)`)).to.equal(`.user:is(.a .b){color:red;}`)
+    // whitespace after a token that is appended wholesale, e.g. url(...) or a string
+    expect(stylis(`background:image-set(url(a.png) 1x, url(b.png) 2x);`)).to.equal(`.user{background:image-set(url(a.png) 1x,url(b.png) 2x);}`)
+    expect(stylis(`background:image-set("a  b.png" 1x);`)).to.equal(`.user{background:image-set("a  b.png" 1x);}`)
   })
 
   test('at-rules', () => {
@@ -135,7 +166,7 @@ describe('Parser', () => {
       stylis(`
         background-image: image-set(url(${urlOneX}) 1x, url(${urlTwoX}) 2x);
      `)
-    ).to.equal(`.user{background-image:image-set(url(${urlOneX}) 1x, url(${urlTwoX}) 2x);}`)
+    ).to.equal(`.user{background-image:image-set(url(${urlOneX}) 1x,url(${urlTwoX}) 2x);}`)
   })
 
   test('& in a string', () => {
@@ -162,9 +193,9 @@ describe('Parser', () => {
         }
      `, '.parent .child')
     ).to.equal([
-      `:is(.parent .child:hover, .other:hover .parent .child, [href="a&b"]) .target{color:red;}`,
-      `:where(.parent .child:focus, .other:focus .parent .child) .target{color:blue;}`,
-      `:has(> .parent .child, + .parent .child){color:green;}`
+      `:is(.parent .child:hover,.other:hover .parent .child,[href="a&b"]) .target{color:red;}`,
+      `:where(.parent .child:focus,.other:focus .parent .child) .target{color:blue;}`,
+      `:has(> .parent .child,+ .parent .child){color:green;}`
     ].join(''))
   })
 
@@ -731,7 +762,7 @@ describe('Parser', () => {
           display: none
         }
       `)
-    ).to.equal(`h1:matches([href="https://css-tricks.com?a=1&b=2"], .user){display:none;}`)
+    ).to.equal(`h1:matches([href="https://css-tricks.com?a=1&b=2"],.user){display:none;}`)
   })
 
   test('@keyframes', () => {
@@ -830,7 +861,7 @@ describe('Parser', () => {
           linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),
           url(/static/background.svg);
       }
-     `)).to.equal(`.user html{background:linear-gradient(0deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)),url(/static/background.svg);}`)
+     `)).to.equal(`.user html{background:linear-gradient(0deg,rgba(255,255,255,0.8),rgba(255,255,255,0.8)),url(/static/background.svg);}`)
   })
 
   test('nesting selector multiple levels', () => {

@@ -57,11 +57,9 @@ export function parse (value, root, parent, rule, rules, rulesets, pseudo, point
 				break
 			// \t \n \r \s
 			case 9: case 10: case 13: case 32:
-				if (parens > 0) {
-					characters += from(character)
-					break
-				}
-				characters += whitespace(previous)
+				// inside ( ) the emitted character is used instead of the consumed one, tokens
+				// such as url(...) are appended wholesale so `previous` does not reflect them
+				characters += whitespace(parens > 0 ? charat(characters, strlen(characters) - 1) : previous, parens)
 				break
 			// \
 			case 92:
