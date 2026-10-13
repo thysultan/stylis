@@ -23,7 +23,7 @@ export function prefix (value, length, children) {
 			return WEBKIT + value + value
 		// mask-composite
 		case 4855:
-			return WEBKIT + value.replace('add', 'source-over').replace('substract', 'source-out').replace('intersect', 'source-in').replace('exclude', 'xor') + value
+			return WEBKIT + value.replace('add', 'source-over').replace('subtract', 'source-out').replace('intersect', 'source-in').replace('exclude', 'xor') + value
 		// tab-size
 		case 4789:
 			return MOZ + value + value

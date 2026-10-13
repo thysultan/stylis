@@ -3,6 +3,18 @@ import {compile, serialize, stringify, middleware, prefixer, prefix} from "../in
 const globalCssValues = ['inherit', 'initial', 'unset', 'revert', 'revert-layer']
 
 describe('Prefixer', () => {
+	test('mask-composite subtract', () => {
+		expect(prefix('mask-composite:subtract;', 14)).to.equal('-webkit-mask-composite:source-out;mask-composite:subtract;')
+	})
+
+	test('mask-composite subtract in a stylesheet', () => {
+		expect(serialize(compile('a{mask-composite:subtract}'), middleware([prefixer, stringify]))).to.equal('a{-webkit-mask-composite:source-out;mask-composite:subtract;}')
+	})
+
+	test('does not turn a misspelled mask-composite value into a valid operation', () => {
+		expect(prefix('mask-composite:substract;', 14)).to.equal('-webkit-mask-composite:substract;mask-composite:substract;')
+	})
+
 	test('flex-box', () => {
 		globalCssValues.concat(['block', 'inline', 'inline-block', 'flow-root', 'none', 'contents', 'table', 'table-row', 'list-item']).forEach(v => expect(prefix(`display:${v};`, 7)).to.equal([`display:${v};`].join()))
 
